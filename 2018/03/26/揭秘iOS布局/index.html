@@ -5,14 +5,23 @@
   
 
   
-  <title>Hexo</title>
+  <title>揭秘iOS布局 | Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="Hexo">
-<meta property="og:url" content="http://yoursite.com/index.html">
+  <meta name="description" content="#解开神秘的iOS布局 翻译自: Demystifying iOS Layout 在你刚开始开发iOS应用时,最难避免或者说最难调试的是处理视图的布局和内容;通常这些事情的发生是因为对 view updates 真实发生存在误解;了解 view updates 的方式和时间需要更深入地了解iOS应用程序的主运行循环,以及它如何与UIView提供的某些方法关联;这篇博文将解释这些互动,希望澄清如何使">
+<meta name="keywords" content="iOS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="揭秘iOS布局">
+<meta property="og:url" content="http://yoursite.com/2018/03/26/揭秘iOS布局/index.html">
 <meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="#解开神秘的iOS布局 翻译自: Demystifying iOS Layout 在你刚开始开发iOS应用时,最难避免或者说最难调试的是处理视图的布局和内容;通常这些事情的发生是因为对 view updates 真实发生存在误解;了解 view updates 的方式和时间需要更深入地了解iOS应用程序的主运行循环,以及它如何与UIView提供的某些方法关联;这篇博文将解释这些互动,希望澄清如何使">
+<meta property="og:image" content="http://tech.gc.com/images/demystifying-ios-layout/main_event_loop.jpg">
+<meta property="og:image" content="http://tech.gc.com/images/demystifying-ios-layout/tech-blog-loop.png">
+<meta property="og:image" content="http://tech.gc.com/images/demystifying-ios-layout/update_cycle.png">
+<meta property="og:updated_time" content="2018-03-26T04:03:09.843Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Hexo">
+<meta name="twitter:title" content="揭秘iOS布局">
+<meta name="twitter:description" content="#解开神秘的iOS布局 翻译自: Demystifying iOS Layout 在你刚开始开发iOS应用时,最难避免或者说最难调试的是处理视图的布局和内容;通常这些事情的发生是因为对 view updates 真实发生存在误解;了解 view updates 的方式和时间需要更深入地了解iOS应用程序的主运行循环,以及它如何与UIView提供的某些方法关联;这篇博文将解释这些互动,希望澄清如何使">
+<meta name="twitter:image" content="http://tech.gc.com/images/demystifying-ios-layout/main_event_loop.jpg">
   
     <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
   
@@ -59,9 +68,7 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main">
-  
-    <article id="post-揭秘iOS布局" class="article article-type-post" itemscope itemprop="blogPost">
+        <section id="main"><article id="post-揭秘iOS布局" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/03/26/揭秘iOS布局/" class="article-date">
   <time datetime="2018-03-26T04:01:28.000Z" itemprop="datePublished">2018-03-26</time>
@@ -74,8 +81,8 @@
       <header class="article-header">
         
   
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/03/26/揭秘iOS布局/">揭秘iOS布局</a>
+    <h1 class="article-title" itemprop="name">
+      揭秘iOS布局
     </h1>
   
 
@@ -173,56 +180,19 @@
     </footer>
   </div>
   
-</article>
-
-
+    
+<nav id="article-nav">
   
-    <article id="post-hello-world" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/03/26/hello-world/" class="article-date">
-  <time datetime="2018-03-26T03:29:50.821Z" itemprop="datePublished">2018-03-26</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
   
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/03/26/hello-world/">Hello World</a>
-    </h1>
+    <a href="/2018/03/26/hello-world/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Älter</strong>
+      <div class="article-nav-title">Hello World</div>
+    </a>
   
+</nav>
 
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="noopener">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="noopener">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="noopener">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="noopener">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="noopener">Deployment</a></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/03/26/hello-world/" data-id="cjf7pji6v0000m6s6m542kz95" class="article-share-link">Teilen</a>
-      
-      
-    </footer>
-  </div>
   
 </article>
-
-
-  
-
 
 </section>
         
