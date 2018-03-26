@@ -7,20 +7,20 @@
   
   <title>揭秘iOS布局 | Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="#解开神秘的iOS布局 翻译自: Demystifying iOS Layout 在你刚开始开发iOS应用时,最难避免或者说最难调试的是处理视图的布局和内容;通常这些事情的发生是因为对 view updates 真实发生存在误解;了解 view updates 的方式和时间需要更深入地了解iOS应用程序的主运行循环,以及它如何与UIView提供的某些方法关联;这篇博文将解释这些互动,希望澄清如何使">
+  <meta name="description" content="#解开神秘的iOS布局 翻译自: Demystifying iOS Layout 在你刚开始开发iOS应用时,最难避免或者说最难调试的是处理视图的布局和内容;通常这些事情的发生是因为对 视图更新 真实发生存在误解;了解 视图更新 的方式和时间需要更深入地了解iOS应用程序的主运行循环,以及它如何与UIView提供的某些方法关联;这篇博文将解释这些互动,希望澄清如何使用UIView的方法来获得你想要">
 <meta name="keywords" content="iOS">
 <meta property="og:type" content="article">
 <meta property="og:title" content="揭秘iOS布局">
 <meta property="og:url" content="http://yoursite.com/2018/03/26/揭秘iOS布局/index.html">
 <meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="#解开神秘的iOS布局 翻译自: Demystifying iOS Layout 在你刚开始开发iOS应用时,最难避免或者说最难调试的是处理视图的布局和内容;通常这些事情的发生是因为对 view updates 真实发生存在误解;了解 view updates 的方式和时间需要更深入地了解iOS应用程序的主运行循环,以及它如何与UIView提供的某些方法关联;这篇博文将解释这些互动,希望澄清如何使">
+<meta property="og:description" content="#解开神秘的iOS布局 翻译自: Demystifying iOS Layout 在你刚开始开发iOS应用时,最难避免或者说最难调试的是处理视图的布局和内容;通常这些事情的发生是因为对 视图更新 真实发生存在误解;了解 视图更新 的方式和时间需要更深入地了解iOS应用程序的主运行循环,以及它如何与UIView提供的某些方法关联;这篇博文将解释这些互动,希望澄清如何使用UIView的方法来获得你想要">
 <meta property="og:image" content="http://tech.gc.com/images/demystifying-ios-layout/main_event_loop.jpg">
 <meta property="og:image" content="http://tech.gc.com/images/demystifying-ios-layout/tech-blog-loop.png">
 <meta property="og:image" content="http://tech.gc.com/images/demystifying-ios-layout/update_cycle.png">
-<meta property="og:updated_time" content="2018-03-26T04:03:09.843Z">
+<meta property="og:updated_time" content="2018-03-26T04:08:54.098Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="揭秘iOS布局">
-<meta name="twitter:description" content="#解开神秘的iOS布局 翻译自: Demystifying iOS Layout 在你刚开始开发iOS应用时,最难避免或者说最难调试的是处理视图的布局和内容;通常这些事情的发生是因为对 view updates 真实发生存在误解;了解 view updates 的方式和时间需要更深入地了解iOS应用程序的主运行循环,以及它如何与UIView提供的某些方法关联;这篇博文将解释这些互动,希望澄清如何使">
+<meta name="twitter:description" content="#解开神秘的iOS布局 翻译自: Demystifying iOS Layout 在你刚开始开发iOS应用时,最难避免或者说最难调试的是处理视图的布局和内容;通常这些事情的发生是因为对 视图更新 真实发生存在误解;了解 视图更新 的方式和时间需要更深入地了解iOS应用程序的主运行循环,以及它如何与UIView提供的某些方法关联;这篇博文将解释这些互动,希望澄清如何使用UIView的方法来获得你想要">
 <meta name="twitter:image" content="http://tech.gc.com/images/demystifying-ios-layout/main_event_loop.jpg">
   
     <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
@@ -92,11 +92,11 @@
       
         <p>#解开神秘的iOS布局</p>
 <p>翻译自: <a href="http://tech.gc.com/demystifying-ios-layout/" target="_blank" rel="noopener">Demystifying iOS Layout</a></p>
-<p>在你刚开始开发iOS应用时,最难避免或者说最难调试的是处理视图的布局和内容;通常这些事情的发生是因为对 <strong>view updates</strong> 真实发生存在误解;了解 <strong>view updates</strong> 的方式和时间需要更深入地了解iOS应用程序的主运行循环,以及它如何与<code>UIView</code>提供的某些方法关联;这篇博文将解释这些互动,希望澄清如何使用<code>UIView</code>的方法来获得你想要的行为;</p>
+<p>在你刚开始开发iOS应用时,最难避免或者说最难调试的是处理视图的布局和内容;通常这些事情的发生是因为对 <strong>视图更新</strong> 真实发生存在误解;了解 <strong>视图更新</strong> 的方式和时间需要更深入地了解iOS应用程序的主运行循环,以及它如何与<code>UIView</code>提供的某些方法关联;这篇博文将解释这些互动,希望澄清如何使用<code>UIView</code>的方法来获得你想要的行为;</p>
 <p>##iOS应用程序的主运行循环<br>iOS应用程序的主运行循环用来处理所有用户输入事件并在您的应用程序中触发适当的响应;任何与应用程序的用户交互都会被添加到事件队列中;应用程序对象(如下图所示)将事件队列中的事件取出,并将它们分派给应用程序中的其他对象;<strong>它本质上是通过解释来自用户的输入事件并在应用程序的核心对象中为该输入调用相应的处理程序来执行运行循环</strong>;这些处理程序调用应用程序开发人员编写的代码;一旦这些方法调用返回,控制回到主运行循环并且开始更新周期;更新周期负责布局和重绘视图(在下一节中介绍);下面是应用程序如何与设备进行通信并处理用户输入的插图</p>
 <p><img src="http://tech.gc.com/images/demystifying-ios-layout/main_event_loop.jpg" alt="Main Event Loop"></p>
 <p><em><a href="https://developer.apple.com/library/content/documentation/General/Conceptual/Devpedia-CocoaApp/MainEventLoop.html" target="_blank" rel="noopener">https://developer.apple.com/library/content/documentation/General/Conceptual/Devpedia-CocoaApp/MainEventLoop.html</a></em></p>
-<p>##更新周期<br>更新周期是应用程序完成运行所有事件处理代码后,控制权返回到主运行循环的点;就是在这个点,系统开始更新布局,显示和约束;如果您要求改变视图而它正在执行事件处理程序,系统会将此视图标记为需要重绘;在下一次更新周期,系统将执行这些视图上所有的变化;用户交互和布局更新之间的时间间隔对用户来说应该是感觉不到的;iOS应用程序通常以60fps动画,这意味着一个刷新周期只需要1/60秒;由于这种情况发生的速度很快,用户不会注意到她与设备上的应用程序进行交互和看到内容和布局更新之间的UI的滞后;但是,由于事件被执行的时间和相应视图的重绘时间之间存在时间间隔,所以在运行循环过程中,视图可能不会按照您希望的方式更新;如果您有任何计算依赖视图最新的内容或布局,您有可能操作的是该视图的旧的内容或布局而不是最新的;了解运行循环,更新周期和某些的<code>UIView</code>方法能够帮助避免或者调试这类问题;</p>
+<p>##更新周期(Update Cycle)<br>更新周期是应用程序完成运行所有事件处理代码后,控制权返回到主运行循环的点;就是在这个点,系统开始更新布局,显示和约束;如果您要求改变视图而它正在执行事件处理程序,系统会将此视图标记为需要重绘;在下一次更新周期,系统将执行这些视图上所有的变化;用户交互和布局更新之间的时间间隔对用户来说应该是感觉不到的;iOS应用程序通常以60fps动画,这意味着一个刷新周期只需要1/60秒;由于这种情况发生的速度很快,用户不会注意到她与设备上的应用程序进行交互和看到内容和布局更新之间的UI的滞后;但是,由于事件被执行的时间和相应视图的重绘时间之间存在时间间隔,所以在运行循环过程中,视图可能不会按照您希望的方式更新;如果您有任何计算依赖视图最新的内容或布局,您有可能操作的是该视图的旧的内容或布局而不是最新的;了解运行循环,更新周期和某些的<code>UIView</code>方法能够帮助避免或者调试这类问题;</p>
 <p>您可以在下图中看到更新周期在运行循环结束时如何发生<br><img src="http://tech.gc.com/images/demystifying-ios-layout/tech-blog-loop.png" alt="Update Cycle"></p>
 <p>##布局<br>视图的布局指的是它在屏幕上的大小和位置;每一个视图都有一个 frame 属性来描述它在父视图坐标系统中的位置以及它的大小;<code>UIView</code>提供了一些方法,可以让你通知系统一个视图的布局已经改变,同时为你提供了可以重写的方法,以便在重新计算视图的布局后定义要执行的操作</p>
 <p>###layoutSubviews()</p>
@@ -172,7 +172,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/03/26/揭秘iOS布局/" data-id="cjf7pji6z0001m6s6296aruu4" class="article-share-link">Teilen</a>
+      <a data-url="http://yoursite.com/2018/03/26/揭秘iOS布局/" data-id="cjf7pqsgs0001n7s68hyygym1" class="article-share-link">Teilen</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/iOS/">iOS</a></li></ul>
