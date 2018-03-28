@@ -1,10 +1,8 @@
 ---
-title: 揭秘iOS布局
+title: 揭开神秘的iOS布局
 date: 2018-03-26 12:01:28
 tags: iOS
 ---
-
-# 解开神秘的iOS布局
 
 翻译自: [Demystifying iOS Layout](http://tech.gc.com/demystifying-ios-layout/)
 
