@@ -228,6 +228,136 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/28/iPhoneX上pop回到根控制器上漂移的bug/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="franky">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content=" 金文的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/28/iPhoneX上pop回到根控制器上漂移的bug/" itemprop="url">iPhoneX上pop回到根控制器上漂移的bug</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Veröffentlicht am</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-28T16:02:08+08:00">
+                2018-04-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>记录一个在iPhone X上发生的诡异的bug…语言怎么描述都太苍白,那么直接看图<br><img src="/Users/franky/Desktop/BrowserPreview_tmp.gif" alt=""></p>
+<p>只有在滑动到最底部的时候,push到下一个页面,然后在pop回来就会出现contentOffset.y值自动偏移的现象…</p>
+<p>视图的层次结构如图:<br><img src="/Users/franky/Desktop/Snip20180428_1.png" alt=""></p>
+<p>选中的视图控制器就是TabBarController的第二个子控制器,控制器的view就是一个UICollectionView;我是很懵逼的…同事说可能是iPhone X上的安全距离的原因(但我还是很懵逼)…于是我对视图层次结构做了下修改;</p>
+<ul>
+<li>取消修改控制器的view为UICollectionView</li>
+<li>将UICollectionView作为控制器的view的子视图</li>
+<li>设置collectionView的约束为,上左右等于控制器的view,下等于控制器的view的下面,但是偏移一个-34的高度(仅在iPhone X上)</li>
+</ul>
+<p>修改之后的视图层次结构如下:<br><img src="/Users/franky/Desktop/Snip20180428_2.png" alt=""></p>
+<p>这样,collectionView不再漂移了…对上述偏移的值进行修改测试可以发现,当这个值小于等于-34的时候就不会发生漂移,大于-34时就会发生漂移…换一句话的意思就是,如果collectionView距离底部的距离小于34的那么就会漂移,大于等于34不会发生漂移…</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/16/记录一个pod-install失败的解决方法/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -959,7 +1089,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-count">6</span>
                   <span class="site-state-item-name">Artikel</span>
                 </a>
               </div>
