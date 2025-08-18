@@ -1,0 +1,401 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>iOS 底层知识入门 | masterKing 的博客</title><meta name="author" content="masterKing"><meta name="copyright" content="masterKing"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="iOS 底层知识入门很多讲 iOS 底层知识的课程，视频，文章，讲师上来就是一个  struct objc_object &#123;...&#125; 结构体或者是 struct objc_class : objc_object &#123;...&#125; 的结构体，我不知道其他人是怎么想的，但是对于我本人来说，第一次接触的感觉是一脸懵逼，这两个结构体是干什么的？平时开发过程中从来没有接触和">
+<meta property="og:type" content="article">
+<meta property="og:title" content="iOS 底层知识入门">
+<meta property="og:url" content="https://masterking.github.io/2025/04/24/iOS-%E5%BA%95%E5%B1%82%E7%9F%A5%E8%AF%86%E5%85%A5%E9%97%A8/index.html">
+<meta property="og:site_name" content="masterKing 的博客">
+<meta property="og:description" content="iOS 底层知识入门很多讲 iOS 底层知识的课程，视频，文章，讲师上来就是一个  struct objc_object &#123;...&#125; 结构体或者是 struct objc_class : objc_object &#123;...&#125; 的结构体，我不知道其他人是怎么想的，但是对于我本人来说，第一次接触的感觉是一脸懵逼，这两个结构体是干什么的？平时开发过程中从来没有接触和">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://masterking.github.io/images/iOS_low-level_principles.webp">
+<meta property="article:published_time" content="2025-04-24T09:22:46.000Z">
+<meta property="article:modified_time" content="2025-06-03T22:47:18.316Z">
+<meta property="article:author" content="masterKing">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://masterking.github.io/images/iOS_low-level_principles.webp"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "iOS 底层知识入门",
+  "url": "https://masterking.github.io/2025/04/24/iOS-%E5%BA%95%E5%B1%82%E7%9F%A5%E8%AF%86%E5%85%A5%E9%97%A8/",
+  "image": "https://masterking.github.io/images/iOS_low-level_principles.webp",
+  "datePublished": "2025-04-24T09:22:46.000Z",
+  "dateModified": "2025-06-03T22:47:18.316Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "masterKing",
+      "url": "https://masterking.github.io"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.ico"><link rel="canonical" href="https://masterking.github.io/2025/04/24/iOS-%E5%BA%95%E5%B1%82%E7%9F%A5%E8%AF%86%E5%85%A5%E9%97%A8/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//hm.baidu.com"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?e6857234b462ad05308d8b79794f0358";
+  var s = document.getElementsByTagName("script")[0];
+  s.parentNode.insertBefore(hm, s);
+})();
+btf.addGlobalFn('pjaxComplete', () => {
+  _hmt.push(['_trackPageview',window.location.pathname])
+}, 'baidu_analytics')
+</script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"未找到符合您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":false,"highlightHeightLimit":false,"highlightFullpage":true,"highlightMacStyle":true},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'iOS 底层知识入门',
+  isHighlightShrink: undefined,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg" style="background: linear-gradient( 135deg, #2c241f, #968282);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/images/WechatIMG1.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">47</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">32</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">6</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/sileorepo/"><i class="fa-fw fas fa-shop"></i><span> sileo 源</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/images/iOS_low-level_principles.webp);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">masterKing 的博客</span></a><a class="nav-page-title" href="/"><span class="site-name">iOS 底层知识入门</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/sileorepo/"><i class="fa-fw fas fa-shop"></i><span> sileo 源</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">iOS 底层知识入门</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-04-24T09:22:46.000Z" title="发表于 2025-04-24 17:22:46">2025-04-24</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-06-03T22:47:18.316Z" title="更新于 2025-06-04 06:47:18">2025-06-04</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/iOS-%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86/">iOS 底层原理</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">总字数:</span><span class="word-count">3.3k</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span><span class="post-meta-separator">|</span><span class="post-meta-commentcount"><i class="far fa-comments fa-fw post-meta-icon"></i><span class="post-meta-label">评论数:</span><a href="/2025/04/24/iOS-%E5%BA%95%E5%B1%82%E7%9F%A5%E8%AF%86%E5%85%A5%E9%97%A8/#post-comment" itemprop="discussionUrl"><span class="valine-comment-count" data-xid="/2025/04/24/iOS-%E5%BA%95%E5%B1%82%E7%9F%A5%E8%AF%86%E5%85%A5%E9%97%A8/" itemprop="commentCount"><i class="fa-solid fa-spinner fa-spin"></i></span></a></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><div id="post-outdate-notice" data="{&quot;limitDay&quot;:365,&quot;messagePrev&quot;:&quot;距离上次更新已有&quot;,&quot;messageNext&quot;:&quot;天，文章某些内容可能已过时。&quot;,&quot;postUpdate&quot;:&quot;2025-06-04 06:47:18&quot;}" hidden></div><h1 id="iOS-底层知识入门"><a href="#iOS-底层知识入门" class="headerlink" title="iOS 底层知识入门"></a>iOS 底层知识入门</h1><p>很多讲 iOS 底层知识的课程，视频，文章，讲师上来就是一个  <code>struct objc_object &#123;...&#125;</code> 结构体或者是 <code>struct objc_class : objc_object &#123;...&#125;</code> 的结构体，我不知道其他人是怎么想的，但是对于我本人来说，第一次接触的感觉是一脸懵逼，这两个结构体是干什么的？平时开发过程中从来没有接触和使用过它们啊？</p>
+<p>还有很多讲师为了卖自己的课程，宣称学习 iOS 底层知识完全不需要 C++ 语言知识。跟着他的课程就能掌握。。。我作为一个过来人，真的是想骂人，如果你是个完全没有任何一点 C++ 基础的 iOS 开发者想要深入学习 iOS 的底层知识，我的建议还是先将 C++ 的一些基础知识过一遍再说吧。对于一个有开发经验的程序员来说，学习一门编程语言的基础语法真的不算一件难事。。。何况即使是有 C++ 基础的人也依旧看不明白系统的底层源码，为什么？因为不仅仅需要 C++ 语言的基础知识，还需要掌握 dyld，MachO，动态库共享缓存等底层相关的知识和概念，你才能真正看明白底层代码到底在做些什么。</p>
+<p>要回答第一个问题，就不得不提到 Objective-C 语言的基石 –&gt; <code>libobjc.A.dylib</code> 库，也叫 Objective-C 的运行时库，主要由 Objective-C，Objective-C++，C++ 编写，一小部分由汇编，C，Perl 等其他语言编写。可以这么说，如果没有 <code>libobjc.A.dylib</code> 库，就没有 Objective-C 语言。Objective-C 语言无法离开 <code>libobjc.A.dylib</code> 库。当一个 Objective-C 程序启动时，dyld 会先加载 <code>libobjc.A.dylib</code>，并执行其初始化代码，然后才能开始执行程序的 <code>main</code> 函数，没有 <code>libobjc.A.dylib</code> 库 Objective-C 代码无法运行。因为在 Objective-C 中，类的加载、分类的加载、<code>+load</code> 方法等都需要运行时库的支持，这些都是在程序的 main 函数之前就完成的。还有在程序运行过程中的对象内存管理，关联对象，消息发送，消息转发等重要又基础的功能都是由该库完成的。</p>
+<p><code>libobjc.A.dylib</code> 是 Objective-C 语言的核心运行时库，也是 iOS&#x2F;macOS 生态中所有 Objective-C 和 Swift 应用的底层基石（少了它不行）。它的作用远不止“支持语法”，而是构建了整个动态对象模型和消息传递机制。<code>struct objc_object &#123;...&#125;</code> 和 <code>struct objc_class : objc_object &#123;...&#125;</code> 两个结构体都是在这个库里面声明和实现的 C++ 结构体。在 Objective-C 1.0 时，它们完全用 C 实现，在后续的 Objective-C 2.0 中使用 C++ 重构以提升性能和添加新的功能。</p>
+<p>NSObject 类的实现代码也是在该库里面，苹果开源了这个库的部分实现，你可以在 <a target="_blank" rel="noopener" href="https://github.com/apple-oss-distributions/objc4/tags">objc4</a> 下载到源码工程，objc4 工程的编译产物就是 <code>libobjc.A.dylib</code> 库。不过苹果开源的这个工程的是无法正常运行起来的，需要通过一些步骤的配置才能成功运行起来，好在有一个开源的 <a target="_blank" rel="noopener" href="https://github.com/RetVal/objc-runtime">项目</a> 帮我们解决了配置 objc4 源码项目的繁琐的步骤，这样就可以在这个源码项目中运行调试底层了。查看 <code>NSObject</code> 的实现代码就会发现，大部分的实现都是调用了 <code>struct objc_object &#123;...&#125;</code> 的方法或者 <code>struct objc_class : objc_object &#123;...&#125;</code> 的方法，是的 C++ 中的结构体和类一样，可以有成员变量可以有对象方法，类方法。也就是说 <code>struct objc_object &#123;...&#125;</code> 是所有的 Objective-C 实例对象的底层结构，<code>struct objc_class : objc_object &#123;...&#125;</code> 是所有的 Objective-C 类对象的底层结构。</p>
+<h2 id="libobjc-A-dylib-的完整作用介绍"><a href="#libobjc-A-dylib-的完整作用介绍" class="headerlink" title="libobjc.A.dylib 的完整作用介绍"></a><code>libobjc.A.dylib</code> 的完整作用介绍</h2><h3 id="一、​​对象生命周期管理"><a href="#一、​​对象生命周期管理" class="headerlink" title="一、​​对象生命周期管理"></a>一、​​对象生命周期管理</h3><ol>
+<li>对象内存分配与释放<ul>
+<li>通过 <code>objc_allocateClassPair</code> 和 <code>class_createInstance</code> 动态创建类和对象。</li>
+<li>管理对象的引用计数（Retain&#x2F;Release），包括自动引用计数（ARC）的底层实现。 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">id obj = class_createInstance([NSObject class], <span class="number">0</span>); <span class="comment">// 创建实例</span></span><br><span class="line">objc_retain(obj); <span class="comment">// 增加引用计数</span></span><br><span class="line">objc_release(obj); <span class="comment">// 释放对象</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li>类与元类（Metaclass）系统<ul>
+<li>维护 <code>Class</code> 和 <code>Meta Class</code> 的继承链，确保方法查找的层级正确性。</li>
+<li>每个类的 <code>isa</code> 指针指向其元类，元类的 <code>isa</code> 指向根元类（Root Metaclass）。</li>
+</ul>
+</li>
+</ol>
+<h3 id="二、​​消息传递机制（Messaging）​"><a href="#二、​​消息传递机制（Messaging）​" class="headerlink" title="二、​​消息传递机制（Messaging）​"></a>二、​​消息传递机制（Messaging）​</h3><ol>
+<li>动态方法调用<ul>
+<li>实现 <code>objc_msgSend</code> 函数（汇编优化），负责方法查找、缓存和跳转。</li>
+<li>方法缓存（Method Cache）加速高频调用的方法。</li>
+</ul>
+</li>
+<li>消息转发（Message Forwarding）<ul>
+<li>处理未实现方法的动态解析（<code>resolveInstanceMethod:</code>）、备用接收者（<code>forwardingTargetForSelector:</code>）和完整转发（<code>forwardInvocation:</code>）。</li>
+<li>支持 <code>@dynamic</code> 属性的延迟绑定（如 Core Data 模型）。</li>
+</ul>
+</li>
+</ol>
+<h3 id="三、运行时类型系统-（Runtime-Type-System）"><a href="#三、运行时类型系统-（Runtime-Type-System）" class="headerlink" title="三、运行时类型系统 （Runtime Type System）"></a>三、运行时类型系统 （Runtime Type System）</h3><ol>
+<li>类型信息注册与查询<ul>
+<li>管理类的属性（<code>class_copyPropertyList</code>）、方法（<code>class_copyMethodList</code>）、协议（<code>class_copyProtocolList</code>）和成员变量（<code>class_copyIvarList</code>）。</li>
+<li>支持运行时动态创建&#x2F;修改类（<code>objc_registerClassPair</code>）。</li>
+</ul>
+</li>
+<li>类型编码（Type Encoding）<ul>
+<li>将 Objective-C 类型转换为 C 字符串编码（如 <code>@encode(NSInteger)</code> → <code>&quot;q&quot;</code>），用于序列化和反射。</li>
+<li>实现 <code>NSMethodSignature</code> 的方法签名解析。</li>
+</ul>
+</li>
+</ol>
+<h3 id="四、内存管理"><a href="#四、内存管理" class="headerlink" title="四、内存管理"></a>四、内存管理</h3><ol>
+<li>自动释放池（Autorelease Pool）<ul>
+<li>通过 <code>objc_autoreleasePoolPush</code> 和 <code>objc_autoreleasePoolPop</code> 管理延迟释放的对象。</li>
+<li>每个线程的自动释放池栈由 <code>libobjc</code> 维护。</li>
+</ul>
+</li>
+<li>弱引用（Weak References）<ul>
+<li>管理弱引用表（Weak Table），实现 <code>__weak</code> 变量的自动置 <code>nil</code>。 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">id __weak weakObj = strongObj; <span class="comment">// 弱引用表插入记录</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li>关联对象（Associated Objects）<ul>
+<li>通过 <code>objc_setAssociatedObject</code> 动态绑定键值对到对象（类似“扩展属性”）。 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">objc_setAssociatedObject(obj, key, value, OBJC_ASSOCIATION_RETAIN);</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ol>
+<h3 id="五、协议与分类（Protocol-Category）​"><a href="#五、协议与分类（Protocol-Category）​" class="headerlink" title="五、协议与分类（Protocol &amp; Category）​"></a>五、协议与分类（Protocol &amp; Category）​</h3><ol>
+<li>协议动态注册<ul>
+<li>支持运行时添加协议方法（<code>protocol_addMethodDescription</code>）。</li>
+</ul>
+</li>
+<li>分类（<code>Category</code>）合并<ul>
+<li>在 <code>attachCategories</code> 函数中，将分类的方法、属性和协议合并到主类。</li>
+<li>分类的方法会覆盖主类的同名方法。</li>
+</ul>
+</li>
+</ol>
+<h3 id="六、异常处理"><a href="#六、异常处理" class="headerlink" title="六、异常处理"></a>六、异常处理</h3><ol>
+<li>Objective-C 异常模型<ul>
+<li>实现 <code>@try/@catch/@finally</code> 的异常捕获机制。</li>
+<li>与 C++ 异常交互（通过 <code>OBJC_USE_OBJC_EXCEPTIONS </code> 配置）。</li>
+</ul>
+</li>
+<li>错误处理桥接<ul>
+<li>将 <code>NSError</code> 的 <code>errorWithDomain:code:userInfo:</code> 映射到底层异常。</li>
+</ul>
+</li>
+</ol>
+<h3 id="七、底层性能优化"><a href="#七、底层性能优化" class="headerlink" title="七、底层性能优化"></a>七、底层性能优化</h3><ol>
+<li>方法缓存（Method Cache）<ul>
+<li>每个类维护一个哈希表缓存已查找的方法（<code>objc_cache</code>）。</li>
+</ul>
+</li>
+<li>Tagged Pointer 优化<ul>
+<li>将小对象（如 <code>NSNumber</code>、<code>NSDate</code>）直接编码到指针中，避免堆内存分配。</li>
+</ul>
+</li>
+<li>非脆弱实例变量（Non-Fragile IVars）<ul>
+<li>允许子类安全扩展父类的实例变量，避免二进制兼容性问题。</li>
+</ul>
+</li>
+</ol>
+<h3 id="八、​​与-Swift-的交互"><a href="#八、​​与-Swift-的交互" class="headerlink" title="八、​​与 Swift 的交互"></a>八、​​与 Swift 的交互</h3><ol>
+<li>Swift 类的 Objective-C 兼容性<ul>
+<li>为 <code>@objc</code> 修饰的 Swift 类生成 Objective-C 元数据（如 <code>_TtC</code> 前缀的类名）。</li>
+</ul>
+</li>
+<li>动态特性支持<ul>
+<li>实现 Swift 的 <code>dynamic</code> 方法调用（通过 <code>objc_msgSend</code>）。</li>
+</ul>
+</li>
+<li>内存模型桥接<ul>
+<li>Swift 引用计数与 Objective-C ARC 共享同一套底层计数器。</li>
+</ul>
+</li>
+</ol>
+<h3 id="九、​​调试与内省（Introspection）​"><a href="#九、​​调试与内省（Introspection）​" class="headerlink" title="九、​​调试与内省（Introspection）​"></a>九、​​调试与内省（Introspection）​</h3><ol>
+<li>动态调试工具支持<ul>
+<li>提供 <code>class_getName</code>、<code>method_getImplementation</code> 等函数供 LLDB 使用。</li>
+</ul>
+</li>
+<li>运行时环境变量<ul>
+<li>通过 <code>OBJC_PRINT_LOAD_METHODS</code> 等环境变量输出运行时日志。</li>
+</ul>
+</li>
+<li>逆向工程基础<ul>
+<li><code>class-dump</code> 等工具依赖 <code>libobjc</code> 的类信息导出功能。</li>
+</ul>
+</li>
+</ol>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p><code>libobjc.A.dylib</code> 是 Objective-C 动态特性的实现核心，其作用覆盖：</p>
+<ul>
+<li><strong>对象模型</strong>​​：从内存分配到消息传递的完整生命周期管理</li>
+<li><strong>动态性</strong>​​：方法转发、关联对象、分类合并等运行时魔法</li>
+<li><strong>性能</strong>​​：方法缓存、Tagged Pointer、非脆弱 IVars 等底层优化</li>
+<li><strong>跨语言</strong>​​：为 Swift 提供动态能力与内存模型兼容性</li>
+</ul>
+<p>即使 Apple 推动 Swift 取代 Objective-C，<code>libobjc</code> 在可预见的未来仍不可替代。它如同操作系统的“神经系统”，将高级语言代码翻译为可执行的动态行为。理解其原理，是掌握 iOS&#x2F;macOS 开发生态的关键。</p>
+<h1 id="关于运行时"><a href="#关于运行时" class="headerlink" title="关于运行时"></a>关于运行时</h1><p><strong>运行时（Runtime）</strong>​​ 是程序在运行时所依赖的环境和机制，负责管理内存、方法调用、类型检查、异常处理、动态行为等底层操作。它的核心作用是在程序执行期间提供动态支持，而不仅仅是编译时静态确定的逻辑。</p>
+<h2 id="为什么-Objective-C-需要运行时？​"><a href="#为什么-Objective-C-需要运行时？​" class="headerlink" title="为什么 Objective-C 需要运行时？​"></a>为什么 Objective-C 需要运行时？​</h2><p>Objective-C 是一种​​动态语言​​，它的许多特性依赖运行时实现：</p>
+<ol>
+<li>动态消息分发​​：<br> Objective-C 的方法调用（如 <code>[obj doSomething]</code>）本质是通过运行时调用发送消息函数（<code>objc_msgSend</code>）。运行时在程序执行期间动态查找方法实现（甚至允许动态添加&#x2F;替换方法），而非编译时绑定。ß∑</li>
+<li>​​运行时类型检查和反射​​：<br> 支持通过 <code>NSClassFromString</code> 动态加载类、<code>isKindOfClass</code> 检查类型、<code>respondsToSelector</code> 判断方法是否存在。</li>
+<li>​​方法交换（Method Swizzling）​​：<br> 允许在运行时交换两个方法的实现（常用于调试或 AOP 编程）。</li>
+<li>动态协议和类扩展​​：<br> 通过运行时 API（如 <code>class_addMethod</code>）动态添加方法或属性到已有类。</li>
+</ol>
+<h2 id="所有语言都需要一个运行时吗？​"><a href="#所有语言都需要一个运行时吗？​" class="headerlink" title="所有语言都需要一个运行时吗？​"></a>所有语言都需要一个运行时吗？​</h2><p>是的，但运行时的形式和复杂度差异极大：</p>
+<ol>
+<li>低级语言（如 C）​​：<br> 运行时极简，通常仅包含标准库（如 <code>libc</code>），负责内存分配（<code>malloc</code>）、文件操作等基础功能。动态行为（如多态）需手动实现。</li>
+<li>静态编译语言（如 C++、Rust）​​：<br> 运行时主要处理异常、虚函数表（vtable）等，大部分逻辑在编译时确定，性能高但灵活性较低。</li>
+<li>​​动态语言（如 Python、JavaScript）​​：<br> 运行时复杂，负责解释执行、垃圾回收、动态类型检查等。例如 Python 的 <code>sys</code> 模块、JS 引擎（如 V8）都是运行时的核心。</li>
+<li>虚拟机语言（如 Java、C#）​​：<br> 依赖虚拟机（JVM、CLR）作为运行时环境，提供跨平台执行、即时编译（JIT）、垃圾回收等高级功能。</li>
+<li>特殊场景语言（如 Go）​​：<br> Go 的运行时管理协程（goroutine）、垃圾回收和网络轮询器，但最终编译为静态二进制文件。</li>
+</ol>
+<h2 id="总结-1"><a href="#总结-1" class="headerlink" title="总结"></a>总结</h2><ul>
+<li>​​<strong>运行时存在的必要性​​</strong>：所有语言都需要运行时支持，只是其职责和复杂度因语言设计目标而异。</li>
+<li><strong>Objective-C 的特殊性</strong>​​：其动态特性（如消息传递、反射）高度依赖运行时，而类似 C++ 的静态语言则在编译时完成更多工作。</li>
+<li><strong>性能与灵活性的权衡</strong>​​：运行时越复杂（如动态语言），开发效率越高，但可能牺牲性能；反之，运行时越简单（如 C），性能更高但灵活性受限。</li>
+</ul>
+<h1 id="Clang-是如何处理-Objective-C-源码的"><a href="#Clang-是如何处理-Objective-C-源码的" class="headerlink" title="Clang 是如何处理 Objective-C 源码的"></a>Clang 是如何处理 Objective-C 源码的</h1><p>Clang 是 LLVM 项目的一部分，主要用于 C、C++ 和 Objective-C 的编译。Objective-C 的类和对象在经过 Clang 编译后确实会被转换为 C 语言的结构体和函数，但这种转换并不是简单的“一对一映射”，而是通过 ​​Objective-C Runtime（运行时机制）​​ 的复杂设计实现的。以下是具体细节：</p>
+<ol>
+<li>​​对象和类的本质：C 结构体​<br> 所有 Objective-C 对象和类的底层实现都基于 C 结构体：<ul>
+<li><strong>实例</strong>：本质是 <code>objc_object</code> 结构体，核心成员是 isa 指针（指向所属的类）。  <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">objc_object</span> &#123;</span><br><span class="line">	Class isa; <span class="comment">// 指向所属的类</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><strong>类（Class）</strong>：本质是 <code>objc_class</code> 结构体，继承自 <code>objc_object</code>，因此类本身也是一个对象（称为“类对象”）。  <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">objc_class</span> : objc_object &#123;</span><br><span class="line">    Class superclass;              <span class="comment">// 父类指针</span></span><br><span class="line">    <span class="type">cache_t</span> cache;                 <span class="comment">// 方法缓存</span></span><br><span class="line">    <span class="type">class_data_bits_t</span> bits;        <span class="comment">// 存储方法列表、属性列表等</span></span><br><span class="line">    <span class="comment">// ...方法</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li>​​成员变量（ivar）和属性的处理​<ul>
+<li><strong>成员变量</strong>​​：直接存储在对象的结构体中。<br>  例如，定义一个 <code>Person</code> 类：  <figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">Person</span> : <span class="title">NSObject</span> </span>&#123;</span><br><span class="line">	<span class="built_in">NSString</span> *_name;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>) <span class="built_in">NSInteger</span> age;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+  编译后，成员变量 <code>_name</code> 和属性自动合成的 <code>_age</code> 会被合并到 <code>Person</code> 对象的结构体中：  <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">Person_IMPL</span> &#123;</span></span><br><span class="line">    Class isa;         <span class="comment">// 继承自 objc_object</span></span><br><span class="line">    NSString *_name;   <span class="comment">// 成员变量</span></span><br><span class="line">    NSInteger _age;    <span class="comment">// 属性合成的成员变量</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></li>
+<li><strong>属性</strong>​​：编译器会自动生成 ​​<strong>getter&#x2F;setter</strong> 方法​​，并转换为 C 函数。例如：   <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 自动生成的 getter 和 setter 函数</span></span><br><span class="line">NSInteger <span class="title function_">Person_getAge</span><span class="params">(Person *self, SEL _cmd)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> self-&gt;_age;</span><br><span class="line">&#125;</span><br><span class="line"><span class="type">void</span> <span class="title function_">Person_setAge</span><span class="params">(Person *self, SEL _cmd, NSInteger age)</span> &#123;</span><br><span class="line">    self-&gt;_age = age;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li>​​对象方法和类方法的处理​<ul>
+<li><strong>对象方法</strong>​​：被编译为 C 函数，并存储在类的方法列表中（<code>class_data_bits_t</code> 中的 <code>method_list_t</code>）。<br>  例如，一个 <code>Person</code> 类的方法：  <figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">\- (<span class="type">void</span>)sayHello &#123;</span><br><span class="line">	<span class="built_in">NSLog</span>(<span class="string">@&quot;Hello!&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+  会被编译为：  <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">Person_sayHello</span><span class="params">(Person *self, SEL _cmd)</span> &#123;</span><br><span class="line">    NSLog(@<span class="string">&quot;Hello!&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+  该方法会被添加到 <code>Person</code> 类的 <code>method_list_t</code> 中。</li>
+<li><strong>类方法</strong>：一样被编译为 C 函数，但存储在 <code>元类（Meta Class）</code> 的方法列表中。<br>  元类是类对象的类，其结构体与 <code>objc_class</code> 一致，但方法列表存储的是类方法。</li>
+</ul>
+</li>
+<li>​​消息发送（方法调用）的底层实现<br> Objective-C 的方法调用（如 <code>[obj method]</code>）会被编译器转换为 <code>objc_msgSend</code> 函数： <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 源码中的方法调用</span></span><br><span class="line">[person sayHello];</span><br><span class="line"></span><br><span class="line"><span class="comment">// 编译后转换为：</span></span><br><span class="line">objc_msgSend(person, @selector(sayHello));</span><br></pre></td></tr></table></figure>
+ <code>objc_msgSend</code> 的底层逻辑是动态查找方法实现，以下只是个精简版本的大概步骤：<ol>
+<li>通过 <code>isa</code> 指针找到对象的类</li>
+<li>在类的方法缓存中查找 <code>sayHello</code> 方法</li>
+<li>在类的方法列表中查找 <code>sayHello</code> 方法</li>
+<li>若未找到，沿着继承链向父类查找</li>
+<li>后续处理…</li>
+</ol>
+</li>
+</ol>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://masterking.github.io">masterKing</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://masterking.github.io/2025/04/24/iOS-%E5%BA%95%E5%B1%82%E7%9F%A5%E8%AF%86%E5%85%A5%E9%97%A8/">https://masterking.github.io/2025/04/24/iOS-底层知识入门/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="https://masterking.github.io" target="_blank">masterKing 的博客</a>！</span></div></div><div class="tag_share"><div class="post-share"><div class="social-share" data-image="/images/iOS_low-level_principles.webp" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2025/02/23/KVO/" title="KVO"><img class="cover" src="/images/iOS_low-level_principles.webp" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">KVO</div></div><div class="info-2"><div class="info-item-1">KVO 的基本和高级使用 context 如果不需要使用，填 NULL。如果需要使用 context 推荐传递静态变量。官方文档中还提到，在父类和子类中同时监听某个属性时无法使用 keyPath 区分的情况下就可以使用 context 进行区分。 是否有必要移除观察者？当然有必要，该移除的时候就一定要移除 automaticallyNotifiesObserversForKey: 的使用 k...</div></div></div></a><a class="pagination-related" href="/2025/04/25/iOS-%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86%E5%AF%BC%E5%9B%BE/" title="iOS 底层原理导图"><img class="cover" src="/images/iOS_low-level_principles.webp" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">iOS 底层原理导图</div></div><div class="info-2"><div class="info-item-1">iOS 底层原理导图 iOS 底层知识入门  KVC   KVO   Category  关联对象  Block  Runtime  深入理解iOS对象模型（一）：实例对象的内存探秘 Objective-C 类对象   Runloop  多线程  线程同步方案（锁、串行队列）   内存管理  性能优化  架构设计   </div></div></div></a></nav><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div class="vcomment" id="vcomment"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content is-expand"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#iOS-%E5%BA%95%E5%B1%82%E7%9F%A5%E8%AF%86%E5%85%A5%E9%97%A8"><span class="toc-text">iOS 底层知识入门</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#libobjc-A-dylib-%E7%9A%84%E5%AE%8C%E6%95%B4%E4%BD%9C%E7%94%A8%E4%BB%8B%E7%BB%8D"><span class="toc-text">libobjc.A.dylib 的完整作用介绍</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E2%80%8B%E2%80%8B%E5%AF%B9%E8%B1%A1%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E7%AE%A1%E7%90%86"><span class="toc-text">一、​​对象生命周期管理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E2%80%8B%E2%80%8B%E6%B6%88%E6%81%AF%E4%BC%A0%E9%80%92%E6%9C%BA%E5%88%B6%EF%BC%88Messaging%EF%BC%89%E2%80%8B"><span class="toc-text">二、​​消息传递机制（Messaging）​</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E8%BF%90%E8%A1%8C%E6%97%B6%E7%B1%BB%E5%9E%8B%E7%B3%BB%E7%BB%9F-%EF%BC%88Runtime-Type-System%EF%BC%89"><span class="toc-text">三、运行时类型系统 （Runtime Type System）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9B%9B%E3%80%81%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86"><span class="toc-text">四、内存管理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%94%E3%80%81%E5%8D%8F%E8%AE%AE%E4%B8%8E%E5%88%86%E7%B1%BB%EF%BC%88Protocol-Category%EF%BC%89%E2%80%8B"><span class="toc-text">五、协议与分类（Protocol &amp; Category）​</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%AD%E3%80%81%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86"><span class="toc-text">六、异常处理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%83%E3%80%81%E5%BA%95%E5%B1%82%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96"><span class="toc-text">七、底层性能优化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%AB%E3%80%81%E2%80%8B%E2%80%8B%E4%B8%8E-Swift-%E7%9A%84%E4%BA%A4%E4%BA%92"><span class="toc-text">八、​​与 Swift 的交互</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B9%9D%E3%80%81%E2%80%8B%E2%80%8B%E8%B0%83%E8%AF%95%E4%B8%8E%E5%86%85%E7%9C%81%EF%BC%88Introspection%EF%BC%89%E2%80%8B"><span class="toc-text">九、​​调试与内省（Introspection）​</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-text">总结</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%85%B3%E4%BA%8E%E8%BF%90%E8%A1%8C%E6%97%B6"><span class="toc-text">关于运行时</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88-Objective-C-%E9%9C%80%E8%A6%81%E8%BF%90%E8%A1%8C%E6%97%B6%EF%BC%9F%E2%80%8B"><span class="toc-text">为什么 Objective-C 需要运行时？​</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%89%80%E6%9C%89%E8%AF%AD%E8%A8%80%E9%83%BD%E9%9C%80%E8%A6%81%E4%B8%80%E4%B8%AA%E8%BF%90%E8%A1%8C%E6%97%B6%E5%90%97%EF%BC%9F%E2%80%8B"><span class="toc-text">所有语言都需要一个运行时吗？​</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%BB%E7%BB%93-1"><span class="toc-text">总结</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Clang-%E6%98%AF%E5%A6%82%E4%BD%95%E5%A4%84%E7%90%86-Objective-C-%E6%BA%90%E7%A0%81%E7%9A%84"><span class="toc-text">Clang 是如何处理 Objective-C 源码的</span></a></li></ol></div></div></div></div></main><footer id="footer" style="background-image: url(/images/iOS_low-level_principles.webp);"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2018 - 2025 By masterKing</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.4.3</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="前往评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"><script>(() => {
+  const isShuoshuo = GLOBAL_CONFIG_SITE.pageType === 'shuoshuo'
+  const option = null
+
+  const initValine = (el, path) => {
+    if (isShuoshuo) {
+      window.shuoshuoComment.destroyValine = () => {
+        if (el.children.length) {
+          el.innerHTML = ''
+          el.classList.add('no-comment')
+        }
+      }
+    }
+
+    const valineConfig = {
+      el: '#vcomment',
+      appId: 'Nj4rbGaJ3pAWBRJWseaRg9Zu-gzGzoHsz',
+      appKey: '3tVispErrQeAytUHyJrFos3n',
+      avatar: 'monsterid',
+      serverURLs: '',
+      emojiMaps: "",
+      visitor: false,
+      ...option,
+      path: isShuoshuo ? path : (option && option.path) || window.location.pathname
+    }
+
+    new Valine(valineConfig)
+  }
+
+  const loadValine = async (el, path) => {
+    if (typeof Valine === 'function') {
+      initValine(el, path)
+    } else {
+      await btf.getScript('https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js')
+      initValine(el, path)
+    }
+  }
+
+  if (isShuoshuo) {
+    'Valine' === 'Valine'
+      ? window.shuoshuoComment = { loadComment: loadValine }
+      : window.loadOtherComment = loadValine
+    return
+  }
+
+  if ('Valine' === 'Valine' || !false) {
+    if (false) btf.loadComment(document.getElementById('vcomment'),loadValine)
+    else setTimeout(loadValine, 0)
+  } else {
+    window.loadOtherComment = loadValine
+  }
+})()</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div></body></html>

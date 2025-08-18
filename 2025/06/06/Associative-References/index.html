@@ -1,0 +1,363 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>Associative References | masterKing 的博客</title><meta name="author" content="masterKing"><meta name="copyright" content="masterKing"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="分类能否添加属性？实例变量？在讲解 Associative References 为为何物之前，我们先看一下这个问题：  分类中能否添加实例变量？如果可以如何添加？如果不可以，解释为什么？  可以通过编译器看看能否在分类中添加实例变量：   如上图所示，在分类中虽然可以添加属性，但是并不会生成对应的实例变量，也无法手动添加实例变量。编译器提示，实例变量不能放在分类中。那么现在的问题是，为什么">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Associative References">
+<meta property="og:url" content="https://masterking.github.io/2025/06/06/Associative-References/index.html">
+<meta property="og:site_name" content="masterKing 的博客">
+<meta property="og:description" content="分类能否添加属性？实例变量？在讲解 Associative References 为为何物之前，我们先看一下这个问题：  分类中能否添加实例变量？如果可以如何添加？如果不可以，解释为什么？  可以通过编译器看看能否在分类中添加实例变量：   如上图所示，在分类中虽然可以添加属性，但是并不会生成对应的实例变量，也无法手动添加实例变量。编译器提示，实例变量不能放在分类中。那么现在的问题是，为什么">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://masterking.github.io/images/iOS_low-level_principles.webp">
+<meta property="article:published_time" content="2025-06-06T01:27:34.000Z">
+<meta property="article:modified_time" content="2025-06-07T11:16:08.835Z">
+<meta property="article:author" content="masterKing">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://masterking.github.io/images/iOS_low-level_principles.webp"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Associative References",
+  "url": "https://masterking.github.io/2025/06/06/Associative-References/",
+  "image": "https://masterking.github.io/images/iOS_low-level_principles.webp",
+  "datePublished": "2025-06-06T01:27:34.000Z",
+  "dateModified": "2025-06-07T11:16:08.835Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "masterKing",
+      "url": "https://masterking.github.io"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.ico"><link rel="canonical" href="https://masterking.github.io/2025/06/06/Associative-References/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//hm.baidu.com"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?e6857234b462ad05308d8b79794f0358";
+  var s = document.getElementsByTagName("script")[0];
+  s.parentNode.insertBefore(hm, s);
+})();
+btf.addGlobalFn('pjaxComplete', () => {
+  _hmt.push(['_trackPageview',window.location.pathname])
+}, 'baidu_analytics')
+</script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"未找到符合您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":false,"highlightHeightLimit":false,"highlightFullpage":true,"highlightMacStyle":true},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Associative References',
+  isHighlightShrink: undefined,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg" style="background: linear-gradient( 135deg, #2c241f, #968282);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/images/WechatIMG1.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">47</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">32</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">6</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/sileorepo/"><i class="fa-fw fas fa-shop"></i><span> sileo 源</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/images/iOS_low-level_principles.webp);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">masterKing 的博客</span></a><a class="nav-page-title" href="/"><span class="site-name">Associative References</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/sileorepo/"><i class="fa-fw fas fa-shop"></i><span> sileo 源</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">Associative References</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-06-06T01:27:34.000Z" title="发表于 2025-06-06 09:27:34">2025-06-06</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-06-07T11:16:08.835Z" title="更新于 2025-06-07 19:16:08">2025-06-07</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/iOS-%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86/">iOS 底层原理</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">总字数:</span><span class="word-count">3.5k</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span><span class="post-meta-separator">|</span><span class="post-meta-commentcount"><i class="far fa-comments fa-fw post-meta-icon"></i><span class="post-meta-label">评论数:</span><a href="/2025/06/06/Associative-References/#post-comment" itemprop="discussionUrl"><span class="valine-comment-count" data-xid="/2025/06/06/Associative-References/" itemprop="commentCount"><i class="fa-solid fa-spinner fa-spin"></i></span></a></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><div id="post-outdate-notice" data="{&quot;limitDay&quot;:365,&quot;messagePrev&quot;:&quot;距离上次更新已有&quot;,&quot;messageNext&quot;:&quot;天，文章某些内容可能已过时。&quot;,&quot;postUpdate&quot;:&quot;2025-06-07 19:16:08&quot;}" hidden></div><!--
+1. 分类中能不能添加属性？实践得知，可以添加属性，但是不会生成成员变量导致无法正常存取值。
+2. 那么问题就来了，为什么 Objective-C 语言设计了 Category 语法，但是又不能通过 Category 添加成员变量呢？
+3. 虽然在 Category 中无法添加成员变量，但是 objc/runtime.h 提供了 Associative References 技术实现在分类中添加属性也能实现类似成员变量的效果
+4. Associative References 的使用，只有 3 个 API，使用起来很简单的。
+5. Associative References 的底层原理。就是 API 的底层实现。在 objc4 源码中的 objc-references.mm 文件中。
+-->
+
+<h1 id="分类能否添加属性？实例变量？"><a href="#分类能否添加属性？实例变量？" class="headerlink" title="分类能否添加属性？实例变量？"></a>分类能否添加属性？实例变量？</h1><p>在讲解 Associative References 为为何物之前，我们先看一下这个问题：</p>
+<blockquote>
+<p>分类中能否添加实例变量？如果可以如何添加？如果不可以，解释为什么？</p>
+</blockquote>
+<p>可以通过编译器看看能否在分类中添加实例变量：</p>
+<img src="/2025/06/06/Associative-References/Snip20250607_1.png" class="">
+
+<p>如上图所示，在分类中虽然可以添加属性，但是并不会生成对应的实例变量，也无法手动添加实例变量。编译器提示，实例变量不能放在分类中。那么现在的问题是，为什么 Objective-C 语言设计了分类语法，但是分类中却无法给类添加实例变量？</p>
+<p>Objective-C 的分类 (@category) 被设计为一个​​轻量级、无侵入式​​扩展已有类的方式，其首要目标是​​添加方法（包括实例方法和类方法）​​，而不是修改类的实例结构。不允许添加成员变量（实例变量&#x2F;ivar）是经过深思熟虑的设计选择，主要原因如下：</p>
+<ol>
+<li><strong>保持运行时稳定性和避免内存布局冲突（核心原因）：</strong><ul>
+<li>当你定义一个类时，编译器会为其创建固定的内存布局信息（类结构在底层的定义 objc_class），其中包含了实例变量（ivars）的名称、类型、偏移量等信息。编译后的代码（包括其他可能依赖这个类的代码）以及运行时环境都基于这个布局信息来访问对象的数据（比如 object-&gt;ivar）。</li>
+<li>如果分类可以添加 ivars，这就意味着​​<strong>需要在运行时动态改变类的内存布局​​</strong>！想象一下：<ul>
+<li>程序启动，类 A 被加载，它的内存布局是固定的 (包含 ivar1, ivar2)。</li>
+<li>稍后，一个包含新增 ivar3 的分类被加载。运行时必须尝试“扩展”类 A 的内存布局来容纳 ivar3。</li>
+<li>所有已经存在的类 A 的实例都需要被“调整”！因为之前创建时并没有预留 ivar3 的空间。这不仅成本极高（遍历所有现有实例并调整大小几乎不可能高效完成），而且在多线程环境下极其脆弱。</li>
+<li>更重要的是，任何编译时依赖于原内存布局的代码（如直接使用偏移量访问成员变量的代码——编译器优化后常有）会立即出错，因为 ivar1 和 ivar2 的偏移量很可能因为新增了 ivar3 而改变。</li>
+</ul>
+</li>
+<li>这种对内存布局的动态修改会引入巨大的不稳定性、兼容性问题和性能瓶颈。禁止分类添加 ivars 确保了类一旦被编译和加载，其基结构就是稳定的。</li>
+</ul>
+</li>
+<li>内存管理和生命周期复杂性：<ul>
+<li>成员变量是对象的一部分，与对象本身具有相同的生命周期（随对象创建而创建，随对象销毁而销毁）。内存管理也由其所属类（或其父类）负责。</li>
+<li>如果分类可以添加 ivars，那么这个变量内存的分配、初始化（构造函数逻辑放在哪？）、析构（析构函数逻辑放在哪？）、内存管理（如 retain&#x2F;release，ARC 时代自动合成）的职责归属就变得模糊不清。它打破了类本身对其实例数据的单一管理责任原则。特别是当多个分类都试图管理自己的 ivars 时，问题会变得非常混乱。分类本身也不具有像类那样的初始化（+initialize）和析构机制。</li>
+</ul>
+</li>
+<li>分类的设计哲学：无状态的行为扩展：​​<ul>
+<li>分类的主要设计目的是​​扩展类的行为（方法）​​，而不是​​修改类或实例的状态（数据）​​。它让你可以：<ul>
+<li>为系统类或第三方类添加新功能（方法）。</li>
+<li>将一个庞大类的实现分拆到多个文件中（模块化管理）。</li>
+<li>声明那些本应是私有的方法（在实现文件里声明匿名分类&#x2F;类扩展 @interface ClassName ()）来避免公开声明。</li>
+</ul>
+</li>
+<li>它被设计为一种​​相对安全、隔离的方式​​来添加功能。添加方法通常不会破坏已有的代码或内存布局（重写现有方法或类方法除外，那需要谨慎）。保持分类“无状态”（指不携带自己的数据）是这个安全隔离的关键。</li>
+</ul>
+</li>
+<li>替代方案：关联对象<ul>
+<li>虽然不能直接添加 ivars，但 Objective-C 运行时提供了 ​​关联对象（Associated Objects）​​ 机制来模拟给已有类的实例动态添加关联值（不是真正的实例变量！）。</li>
+<li>原理：运行时维护一个全局的弱引用表，将键值对（key-value）关联到指定的对象实例上。访问关联对象时，通过这个表和对象实例来查找。</li>
+<li>关键区别：<ul>
+<li><strong>内存位置</strong>：​​ Ivars 存储在对象实例内部的内存块中。关联对象存储在运行时管理的独立表中。</li>
+<li><strong>访问速度</strong>：​​ Ivar 访问是直接的内存偏移访问，非常快。关联对象访问需要查表，相对慢一些（虽然对于绝大多数应用场景可忽略）。</li>
+<li><strong>生命周期</strong>：​​ Ivars 与对象共存亡。关联对象可以通过策略（objc_AssociationPolicy）来控制其生命周期是随对象保留（OBJC_ASSOCIATION_RETAIN）、复制（OBJC_ASSOCIATION_COPY）还是赋值（OBJC_ASSOCIATION_ASSIGN），并且在对象释放时自动清理（根据策略）。但这需要手动管理策略。</li>
+<li><strong>管理责任</strong>：​​ Ivars 是类定义的一部分，内存管理责任清晰（由类或父类负责）。关联对象的管理责任在添加分类的代码上。</li>
+</ul>
+</li>
+<li>关联对象的权衡：​​ 关联对象提供了一种灵活性，但也引入了间接访问、潜在的循环引用风险（如果策略选择不当）和轻微的性能开销。语言设计者选择了在分类中添加“成员变量”的责任交给开发者显式地通过关联对象来实现，而不是破坏类实例内存布局的稳定性和简洁性。</li>
+</ul>
+</li>
+</ol>
+<p>Objective-C 限制分类添加成员变量是一个深思熟虑的设计决策，核心目的是：</p>
+<ul>
+<li><strong>保证运行时稳定</strong>：​​ 防止动态修改已加载类的内存布局而导致崩溃和不可预测行为。</li>
+<li>​​<strong>明确内存管理责任</strong>：​​ 避免与类和对象固有生命周期管理模型冲突。</li>
+<li><strong>维护分类的设计初衷</strong>：​​ 专注于安全、无状态地扩展行为（方法），而非状态（数据）。分类应该是功能的“插件”，而不是修改类根基的“手术刀”。</li>
+</ul>
+<h1 id="Associative-References"><a href="#Associative-References" class="headerlink" title="Associative References"></a>Associative References</h1><p>Associative References 中文直译过来是关联引用，在 Xcode 中，使用快捷键 Command + Shift + O 再输入 objc&#x2F;runtime.h 就能看到文件中有一个部分就是 Associative References。它包括了三个 API 和一个枚举类型：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="title function_">OBJC_ENUM</span><span class="params">(<span class="type">uintptr_t</span>, objc_AssociationPolicy)</span> &#123;</span><br><span class="line">    OBJC_ASSOCIATION_ASSIGN = <span class="number">0</span>,           <span class="comment">/**&lt; Specifies an unsafe unretained reference to the associated object. */</span></span><br><span class="line">    OBJC_ASSOCIATION_RETAIN_NONATOMIC = <span class="number">1</span>, <span class="comment">/**&lt; Specifies a strong reference to the associated object. </span></span><br><span class="line"><span class="comment">                                            *   The association is not made atomically. */</span></span><br><span class="line">    OBJC_ASSOCIATION_COPY_NONATOMIC = <span class="number">3</span>,   <span class="comment">/**&lt; Specifies that the associated object is copied. </span></span><br><span class="line"><span class="comment">                                            *   The association is not made atomically. */</span></span><br><span class="line">    OBJC_ASSOCIATION_RETAIN = <span class="number">01401</span>,       <span class="comment">/**&lt; Specifies a strong reference to the associated object.</span></span><br><span class="line"><span class="comment">                                            *   The association is made atomically. */</span></span><br><span class="line">    OBJC_ASSOCIATION_COPY = <span class="number">01403</span>          <span class="comment">/**&lt; Specifies that the associated object is copied.</span></span><br><span class="line"><span class="comment">                                            *   The association is made atomically. */</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">OBJC_EXPORT <span class="type">void</span></span><br><span class="line"><span class="title function_">objc_setAssociatedObject</span><span class="params">(id _Nonnull object, <span class="type">const</span> <span class="type">void</span> * _Nonnull key,</span></span><br><span class="line"><span class="params">                         id _Nullable value, objc_AssociationPolicy policy)</span></span><br><span class="line">    <span class="title function_">OBJC_AVAILABLE</span><span class="params">(<span class="number">10.6</span>, <span class="number">3.1</span>, <span class="number">9.0</span>, <span class="number">1.0</span>, <span class="number">2.0</span>)</span>;</span><br><span class="line"></span><br><span class="line">OBJC_EXPORT id _Nullable</span><br><span class="line"><span class="title function_">objc_getAssociatedObject</span><span class="params">(id _Nonnull object, <span class="type">const</span> <span class="type">void</span> * _Nonnull key)</span></span><br><span class="line">    <span class="title function_">OBJC_AVAILABLE</span><span class="params">(<span class="number">10.6</span>, <span class="number">3.1</span>, <span class="number">9.0</span>, <span class="number">1.0</span>, <span class="number">2.0</span>)</span>;</span><br><span class="line"></span><br><span class="line">OBJC_EXPORT <span class="type">void</span></span><br><span class="line"><span class="title function_">objc_removeAssociatedObjects</span><span class="params">(id _Nonnull object)</span></span><br><span class="line">    <span class="title function_">OBJC_AVAILABLE</span><span class="params">(<span class="number">10.6</span>, <span class="number">3.1</span>, <span class="number">9.0</span>, <span class="number">1.0</span>, <span class="number">2.0</span>)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到 Associative References 是 iOS 3.1 引入的技术。其中经常使用的只有前面两个 API。<code>objc_removeAssociatedObjects(id _Nonnull object)</code> 在 99.999% 的应用开发场景下都绝不应该调用，它仅推荐在某些极端的场景下谨慎的调用。比如：</p>
+<ol>
+<li>调试与测试：<ul>
+<li>在编写单元测试时，你需要确保被测试对象在测试结束后没有任何残留状态（包括关联对象），以便下一个测试在一个干净的环境开始。</li>
+<li>在调试极其复杂的内存泄漏或对象状态问题时，你可能想观察移除所有关联对象后对问题的影响（但这通常是最后手段）。</li>
+</ul>
+</li>
+<li>非常特殊的框架或工具：<ul>
+<li>如果你在开发一个底层调试工具、一个对象序列化&#x2F;反序列化框架（需要精确控制内存镜像）、或一个对象池实现（需要在对象回收时彻底清除所有外部状态），或许可以考虑在极端谨慎和严格控制上下文中使用它。即使在这里，也需要考虑兼容性问题。</li>
+</ul>
+</li>
+<li>对第三方对象行为的应急干预（极其危险，不推荐）：<ul>
+<li>遇到一个行为异常、怀疑其内部关联对象状态混乱的第三方对象，且在无其他解决方案时铤而走险尝试用它“重置”对象。这无异于赌博，极易引入新问题且难以维护。</li>
+</ul>
+</li>
+</ol>
+<p>总之应该把这个 API 当作核按钮看待，威力巨大，但按下后的后果通常是灾难性的、不可控的。日常开发中应该使用 <code>objc_setAssociatedObject()</code> 并传入 nil 作为 value 参数来实现移除关联对象。</p>
+<p>接着就是如何设置关联对象和获取关联对象了：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">Person</span> : <span class="title">NSObject</span></span></span><br><span class="line"><span class="keyword">@property</span> (atomic, <span class="keyword">strong</span>) <span class="built_in">NSString</span> *name;</span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">Person</span></span></span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">Person</span> (<span class="title">associatedObject</span>)</span></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">assign</span>) <span class="built_in">NSUInteger</span> age;</span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">Person</span> (<span class="title">associatedObject</span>)</span></span><br><span class="line">- (<span class="type">void</span>)setAge:(<span class="built_in">NSUInteger</span>)age &#123;</span><br><span class="line">    objc_setAssociatedObject(<span class="keyword">self</span>, <span class="keyword">@selector</span>(age), @(age), OBJC_ASSOCIATION_ASSIGN);</span><br><span class="line">&#125;</span><br><span class="line">- (<span class="built_in">NSUInteger</span>)age &#123;</span><br><span class="line">    <span class="keyword">return</span> [objc_getAssociatedObject(<span class="keyword">self</span>, <span class="keyword">@selector</span>(age)) unsignedIntegerValue];</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> main(<span class="type">int</span> argc, <span class="keyword">const</span> <span class="type">char</span> *argv[]) &#123;</span><br><span class="line"></span><br><span class="line">    Person *person1 = [Person new];</span><br><span class="line">    person1.name = <span class="string">@&quot;jack&quot;</span>;</span><br><span class="line">    person1.age = <span class="number">22</span>;</span><br><span class="line">    </span><br><span class="line">    Person *person2 = [Person new];</span><br><span class="line">    person2.name = <span class="string">@&quot;rose&quot;</span>;</span><br><span class="line">    person2.age = <span class="number">20</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@&quot;%@,%zd&quot;</span>, person1.name, person1.age);</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@&quot;%@,%zd&quot;</span>, person2.name, person2.age);</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里使用 <code>@selector(age)</code> 作为 key 用来存取关联对象。个人认为这种方式是最简洁方便的，当然除了这种方式，还有很多其他取 key 值的方式：</p>
+<ul>
+<li><code>static const void *kKeyName = &amp;kKeyName;</code> 这种方式及很多其他变体，都需要额外一个全局变量，不论如何都不如 @selector() 来的方便。</li>
+<li>直接使用属性名字符串。这种方式同样也比较简洁，不需要额外的变量。但是需要自己拼写属性名字符串，何不直接使用 @selector() 还有编译器提示。</li>
+</ul>
+<h1 id="关联对象的底层实现"><a href="#关联对象的底层实现" class="headerlink" title="关联对象的底层实现"></a>关联对象的底层实现</h1><p>objc&#x2F;runtime.h 的实现在 objc4 库里面，Apple 开源了这个库，可以在 <a target="_blank" rel="noopener" href="https://github.com/apple-oss-distributions/objc4">https://github.com/apple-oss-distributions/objc4</a> 下载到。搜索其中的 API 很容易就能找到实现的位置，位于 objc-references.mm 文件中。其实如果熟悉 C++ 语言的话，实现的代码看起来也不难。</p>
+<p>关联对象（Associated Object）功能的大致流程和几个核心 C++ 类之间的关系可以归纳如下：</p>
+<ol>
+<li>AssociationsManager：全局管理者<ul>
+<li>职责：管理所有对象的关联数据，确保线程安全</li>
+<li>实现机制：<ul>
+<li>内部通过静态变量 _mapStorage 存储全局唯一的 AssociationsHashMap。</li>
+<li>使用自旋锁 spinlock_t AssociationsManagerLock 保证多线程环境下的数据安全，构造函数加锁，析构函数解锁。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>AssociationsHashMap：全局存储表<ul>
+<li>定义：typedef DenseMap&lt;DisguisedPtr<objc_object>, ObjectAssociationMap&gt; AssociationsHashMap;</li>
+<li>职责：以对象地址为键，存储每个对象的关联数据表（ObjectAssociationMap）</li>
+<li>数据结构：<ul>
+<li>键：将对象包装为 DisguisedPtr<objc_object></li>
+<li>值：ObjectAssociationMap</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>ObjectAssociationMap：对象专属关联表<ul>
+<li>定义：typedef DenseMap&lt;const void *, ObjcAssociation&gt; ObjectAssociationMap;</li>
+<li>职责：存储单个对象的所有关联键值对。</li>
+<li>数据结构：<ul>
+<li>键：用户传入的 void *key 参数（例如使用 @selector(propertyName) 或静态变量地址）</li>
+<li>值：ObjcAssociation（封装关联值和内存管理策略）</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>ObjcAssociation：关联值包装器<ul>
+<li>职责：存储关联值（id _value）和内存管理策略 （uintptr_t _policy）</li>
+<li>要点：负责在 <code>objc_setAssociatedObject</code>,<code>objc_getAssociatedObject</code> 中根据 _policy 进行 retain、release、autorelease 等引用计数操作。</li>
+</ul>
+</li>
+</ol>
+<p>工作流程图：</p>
+<img src="/2025/06/06/Associative-References/47fa45105cca18.png" class="">
+
+<p>Objective-C runtime 就借助这几个 C++ 类高效、安全地在任意对象上动态「挂载」或「取回」任意类型的关联数据。我知道对于很多不熟悉 C++ 的同学来说，不论说明的再如何详细，其实看起来都还是一脸蒙蔽，于是，我使用 Objective-C 语法实现了类似结构的伪代码帮助理解。</p>
+<h1 id="使用-Objective-C-模仿关联对象的底层实现"><a href="#使用-Objective-C-模仿关联对象的底层实现" class="headerlink" title="使用 Objective-C 模仿关联对象的底层实现"></a>使用 Objective-C 模仿关联对象的底层实现</h1><p>以下是基于 Objective-C 运行时关联对象底层原理的简化代码模拟，核心还原了四级结构（AssociationsManager → AssociationsHashMap → ObjectAssociationMap → ObjcAssociation）的设计逻辑。代码以伪实现为主，忽略线程安全等细节，重点展示数据结构关联性：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 1. 模拟 ObjcAssociation（封装值和策略）</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="built_in">NS_ENUM</span>(<span class="built_in">NSUInteger</span>, ObjcAssociationPolicy) &#123;</span><br><span class="line">    K_OBJC_ASSOCIATION_ASSIGN,</span><br><span class="line">    K_OBJC_ASSOCIATION_RETAIN,</span><br><span class="line">    K_OBJC_ASSOCIATION_COPY</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">ObjcAssociation</span> : <span class="title">NSObject</span></span></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>) <span class="type">id</span> value;</span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">assign</span>) ObjcAssociationPolicy policy;</span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">ObjcAssociation</span></span></span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 2. 模拟 ObjectAssociationMap（对象专属关联表）</span></span><br><span class="line"><span class="comment">// 使用 NSMutableDictionary 存储 key → ObjcAssociation 的映射</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="built_in">NSMutableDictionary</span>&lt;<span class="built_in">NSValue</span> *, ObjcAssociation *&gt; ObjectAssociationMap;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 3. 模拟 AssociationsHashMap（全局存储表）</span></span><br><span class="line"><span class="comment">// Key: 对象指针的伪装值（DISGUISE(object)），Value: ObjectAssociationMap</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="built_in">NSMutableDictionary</span>&lt;<span class="built_in">NSNumber</span> *, ObjectAssociationMap *&gt; AssociationsHashMap;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 4. 模拟 AssociationsManager（全局管理者）</span></span><br><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">AssociationsManager</span> : <span class="title">NSObject</span></span></span><br><span class="line">+ (AssociationsHashMap *)sharedMap;</span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">AssociationsManager</span></span></span><br><span class="line">+ (AssociationsHashMap *)sharedMap &#123;</span><br><span class="line">    <span class="keyword">static</span> AssociationsHashMap *_globalMap;</span><br><span class="line">    <span class="keyword">static</span> <span class="built_in">dispatch_once_t</span> onceToken;</span><br><span class="line">    <span class="built_in">dispatch_once</span>(&amp;onceToken, ^&#123;</span><br><span class="line">        _globalMap = [<span class="built_in">NSMutableDictionary</span> new];</span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="keyword">return</span> _globalMap;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 5. 关联对象 API 的简化实现</span></span><br><span class="line"><span class="type">void</span> objc_setAssociatedObject_simulated(<span class="type">id</span> object, <span class="keyword">const</span> <span class="type">void</span> *key, <span class="type">id</span> value, ObjcAssociationPolicy policy) &#123;</span><br><span class="line">    <span class="comment">// Step 1: 获取全局 AssociationsHashMap</span></span><br><span class="line">    AssociationsHashMap *globalMap = [AssociationsManager sharedMap];</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// Step 2: 生成对象伪装键（模拟 DISGUISE(object)）</span></span><br><span class="line">    <span class="built_in">NSNumber</span> *disguisedKey = @((<span class="built_in">NSUInteger</span>)(__bridge <span class="type">void</span> *)object);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// Step 3: 查找或创建 ObjectAssociationMap</span></span><br><span class="line">    ObjectAssociationMap *objMap = globalMap[disguisedKey];</span><br><span class="line">    <span class="keyword">if</span> (!objMap) &#123;</span><br><span class="line">        objMap = [<span class="built_in">NSMutableDictionary</span> new];</span><br><span class="line">        globalMap[disguisedKey] = objMap;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// Step 4: 处理关联值</span></span><br><span class="line">    <span class="keyword">if</span> (value) &#123;</span><br><span class="line">        ObjcAssociation *association = [ObjcAssociation new];</span><br><span class="line">        association.value = (policy == OBJC_ASSOCIATION_COPY) ? [value <span class="keyword">copy</span>] : value;</span><br><span class="line">        association.policy = policy;</span><br><span class="line">        <span class="comment">// 存储关联（key 转换为 NSValue 存储）</span></span><br><span class="line">        objMap[[<span class="built_in">NSValue</span> valueWithPointer:key]] = association;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// value=nil 时移除关联</span></span><br><span class="line">        [objMap removeObjectForKey:[<span class="built_in">NSValue</span> valueWithPointer:key]];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">id</span> objc_getAssociatedObject_simulated(<span class="type">id</span> object, <span class="keyword">const</span> <span class="type">void</span> *key) &#123;</span><br><span class="line">    <span class="comment">// 获取全局 AssociationsHashMap</span></span><br><span class="line">    AssociationsHashMap *globalMap = [AssociationsManager sharedMap];</span><br><span class="line">    <span class="built_in">NSNumber</span> *disguisedKey = @((<span class="built_in">NSUInteger</span>)(__bridge <span class="type">void</span> *)object);</span><br><span class="line">    <span class="comment">// 获取 object 对应的 ObjectAssociationMap</span></span><br><span class="line">    ObjectAssociationMap *objMap = globalMap[disguisedKey];</span><br><span class="line">    <span class="comment">// 获取 object 的 key 对应的关联对象</span></span><br><span class="line">    ObjcAssociation *association = objMap[[<span class="built_in">NSValue</span> valueWithPointer:key]];</span><br><span class="line">    <span class="keyword">return</span> association.value;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://masterking.github.io">masterKing</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://masterking.github.io/2025/06/06/Associative-References/">https://masterking.github.io/2025/06/06/Associative-References/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="https://masterking.github.io" target="_blank">masterKing 的博客</a>！</span></div></div><div class="tag_share"><div class="post-share"><div class="social-share" data-image="/images/iOS_low-level_principles.webp" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2025/06/05/%E6%9E%B6%E6%9E%84%E6%A8%A1%E5%BC%8F/" title="架构模式"><img class="cover" src="/images/iOS_low-level_principles.webp" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">架构模式</div></div><div class="info-2"><div class="info-item-1">面试题 讲解 MVC、MVVM、MVP 以及你在项目里具体是怎么写的？ 你自己用过哪些设计模式？ 一般开始做一个项目，你的架构是如何思考的？  什么是架构？感觉MJ这块讲的不是很好，可能这个确实还是比较抽象，建议多结合ai总结吧。 常见的架构有  MVC MVP MVVM VIPER CDD  MVCApple 官方的 MVC 指的是 Model、View、Controller。Contro...</div></div></div></a><a class="pagination-related" href="/2025/06/08/Category/" title="Category"><img class="cover" src="/images/iOS_low-level_principles.webp" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">Category</div></div><div class="info-2"><div class="info-item-1">分类诞生的历史Objective-C 的分类（Category）语法并非随语言初始版本一同出现，而是随着语言发展逐步引入的重要特性。以下是关键时间线和技术背景分析： Objective-C 由 Brad Cox 和 Tom Love 在 1980 年代初基于 C 语言开发，旨在添加 Smalltalk 风格的面向对象特性。初始版本（1981年）​​ 仅包含核心的面向对象机制（如类、继承、消息...</div></div></div></a></nav><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div class="vcomment" id="vcomment"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content is-expand"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%88%86%E7%B1%BB%E8%83%BD%E5%90%A6%E6%B7%BB%E5%8A%A0%E5%B1%9E%E6%80%A7%EF%BC%9F%E5%AE%9E%E4%BE%8B%E5%8F%98%E9%87%8F%EF%BC%9F"><span class="toc-text">分类能否添加属性？实例变量？</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Associative-References"><span class="toc-text">Associative References</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%85%B3%E8%81%94%E5%AF%B9%E8%B1%A1%E7%9A%84%E5%BA%95%E5%B1%82%E5%AE%9E%E7%8E%B0"><span class="toc-text">关联对象的底层实现</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8-Objective-C-%E6%A8%A1%E4%BB%BF%E5%85%B3%E8%81%94%E5%AF%B9%E8%B1%A1%E7%9A%84%E5%BA%95%E5%B1%82%E5%AE%9E%E7%8E%B0"><span class="toc-text">使用 Objective-C 模仿关联对象的底层实现</span></a></li></ol></div></div></div></div></main><footer id="footer" style="background-image: url(/images/iOS_low-level_principles.webp);"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2018 - 2025 By masterKing</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.4.3</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="前往评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"><script>(() => {
+  const isShuoshuo = GLOBAL_CONFIG_SITE.pageType === 'shuoshuo'
+  const option = null
+
+  const initValine = (el, path) => {
+    if (isShuoshuo) {
+      window.shuoshuoComment.destroyValine = () => {
+        if (el.children.length) {
+          el.innerHTML = ''
+          el.classList.add('no-comment')
+        }
+      }
+    }
+
+    const valineConfig = {
+      el: '#vcomment',
+      appId: 'Nj4rbGaJ3pAWBRJWseaRg9Zu-gzGzoHsz',
+      appKey: '3tVispErrQeAytUHyJrFos3n',
+      avatar: 'monsterid',
+      serverURLs: '',
+      emojiMaps: "",
+      visitor: false,
+      ...option,
+      path: isShuoshuo ? path : (option && option.path) || window.location.pathname
+    }
+
+    new Valine(valineConfig)
+  }
+
+  const loadValine = async (el, path) => {
+    if (typeof Valine === 'function') {
+      initValine(el, path)
+    } else {
+      await btf.getScript('https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js')
+      initValine(el, path)
+    }
+  }
+
+  if (isShuoshuo) {
+    'Valine' === 'Valine'
+      ? window.shuoshuoComment = { loadComment: loadValine }
+      : window.loadOtherComment = loadValine
+    return
+  }
+
+  if ('Valine' === 'Valine' || !false) {
+    if (false) btf.loadComment(document.getElementById('vcomment'),loadValine)
+    else setTimeout(loadValine, 0)
+  } else {
+    window.loadOtherComment = loadValine
+  }
+})()</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div></body></html>

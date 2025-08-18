@@ -1,0 +1,262 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>Reveal | masterKing 的博客</title><meta name="author" content="masterKing"><meta name="copyright" content="masterKing"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="之前已经介绍过 Cycript 这个越狱动态分析的神器，Cycript 是纯命令式的分析工具，对于大多数人&#x2F;普通开发者来说，这种方式还是显得太极客了。还是图形化的界面更容易接受和使用，所以今天介绍的就是这样一款神器 Reveal 。很多 iOS 的正向开发人员会感觉到困惑，说我用 Xcode 的 view debugger 用的挺好的啊。还去了解这个 Reveal 干什么。。。我只能说跟">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Reveal">
+<meta property="og:url" content="https://masterking.github.io/2023/08/26/Reveal/index.html">
+<meta property="og:site_name" content="masterKing 的博客">
+<meta property="og:description" content="之前已经介绍过 Cycript 这个越狱动态分析的神器，Cycript 是纯命令式的分析工具，对于大多数人&#x2F;普通开发者来说，这种方式还是显得太极客了。还是图形化的界面更容易接受和使用，所以今天介绍的就是这样一款神器 Reveal 。很多 iOS 的正向开发人员会感觉到困惑，说我用 Xcode 的 view debugger 用的挺好的啊。还去了解这个 Reveal 干什么。。。我只能说跟">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://masterking.github.io/images/iOSReveseEngineeringAndSecurity1.webp">
+<meta property="article:published_time" content="2023-08-26T12:26:51.000Z">
+<meta property="article:modified_time" content="2024-11-06T08:08:35.663Z">
+<meta property="article:author" content="masterKing">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://masterking.github.io/images/iOSReveseEngineeringAndSecurity1.webp"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Reveal",
+  "url": "https://masterking.github.io/2023/08/26/Reveal/",
+  "image": "https://masterking.github.io/images/iOSReveseEngineeringAndSecurity1.webp",
+  "datePublished": "2023-08-26T12:26:51.000Z",
+  "dateModified": "2024-11-06T08:08:35.663Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "masterKing",
+      "url": "https://masterking.github.io"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.ico"><link rel="canonical" href="https://masterking.github.io/2023/08/26/Reveal/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//hm.baidu.com"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?e6857234b462ad05308d8b79794f0358";
+  var s = document.getElementsByTagName("script")[0];
+  s.parentNode.insertBefore(hm, s);
+})();
+btf.addGlobalFn('pjaxComplete', () => {
+  _hmt.push(['_trackPageview',window.location.pathname])
+}, 'baidu_analytics')
+</script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"未找到符合您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":false,"highlightHeightLimit":false,"highlightFullpage":true,"highlightMacStyle":true},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Reveal',
+  isHighlightShrink: undefined,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg" style="background: linear-gradient( 135deg, #2c241f, #968282);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/images/WechatIMG1.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">47</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">32</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">6</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/sileorepo/"><i class="fa-fw fas fa-shop"></i><span> sileo 源</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/images/iOSReveseEngineeringAndSecurity1.webp);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">masterKing 的博客</span></a><a class="nav-page-title" href="/"><span class="site-name">Reveal</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/sileorepo/"><i class="fa-fw fas fa-shop"></i><span> sileo 源</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">Reveal</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-08-26T12:26:51.000Z" title="发表于 2023-08-26 20:26:51">2023-08-26</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-11-06T08:08:35.663Z" title="更新于 2024-11-06 16:08:35">2024-11-06</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/iOS-%E9%80%86%E5%90%91%E4%B8%8E%E5%AE%89%E5%85%A8/">iOS 逆向与安全</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">总字数:</span><span class="word-count">1.5k</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span><span class="post-meta-separator">|</span><span class="post-meta-commentcount"><i class="far fa-comments fa-fw post-meta-icon"></i><span class="post-meta-label">评论数:</span><a href="/2023/08/26/Reveal/#post-comment" itemprop="discussionUrl"><span class="valine-comment-count" data-xid="/2023/08/26/Reveal/" itemprop="commentCount"><i class="fa-solid fa-spinner fa-spin"></i></span></a></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><div id="post-outdate-notice" data="{&quot;limitDay&quot;:365,&quot;messagePrev&quot;:&quot;距离上次更新已有&quot;,&quot;messageNext&quot;:&quot;天，文章某些内容可能已过时。&quot;,&quot;postUpdate&quot;:&quot;2024-11-06 16:08:35&quot;}" hidden></div><p>之前已经介绍过 Cycript 这个越狱动态分析的神器，Cycript 是纯命令式的分析工具，对于大多数人&#x2F;普通开发者来说，这种方式还是显得太极客了。还是图形化的界面更容易接受和使用，所以今天介绍的就是这样一款神器 Reveal 。很多 iOS 的正向开发人员会感觉到困惑，说我用 Xcode 的 view debugger 用的挺好的啊。还去了解这个 Reveal 干什么。。。我只能说跟我在没接触逆向开发之前的想法一模一样，Reveal 不仅可以分析你的 APP 界面，它还可以分析其他开发者的 APP 界面，甚至分析 iOS 系统自带的 APP 界面。而且对于 flutter 项目生成的 App 使用 view debugger 只能看到视图层级结构内容却只显示一片黑色，而 Reveal 却能看到其中的内容。而且 Reveal 在分析 APP 界面的时候同样不需要中断分析的 APP 进程。</p>
+<p>Cycript 相比 Reveal 功能更加强大，除了可以查看 APP 的 UI 界面以外，还可以获取 APP 中更多的信息，比如对象的成员变量，属性，对象方法，类方法等等。。。虽然 Reveal 仅限 UI 界面分析修改 UI 属性等简单功能，但 Reveal 提供的图形界面对大多数人更加友好。分析界面时选择哪个取决于你的个人爱好，但想动态调试调用方法，获取更多的信息的话，可能 Cycript 会更合适。</p>
+<h1 id="正向开发中使用-Reveal"><a href="#正向开发中使用-Reveal" class="headerlink" title="正向开发中使用 Reveal"></a>正向开发中使用 Reveal</h1><p>由于正向开发过程中使用 Reveal 的意义并不大（基本都是使用 Xcode 的 view debugger），而且就算要使用，集成过程也非常简单。在 <a target="_blank" rel="noopener" href="https://revealapp.com/download/">官网</a> 下载好 Reveal 之后，打开 Reveal 找到 iOS Library，然后将它集成到 APP 中不需要添加一行代码就完事了。然后启动 APP 重新（可能也不需要？）打开 Reveal 就可以看到你的 APP 显示在 Reveal 界面。</p>
+<p>找到 Reveal 的 iOS Library：</p>
+<img src="/2023/08/26/Reveal/8bb982c6fbc34d6796ea0148ed8944b5~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="" alt="image.png">
+
+<p>呃，集成过程还是讲一下吧，不然可能会启动就崩溃。将 iOS Library 复制到项目的根目录下</p>
+<p align=center><img src="Reveal/0e1be61793cb4351878b1a409ffe1be1~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" alt="image.png" width="50%" /></p>
+
+<p>然后找到你的 target -&gt; general -&gt; frameworks,libraries,and embedded content -&gt; RevealServer.framework 右侧选择 Embed &amp; sign 。</p>
+<p align=center><img src="Reveal/d5d400c8a4cc42e388ade86725b6d773~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" alt="image.png" width="70%" /></p>
+
+<p>这样会将 RevealServer.framework 打包到 APP 包的 Frameworks 目录下。如下图：</p>
+<p align=center><img src="Reveal/fd7cfc3a7c6445cbba679ef75a1b47b8~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" alt="image.png" width="50%" /></p>
+
+<p>只有这样，才不会启动崩溃，（这是在我的 Reveal 版本 21 上是这样的，如果你不是这个版本，可能不会有这样的问题）。Reveal 界面如下：</p>
+<img src="/2023/08/26/Reveal/df19cf9fa34141f1a9d205f6669a4137~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="" alt="image.png">
+
+<h1 id="逆向开发中中使用-Reveal"><a href="#逆向开发中中使用-Reveal" class="headerlink" title="逆向开发中中使用 Reveal"></a>逆向开发中中使用 Reveal</h1><h2 id="未越狱环境使用"><a href="#未越狱环境使用" class="headerlink" title="未越狱环境使用"></a>未越狱环境使用</h2><p>同样还是推荐使用 <a target="_blank" rel="noopener" href="https://github.com/AloneMonkey/MonkeyDev">AloneMonkey</a> 的 MonkeyApp 项目模板，项目模板默认就集成了 Reveal ，不过需要注意的是 AloneMonkey 自带的 RevealServer.framework 库版本十分古老了。所以需要将你的 Reveal 的 RevealServer.framework 替换过去。在 Reveal 的 help 中找到 iOS Library，替换 AloneMonkey 中的 RevealServer.framework，AloneMonkey 的 RevealServer.framework 路径如下：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/opt/MonkeyDev/Frameworks/RevealServer.framework</span><br></pre></td></tr></table></figure>
+
+<h2 id="越狱环境使用"><a href="#越狱环境使用" class="headerlink" title="越狱环境使用"></a>越狱环境使用</h2><p>越狱环境的使用需要以下三个步骤</p>
+<ol>
+<li><p><del>从 Cydia&#x2F;Sileo 安装 Reveal2Loader</del></p>
+ <img src="Reveal/b79de82dd10547e3bf78ddb102be1451~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" alt="IMG_0005.PNG" width="50%" />
+ 
+<p> 在最新的越狱 iOS 设备上，无论是 rootless 还是 rootful 好像都无法正常使用了。作者进行了升级适配开源了 <a target="_blank" rel="noopener" href="https://github.com/masterKing/RevealLoader2">RevealLoader2</a> 可以添加作者的软件源：<a href="https://masterking.github.io/sileorepo">https://masterking.github.io/sileorepo</a> 下载</p>
+</li>
+<li><p>将 Mac 上的 Reveal 的 iOS Library 中的 RevealServer.framework 复制到越狱设备的 <code>/Library/Frameworks/RevealServer.framework</code> 路径。可以使用 scp 命令，也可以使用 iFunBox 图形界面操作更直观。</p>
+</li>
+<li><p>在 iOS 设置 APP 中找到 Reveal -&gt; Enabled Applications 选择你想要调试的 APP 打开右侧的开关。</p>
+</li>
+</ol>
+<p>执行上述步骤之后，打开 Mac 的 Reveal 就可以看到越狱 iPhone 上可以调试的 APP 了，可以看到系统的 APP 也可以。下面是系统 备忘录 APP 的界面结构：</p>
+<img src="/2023/08/26/Reveal/44e624f4c78241dfa2da131cd91a5658~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="" alt="image.png">
+
+<h1 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h1><p>通过 Reveal 分析优秀的 APP 的 UI 界面简直是太棒了！当然这只是从 UI 层面的分析，这个时候可能很多人就会说了，光看一下 UI 界面有什么用啊，还不是不知道具体怎么实现的。</p>
+<p>直接看到源码是不太可能的（除非你是苹果公司的工程师🙂），苹果并没有开源这些 APP 。但是想要查看和源码等价的伪代码也不是完全不可能，可以通过反汇编，反编译工具（<strong>hopper</strong>，<strong>ghidra</strong>，<strong>IDA Pro</strong>等工具）还原为高级代码，这些内容都会在后续的文章中更新。</p>
+<p>还有很多 iOS 开发者经常在使用系统库的过程中，可能会遇到一些莫名其妙的问题，如 UIKit ，作者就曾经在子类化 <code>UIRefreshControl</code> 的时候遇到过奇怪的问题，很多时候都会在 <code>- (instancetype)initWithCoder:(NSCoder *)coder</code> 和 <code>- (instancetype)initWithFrame:(CGRect)frame</code> 方法内执行一些通用的公共的初始化方法，于是便实现了一个 <code>- (void)_commonInit</code> 方法完成这个目标。于是奇怪的现象发生了，代码并没有按照预期的那样运行。在作者百思不得其解的时候，想到了通过查看分析 UIRefreshControl 类的反编译伪代码发现，我自己的方法名 <code>_commonInit</code> 与该视图类的私有方法重名了，才导致出现莫名其妙的 bug 。</p>
+<p>iOS 开发者们也许很好奇，经常使用 Xcode 跳到 UIKit 框架的头文件中阅读，然后还想尝试一下找到 UIKit.framework 所在的路径，通过 show in Finder 跳转到了指定的文件却始终找不到 UIKit 的二进制文件？那系统是如何知道 UIKit 的具体实现的？一般的 APP 在它的包内就能找到二进制文件（在 iOS 中也叫 MachO 文件），但是 iOS 系统库的二进制文件的确不太好找。关于如何找到系统库的二进制文件，如何查看它的反编译伪代码，这一切的答案都会在后续的文章更新中揭晓。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://masterking.github.io">masterKing</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://masterking.github.io/2023/08/26/Reveal/">https://masterking.github.io/2023/08/26/Reveal/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="https://masterking.github.io" target="_blank">masterKing 的博客</a>！</span></div></div><div class="tag_share"><div class="post-share"><div class="social-share" data-image="/images/iOSReveseEngineeringAndSecurity1.webp" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2023/08/23/Cycript/" title="Cycript"><img class="cover" src="/images/iOSReveseEngineeringAndSecurity1.webp" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">Cycript</div></div><div class="info-2"><div class="info-item-1">什么是 CycriptCycript 是一种用于 iOS 操作系统的脚本语言，同时也是该语言的解释器（一般来说不需要编译的脚本语言都会提供它对应的解释器，比如 Python、JavaScript、Ruby、PHP 等），Cycript 是 JavaScript，Objective-C++ 等语言的混合物这意味着它能理解 JavaScript，Objective-C++ 甚至是 Objecti...</div></div></div></a><a class="pagination-related" href="/2023/10/19/2023-10-19-2023%E5%B9%B410%E6%9C%88%E4%BA%86%E9%BB%91%E8%8B%B9%E6%9E%9C%E8%BF%98%E9%A6%99%E5%90%97%EF%BC%9F%E6%80%A7%E4%BB%B7%E6%AF%94%E8%B6%85%E9%AB%98%E9%BB%91%E8%8B%B9%E6%9E%9C%E5%8F%B0%E5%BC%8F%E6%9C%BA%E6%90%AD%E9%85%8D-%E9%BB%91%E8%8B%B9%E6%9E%9C%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B/" title="2023年10月了黑苹果还香吗？性价比超高黑苹果台式机搭配&amp;黑苹果安装教程"><img class="cover" src="https://inews.gtimg.com/om_bt/Os3eJ8u3SgB3Kd-zrRRhgfR5hUvdwcVPKUTNO6O7sZfUwAA/641" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">2023年10月了黑苹果还香吗？性价比超高黑苹果台式机搭配&黑苹果安装教程</div></div><div class="info-2"><div class="info-item-1">缘由最近一段时间对 iOS 逆向开发进行了一定的研究，之前也更新过一段时间的相关文章（后续由于搬家，不幸感染病毒🦠等一些原因断更了个把月），在学习和探索过程中，非常明显的感受到逆向分析对电脑的性能要求很高尤其是 CPU，在使用逆向分析工具 ghidra，hopper 等程序对 MachO 文件进行分析的时候，常常一分析就要等上大几个小时，而且我使用了 n 年的 MacBook Pro 在分...</div></div></div></a></nav><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div class="vcomment" id="vcomment"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content is-expand"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%AD%A3%E5%90%91%E5%BC%80%E5%8F%91%E4%B8%AD%E4%BD%BF%E7%94%A8-Reveal"><span class="toc-text">正向开发中使用 Reveal</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%80%86%E5%90%91%E5%BC%80%E5%8F%91%E4%B8%AD%E4%B8%AD%E4%BD%BF%E7%94%A8-Reveal"><span class="toc-text">逆向开发中中使用 Reveal</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9C%AA%E8%B6%8A%E7%8B%B1%E7%8E%AF%E5%A2%83%E4%BD%BF%E7%94%A8"><span class="toc-text">未越狱环境使用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%B6%8A%E7%8B%B1%E7%8E%AF%E5%A2%83%E4%BD%BF%E7%94%A8"><span class="toc-text">越狱环境使用</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%9C%80%E5%90%8E"><span class="toc-text">最后</span></a></li></ol></div></div></div></div></main><footer id="footer" style="background-image: url(/images/iOSReveseEngineeringAndSecurity1.webp);"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2018 - 2025 By masterKing</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.4.3</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="前往评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"><script>(() => {
+  const isShuoshuo = GLOBAL_CONFIG_SITE.pageType === 'shuoshuo'
+  const option = null
+
+  const initValine = (el, path) => {
+    if (isShuoshuo) {
+      window.shuoshuoComment.destroyValine = () => {
+        if (el.children.length) {
+          el.innerHTML = ''
+          el.classList.add('no-comment')
+        }
+      }
+    }
+
+    const valineConfig = {
+      el: '#vcomment',
+      appId: 'Nj4rbGaJ3pAWBRJWseaRg9Zu-gzGzoHsz',
+      appKey: '3tVispErrQeAytUHyJrFos3n',
+      avatar: 'monsterid',
+      serverURLs: '',
+      emojiMaps: "",
+      visitor: false,
+      ...option,
+      path: isShuoshuo ? path : (option && option.path) || window.location.pathname
+    }
+
+    new Valine(valineConfig)
+  }
+
+  const loadValine = async (el, path) => {
+    if (typeof Valine === 'function') {
+      initValine(el, path)
+    } else {
+      await btf.getScript('https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js')
+      initValine(el, path)
+    }
+  }
+
+  if (isShuoshuo) {
+    'Valine' === 'Valine'
+      ? window.shuoshuoComment = { loadComment: loadValine }
+      : window.loadOtherComment = loadValine
+    return
+  }
+
+  if ('Valine' === 'Valine' || !false) {
+    if (false) btf.loadComment(document.getElementById('vcomment'),loadValine)
+    else setTimeout(loadValine, 0)
+  } else {
+    window.loadOtherComment = loadValine
+  }
+})()</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div></body></html>

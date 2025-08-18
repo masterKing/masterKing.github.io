@@ -1,0 +1,286 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>Category | masterKing 的博客</title><meta name="author" content="masterKing"><meta name="copyright" content="masterKing"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="分类诞生的历史Objective-C 的分类（Category）语法并非随语言初始版本一同出现，而是随着语言发展逐步引入的重要特性。以下是关键时间线和技术背景分析： Objective-C 由 Brad Cox 和 Tom Love 在 1980 年代初基于 C 语言开发，旨在添加 Smalltalk 风格的面向对象特性。初始版本（1981年）​​ 仅包含核心的面向对象机制（如类、继承、消息传递）">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Category">
+<meta property="og:url" content="https://masterking.github.io/2025/06/08/Category/index.html">
+<meta property="og:site_name" content="masterKing 的博客">
+<meta property="og:description" content="分类诞生的历史Objective-C 的分类（Category）语法并非随语言初始版本一同出现，而是随着语言发展逐步引入的重要特性。以下是关键时间线和技术背景分析： Objective-C 由 Brad Cox 和 Tom Love 在 1980 年代初基于 C 语言开发，旨在添加 Smalltalk 风格的面向对象特性。初始版本（1981年）​​ 仅包含核心的面向对象机制（如类、继承、消息传递）">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://masterking.github.io/images/iOS_low-level_principles.webp">
+<meta property="article:published_time" content="2025-06-08T01:56:35.000Z">
+<meta property="article:modified_time" content="2025-06-15T13:29:57.070Z">
+<meta property="article:author" content="masterKing">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://masterking.github.io/images/iOS_low-level_principles.webp"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Category",
+  "url": "https://masterking.github.io/2025/06/08/Category/",
+  "image": "https://masterking.github.io/images/iOS_low-level_principles.webp",
+  "datePublished": "2025-06-08T01:56:35.000Z",
+  "dateModified": "2025-06-15T13:29:57.070Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "masterKing",
+      "url": "https://masterking.github.io"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.ico"><link rel="canonical" href="https://masterking.github.io/2025/06/08/Category/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//hm.baidu.com"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?e6857234b462ad05308d8b79794f0358";
+  var s = document.getElementsByTagName("script")[0];
+  s.parentNode.insertBefore(hm, s);
+})();
+btf.addGlobalFn('pjaxComplete', () => {
+  _hmt.push(['_trackPageview',window.location.pathname])
+}, 'baidu_analytics')
+</script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"未找到符合您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":false,"highlightHeightLimit":false,"highlightFullpage":true,"highlightMacStyle":true},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Category',
+  isHighlightShrink: undefined,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg" style="background: linear-gradient( 135deg, #2c241f, #968282);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/images/WechatIMG1.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">47</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">32</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">6</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/sileorepo/"><i class="fa-fw fas fa-shop"></i><span> sileo 源</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/images/iOS_low-level_principles.webp);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">masterKing 的博客</span></a><a class="nav-page-title" href="/"><span class="site-name">Category</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/sileorepo/"><i class="fa-fw fas fa-shop"></i><span> sileo 源</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">Category</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-06-08T01:56:35.000Z" title="发表于 2025-06-08 09:56:35">2025-06-08</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-06-15T13:29:57.070Z" title="更新于 2025-06-15 21:29:57">2025-06-15</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/iOS-%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86/">iOS 底层原理</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">总字数:</span><span class="word-count">2.3k</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span><span class="post-meta-separator">|</span><span class="post-meta-commentcount"><i class="far fa-comments fa-fw post-meta-icon"></i><span class="post-meta-label">评论数:</span><a href="/2025/06/08/Category/#post-comment" itemprop="discussionUrl"><span class="valine-comment-count" data-xid="/2025/06/08/Category/" itemprop="commentCount"><i class="fa-solid fa-spinner fa-spin"></i></span></a></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><div id="post-outdate-notice" data="{&quot;limitDay&quot;:365,&quot;messagePrev&quot;:&quot;距离上次更新已有&quot;,&quot;messageNext&quot;:&quot;天，文章某些内容可能已过时。&quot;,&quot;postUpdate&quot;:&quot;2025-06-15 21:29:57&quot;}" hidden></div><h1 id="分类诞生的历史"><a href="#分类诞生的历史" class="headerlink" title="分类诞生的历史"></a>分类诞生的历史</h1><p>Objective-C 的分类（Category）语法并非随语言初始版本一同出现，而是随着语言发展逐步引入的重要特性。以下是关键时间线和技术背景分析：</p>
+<p>Objective-C 由 Brad Cox 和 Tom Love 在 1980 年代初基于 C 语言开发，旨在添加 Smalltalk 风格的面向对象特性。初始版本（1981年）​​ 仅包含核心的面向对象机制（如类、继承、消息传递），​​未包含分类语法​​。此时语言的核心是“软件组件”（Software-IC）概念，聚焦于通过类封装数据和操作。</p>
+<p>​​Objective-C 的类别（Category）语法是在 1990 年代初加入到 Objective-C 语言中的，具体时间是随着 NeXTSTEP 操作系统的发布而引入的。NeXTSTEP 是苹果公司前首席执行官史蒂夫·乔布斯创办的 NeXT 公司开发的操作系统，它使用了 Objective-C 作为主要编程语言，并引入了类别这一特性。﻿<br>​​<br>​​<strong>设计动机</strong>​​：解决无法修改原始类（如系统框架类）时扩展功能的需求。例如，为 NSString 添加绘图方法而无需继承或修改原始实现。这是最核心的应用场景。早期 Objective-C 依赖继承和组合实现扩展，分类则提供了更轻量、灵活的替代方案，直接为类添加方法。</p>
+<h1 id="核心语法：声明与实现"><a href="#核心语法：声明与实现" class="headerlink" title="核心语法：声明与实现"></a>核心语法：声明与实现</h1><p>分类，分类，顾名思义就知道，它是对类的拆分，所以需要一个明确的类，然后是分类的名称。</p>
+<ul>
+<li>分类的声明：  <figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">ClassName</span> (<span class="title">CategoryName</span>)</span></span><br><span class="line"><span class="comment">// 分类需要的属性。。。</span></span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure></li>
+<li>分类的实现：  <figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">ClassName</span> (<span class="title">CategoryName</span>)</span></span><br><span class="line"><span class="comment">// 方法的实现</span></span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+<h1 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h1><p>按照实际使用频率排序：</p>
+<h2 id="🛠️-一、扩展系统或第三方框架类"><a href="#🛠️-一、扩展系统或第三方框架类" class="headerlink" title="🛠️ 一、扩展系统或第三方框架类"></a>🛠️ 一、扩展系统或第三方框架类</h2><p>场景：为 NSString、NSArray 等系统类或者第三方框架提供的类添加项目所需的特定方法。<br>示例：为 NSString 添加邮箱格式验证方法。</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// NSString+Validation.h</span></span><br><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">NSString</span> (<span class="title">Validation</span>)</span></span><br><span class="line">- (<span class="type">BOOL</span>)isValidEmail;</span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// NSString+Validation.m</span></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">NSString</span> (<span class="title">Validation</span>)</span></span><br><span class="line">- (<span class="type">BOOL</span>)isValidEmail &#123;</span><br><span class="line">    <span class="comment">// 正则验证逻辑</span></span><br><span class="line">    <span class="keyword">return</span> [emailTest evaluateWithObject:<span class="keyword">self</span>];</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+
+<p>优势：</p>
+<ul>
+<li>不修改 NSString 源码，避免破坏系统类的封装性；</li>
+<li>方法对所有 NSString 实例及子类（如 NSMutableString）生效。</li>
+</ul>
+<h2 id="⚙️-二、面向切面编程（AOP）支持"><a href="#⚙️-二、面向切面编程（AOP）支持" class="headerlink" title="⚙️ 二、面向切面编程（AOP）支持"></a>⚙️ 二、面向切面编程（AOP）支持</h2><p>场景​​：无侵入添加横切关注点（如日志、埋点）。<br>示例​​：通过分类实现方法交换（Method Swizzling）：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">ViewController</span> (<span class="title">log</span>)</span></span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">ViewController</span> (<span class="title">log</span>)</span></span><br><span class="line">+ (<span class="type">void</span>)load &#123;</span><br><span class="line">    <span class="keyword">static</span> <span class="built_in">dispatch_once_t</span> onceToken;</span><br><span class="line">    <span class="built_in">dispatch_once</span>(&amp;onceToken, ^&#123;</span><br><span class="line">        Method original = class_getInstanceMethod(<span class="keyword">self</span>, <span class="keyword">@selector</span>(viewDidAppear:));</span><br><span class="line">        Method swizzled = class_getInstanceMethod(<span class="keyword">self</span>, <span class="keyword">@selector</span>(swizzled_viewDidAppear:));</span><br><span class="line">        method_exchangeImplementations(original, swizzled);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br><span class="line">- (<span class="type">void</span>)swizzled_viewDidAppear:(<span class="type">BOOL</span>)animated &#123;</span><br><span class="line">    <span class="comment">// 调用原始方法实现</span></span><br><span class="line">    [<span class="keyword">self</span> swizzled_viewDidAppear:animated];</span><br><span class="line">    <span class="comment">// 实现需求</span></span><br><span class="line">    [Analytics logEvent:<span class="string">@&quot;ScreenAppeared&quot;</span> forView:<span class="keyword">self</span>];</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+
+<p>​​优势​​：</p>
+<ul>
+<li>统一埋点逻辑，避免污染业务代码；</li>
+<li>适用于调试、性能监控等全局行为。</li>
+</ul>
+<h2 id="🧩-三、代码模块化与可读性提升"><a href="#🧩-三、代码模块化与可读性提升" class="headerlink" title="🧩 三、代码模块化与可读性提升"></a>🧩 三、代码模块化与可读性提升</h2><p>场景​​：将大型类的功能拆分到多个分类中，按逻辑分组管理。<br>示例​​：自定义 UIView 时分离布局、动画、样式代码；或者 NSApplication.h，UIApplication.h 头文件的实现方式</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// UIView+Layout.h  (布局相关)</span></span><br><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">UIView</span> (<span class="title">Layout</span>)</span></span><br><span class="line">- (<span class="type">void</span>)autoCenterInSuperview;</span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// UIView+Animation.h  (动画相关)</span></span><br><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">UIView</span> (<span class="title">Animation</span>)</span></span><br><span class="line">- (<span class="type">void</span>)fadeInWithDuration:(<span class="built_in">NSTimeInterval</span>)duration;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h1 id="底层实现原理"><a href="#底层实现原理" class="headerlink" title="底层实现原理"></a>底层实现原理</h1><p>分类中的方法都会合并到类对象的方法列表中。具体来说，分类中的实例方法会被合并到类对象的方法列表中，分类中的类方法会被合并到元类对象的方法列表。</p>
+<p>那么这个合并的动作发生在什么时刻？是程序启动的时候？还是编译源码的时候？</p>
+<p>根据分类的能力来说，分类可以给系统的类和第三方的类添加方法，那么可以推理出一定不是在编译时进行合并的，因为在编译时根本无法获取到系统的类和第三方的类对象啊，只能在运行时加载系统的类和第三方类的时候将分类中的方法添加到类中。其实实际上也确实这样的，我们可以从 Objective-C 的运行时库源码和编译后的产物中得到验证。</p>
+<h2 id="1-编译时的处理"><a href="#1-编译时的处理" class="headerlink" title="1. 编译时的处理"></a>1. 编译时的处理</h2><p>分类的底层结构，即编译器是如何处理我们编写的分类的。</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">NSDate</span> (<span class="title">custom</span>)</span></span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">NSDate</span> (<span class="title">custom</span>)</span></span><br><span class="line">- (<span class="type">void</span>)hello &#123;</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@&quot;%s&quot;</span>, __func__);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+
+<p>我们在源码中创建了多少个分类，在编译时就会产生多少个分类的结构体变量。如：你给 NSObject 创建了 2 个分类，那么在编译时就生成了 2 个分类结构体变量。分类的名字就是变量名的最后部分。通过查看编译后的分类结构也能验证，并不是在编译时就合并到类中了。编译时仅仅是将分类的信息保存了下来。</p>
+<h2 id="2-运行时的合并"><a href="#2-运行时的合并" class="headerlink" title="2. 运行时的合并"></a>2. 运行时的合并</h2><p>那运行时到底是如何合并分类信息到类中的呢？那就是 objc4 的源码分析了</p>
+<p><code>_objc_init -&gt; map_images -&gt; map_images_nolock() -&gt; _read_images()</code></p>
+<p>在 <code>_read_images()</code> 函数里面。核心方法 <code>remethodizeClass()</code> 里面有一个 <code>attachCategories()</code> 方法。最后是 class 的 rw 的 attachLists 方法的实现。</p>
+<p>首先将方法数组扩容，然后将原始的方法列表移动到数组的末尾，再将所有分类的方法列表复制到前面。这样就导致了分类的方法列表会在原始的方法列表前面，造成了类似覆盖的效果。就是说分类中如果存在和原始类中同名的方法，那么就会导致原始类中的方法不会被调用，而是调用分类中的方法。而如多个分类中存在同名的方法，则会按照编译的顺序优先调用，最后编译的分类中的方法会放在数组前面导致的。</p>
+<p>分类涉及的相关知识还是挺深的。。。个人认为，想要掌握 Category 的底层原理，必须先掌握，Objective-C 对象模型，运行时库初始化，等等底层知识。</p>
+<h1 id="使用注意点"><a href="#使用注意点" class="headerlink" title="使用注意点"></a>使用注意点</h1><p>理解了分类的底层原理之后，自然而然的就会考虑到不恰当使用分类可能会导致的问题：</p>
+<h2 id="不能添加实例变量"><a href="#不能添加实例变量" class="headerlink" title="不能添加实例变量"></a>不能添加实例变量</h2><p>这一点需要结合分类的设计初衷来讲，虽然从技术上来说，分类可以做到给类添加实例变量，但是会带来巨大的不稳定性和性能开销以及破坏类的封装性，从多方面考虑让分类支持添加实例变量都不是一个合适的选择。所以实际上也并没有让分类支持添加实例变量的能力，而是提供了关联对象技术达到类似实例变量的效果。</p>
+<h2 id="命名冲突风险"><a href="#命名冲突风险" class="headerlink" title="命名冲突风险"></a>命名冲突风险</h2><p>这是一个非常有可能会遇到的问题，多个分类中如果存在同名的方法，那么运行时到底会执行哪一个方法这是有答案的。取决于最后编译的是哪个分类，从前面的底层原理中得知，最后面的编译的分类会被添加到类的方法列表的前面。但是实际运用分类过程中是极不推荐在分类中使用同名方法的，应该尽量避免，解决办法就是给每个分类的方法添加一个前缀，这样大大降低了同名的可能。</p>
+<h2 id="不可覆盖原生方法"><a href="#不可覆盖原生方法" class="headerlink" title="不可覆盖原生方法"></a>不可覆盖原生方法</h2><p>覆盖系统方法可能导致框架行为异常。这也是非常有可能出现的问题，而且危险性较高，建议分类仅用来添加新功能，而不是修改原有的逻辑。</p>
+<blockquote>
+<p>分类的核心价值在于 ​​“无侵入式扩展”​​，任何可能破坏类封装性或导致运行时冲突的方案（如方法覆盖），都应优先考虑替代设计。</p>
+</blockquote>
+<h1 id="相关面试题"><a href="#相关面试题" class="headerlink" title="相关面试题"></a>相关面试题</h1><ul>
+<li>Category 的使用场景是什么</li>
+<li>Category 的实现原理</li>
+<li>Category 和 Extension 的区别是什么</li>
+<li>Category 有 load 方法吗？load 方法在什么时候被调用？load 方法能继承吗？<ul>
+<li>分类有没有 load 方法？这个问题十分奇怪？分类哪里来的 load 方法？你在分类里写了 load 方法就肯定有，没写就肯定没有啊。。。</li>
+<li>这回是 load_images 方法的源码分析了。先调用类的 load 方法，再调用分类的 load 方法。</li>
+<li>objc 运行时在初始化的时候，会直接调用类的 load 方法，而不是通过消息发送的形式调用 load 方法。</li>
+<li>我觉得，你得先搞懂 Objective-C 语言提供 load 方法的目的是什么？</li>
+<li>load，initialize 方法在 NSObject.h 文件中声明，并没有实现。那么 Objective-C 语言在 NSObject.h 文件中声明 load 和 initialize 又不实现的目的是什么呢？</li>
+</ul>
+</li>
+<li>load、initialize 方法的区别是什么？它们在 category 中的时候被调用的顺序是什么？出现继承时它们之间的被调用过程是怎样的？</li>
+<li>category 能否添加成员变量？如果可以，如何添加，如果不可以，解释为什么不可以？</li>
+</ul>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://masterking.github.io">masterKing</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://masterking.github.io/2025/06/08/Category/">https://masterking.github.io/2025/06/08/Category/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="https://masterking.github.io" target="_blank">masterKing 的博客</a>！</span></div></div><div class="tag_share"><div class="post-share"><div class="social-share" data-image="/images/iOS_low-level_principles.webp" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2025/06/06/Associative-References/" title="Associative References"><img class="cover" src="/images/iOS_low-level_principles.webp" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">Associative References</div></div><div class="info-2"><div class="info-item-1">  分类能否添加属性？实例变量？在讲解 Associative References 为为何物之前，我们先看一下这个问题：  分类中能否添加实例变量？如果可以如何添加？如果不可以，解释为什么？  可以通过编译器看看能否在分类中添加实例变量：   如上图所示，在分类中虽然可以添加属性，但是并不会生成对应的实例变量，也无法手动添加实例变量。编译器提示，实例变量不能放在分类中。那么现在的问题是，为...</div></div></div></a><a class="pagination-related" href="/2025/06/19/iOS%E5%8F%8D%E8%B0%83%E8%AF%95%E4%B8%8E%E5%8F%8D%E5%8F%8D%E8%B0%83%E8%AF%95/" title="iOS反调试与反反调试"><img class="cover" src="/images/iOSReveseEngineeringAndSecurity1.webp" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">iOS反调试与反反调试</div></div><div class="info-2"><div class="info-item-1">反调试原理ptrace​​ptrace (Process Trace)​​ 是 Linux（以及其他一些类 Unix 系统，如 macOS）提供的一个极其强大且底层的​​系统调用​​。它的核心功能是​​允许一个进程（称为 tracer）观察和控制另一个进程（称为 tracee）的执行，并能检查和修改该进程的内存和寄存器。​​ 核心功能 追踪器的介入 (Tracer&#x2F;Tracee):...</div></div></div></a></nav><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div class="vcomment" id="vcomment"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content is-expand"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%88%86%E7%B1%BB%E8%AF%9E%E7%94%9F%E7%9A%84%E5%8E%86%E5%8F%B2"><span class="toc-text">分类诞生的历史</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E8%AF%AD%E6%B3%95%EF%BC%9A%E5%A3%B0%E6%98%8E%E4%B8%8E%E5%AE%9E%E7%8E%B0"><span class="toc-text">核心语法：声明与实现</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="toc-text">使用场景</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%F0%9F%9B%A0%EF%B8%8F-%E4%B8%80%E3%80%81%E6%89%A9%E5%B1%95%E7%B3%BB%E7%BB%9F%E6%88%96%E7%AC%AC%E4%B8%89%E6%96%B9%E6%A1%86%E6%9E%B6%E7%B1%BB"><span class="toc-text">🛠️ 一、扩展系统或第三方框架类</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E2%9A%99%EF%B8%8F-%E4%BA%8C%E3%80%81%E9%9D%A2%E5%90%91%E5%88%87%E9%9D%A2%E7%BC%96%E7%A8%8B%EF%BC%88AOP%EF%BC%89%E6%94%AF%E6%8C%81"><span class="toc-text">⚙️ 二、面向切面编程（AOP）支持</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%F0%9F%A7%A9-%E4%B8%89%E3%80%81%E4%BB%A3%E7%A0%81%E6%A8%A1%E5%9D%97%E5%8C%96%E4%B8%8E%E5%8F%AF%E8%AF%BB%E6%80%A7%E6%8F%90%E5%8D%87"><span class="toc-text">🧩 三、代码模块化与可读性提升</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%BA%95%E5%B1%82%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86"><span class="toc-text">底层实现原理</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E7%BC%96%E8%AF%91%E6%97%B6%E7%9A%84%E5%A4%84%E7%90%86"><span class="toc-text">1. 编译时的处理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E8%BF%90%E8%A1%8C%E6%97%B6%E7%9A%84%E5%90%88%E5%B9%B6"><span class="toc-text">2. 运行时的合并</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8%E6%B3%A8%E6%84%8F%E7%82%B9"><span class="toc-text">使用注意点</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%8D%E8%83%BD%E6%B7%BB%E5%8A%A0%E5%AE%9E%E4%BE%8B%E5%8F%98%E9%87%8F"><span class="toc-text">不能添加实例变量</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%91%BD%E5%90%8D%E5%86%B2%E7%AA%81%E9%A3%8E%E9%99%A9"><span class="toc-text">命名冲突风险</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%8D%E5%8F%AF%E8%A6%86%E7%9B%96%E5%8E%9F%E7%94%9F%E6%96%B9%E6%B3%95"><span class="toc-text">不可覆盖原生方法</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%9B%B8%E5%85%B3%E9%9D%A2%E8%AF%95%E9%A2%98"><span class="toc-text">相关面试题</span></a></li></ol></div></div></div></div></main><footer id="footer" style="background-image: url(/images/iOS_low-level_principles.webp);"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2018 - 2025 By masterKing</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.4.3</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="前往评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"><script>(() => {
+  const isShuoshuo = GLOBAL_CONFIG_SITE.pageType === 'shuoshuo'
+  const option = null
+
+  const initValine = (el, path) => {
+    if (isShuoshuo) {
+      window.shuoshuoComment.destroyValine = () => {
+        if (el.children.length) {
+          el.innerHTML = ''
+          el.classList.add('no-comment')
+        }
+      }
+    }
+
+    const valineConfig = {
+      el: '#vcomment',
+      appId: 'Nj4rbGaJ3pAWBRJWseaRg9Zu-gzGzoHsz',
+      appKey: '3tVispErrQeAytUHyJrFos3n',
+      avatar: 'monsterid',
+      serverURLs: '',
+      emojiMaps: "",
+      visitor: false,
+      ...option,
+      path: isShuoshuo ? path : (option && option.path) || window.location.pathname
+    }
+
+    new Valine(valineConfig)
+  }
+
+  const loadValine = async (el, path) => {
+    if (typeof Valine === 'function') {
+      initValine(el, path)
+    } else {
+      await btf.getScript('https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js')
+      initValine(el, path)
+    }
+  }
+
+  if (isShuoshuo) {
+    'Valine' === 'Valine'
+      ? window.shuoshuoComment = { loadComment: loadValine }
+      : window.loadOtherComment = loadValine
+    return
+  }
+
+  if ('Valine' === 'Valine' || !false) {
+    if (false) btf.loadComment(document.getElementById('vcomment'),loadValine)
+    else setTimeout(loadValine, 0)
+  } else {
+    window.loadOtherComment = loadValine
+  }
+})()</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div></body></html>

@@ -1,0 +1,362 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>代码注入 | masterKing 的博客</title><meta name="author" content="masterKing"><meta name="copyright" content="masterKing"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="上一篇我们已经讲到使用 shell 脚本来重签并调试别人的 APP，那么我们又是重签又是附加调试别人的 APP 是为了啥呢？是太闲了吗，当然不是…我们接下来的任务就是代码注入 App 执行哪些代码?在开始代码注入之前，我们先了解一下一个 iOS 的 App 在运行的时候,究竟会执行哪些代码,以及我们从哪里入手注入代码  MachO。App 的二进制文件，我们写的所有代码都会在这里，后面的文章会介绍">
+<meta property="og:type" content="article">
+<meta property="og:title" content="代码注入">
+<meta property="og:url" content="https://masterking.github.io/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/index.html">
+<meta property="og:site_name" content="masterKing 的博客">
+<meta property="og:description" content="上一篇我们已经讲到使用 shell 脚本来重签并调试别人的 APP，那么我们又是重签又是附加调试别人的 APP 是为了啥呢？是太闲了吗，当然不是…我们接下来的任务就是代码注入 App 执行哪些代码?在开始代码注入之前，我们先了解一下一个 iOS 的 App 在运行的时候,究竟会执行哪些代码,以及我们从哪里入手注入代码  MachO。App 的二进制文件，我们写的所有代码都会在这里，后面的文章会介绍">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://masterking.github.io/images/iOSReveseEngineeringAndSecurity1.webp">
+<meta property="article:published_time" content="2021-06-23T16:12:46.000Z">
+<meta property="article:modified_time" content="2024-11-07T14:35:11.495Z">
+<meta property="article:author" content="masterKing">
+<meta property="article:tag" content="yololib">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://masterking.github.io/images/iOSReveseEngineeringAndSecurity1.webp"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "代码注入",
+  "url": "https://masterking.github.io/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/",
+  "image": "https://masterking.github.io/images/iOSReveseEngineeringAndSecurity1.webp",
+  "datePublished": "2021-06-23T16:12:46.000Z",
+  "dateModified": "2024-11-07T14:35:11.495Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "masterKing",
+      "url": "https://masterking.github.io"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.ico"><link rel="canonical" href="https://masterking.github.io/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//hm.baidu.com"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?e6857234b462ad05308d8b79794f0358";
+  var s = document.getElementsByTagName("script")[0];
+  s.parentNode.insertBefore(hm, s);
+})();
+btf.addGlobalFn('pjaxComplete', () => {
+  _hmt.push(['_trackPageview',window.location.pathname])
+}, 'baidu_analytics')
+</script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"未找到符合您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":false,"highlightHeightLimit":false,"highlightFullpage":true,"highlightMacStyle":true},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '代码注入',
+  isHighlightShrink: undefined,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg" style="background: linear-gradient( 135deg, #2c241f, #968282);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/images/WechatIMG1.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">47</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">32</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">6</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/sileorepo/"><i class="fa-fw fas fa-shop"></i><span> sileo 源</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/images/iOSReveseEngineeringAndSecurity1.webp);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">masterKing 的博客</span></a><a class="nav-page-title" href="/"><span class="site-name">代码注入</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/sileorepo/"><i class="fa-fw fas fa-shop"></i><span> sileo 源</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">代码注入</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2021-06-23T16:12:46.000Z" title="发表于 2021-06-24 00:12:46">2021-06-24</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-11-07T14:35:11.495Z" title="更新于 2024-11-07 22:35:11">2024-11-07</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/iOS-%E9%80%86%E5%90%91%E4%B8%8E%E5%AE%89%E5%85%A8/">iOS 逆向与安全</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">总字数:</span><span class="word-count">4.4k</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span><span class="post-meta-separator">|</span><span class="post-meta-commentcount"><i class="far fa-comments fa-fw post-meta-icon"></i><span class="post-meta-label">评论数:</span><a href="/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/#post-comment" itemprop="discussionUrl"><span class="valine-comment-count" data-xid="/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/" itemprop="commentCount"><i class="fa-solid fa-spinner fa-spin"></i></span></a></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><div id="post-outdate-notice" data="{&quot;limitDay&quot;:365,&quot;messagePrev&quot;:&quot;距离上次更新已有&quot;,&quot;messageNext&quot;:&quot;天，文章某些内容可能已过时。&quot;,&quot;postUpdate&quot;:&quot;2024-11-07 22:35:11&quot;}" hidden></div><p>上一篇我们已经讲到使用 shell 脚本来重签并调试别人的 APP，那么我们又是重签又是附加调试别人的 APP 是为了啥呢？是太闲了吗，当然不是…我们接下来的任务就是<strong>代码注入</strong></p>
+<h1 id="App-执行哪些代码"><a href="#App-执行哪些代码" class="headerlink" title="App 执行哪些代码?"></a>App 执行哪些代码?</h1><p>在开始代码注入之前，我们先了解一下一个 iOS 的 App 在运行的时候,究竟会执行哪些代码,以及我们从哪里入手注入代码</p>
+<ol>
+<li>MachO。App 的二进制文件，我们写的所有代码都会在这里，后面的文章会介绍</li>
+<li>Framework 可以是我们写的，也可以是第三方的代码</li>
+<li>系统库</li>
+</ol>
+<p>其中系统库，在非越狱手机上我们改不了。MachO 我们可以修改，但是比较麻烦，需要会写汇编。而 Framework 是我们经常接触也是最容易入手的，我们自己写一个就行了…</p>
+<p>那么现在的问题就是我们写的 Framework 别人的 APP 怎么会执行呢?</p>
+<p>MachO 文件里面有一个 Load Commands 的部分，DYLD(the dynamic link editor 是苹果的动态链接器，后面的文章也会介绍)会读取这个 Load Commands 里面的内容，并加载到内存中，如果我们能把我们自己的 Framework 插入到别人 APP 的 MachO 的 Load Commands 里，那么我们的代码就自然的被执行了</p>
+<p>那么现在的问题就变成了如何把我们写的 Framework 插入到别人 App 的 MachO 文件里?</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/KJCracks/yololib"><strong>yololib</strong></a> 这是一个终端命令行工具，就是用来把我们写的 Framework 插入到 MachO 文件里，代码不多就 200 来行，感兴趣的可以看看源码，用法是 <code>yololib 参数1 参数2</code> 其中参数 1 是 MachO 文件,参数 2 是我们的 Framework 相对于 MachO 文件的路径。</p>
+<p>下载源码之后是我们很熟悉的 Xcode 工程，只不过是 Mac 上的命令行工程而不是我们常用的 iOS 工程，修改一下 Deployment Target 到你的 Xcode 兼容的最低版本，然后编译一下就能在编译后的文件夹下找到。编译后的文件夹可以通过点击 Xcode 上的 Product -&gt; Show Build Folder in Finder 中的 Products-&gt;Debug 找到。</p>
+<p>为了方便我们使用这个工具,建议把它放到系统的 usr&#x2F;local&#x2F;bin 目录下，记得给它提升可执行权限(在终端<code>chmod +x yololib</code>)，这样我们任意打开一个终端都可以使用这个命令了，也方便我们使用脚本来操作。</p>
+<p>好了，现在万事具备，只欠我们动手操作了…还记得上一篇文章讲到的内容吗，使用 shell 脚本重签 App。可以接着使用上次的工程，也可以新建一个工程来执行后面的代码注入，配置好脚本之后只需要放入一个砸壳的 app 包到根目录下就好了。我这里新建一个项目来演示后面的代码注入</p>
+<h1 id="代码注入的步骤"><a href="#代码注入的步骤" class="headerlink" title="代码注入的步骤"></a>代码注入的步骤</h1><h2 id="新建-Framework"><a href="#新建-Framework" class="headerlink" title="新建 Framework"></a>新建 Framework</h2><p>在完成了上一篇 shell 脚本重签的步骤之后，我们先来新建一个 Framework，把我们的 Framework 准备好</p>
+<img src="/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/df6e2cd5a8a44393bd4c2ad7e6e968b3~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>Framework 的名字就叫 FrankyHook 这个名字无所谓，但是要记住因为在后续使用 yololib 的时候要用到，在里面新建一个类 CodeInject 这个叫什么也无所谓，继承自 NSObject 就够了，主要是需要它的 load 方法，并在 load 方法里面打印点内容</p>
+<img src="/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/e6907858950d4925955c8e35546d239a~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<h2 id="在脚本中添加代码"><a href="#在脚本中添加代码" class="headerlink" title="在脚本中添加代码"></a>在脚本中添加代码</h2><p>记得修改为你自己的 Framework 名字，要是照着我的抄的的当我没说</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yololib <span class="string">&quot;<span class="variable">$&#123;BUILT_PRODUCTS_DIR&#125;</span>/<span class="variable">$&#123;TARGET_NAME&#125;</span>.app/<span class="variable">$&#123;APP_BINARY&#125;</span>&quot;</span> <span class="string">&quot;Frameworks/FrankyHook.framework/FrankyHook&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>这里面有一个小细节，就是你的脚本运行一定要放在嵌入 Frameworks 之后，不然每次脚本运行之后再嵌入 Frameworks 的话 Xcode 会结合 Framework 的 Info.plist 重新处理工程源代码下的 Info.plist 文件到编译的包中，会导致少了很多配置从而启动崩溃。</p>
+<img src="/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/c1d7d440bea24897a23196bf5f8333eb~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>实不相瞒，做了四年多的 iOS 开发，也是到今天才知道这个地方居然可以拖动…</p>
+<h2 id="command-R-看控制台输出"><a href="#command-R-看控制台输出" class="headerlink" title="command + R 看控制台输出"></a>command + R 看控制台输出</h2><img src="/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/756a92a31db340e29078c8fa6a4e15f5~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>怎么样，是不是发现我们已经可以在 WeChat 里面执行我们的代码了？接下来我们来实现两个小小的需求</p>
+<h1 id="需要具备的一些知识点"><a href="#需要具备的一些知识点" class="headerlink" title="需要具备的一些知识点"></a>需要具备的一些知识点</h1><p>接下来的内容需要对 Objective-C 的 rumtime 有一定的了解,了解的同学这部分可以直接跳过,看下一部分<br></p>
+<p><strong>Method Swizzle方法交换</strong><br></p>
+<p>runtime 提供了一些 api 来让我们实现方法交换,现在假设有这么一段代码:</p>
+<img src="/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/448f73738ec247ffb300687ec6f3b910~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>使用 NSURL 初始化 URL 的时候，如果 URL 中含有中文，那么初始化就会失败返回 nil。这个问题做过 iOS 开发的同学应该都遇到过，解决的办法就是对 URL 进行一次百分号编码，现在假设一种情景，你刚入职一家新公司，发现了这个问题，然后在工程里面搜索了一下，发现我的天啦，到处都是这种 URL 中夹着中文，而没有进行编码的情况，那么这个时候，你是选择一个一个的去修改呢，还是会想其他更好的办法?</p>
+<p>使用方法交换就是更好的办法，新建一个 NSURL 的分类，在分类的 load 方法中,实现我们的方法交换</p>
+<img src="/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/37ae39be58a44d84be2e8b3d8f776c33~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>一个 OC 方法，我们可以分为两个部分，一个是方法名 SEL，一个是方法的实现 IMP。正常情况下，一个方法的名字对应着它的实现。而有时候我们通过 runtime 来交换方法的实现。就如上面的 <code>load</code> 方法里面的代码，默认情况下方法 <code>one</code> 和方法 <code>two</code> 的实现都是指向他们自己的 IMP 的，通过 <code>method_exchangeImplementations()</code> 函数交换之后，方法 <code>one</code> 的实现就指向了方法 <code>two</code> 的实现，而方法 <code>two</code> 的实现就指向了方法 <code>one</code> 的实现，当代码调用 <code>URLWithString:</code> 的时候，就会来到我们的 <code>HK_URLWithString:</code> 方法，当代码调用 <code>HK_URLWithString:</code> 的时候，就会执行 <code>URLWithString:</code> 方法</p>
+<p>这样原来工程里的所有 <code>URLWithString:</code> 方法都会执行到我们的代码中去，首先调用一次原始的初始化 URL 的方法，看能否成功生成 url 如果为 nil，就表示我们可能需要对字符串 str 进行一下编码。再用编码过后的 str 初始化 url，这样就不用浪费时间精力去一个一个的去修改工程里的代码了</p>
+<h1 id="拦截微信的注册点击"><a href="#拦截微信的注册点击" class="headerlink" title="拦截微信的注册点击"></a>拦截微信的注册点击</h1><p>使用 Debug View Hierarchy 查看微信的登录注册页面的视图层次结构，找到注册的按钮，查看按钮的 target 和 action</p>
+<img src="/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/ca5a9d2062f94a66819e4b3d7c70342e~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>我们知道了注册按钮点击的时候，会调用 <code>WCAccountLoginControlLogic</code> 的 <code>onFirstViewRegister</code> 方法，而且我们也已经可以在我们的 Framework 中执行我们的注入代码了，那么接下来我们如何实现拦截微信的注册按钮点击呢？当然可以使用 Method Swizzle 来实现</p>
+<p>在开始写代码实现方法交换之前，还有一个小小的问题，虽然我们根据经验可以知道这个 <code>onFirstViewRegister</code> 应该是个对象方法，可能没有返回值也没有参数，但这些都只是根据我们经验的猜测…关考猜测可不行，那么怎么验证我们的猜测呢？</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/nygard/class-dump"><strong>Class-dump</strong></a> 和 <strong>yololib</strong> 一样，也是一个终端命令行工具，同样也可以放到 usr&#x2F;local&#x2F;bin 目录下可以全局使用，它的作用是可以把 MachO 文件里的头文件信息全部导出来，我们可以 cd 到工程编译生成的 APP 包里面,使用以下命令<br></p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">class-dump -H WeChat -o ./headers/</span><br></pre></td></tr></table></figure>
+
+<p>将它的头文件都导到一个 headers 的文件夹内，这个过程需要一点时间</p>
+<img src="/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/1d783025112d46a7b01eaec3b73c3bd7~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>看了下这个文件挺大的，导完之后可以把它剪切到工程根目录下，这样给我们手机也能省点空间，也确实完全没必要放在 APP 包里面</p>
+<img src="/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/d734b1bee7d54b31b18821dba3857f24~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>可以看到这里面有 15074 个项目，微信的头文件还真不少呢…这么大的文件夹如果我们用 Xcode 打开搜索的话，一定会十分的痛苦。这里推荐使用 sublime…更轻量一点，找起头文件来也更快，搜索一番发现如图所示</p>
+<img src="/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/91d0302f97474f3295c318d5234d8944~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>这样就确保了这个 <code>onFirstViewRegister</code> 方法是无返回值无参数的，可以开始编写代码实现拦截了</p>
+<p>现在我们可以来到我们 Framework 的 CodeInject.m 文件写点代码</p>
+<img src="/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/1303896e20f242a69833262c714c29e9~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>代码就这么点，现在 command + R 运行起来之后，再次点击微信的注册按钮试试看？</p>
+<img src="/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/c3fbbc9607184b71b639734374708a27~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<h1 id="窃取用户的账号密码"><a href="#窃取用户的账号密码" class="headerlink" title="窃取用户的账号密码"></a>窃取用户的账号密码</h1><p>上面的需求仅仅只是破坏了功能，原来的功能都没法使用了。接下来这个需求让用户在神不知鬼不觉的情况下，账号密码就被窃取了（所以市面上那些来源不明的 App 真不要下载使用，除非你也是搞逆向研究的）。那么我们在什么时候，能拿到用户的账号和密码呢？当然是点击登录按钮的时候，所以你懂的，使用 viewDebug 查看登录按钮</p>
+<img src="/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/f7a259179375477c850d9ec4e85e6cff~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>登录按钮点击的 target:<code>WCAccountMainLoginViewController</code>,action:<code>onNext</code>;</p>
+<p>查看刚刚 class-dump 出来的头文件发现这个 onNext 方法是没有参数的，那么我们需要的账号密码在哪里呢？哈哈，有经验的同学是不是发现这两个名字是不是莫名的熟悉</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">WCAccountTextFieldItem *_textFieldUserNameItem;</span><br><span class="line">WCAccountTextFieldItem *_textFieldUserPwdItem;</span><br></pre></td></tr></table></figure>
+
+<img src="/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/f71ee81de1e24f7e9abf2f6c5100420f~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>变量名是挺熟悉的，但是这个 <code>WCAccountTextFieldItem</code> 我们不知道是个什么东西怎么办？头文件都在手上了还问怎么办，接着搜索啊…</p>
+<img src="/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/750ecea4818247c8b7773d78750e4cab~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p><code>WCAccountTextFieldItem</code> 里面貌似没啥东西，那就看它父类 <code>WCBaseTextFieldItem</code></p>
+<img src="/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/f44b4b6fd6b94c2fb6cfb3e138e3b213~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>在 <code>WCBaseTextFieldItem</code> 类里面发现了一个 <code>WXUITextField</code> 的东西,跟我们熟悉的 <code>UITextField</code> 很像了，我们猜测可能就是这个 <code>m_textField</code> 存放着我们想要的东西，先不着急写代码</p>
+<p>现在我们可以再次使用 viewDebug 工具调试查看一下我们的账号和密码在哪里，并且使用 lldb 来动态调试验证我们的猜测</p>
+<img src="/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/4f7d5f230f76437e9438557b03ff5490~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>首先控制器的地址，可以由登录按钮的 target 获取到。获取到控制器之后，再使用 KVC 大法获取成员变量 <code>_textFieldUserPwdItem</code> 的地址(密码都能获取到了，账号也是一样的操作)并打印它。获取到 <code>_textFieldUserPwdItem</code> 的地址之后，再次使用 KVC 大法获取它的成员变量 <code>m_textField</code> 的地址并打印这个对象，好家伙，明文密码不就在这儿了吗!!!</p>
+<p>接下来我们通过代码来实现需求:</p>
+<img src="/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/935ac041181d4ebb9647deb4dadd555d~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>这代码看起来跟拦截微信注册的代码差不太多，那么我们 command + R 运行看看结果</p>
+<img src="/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/736508d48fa74925978c44a80393e619~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>WTF？账号密码确实是都获取到了，但是 APP 却崩溃了？为什么会发生崩溃，崩溃信息是我们经常能够遇到的经典报错 <code>unrecognized selector sent to instance 0x10b15b400</code> 说是控制器 <code>WCAccountMainLoginViewController</code> 无法识别 <code>FK_onNext</code> 这个方法</p>
+<p>我们思考一下，方法交换为什么一般推荐写在想要交换方法的类所在的分类里面？因为在想要交换方法的类的分类当中，我们会新增一个方法，用来实现我们的逻辑，也正好是因为在分类中，所以当前类自然的添加了我们新增的方法，这样交换下来就不会出现找不到方法的错误</p>
+<p>而上面的代码，我们的本意也是希望在 <code>WCAccountMainLoginViewController</code> 里面新增一个方法处理我们的逻辑，并交换 <code>onNext</code> 方法，但现在的问题是我们在 <code>CodeInject</code> 这个类的 <code>load</code> 方法中，那么有什么办法可以解决这个问题呢？</p>
+<h3 id="动态添加方法"><a href="#动态添加方法" class="headerlink" title="动态添加方法"></a>动态添加方法</h3><p>rumtime 的 api 提供了运行时动态添加方法的能力</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">BOOL</span><br><span class="line"><span class="title function_">class_addMethod</span><span class="params">(Class _Nullable cls, SEL _Nonnull name, IMP _Nonnull imp, <span class="type">const</span> <span class="type">char</span> * _Nullable types)</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>参数1: 给哪个类添加方法</li>
+<li>参数2: 方法的名字</li>
+<li>参数3: 方法的实现</li>
+<li>参数4: 方法的参数和返回值描述,用一些特定的符号表示,也可以不写</li>
+<li>参数5: BOOL值,表示是否添加成功</li>
+</ul>
+<p>那么借用这个 api 我们能想到什么解决办法呢，给 <code>WCAccountMainLoginViewController</code> 控制器添加我们的 <code>FK_onNext</code> 方法，再让 <code>FK_onNext</code> 和 <code>onNext</code> 方法交换，最终的代码如下</p>
+<img src="/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/c78c52886b3b41c3849c099e1634f3f3~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>再次 command + R 运行发现，既能成功获取到用户输入的账号密码，又能成功的去调用微信的登录逻辑了</p>
+<h3 id="动态替换方法"><a href="#动态替换方法" class="headerlink" title="动态替换方法"></a>动态替换方法</h3><p>现在除了添加新方法的方式，我们还有其他的办法吗？当然有(强大的runtime) rumtime 的 api 还提供了运行时替换方法的能力</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">IMP _Nullable</span><br><span class="line"><span class="title function_">class_replaceMethod</span><span class="params">(Class _Nullable cls, SEL _Nonnull name, IMP _Nonnull imp, <span class="type">const</span> <span class="type">char</span> * _Nullable types)</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>参数1: 替换哪个类</li>
+<li>参数2: 方法的名字</li>
+<li>参数3: 方法的实现</li>
+<li>参数4: 方法的参数和返回值描述,用一些特定的符号表示,也可以不写</li>
+<li>返回值: IMP，原始的方法实现</li>
+</ul>
+<p>如果使用这个方式，那么我们应该是将原始的 <code>onNext</code> 方法替换成我们的 <code>FK_onNext</code> 方法，那么我们如何去调用微信原始的 <code>onNext</code> 方法呢，在替换之前将原始的 <code>onNext</code> 方法的实现 IMP 记录下来，然后在我们的 <code>FK_onNext</code> 方法中使用这个记录的 IMP 来实现对原始 <code>onNext</code> 的调用，具体代码如下图:</p>
+<img src="/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/dea8641224fa410a9830ea57b23be7d1~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>对比方法交换的代码实现，我们发现方法替换的方式需要多一个变量 <code>originalIMP</code>，用来记录原始的 <code>onNext</code> 方法的实现，而且还会报个警告，虽然少了一点点代码，但看起来也不是那么好理解…当然，这里使用方法替换也只是为了学习一下 runtime 提供的 api，感受一下 rumtime 的强大，具体使用哪个方式就看个人的喜好</p>
+<h3 id="动态获取方法实现和设置方法实现"><a href="#动态获取方法实现和设置方法实现" class="headerlink" title="动态获取方法实现和设置方法实现"></a>动态获取方法实现和设置方法实现</h3><p>那么,还有更骚的操作吗？当然有…</p>
+<p>获取方法 m 的实现 IMP</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">IMP _Nonnull</span><br><span class="line"><span class="title function_">method_getImplementation</span><span class="params">(Method _Nonnull m)</span></span><br></pre></td></tr></table></figure>
+
+<p>设置方法 m 的实现 IMP</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">IMP _Nonnull</span><br><span class="line"><span class="title function_">method_setImplementation</span><span class="params">(Method _Nonnull m, IMP _Nonnull imp)</span></span><br></pre></td></tr></table></figure>
+
+<p>这个原理其实跟替换差不太多，首先获取原始 <code>onNext</code> 的实现并记录，然后设置新的 IMP(我们写的 <code>FK_onNext</code> )给 <code>WCAccountMainLoginViewController</code> 的 <code>onNext</code> 方法，具体代码如下：</p>
+<img src="/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/dfd4a8d6d9b0480584bcf4c782353eaf~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>好了，到此我们为了实现窃取用户的账号密码已经使用了三种 runtime 提供的方式…到这里就真的没了</p>
+<p>从上一篇 iOS 重签名，到这一篇的代码注入，如果你使用过 MonkeyDev 工具的 MonkeyApp 就会发现是如此的相似。其实这就是 MonkeyDev 的实现原理，只是 MonkeyDev 的实现更加复杂。</p>
+<p>下一篇文章开始介绍我们最近一直提到的 MachO 文件，到底什么是 MachO 文件，它包含了什么东西，干什么用的…</p>
+<h1 id="反微信重签名检测"><a href="#反微信重签名检测" class="headerlink" title="反微信重签名检测"></a>反微信重签名检测</h1><p>如果你希望在重签名的微信上登录账号使用，最好在添加以下代码绕过微信的检测。否则会有封号的风险，不保证以下代码长期有效。将以下代码粘贴到 CodeInject.m 文件中，不要放到类的实现中就行。</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#import <span class="string">&lt;objc/runtime.h&gt;</span></span></span><br><span class="line"><span class="comment">// 函数指针</span></span><br><span class="line"><span class="built_in">NSUUID</span>* (*original_advertisingIdentifier)(<span class="type">id</span>, SEL);</span><br><span class="line"><span class="type">void</span> (*original_setBundleId)(<span class="type">id</span>, SEL, <span class="built_in">NSString</span>*);</span><br><span class="line"><span class="type">void</span> (*original_setClientSeqId)(<span class="type">id</span>, SEL, <span class="built_in">NSString</span>*);</span><br><span class="line"><span class="type">void</span> (*original_setDeviceName)(<span class="type">id</span>, SEL, <span class="built_in">NSString</span>*);</span><br><span class="line"><span class="type">void</span> (*original_addLogInfo_withMessage)(<span class="type">id</span>, SEL,<span class="type">int</span> *,<span class="keyword">const</span> <span class="type">char</span> *);</span><br><span class="line"><span class="type">BOOL</span> (*original_HasInstallJailbreakPluginInvalidIAPPurchase)(<span class="type">id</span>, SEL);</span><br><span class="line"><span class="type">BOOL</span> (*original_IsJailBreak)(<span class="type">id</span>, SEL);</span><br><span class="line"><span class="type">BOOL</span> (*original_HasInstallJailbreakPlugin)(<span class="type">id</span>, SEL, <span class="type">id</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// hook函数</span></span><br><span class="line"><span class="keyword">static</span> <span class="built_in">NSUUID</span>* hook_advertisingIdentifier(<span class="type">id</span> <span class="keyword">self</span>, SEL _cmd) &#123;</span><br><span class="line">    <span class="built_in">NSUUID</span> *advertisingIdentifier;</span><br><span class="line">    <span class="built_in">NSString</span> *key = <span class="string">@&quot;idfa&quot;</span>;</span><br><span class="line">    <span class="built_in">NSString</span> *idfa = [[<span class="built_in">NSUserDefaults</span> standardUserDefaults] stringForKey:key];</span><br><span class="line">    <span class="keyword">if</span> (idfa &amp;&amp; idfa.length)&#123;</span><br><span class="line">        advertisingIdentifier = [[<span class="built_in">NSUUID</span> alloc] initWithUUIDString:idfa];</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        advertisingIdentifier = [<span class="built_in">NSUUID</span> UUID];</span><br><span class="line">        [[<span class="built_in">NSUserDefaults</span> standardUserDefaults] setObject:advertisingIdentifier.UUIDString forKey:key];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> advertisingIdentifier;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">static</span> <span class="type">void</span> hook_setBundleId(<span class="type">id</span> <span class="keyword">self</span>, SEL _cmd, <span class="built_in">NSString</span> *bundleId) &#123;</span><br><span class="line">    <span class="keyword">if</span> ([bundleId isEqualToString:[<span class="built_in">NSBundle</span> mainBundle].bundleIdentifier]) &#123;</span><br><span class="line">        bundleId = <span class="string">@&quot;com.tencent.xin&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    original_setBundleId(<span class="keyword">self</span>, _cmd, bundleId);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">static</span> <span class="type">void</span> hook_setClientDeqId(<span class="type">id</span> <span class="keyword">self</span>, SEL _cmd, <span class="built_in">NSString</span> *clientSeqId) &#123;</span><br><span class="line">    <span class="built_in">NSString</span> *key = <span class="string">@&quot;clientSeqId&quot;</span>;</span><br><span class="line">    <span class="built_in">NSString</span> *clientSeqId_fist = [[<span class="built_in">NSUserDefaults</span> standardUserDefaults] stringForKey:key];</span><br><span class="line">    <span class="keyword">if</span> (!clientSeqId_fist || clientSeqId_fist.length == <span class="number">0</span>) &#123;</span><br><span class="line">        clientSeqId_fist = [[<span class="built_in">NSUUID</span> UUID].UUIDString stringByReplacingOccurrencesOfString:<span class="string">@&quot;-&quot;</span> withString:<span class="string">@&quot;&quot;</span>];</span><br><span class="line">        [[<span class="built_in">NSUserDefaults</span> standardUserDefaults] setObject:clientSeqId_fist forKey:key];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">NSString</span> *newClientSeqId;</span><br><span class="line">    <span class="keyword">if</span> ([clientSeqId containsString:<span class="string">@&quot;-&quot;</span>]) &#123;</span><br><span class="line">        <span class="built_in">NSRange</span> range = [clientSeqId rangeOfString:<span class="string">@&quot;-&quot;</span>];</span><br><span class="line">        <span class="built_in">NSString</span> *clientSeqId_last = [clientSeqId substringFromIndex:range.location];</span><br><span class="line">        newClientSeqId = [<span class="built_in">NSString</span> stringWithFormat:<span class="string">@&quot;%@%@&quot;</span>, clientSeqId_fist, clientSeqId_last];</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        newClientSeqId = clientSeqId_fist;</span><br><span class="line">    &#125;</span><br><span class="line">    original_setClientSeqId(<span class="keyword">self</span>, _cmd, newClientSeqId);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">static</span> <span class="type">void</span> hook_setDeviceName(<span class="type">id</span> <span class="keyword">self</span>, SEL _cmd, <span class="built_in">NSString</span> *deviceName) &#123;</span><br><span class="line">    original_setDeviceName(<span class="keyword">self</span>, _cmd, <span class="string">@&quot;iPhone&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">static</span> <span class="type">void</span> hook_addLogInfo_withMessage(<span class="type">id</span> <span class="keyword">self</span>, SEL _cmd, <span class="type">int</span> *arg1, <span class="keyword">const</span> <span class="type">char</span> *arg2) &#123;</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">static</span> <span class="type">BOOL</span> hook_original_HasInstallJailbreakPluginInvalidIAPPurchase(<span class="type">id</span> <span class="keyword">self</span>, SEL _cmd) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">NO</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">static</span> <span class="type">BOOL</span> hook_IsJailBreak(<span class="type">id</span> <span class="keyword">self</span>, SEL _cmd) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">NO</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">static</span> <span class="type">BOOL</span> hook_HasInstallJailbreakPlugin(<span class="type">id</span> <span class="keyword">self</span>, SEL _cmd, <span class="type">id</span> arg1) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">NO</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 所有被 hook 的类和函数放在这里的构造函数中</span></span><br><span class="line">__attribute__((constructor)) <span class="keyword">static</span> <span class="type">void</span> hookMethods(<span class="type">void</span>) &#123;</span><br><span class="line">    <span class="keyword">@autoreleasepool</span> &#123;</span><br><span class="line">        Class cls = <span class="built_in">NSClassFromString</span>(<span class="string">@&quot;ASIdentifierManager&quot;</span>);</span><br><span class="line">        <span class="keyword">if</span> (cls) &#123;</span><br><span class="line">            Method method = class_getInstanceMethod(cls, <span class="keyword">@selector</span>(advertisingIdentifier));</span><br><span class="line">            <span class="keyword">if</span> (method) &#123;</span><br><span class="line">                original_advertisingIdentifier = (<span class="built_in">NSUUID</span>*(*)(<span class="type">id</span>, SEL))method_getImplementation(method);</span><br><span class="line">                method_setImplementation(method, (IMP)hook_advertisingIdentifier);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        cls = <span class="built_in">NSClassFromString</span>(<span class="string">@&quot;ManualAuthAesReqData&quot;</span>);</span><br><span class="line">        <span class="keyword">if</span> (cls) &#123;</span><br><span class="line">            Method method = class_getInstanceMethod(cls, <span class="keyword">@selector</span>(setBundleId:));</span><br><span class="line">            <span class="keyword">if</span> (method) &#123;</span><br><span class="line">                original_setBundleId = (<span class="type">void</span>(*)(<span class="type">id</span>,SEL,<span class="built_in">NSString</span>*))method_getImplementation(method);</span><br><span class="line">                method_setImplementation(method, (IMP)hook_setBundleId);</span><br><span class="line">            &#125;</span><br><span class="line">            method = class_getInstanceMethod(cls, <span class="keyword">@selector</span>(setClientSeqId:));</span><br><span class="line">            <span class="keyword">if</span> (method) &#123;</span><br><span class="line">                original_setBundleId = (<span class="type">void</span>(*)(<span class="type">id</span>,SEL,<span class="built_in">NSString</span>*))method_getImplementation(method);</span><br><span class="line">                method_setImplementation(method, (IMP)hook_setBundleId);</span><br><span class="line">            &#125;</span><br><span class="line">            method = class_getInstanceMethod(cls, <span class="keyword">@selector</span>(setDeviceName:));</span><br><span class="line">            <span class="keyword">if</span> (method) &#123;</span><br><span class="line">                original_setDeviceName = (<span class="type">void</span>(*)(<span class="type">id</span>,SEL,<span class="built_in">NSString</span>*))method_getImplementation(method);</span><br><span class="line">                method_setImplementation(method, (IMP)hook_setDeviceName);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        cls = <span class="built_in">NSClassFromString</span>(<span class="string">@&quot;MMCrashReportExtLogMgr&quot;</span>);</span><br><span class="line">        <span class="keyword">if</span> (cls) &#123;</span><br><span class="line">            Method method = class_getInstanceMethod(cls, <span class="keyword">@selector</span>(addLogInfo:withMessage:));</span><br><span class="line">            <span class="keyword">if</span> (method) &#123;</span><br><span class="line">                original_addLogInfo_withMessage = (<span class="type">void</span>(*)(<span class="type">id</span>,SEL,<span class="type">int</span>*,<span class="keyword">const</span> <span class="type">char</span>*))method_getImplementation(method);</span><br><span class="line">                method_setImplementation(method, (IMP)hook_addLogInfo_withMessage);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        cls = <span class="built_in">NSClassFromString</span>(<span class="string">@&quot;JailBreakHelper&quot;</span>);</span><br><span class="line">        <span class="keyword">if</span> (cls) &#123;</span><br><span class="line">            Method method = class_getInstanceMethod(cls, <span class="keyword">@selector</span>(HasInstallJailbreakPluginInvalidIAPPurchase));</span><br><span class="line">            <span class="keyword">if</span> (method) &#123;</span><br><span class="line">                original_HasInstallJailbreakPluginInvalidIAPPurchase = (<span class="type">BOOL</span>(*)(<span class="type">id</span>,SEL))method_getImplementation(method);</span><br><span class="line">                method_setImplementation(method, (IMP)hook_original_HasInstallJailbreakPluginInvalidIAPPurchase);</span><br><span class="line">            &#125;</span><br><span class="line">            method = class_getInstanceMethod(cls, <span class="keyword">@selector</span>(IsJailBreak));</span><br><span class="line">            <span class="keyword">if</span> (method) &#123;</span><br><span class="line">                original_IsJailBreak = (<span class="type">BOOL</span>(*)(<span class="type">id</span>,SEL))method_getImplementation(method);</span><br><span class="line">                method_setImplementation(method, (IMP)hook_IsJailBreak);</span><br><span class="line">            &#125;</span><br><span class="line">            method = class_getInstanceMethod(cls, <span class="keyword">@selector</span>(HasInstallJailbreakPlugin:));</span><br><span class="line">            <span class="keyword">if</span> (method) &#123;</span><br><span class="line">                original_HasInstallJailbreakPlugin = (<span class="type">BOOL</span>(*)(<span class="type">id</span>,SEL,<span class="type">id</span>))method_getImplementation(method);</span><br><span class="line">                method_setImplementation(method, (IMP)hook_HasInstallJailbreakPlugin);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://masterking.github.io">masterKing</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://masterking.github.io/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/">https://masterking.github.io/2021/06/24/代码注入/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="https://masterking.github.io" target="_blank">masterKing 的博客</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/yololib/">yololib</a></div><div class="post-share"><div class="social-share" data-image="/images/iOSReveseEngineeringAndSecurity1.webp" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2021/06/20/iOS-%E5%BA%94%E7%94%A8%E9%87%8D%E7%AD%BE%E5%90%8D/" title="iOS 应用重签名"><img class="cover" src="/images/iOSReveseEngineeringAndSecurity1.webp" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">iOS 应用重签名</div></div><div class="info-2"><div class="info-item-1">上一篇文章作者讲解了 iOS 应用签名的原理。理解了签名的流程之后，我们知道签名保证的是自签名之后原始数据没有被其他人篡改，我们的 App 在调试过程中每次安装到设备上都会签名，假设我们使用自己的配置文件和证书对他人的 App 进行签名，是不是就能冒充是我们自己开发的 APP 了？ 是的。 如果你足够细心的话，在 Xcode 每次编译源码的时候，最后的几个步骤中就会看到签名过程：   由图中...</div></div></div></a><a class="pagination-related" href="/2021/06/28/Mach-O/" title="Mach-O"><img class="cover" src="/images/iOSReveseEngineeringAndSecurity1.webp" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">Mach-O</div></div><div class="info-2"><div class="info-item-1">通用二进制(Universal binary)文件macOS 系统一路走来，支持的 CPU 及硬件平台都有了很大的变化，从早期的 PowerPC 平台，到后来的 x86，再到现在主流的 arm、x86-64 平台。软件开发人员为了做到不同硬件平台的兼容性，如果需要为每一个平台编译一个可执行文件，这将是非常繁琐的。 为了解决软件在多个硬件平台上的兼容性问题，苹果开发了一个通用的二进制文件格式（...</div></div></div></a></nav><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div class="vcomment" id="vcomment"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content is-expand"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#App-%E6%89%A7%E8%A1%8C%E5%93%AA%E4%BA%9B%E4%BB%A3%E7%A0%81"><span class="toc-text">App 执行哪些代码?</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5%E7%9A%84%E6%AD%A5%E9%AA%A4"><span class="toc-text">代码注入的步骤</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%96%B0%E5%BB%BA-Framework"><span class="toc-text">新建 Framework</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9C%A8%E8%84%9A%E6%9C%AC%E4%B8%AD%E6%B7%BB%E5%8A%A0%E4%BB%A3%E7%A0%81"><span class="toc-text">在脚本中添加代码</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#command-R-%E7%9C%8B%E6%8E%A7%E5%88%B6%E5%8F%B0%E8%BE%93%E5%87%BA"><span class="toc-text">command + R 看控制台输出</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%9C%80%E8%A6%81%E5%85%B7%E5%A4%87%E7%9A%84%E4%B8%80%E4%BA%9B%E7%9F%A5%E8%AF%86%E7%82%B9"><span class="toc-text">需要具备的一些知识点</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%8B%A6%E6%88%AA%E5%BE%AE%E4%BF%A1%E7%9A%84%E6%B3%A8%E5%86%8C%E7%82%B9%E5%87%BB"><span class="toc-text">拦截微信的注册点击</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%AA%83%E5%8F%96%E7%94%A8%E6%88%B7%E7%9A%84%E8%B4%A6%E5%8F%B7%E5%AF%86%E7%A0%81"><span class="toc-text">窃取用户的账号密码</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8A%A8%E6%80%81%E6%B7%BB%E5%8A%A0%E6%96%B9%E6%B3%95"><span class="toc-text">动态添加方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8A%A8%E6%80%81%E6%9B%BF%E6%8D%A2%E6%96%B9%E6%B3%95"><span class="toc-text">动态替换方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8A%A8%E6%80%81%E8%8E%B7%E5%8F%96%E6%96%B9%E6%B3%95%E5%AE%9E%E7%8E%B0%E5%92%8C%E8%AE%BE%E7%BD%AE%E6%96%B9%E6%B3%95%E5%AE%9E%E7%8E%B0"><span class="toc-text">动态获取方法实现和设置方法实现</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8F%8D%E5%BE%AE%E4%BF%A1%E9%87%8D%E7%AD%BE%E5%90%8D%E6%A3%80%E6%B5%8B"><span class="toc-text">反微信重签名检测</span></a></li></ol></div></div></div></div></main><footer id="footer" style="background-image: url(/images/iOSReveseEngineeringAndSecurity1.webp);"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2018 - 2025 By masterKing</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.4.3</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="前往评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"><script>(() => {
+  const isShuoshuo = GLOBAL_CONFIG_SITE.pageType === 'shuoshuo'
+  const option = null
+
+  const initValine = (el, path) => {
+    if (isShuoshuo) {
+      window.shuoshuoComment.destroyValine = () => {
+        if (el.children.length) {
+          el.innerHTML = ''
+          el.classList.add('no-comment')
+        }
+      }
+    }
+
+    const valineConfig = {
+      el: '#vcomment',
+      appId: 'Nj4rbGaJ3pAWBRJWseaRg9Zu-gzGzoHsz',
+      appKey: '3tVispErrQeAytUHyJrFos3n',
+      avatar: 'monsterid',
+      serverURLs: '',
+      emojiMaps: "",
+      visitor: false,
+      ...option,
+      path: isShuoshuo ? path : (option && option.path) || window.location.pathname
+    }
+
+    new Valine(valineConfig)
+  }
+
+  const loadValine = async (el, path) => {
+    if (typeof Valine === 'function') {
+      initValine(el, path)
+    } else {
+      await btf.getScript('https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js')
+      initValine(el, path)
+    }
+  }
+
+  if (isShuoshuo) {
+    'Valine' === 'Valine'
+      ? window.shuoshuoComment = { loadComment: loadValine }
+      : window.loadOtherComment = loadValine
+    return
+  }
+
+  if ('Valine' === 'Valine' || !false) {
+    if (false) btf.loadComment(document.getElementById('vcomment'),loadValine)
+    else setTimeout(loadValine, 0)
+  } else {
+    window.loadOtherComment = loadValine
+  }
+})()</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div></body></html>
