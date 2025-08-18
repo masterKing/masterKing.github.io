@@ -1,6 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>OC与iOS混编</title>
+    <url>/2019/04/12/2019-04-12-OC%E4%B8%8EiOS%E6%B7%B7%E7%BC%96/</url>
+    <content><![CDATA[<h1 id="记录一下-OC-和-Swift-混编的问题"><a href="#记录一下-OC-和-Swift-混编的问题" class="headerlink" title="记录一下,OC 和 Swift 混编的问题"></a>记录一下,OC 和 Swift 混编的问题</h1><p>在OC项目中,需要使用 Swift 的时候,一般情况下,在你的 OC 项目中新建一个 Swift 文件的时候,系统会自动提示你是否需要配置一个 Objective-C 桥接头文件,如下图:</p>
+<img src="/2019/04/12/2019-04-12-OC%E4%B8%8EiOS%E6%B7%B7%E7%BC%96/Snip20190412_4.png" class="">
+
+<p>点击最右侧的创建桥接头文件,系统就会帮你配置创建并配置好一个桥接头文件…这个桥接头文件的作用是,让你可以在 Swift 代码中使用 OC 中的类;只需要将你需要在 Swift 代码中使用的类的头文件在桥接头文件中导入一下就可以使用了;如果一不小心点击了 Don’t Create 按钮,那就需要你自己再手动创建一个头文件,将它配置成桥接头文件,才可以使用.配置步骤如下:</p>
+<ol>
+<li>创建一个头文件 <img src="/2019/04/12/2019-04-12-OC%E4%B8%8EiOS%E6%B7%B7%E7%BC%96/Snip20190412_5.png" class="">
+ <img src="/2019/04/12/2019-04-12-OC%E4%B8%8EiOS%E6%B7%B7%E7%BC%96/Snip20190412_6.png" class=""></li>
+<li>配置成为OC桥接头文件  <img src="/2019/04/12/2019-04-12-OC%E4%B8%8EiOS%E6%B7%B7%E7%BC%96/Snip20190412_7.png" class=""></li>
+</ol>
+<p>在里面导入 OC 的头文件,就可以在 Swift 代码中使用了</p>
+<p>如果是想要在 OC 的代码中使用 Swift 的类的话,这个就更加简单了,只需要导入一个系统自动生成的头文件就可以访问了,这个头文件在项目目录中看不到;但是在上图标记 ③ 的框框下面你可以看到它的名字,直接导入这个头文件就可以使用了,需要注意的是系统并不会自动补全这个头文件…没有提示,需要你自己一个一个字母敲进去</p>
+<hr/>
+
+<p>再来说一下,在 Swift 项目中,想要使用 OC 代码;跟上面的步骤是一样的,第一次在 Swift 项目中创建 OC 类的时候,系统就会提示你是否创建 Objective-C 桥接头文件;这个头文件的作用跟上是一样的,让你可以在 Swift 代码中使用 OC 的类,只需在这个头文件导入 OC 类就行了…在 OC 代码中想要使用 Swift 类也跟上面一样,导入系统自动生成的那个头文件就可以使用了</p>
+]]></content>
+      <tags>
+        <tag>iOS</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>设计模式</title>
     <url>/2019/04/04/2019-04-04-%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/</url>
     <content><![CDATA[<p>#关于设计模式</p>
@@ -29,28 +51,6 @@
 <td align="left">Chain of Responsibility<br/>Command<br/>Iterator<br/>Mediator<br/>Memento<br/>Observer<br/>State<br/>Stragegy<br/>Visitor</td>
 </tr>
 </tbody></table>
-]]></content>
-      <tags>
-        <tag>iOS</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>OC与iOS混编</title>
-    <url>/2019/04/12/2019-04-12-OC%E4%B8%8EiOS%E6%B7%B7%E7%BC%96/</url>
-    <content><![CDATA[<h1 id="记录一下-OC-和-Swift-混编的问题"><a href="#记录一下-OC-和-Swift-混编的问题" class="headerlink" title="记录一下,OC 和 Swift 混编的问题"></a>记录一下,OC 和 Swift 混编的问题</h1><p>在OC项目中,需要使用 Swift 的时候,一般情况下,在你的 OC 项目中新建一个 Swift 文件的时候,系统会自动提示你是否需要配置一个 Objective-C 桥接头文件,如下图:</p>
-<img src="/2019/04/12/2019-04-12-OC%E4%B8%8EiOS%E6%B7%B7%E7%BC%96/Snip20190412_4.png" class="">
-
-<p>点击最右侧的创建桥接头文件,系统就会帮你配置创建并配置好一个桥接头文件…这个桥接头文件的作用是,让你可以在 Swift 代码中使用 OC 中的类;只需要将你需要在 Swift 代码中使用的类的头文件在桥接头文件中导入一下就可以使用了;如果一不小心点击了 Don’t Create 按钮,那就需要你自己再手动创建一个头文件,将它配置成桥接头文件,才可以使用.配置步骤如下:</p>
-<ol>
-<li>创建一个头文件 <img src="/2019/04/12/2019-04-12-OC%E4%B8%8EiOS%E6%B7%B7%E7%BC%96/Snip20190412_5.png" class="">
- <img src="/2019/04/12/2019-04-12-OC%E4%B8%8EiOS%E6%B7%B7%E7%BC%96/Snip20190412_6.png" class=""></li>
-<li>配置成为OC桥接头文件  <img src="/2019/04/12/2019-04-12-OC%E4%B8%8EiOS%E6%B7%B7%E7%BC%96/Snip20190412_7.png" class=""></li>
-</ol>
-<p>在里面导入 OC 的头文件,就可以在 Swift 代码中使用了</p>
-<p>如果是想要在 OC 的代码中使用 Swift 的类的话,这个就更加简单了,只需要导入一个系统自动生成的头文件就可以访问了,这个头文件在项目目录中看不到;但是在上图标记 ③ 的框框下面你可以看到它的名字,直接导入这个头文件就可以使用了,需要注意的是系统并不会自动补全这个头文件…没有提示,需要你自己一个一个字母敲进去</p>
-<hr/>
-
-<p>再来说一下,在 Swift 项目中,想要使用 OC 代码;跟上面的步骤是一样的,第一次在 Swift 项目中创建 OC 类的时候,系统就会提示你是否创建 Objective-C 桥接头文件;这个头文件的作用跟上是一样的,让你可以在 Swift 代码中使用 OC 的类,只需在这个头文件导入 OC 类就行了…在 OC 代码中想要使用 Swift 类也跟上面一样,导入系统自动生成的那个头文件就可以使用了</p>
 ]]></content>
       <tags>
         <tag>iOS</tag>
@@ -4045,7 +4045,6 @@ commonModes并不是一个真正单独的模式
       <tags>
         <tag>dyld</tag>
         <tag>load</tag>
-        <tag>initialize</tag>
       </tags>
   </entry>
   <entry>
@@ -4771,6 +4770,31 @@ commonModes并不是一个真正单独的模式
       </tags>
   </entry>
   <entry>
+    <title>iPhoneX上pop回到根控制器上漂移的bug</title>
+    <url>/2018/04/28/iPhoneX%E4%B8%8Apop%E5%9B%9E%E5%88%B0%E6%A0%B9%E6%8E%A7%E5%88%B6%E5%99%A8%E4%B8%8A%E6%BC%82%E7%A7%BB%E7%9A%84bug/</url>
+    <content><![CDATA[<p>记录一个在 iPhone X 上发生的诡异的 bug…语言怎么描述都太苍白,那么直接看图</p>
+<img src="/2018/04/28/iPhoneX%E4%B8%8Apop%E5%9B%9E%E5%88%B0%E6%A0%B9%E6%8E%A7%E5%88%B6%E5%99%A8%E4%B8%8A%E6%BC%82%E7%A7%BB%E7%9A%84bug/BrowserPreview_tmp201804281808.gif" class="">
+
+<p>只有在滑动到最底部的时候,push 到下一个页面,然后在 pop 回来就会出现 contentOffset.y 值自动偏移的现象…</p>
+<p>视图的层次结构如图:</p>
+<img src="/2018/04/28/iPhoneX%E4%B8%8Apop%E5%9B%9E%E5%88%B0%E6%A0%B9%E6%8E%A7%E5%88%B6%E5%99%A8%E4%B8%8A%E6%BC%82%E7%A7%BB%E7%9A%84bug/Snip20180428_1.png" class="">
+
+<p>选中的视图控制器就是 TabBarController 的第二个子控制器,控制器的 view 就是一个 UICollectionView;我是很懵逼的…同事说可能是 iPhone X 上的安全距离的原因(但我还是很懵逼)…于是我对视图层次结构做了下修改;</p>
+<ul>
+<li>取消修改控制器的 view 为 UICollectionView</li>
+<li>将 UICollectionView 作为控制器的 view 的子视图</li>
+<li>设置 collectionView 的约束为,上左右等于控制器的 view,下等于控制器的 view 的下面,但是偏移一个 -34 的高度(仅在 iPhone X 上)</li>
+</ul>
+<p>修改之后的视图层次结构如下:</p>
+<img src="/2018/04/28/iPhoneX%E4%B8%8Apop%E5%9B%9E%E5%88%B0%E6%A0%B9%E6%8E%A7%E5%88%B6%E5%99%A8%E4%B8%8A%E6%BC%82%E7%A7%BB%E7%9A%84bug/Snip20180428_2.png" class="">
+
+<p>这样,collectionView 不再漂移了…对上述偏移的值进行修改测试可以发现,当这个值小于等于 -34 的时候就不会发生漂移,大于 -34 时就会发生漂移…换一句话的意思就是,如果 collectionView 距离底部的距离小于 34 的那么就会漂移,大于等于 34 不会发生漂移…</p>
+]]></content>
+      <tags>
+        <tag>iOS</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>iOS逆向与安全开篇介绍</title>
     <url>/2024/03/27/iOS%E9%80%86%E5%90%91%E4%B8%8E%E5%AE%89%E5%85%A8%E5%BC%80%E7%AF%87%E4%BB%8B%E7%BB%8D/</url>
     <content><![CDATA[<h1 id="学习-iOS-逆向开发的前提"><a href="#学习-iOS-逆向开发的前提" class="headerlink" title="学习 iOS 逆向开发的前提"></a>学习 iOS 逆向开发的前提</h1><ul>
@@ -4824,31 +4848,6 @@ commonModes并不是一个真正单独的模式
       <categories>
         <category>iOS 逆向与安全</category>
       </categories>
-  </entry>
-  <entry>
-    <title>iPhoneX上pop回到根控制器上漂移的bug</title>
-    <url>/2018/04/28/iPhoneX%E4%B8%8Apop%E5%9B%9E%E5%88%B0%E6%A0%B9%E6%8E%A7%E5%88%B6%E5%99%A8%E4%B8%8A%E6%BC%82%E7%A7%BB%E7%9A%84bug/</url>
-    <content><![CDATA[<p>记录一个在 iPhone X 上发生的诡异的 bug…语言怎么描述都太苍白,那么直接看图</p>
-<img src="/2018/04/28/iPhoneX%E4%B8%8Apop%E5%9B%9E%E5%88%B0%E6%A0%B9%E6%8E%A7%E5%88%B6%E5%99%A8%E4%B8%8A%E6%BC%82%E7%A7%BB%E7%9A%84bug/BrowserPreview_tmp201804281808.gif" class="">
-
-<p>只有在滑动到最底部的时候,push 到下一个页面,然后在 pop 回来就会出现 contentOffset.y 值自动偏移的现象…</p>
-<p>视图的层次结构如图:</p>
-<img src="/2018/04/28/iPhoneX%E4%B8%8Apop%E5%9B%9E%E5%88%B0%E6%A0%B9%E6%8E%A7%E5%88%B6%E5%99%A8%E4%B8%8A%E6%BC%82%E7%A7%BB%E7%9A%84bug/Snip20180428_1.png" class="">
-
-<p>选中的视图控制器就是 TabBarController 的第二个子控制器,控制器的 view 就是一个 UICollectionView;我是很懵逼的…同事说可能是 iPhone X 上的安全距离的原因(但我还是很懵逼)…于是我对视图层次结构做了下修改;</p>
-<ul>
-<li>取消修改控制器的 view 为 UICollectionView</li>
-<li>将 UICollectionView 作为控制器的 view 的子视图</li>
-<li>设置 collectionView 的约束为,上左右等于控制器的 view,下等于控制器的 view 的下面,但是偏移一个 -34 的高度(仅在 iPhone X 上)</li>
-</ul>
-<p>修改之后的视图层次结构如下:</p>
-<img src="/2018/04/28/iPhoneX%E4%B8%8Apop%E5%9B%9E%E5%88%B0%E6%A0%B9%E6%8E%A7%E5%88%B6%E5%99%A8%E4%B8%8A%E6%BC%82%E7%A7%BB%E7%9A%84bug/Snip20180428_2.png" class="">
-
-<p>这样,collectionView 不再漂移了…对上述偏移的值进行修改测试可以发现,当这个值小于等于 -34 的时候就不会发生漂移,大于 -34 时就会发生漂移…换一句话的意思就是,如果 collectionView 距离底部的距离小于 34 的那么就会漂移,大于等于 34 不会发生漂移…</p>
-]]></content>
-      <tags>
-        <tag>iOS</tag>
-      </tags>
   </entry>
   <entry>
     <title>代码注入</title>
