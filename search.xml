@@ -1,6 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>设计模式</title>
+    <url>/2019/04/04/2019-04-04-%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/</url>
+    <content><![CDATA[<p>#关于设计模式</p>
+<table>
+<thead>
+<tr>
+<th>*</th>
+<th>*</th>
+<th align="left">创建型</th>
+<th align="left">结构型</th>
+<th align="left">行为型</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>范围</td>
+<td>类</td>
+<td align="left">Factory Method</td>
+<td align="left">Adapter(类)</td>
+<td align="left">Interpreter<br/>Template Method</td>
+</tr>
+<tr>
+<td>*</td>
+<td>对象</td>
+<td align="left">Abstract Factory<br/>Builder<br/>Prototype<br/>Singleton</td>
+<td align="left">Adapter(对象)<br/>Bridge<br/>Composite<br/>Decorator<br/>Facade<br/>Flyweight<br/>Proxy<br/></td>
+<td align="left">Chain of Responsibility<br/>Command<br/>Iterator<br/>Mediator<br/>Memento<br/>Observer<br/>State<br/>Stragegy<br/>Visitor</td>
+</tr>
+</tbody></table>
+]]></content>
+      <tags>
+        <tag>iOS</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>OC与iOS混编</title>
     <url>/2019/04/12/2019-04-12-OC%E4%B8%8EiOS%E6%B7%B7%E7%BC%96/</url>
     <content><![CDATA[<h1 id="记录一下-OC-和-Swift-混编的问题"><a href="#记录一下-OC-和-Swift-混编的问题" class="headerlink" title="记录一下,OC 和 Swift 混编的问题"></a>记录一下,OC 和 Swift 混编的问题</h1><p>在OC项目中,需要使用 Swift 的时候,一般情况下,在你的 OC 项目中新建一个 Swift 文件的时候,系统会自动提示你是否需要配置一个 Objective-C 桥接头文件,如下图:</p>
@@ -21,6 +55,34 @@
       <tags>
         <tag>iOS</tag>
       </tags>
+  </entry>
+  <entry>
+    <title>记录一个报错</title>
+    <url>/2019/04/25/2019-04-25-%E8%AE%B0%E5%BD%95%E4%B8%80%E4%B8%AA%E6%8A%A5%E9%94%99/</url>
+    <content><![CDATA[<h1 id="Undefined-symbols-for-architecture-arm64"><a href="#Undefined-symbols-for-architecture-arm64" class="headerlink" title="Undefined symbols for architecture arm64"></a>Undefined symbols for architecture arm64</h1><img src="/2019/04/25/2019-04-25-%E8%AE%B0%E5%BD%95%E4%B8%80%E4%B8%AA%E6%8A%A5%E9%94%99/Snip20190425_23.png" class="">
+
+<p>上面这个报错经常会遇到…但是一直不知道是为啥出现的…今天碰巧知道了出现的原因</p>
+<p>错误出现的步骤是这样的</p>
+<ul>
+<li><ol>
+<li>首先我新建了 Director 和 ConcreteBuild 两个类</li>
+</ol>
+</li>
+<li><ol start="2">
+<li>在 viewController.m 中我使用这两个类写了一些代码</li>
+</ol>
+</li>
+<li><ol start="3">
+<li>这个时候我觉得这两个类写的不好不想要了,于是全部删除了…</li>
+</ol>
+</li>
+</ul>
+<p>但此时在 viewController.m 中的代码还没有移除掉;再次编译运行的时候就会报</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">Undefined symbols <span class="keyword">for</span> architecture arm64:</span><br><span class="line"><span class="string">&quot;\_OBJC\_CLASS\_$\_Director&quot;</span>, referenced from:</span><br><span class="line">objc-class-ref <span class="keyword">in</span> ViewController.o</span><br></pre></td></tr></table></figure>
+
+<p>知道了错误产生的原因之后,再解决问题就很容易了…去 viewController.m 文件中把相关的代码全删了就好了…</p>
+<p>只是有点儿疑惑为什么 xcode 不报找不到头文件 Director 或 ConcreteBuild 错误,而报这个 Undefined symbols for architecture arm64: 错误…一脸懵</p>
+]]></content>
   </entry>
   <entry>
     <title>MBProgressHUD源码解析</title>
@@ -575,40 +637,6 @@
       </tags>
   </entry>
   <entry>
-    <title>设计模式</title>
-    <url>/2019/04/04/2019-04-04-%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/</url>
-    <content><![CDATA[<p>#关于设计模式</p>
-<table>
-<thead>
-<tr>
-<th>*</th>
-<th>*</th>
-<th align="left">创建型</th>
-<th align="left">结构型</th>
-<th align="left">行为型</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>范围</td>
-<td>类</td>
-<td align="left">Factory Method</td>
-<td align="left">Adapter(类)</td>
-<td align="left">Interpreter<br/>Template Method</td>
-</tr>
-<tr>
-<td>*</td>
-<td>对象</td>
-<td align="left">Abstract Factory<br/>Builder<br/>Prototype<br/>Singleton</td>
-<td align="left">Adapter(对象)<br/>Bridge<br/>Composite<br/>Decorator<br/>Facade<br/>Flyweight<br/>Proxy<br/></td>
-<td align="left">Chain of Responsibility<br/>Command<br/>Iterator<br/>Mediator<br/>Memento<br/>Observer<br/>State<br/>Stragegy<br/>Visitor</td>
-</tr>
-</tbody></table>
-]]></content>
-      <tags>
-        <tag>iOS</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>8天让iOS开发者上手Flutter之三</title>
     <url>/2021/07/22/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%89/</url>
     <content><![CDATA[<h1 id="搭建项目主框架"><a href="#搭建项目主框架" class="headerlink" title="搭建项目主框架"></a>搭建项目主框架</h1><h2 id="新建微信聊天，通讯录，发现，我的四个文件"><a href="#新建微信聊天，通讯录，发现，我的四个文件" class="headerlink" title="新建微信聊天，通讯录，发现，我的四个文件"></a>新建微信聊天，通讯录，发现，我的四个文件</h2><p>上一篇文章最后我们已经将 APP 的 TabBar 和四个对应的子视图搭建好了，但是每一个子视图里面肯定会有大量的代码，全部放到 rootPage 文件里面肯定是不合理的。所以我们为每个子视图创建单独的文件，并将代码分散到每个文件中。</p>
@@ -973,32 +1001,198 @@
       </tags>
   </entry>
   <entry>
-    <title>记录一个报错</title>
-    <url>/2019/04/25/2019-04-25-%E8%AE%B0%E5%BD%95%E4%B8%80%E4%B8%AA%E6%8A%A5%E9%94%99/</url>
-    <content><![CDATA[<h1 id="Undefined-symbols-for-architecture-arm64"><a href="#Undefined-symbols-for-architecture-arm64" class="headerlink" title="Undefined symbols for architecture arm64"></a>Undefined symbols for architecture arm64</h1><img src="/2019/04/25/2019-04-25-%E8%AE%B0%E5%BD%95%E4%B8%80%E4%B8%AA%E6%8A%A5%E9%94%99/Snip20190425_23.png" class="">
+    <title>8天让iOS开发者上手Flutter之八</title>
+    <url>/2021/08/29/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AB/</url>
+    <content><![CDATA[<h1 id="介绍四种-Flutter-Project"><a href="#介绍四种-Flutter-Project" class="headerlink" title="介绍四种 Flutter Project"></a>介绍四种 Flutter Project</h1><p>先介绍一下这四个的差别和使用的场景。</p>
+<img src="/2021/08/29/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AB/4c14a47588414f198ca94d7fb4799997~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
 
-<p>上面这个报错经常会遇到…但是一直不知道是为啥出现的…今天碰巧知道了出现的原因</p>
-<p>错误出现的步骤是这样的</p>
-<ul>
-<li><ol>
-<li>首先我新建了 Director 和 ConcreteBuild 两个类</li>
-</ol>
-</li>
-<li><ol start="2">
-<li>在 viewController.m 中我使用这两个类写了一些代码</li>
-</ol>
-</li>
-<li><ol start="3">
-<li>这个时候我觉得这两个类写的不好不想要了,于是全部删除了…</li>
-</ol>
-</li>
-</ul>
-<p>但此时在 viewController.m 中的代码还没有移除掉;再次编译运行的时候就会报</p>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">Undefined symbols <span class="keyword">for</span> architecture arm64:</span><br><span class="line"><span class="string">&quot;\_OBJC\_CLASS\_$\_Director&quot;</span>, referenced from:</span><br><span class="line">objc-class-ref <span class="keyword">in</span> ViewController.o</span><br></pre></td></tr></table></figure>
+<h2 id="Flutter-App"><a href="#Flutter-App" class="headerlink" title="Flutter App"></a>Flutter App</h2><p>如果是想要使用 flutter 开发一个新的项目，那么就选择 Flutter App。就像我们之前的 <code>wechat_demo</code></p>
+<h2 id="Flutter-Module"><a href="#Flutter-Module" class="headerlink" title="Flutter Module"></a>Flutter Module</h2><p>但是很多时候我们目前手上的原生 APP 可能会很庞大，不是随便就可以重新使用 flutter 重新再写一遍的。但是又想在现有的 APP 中体验一下 flutter，那么就选择 Flutter Module</p>
+<h2 id="Flutter-Package"><a href="#Flutter-Package" class="headerlink" title="Flutter Package"></a>Flutter Package</h2><p>Flutter 支持使用其他开发者向 Flutter 和 Dart 生态系统贡献的共享 package(类似于 iOS 中的第三方库吧，AFNetworking，YYKit等等…)，这意味着你可以快速构建应用而不是一切从零开始。</p>
+<p>Package 最低要求是包含一个 <code>pubspec.yaml</code> 文件。此外，一个 package 可以包含依赖关系 (在 <code>pubspec.yaml</code> 文件里声明)、 Dart 库、应用、资源、测试、图片和例子等。 pub.dev 上列出了很多 package，由 Google 工程师和 Flutter 和 Dart 社区的开发者开发和发布，你可以用在自己的应用里。</p>
+<h2 id="Flutter-Plugin"><a href="#Flutter-Plugin" class="headerlink" title="Flutter Plugin"></a>Flutter Plugin</h2><p>插件 (plugin) 是 package 的一种，全称是 plugin package，我们简称为 plugin，中文叫插件。插件 (plugin package) 是一种特别的 package，特别指那些帮助你获得原生平台特性的 package。插件可以为 Android (使用 Kotlin 或 Java 语言)、 iOS (使用 Swift 或 Objective-C 语言)、Web、macOS、Windows、Linux 平台，或其任意组合的平台编写。比如：某个插件可以为 Flutter 应用提供使用原生平台的摄像头的功能。</p>
+<h1 id="使用-Flutter-Module-进行混合开发"><a href="#使用-Flutter-Module-进行混合开发" class="headerlink" title="使用 Flutter Module 进行混合开发"></a>使用 Flutter Module 进行混合开发</h1><p>我们前七天开发的项目就是 Flutter App，今天主要介绍如何使用 Flutter Module 进行混合开发。混合开发官方推荐只使用单个 Flutter 页面，多个 Flutter 页面也能支持，但有可能会出现稳定性、性能问题以及 API 仍然可能变动的问题。请大家谨慎使用。<a href="https://flutter.cn/docs/development/add-to-app/multiple-flutters">官方介绍链接</a></p>
+<h1 id="iOS-原生项目中导入-Flutter"><a href="#iOS-原生项目中导入-Flutter" class="headerlink" title="iOS 原生项目中导入 Flutter"></a>iOS 原生项目中导入 Flutter</h1><h2 id="准备一个原生-iOS-项目"><a href="#准备一个原生-iOS-项目" class="headerlink" title="准备一个原生 iOS 项目"></a>准备一个原生 iOS 项目</h2><p>进行混合开发就一定需要一个原生项目，根据你的需求，可以使用目前手上的 APP，也可以临时创建一个 Demo 来先练练手。我们这里就临时新建一个 iOS 原生 Demo。</p>
+<img src="/2021/08/29/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AB/05dd3ccc43394ae4bbcd492293eee1b1~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
 
-<p>知道了错误产生的原因之后,再解决问题就很容易了…去 viewController.m 文件中把相关的代码全删了就好了…</p>
-<p>只是有点儿疑惑为什么 xcode 不报找不到头文件 Director 或 ConcreteBuild 错误,而报这个 Undefined symbols for architecture arm64: 错误…一脸懵</p>
+<p>这个原生项目很简单，就这么两行代码。</p>
+<h2 id="新建-Flutter-Module-项目"><a href="#新建-Flutter-Module-项目" class="headerlink" title="新建 Flutter Module 项目"></a>新建 Flutter Module 项目</h2><p>新建一个 Flutter Module 项目，项目名就叫 module。</p>
+<img src="/2021/08/29/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AB/76de47c4dafc48f3bc1dfe7b8e9af0c0~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>最好将两个项目放在同级目录下，因为原生项目需要知道 Flutter Module 项目的位置。</p>
+<img src="/2021/08/29/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AB/c3ccd6384a4a4c9ea5a35c9acf783ec3~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<h2 id="使用-cocoapods-建立关联"><a href="#使用-cocoapods-建立关联" class="headerlink" title="使用 cocoapods 建立关联"></a>使用 cocoapods 建立关联</h2><p>在原生项目 Demo 里建立 Podfile 文件,然后编辑 Podfile。</p>
+<figure class="highlight dart"><table><tr><td class="code"><pre><span class="line">flutter_application_path = <span class="string">&#x27;Podfile相对flutter module的路径&#x27;</span></span><br><span class="line">load File.join(flutter_application_path, <span class="string">&#x27;.ios&#x27;</span>, <span class="string">&#x27;Flutter&#x27;</span>, <span class="string">&#x27;podhelper.rb&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<p>在每个需要集成 flutter module 的 target 添加如下代码</p>
+<figure class="highlight ruby"><table><tr><td class="code"><pre><span class="line">target <span class="string">&#x27;你的APP&#x27;</span> <span class="keyword">do</span></span><br><span class="line">  install_all_flutter_pods(flutter_application_path)</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+
+<p>编辑完之后的 Podfile 如下。</p>
+<img src="/2021/08/29/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AB/6f23d64afaad48af93ad329beaed0195~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>然后执行 <code>pod install</code> 命令</p>
+<img src="/2021/08/29/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AB/091aa3f14c0a48849a1069034a995ae5~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>如上图所示就表示集成好了。就接下来就是如何在原生项目中展示 flutter 的内容了。</p>
+<h2 id="展示单个-Flutter-页面"><a href="#展示单个-Flutter-页面" class="headerlink" title="展示单个 Flutter 页面"></a>展示单个 Flutter 页面</h2><p>展示单个 Flutter 页面的方式有两种，一种是使用 FlutterEngine 的方式，一种是不使用 FlutterEngine 的方式，其实不使用 FlutterEngine 的说法是不严谨的，只是我们没有使用代码创建 FlutterEngine 而已，Flutter 框架内部自己创建了 FlutterEngine，但是为了方便记忆，我们可以这么理解。但是这种不使用 FlutterEngine 的方式<a href="https://flutter.cn/docs/development/add-to-app/ios/add-flutter-screen#alternatively---create-a-flutterviewcontroller-with-an-implicit-flutterengine">官方并不推荐</a>。</p>
+<p>因为按需创建 <code>FlutterEngine</code> 的话，在 <code>FlutterViewController</code> 被 present 出来之后，第一帧图像渲染完之前，将会引入明显的延迟。但是当 Flutter 页面很少被展示时，当对决定何时启动 Dart VM 没有好的启发时，当 Flutter 无需在页面（view controller）之间保持状态时，此方式可能会有用。</p>
+<h3 id="不使用-FlutterEngine-展示单个-Flutter-页面-官方并不推荐"><a href="#不使用-FlutterEngine-展示单个-Flutter-页面-官方并不推荐" class="headerlink" title="不使用 FlutterEngine 展示单个 Flutter 页面(官方并不推荐)"></a>不使用 FlutterEngine 展示单个 Flutter 页面(官方并不推荐)</h3><p>来到 <code>ViewController.m</code> 文件中导入 <code>Flutter</code> 的头文件</p>
+<img src="/2021/08/29/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AB/a07fce1803d941e9bce3a14c91c0a02c~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>直接创建 <code>FlutterViewController</code> 对象，并使用 present 和 push 两种方式展示</p>
+<img src="/2021/08/29/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AB/9cc03a3c599f4a9b9364d3be40f47f68~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>APP显示如下图所示：<br></p>
+<p>present方式显示如图：</p>
+<div align=center>
+<img src="8天让iOS开发者上手Flutter之八/4fc895fa4a0d40329a77e4f982bc97df~tplv-k3u1fbpfcp-watermark.png">
+</div>
+
+<p>push方式显示如图：</p>
+<div align=center>
+<img src="8天让iOS开发者上手Flutter之八/3ed33eafd5744d229a3fa6522dc9e47c~tplv-k3u1fbpfcp-watermark.png">
+</div>
+
+<h3 id="使用-FlutterEngine-展示单个-Flutter-页面"><a href="#使用-FlutterEngine-展示单个-Flutter-页面" class="headerlink" title="使用 FlutterEngine 展示单个 Flutter 页面"></a>使用 FlutterEngine 展示单个 Flutter 页面</h3><h4 id="创建-FlutterEngine"><a href="#创建-FlutterEngine" class="headerlink" title="创建 FlutterEngine"></a>创建 FlutterEngine</h4><p>创建 <code>FlutterEngine</code> 的合适位置取决于您的应用。作为示例，我们将在应用启动的 <code>AppDelegate</code> 中创建一个 <code>FlutterEngine</code>，并作为属性暴露给外界。</p>
+<p>在 <code>AppDelegate.h</code> 中</p>
+<img src="/2021/08/29/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AB/ded0c838a6f94e83a17f8a0f7e437d3c~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>在<code>AppDelegate.m</code>中</p>
+<img src="/2021/08/29/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AB/d409152918c444dab8b008e6e1772723~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<h4 id="展示-FlutterViewController"><a href="#展示-FlutterViewController" class="headerlink" title="展示 FlutterViewController"></a>展示 FlutterViewController</h4><img src="/2021/08/29/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AB/8629028d1cf04881bb4e9902a5cd8a30~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>现在，你的 iOS 应用中集成了一个 Flutter 页面。</p>
+<h2 id="展示多个-Flutter-页面"><a href="#展示多个-Flutter-页面" class="headerlink" title="展示多个 Flutter 页面"></a>展示多个 Flutter 页面</h2><p>使用上面的方式，最终展示的 Flutter 页面都是同一个页面。而在实际混合开发中，想要展示多个不同的 Flutter 页面的需求应该是普遍的。那么 Flutter 能做到吗？答案是可以的，官方的说法是自 Flutter 2.0.0 开始，可以同时添加多个 Flutter 实例。由于稳定性，性能问题以及 API 任然可能变动，请谨慎使用。<a href="https://flutter.cn/docs/development/add-to-app/multiple-flutters">链接</a></p>
+<h3 id="使用-FlutterEngineGroup"><a href="#使用-FlutterEngineGroup" class="headerlink" title="使用 FlutterEngineGroup"></a>使用 FlutterEngineGroup</h3><p>展示多个 Flutter 页面需要使用到 <code>FlutterEngineGroup</code> 来创建 <code>FlutterEngine</code>,而不是上面直接使用 <code>FlutterEngine</code> 的方式。</p>
+<p>在<code>AppDelegate.h</code>中</p>
+<img src="/2021/08/29/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AB/a543a5a2a1854fa291bf8e2120c6fe90~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>在<code>AppDelegate.m</code>中</p>
+<img src="/2021/08/29/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AB/27d732aecdc9406884024b447df68faa~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<h3 id="新建一个-flutter-页面"><a href="#新建一个-flutter-页面" class="headerlink" title="新建一个 flutter 页面"></a>新建一个 flutter 页面</h3><p>来到 Android Studio 中的 Flutter module 项目，新建一个 page_two.dart 文件，并做些简单的展示</p>
+<img src="/2021/08/29/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AB/26b655d067424c298a28d5cff4d3ea1e~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p><code>PageTwo</code> 页面写好之后，还需要到 main.dart 文件中声明一个新的 dart 入口。这样才能在原生中找到这个 <code>PageTwo</code> 页面,代码如图：</p>
+<img src="/2021/08/29/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AB/beae4201c18346d1a3c10e698d1dbd44~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png"><br>
+
+<p><code>page_two</code> 就是 <code>PageTwo</code> 的入口函数，在原生中待会就会用到。</p>
+<h3 id="展示两个-Flutter-页面"><a href="#展示两个-Flutter-页面" class="headerlink" title="展示两个 Flutter 页面"></a>展示两个 Flutter 页面</h3><p>回到原生项目的 ViewController.m 文件中，实现如下代码：</p>
+<img src="/2021/08/29/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AB/f0fba33c2802457588b86c41086ae6d5~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>在第0行，我们创建 <code>engine</code> 的时候，并没有传入 Entrypoint 参数，所以就会展示默认的入口函数 <code>main</code> 对应的页面。在第 1 行中，我们创建 <code>engine</code> 的时候，指定了入口函数为 <code>page_two</code>，那么就会展示 page_two() 所对应的页面。</p>
+<p>present 展示的页面如图：</p>
+<div align=center>
+<img src='8天让iOS开发者上手Flutter之八/f04e4be2fa0f415e8931f017ad091e71~tplv-k3u1fbpfcp-watermark.png'>
+</div>
+
+<p>push展示的页面如图：</p>
+<div align=center>
+<img src='8天让iOS开发者上手Flutter之八/a20cf2162ca24b3d816c8938d5d3d8c2~tplv-k3u1fbpfcp-watermark.png'>
+</div>
+
+<h1 id="Flutter-与-iOS-端通信"><a href="#Flutter-与-iOS-端通信" class="headerlink" title="Flutter 与 iOS 端通信"></a>Flutter 与 iOS 端通信</h1><p>Flutter 和 iOS 端的通信主要是使用各种通道。有<code>MethodChannel</code>，<code>BasicMessageChannel</code>,<code>EventChannel</code>等等，这里主要介绍前面两种通道。通道通过名称来建立联系，所以通道的名称需要确保是唯一的。如果有同名的通道，通信会受到干扰</p>
+<h2 id="MethodChannel-方法通道"><a href="#MethodChannel-方法通道" class="headerlink" title="MethodChannel 方法通道"></a>MethodChannel 方法通道</h2><p>方法通道主要用了传递方法名称和参数。在前面我们新建 PageTwo 的时候，就已经创建了一个 <code>MethodChannel</code> 了，名字为 <code>page_two_channel</code>。然后在文本‘返回上一页’的点击手势里面调用了一个方法 <code>invokeMethod()</code>。这个方法可以传递多个参数，第一个参数就是方法名称，后面是方法参数。我们这里没有参数，就只传入一个方法名 <code>pop</code>。那么 Flutter 端的工作就完成了，再回到我们的 iOS 原生端，ViewController.m 里面。实现如下代码：</p>
+<img src="/2021/08/29/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AB/45acb3a2d3af47278d290b0a24534ac5~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>在 iOS 中给 <code>MethodChannel</code> 加了一个 <code>Flutter</code> 前缀。然后初始化 <code>FlutterMethodChannel</code> 的时候，传入的名字一定要和 flutter 端是一致的，不然是无法建立通讯的。然后调用 <code>setMethodCallHandler:</code> 方法传入一个 block 参数。block 参数会在 channel.invokeMethod() 的时候被调用。block 参数 <code>call</code> 就是对 invokeMethod 参数的一个封装。<code>call</code> 的 <code>method</code> 就是方法名，还有一个 <code>arguments</code> 就是方法参数。这样就可以根据方法名进行判断后作出处理了。现在是从 flutter 向 iOS 原生通信，实现了在 flutter 中点击方法实现了 pop 回到上个页面的。相反的，也可以从 iOS 端向 flutter 端通信。在 iOS 端，使用 <code>channel</code> 调用 <code>invokeMethod()</code> 就可以向 flutter 发送消息了，在 flutter 端同样设置 <code>channel</code> 的 <code>setMethodCallHandler</code> 就可以接收了。</p>
+<p>flutter 端 <code>setMethodCallHandler</code> 代码如下：</p>
+<img src="/2021/08/29/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AB/6eae59f6154f455d82eca2588c6be0fc~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>这里说一句，这些通道不能在无状态的 Widget 里使用，改为有状态的就可以了。</p>
+<h2 id="BasicMessageChannel-基础消息通道"><a href="#BasicMessageChannel-基础消息通道" class="headerlink" title="BasicMessageChannel 基础消息通道"></a>BasicMessageChannel 基础消息通道</h2><p>除了上面提到的 <code>MethodChannel</code>，你还可以使用<a href="https://docs.flutter.io/flutter/services/BasicMessageChannel-class.html"><code>BasicMessageChannel</code></a>，它支持使用自定义消息编解码器进行基本的异步消息传递。 此外，您可以使用专门的 <a href="https://docs.flutter.io/flutter/services/BinaryCodec-class.html"><code>BinaryCodec</code></a>，<a href="https://docs.flutter.io/flutter/services/StringCodec-class.html"><code>StringCodec</code></a>和 <a href="https://docs.flutter.io/flutter/services/JSONMessageCodec-class.html"><code>JSONMessageCodec</code></a>类，或创建自己的编解码器。</p>
+<p><code>BasicMessageChannel</code> 这个通道的使用方法跟上面的 <code>MethodChannel</code> 是一样的，不同点是在 flutter 中创建 <code>BasicMessageChannel</code> 这个通道需要传入一个编解码器，使用一个标准的编解码器 <code>StandardMessageCodec</code> 可以将基本的数据类型进行编解码。<code>BasicMessageChannel</code> 通道可以实现基础数据类型的通讯。iOS 和 flutter 的基础数据类型对应编解码关系：</p>
+<img src="/2021/08/29/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AB/992500b07cb845a8afe0039b21cc9384~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>本来还想写一个混合开发的实际案例的，但是鉴于本人目前的重点并不是 flutter，而且网上也有较多的介绍这种混合开发的实际案例，所以这里篇文章就写到这里了。这 8 篇文章的内容应该说只是一个 iOSer 入门 flutter 的教程，只是些皮毛东西，离掌握 flutter，Dart 还差的很远。而 flutter 的出现也并不是说会完全取代 Android 和 iOS 开发者，flutter 只能用来搭建一套各平台统一的 UI，而各个平台相关的功能，和硬件相关的需求，都依然需要各个平台的开发者去实现。</p>
 ]]></content>
+      <categories>
+        <category>flutter</category>
+      </categories>
+      <tags>
+        <tag>flutter</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>8天让iOS开发者上手Flutter之四</title>
+    <url>/2021/07/25/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%9B%9B/</url>
+    <content><![CDATA[<p>上一篇文章我们已经完成了发现页面的搭建，下一步我们实现微信的我的页面</p>
+<h1 id="我的页面"><a href="#我的页面" class="headerlink" title="我的页面"></a>我的页面</h1><p>在着手开发我的页面之前，先新建一个 discover 目录，将发现页面相关的文件统一挪动到这个目录下。这里会发现 Android Studio 一个比较特别的地方，新建一个目录后，挪动了的文件不需要重新导入头文件。AndroidStudio 会在需要的地方自动补全路径。这点感觉还是蛮智能的。</p>
+<img src="/2021/07/25/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%9B%9B/528d39f8d678470ca40e1823f8b0af82~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<h2 id="设置APP启动默认展示我的页面"><a href="#设置APP启动默认展示我的页面" class="headerlink" title="设置APP启动默认展示我的页面"></a>设置APP启动默认展示我的页面</h2><p>这个设置在上一篇文章开发发现页面的时候也说过了，就是修改 rootPage.dart 文件里 _currentIndex 的值。</p>
+<img src="/2021/07/25/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%9B%9B/49c0b0536b3a48c09cb0f9a3ec6ad539~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<h2 id="布局右上角的拍照按钮"><a href="#布局右上角的拍照按钮" class="headerlink" title="布局右上角的拍照按钮"></a>布局右上角的拍照按钮</h2><p>观察这个右上角的拍照按钮，会发现上下拖动列表的时候，这个拍照按钮的位置是不会发生变化的。意思是拍照按钮和列表是同级的关系，不是父子控件的关系。所以这里的布局我们可以使用 Stack 来实现，ListView 放在底下，这个拍照按钮放在上面。布局的方式多种多样，只要是能实现需求效果的都是可行的。这个 flutter 的 UI 布局有时候写着写着就会发现括号对不上，使用 command + option + L 也不管用，依然对不齐，这对于某些强迫症的人看起来是真的挺难受的，下图里都还是我一行一行调整了之后的。</p>
+<img src="/2021/07/25/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%9B%9B/97c360d9da944ae58e159ca1c540cfe3~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<h2 id="实现-ListView-的普通-cell-部分"><a href="#实现-ListView-的普通-cell-部分" class="headerlink" title="实现 ListView 的普通 cell 部分"></a>实现 ListView 的普通 cell 部分</h2><p>我的页面的 ListView 的头部那个 cell 明显和它其他的 cell 不同，其他的 cell 跟我们上一篇文章里开发的 discover_cell 基本上是类似的，所以可以直接拿过来使用。做过 iOS 开发的都知道，tableView 等滚动视图作为控制器的根视图的时候，顶部都会有一个间距，在 flutter 里面也有这样的情况，如果需要干掉，就需要将我们的 ListView 包装在一个 <code>MediaQuery.removePadding()</code> 里面，然后设置它的属性 <code>removeTop: true</code>。这样就可以去掉顶部的间距了。完整代码如下：</p>
+<img src="/2021/07/25/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%9B%9B/62a1932e2d984c959c5cded8cbc3052a~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>此时APP显示如图：</p>
+<div align=center>
+<img src="8天让iOS开发者上手Flutter之四/7de9c40bd8f44ecf8478bc0f6c96c1f2~tplv-k3u1fbpfcp-watermark.png"/>
+</div>
+
+<h2 id="实现-ListView-的头部-cell"><a href="#实现-ListView-的头部-cell" class="headerlink" title="实现 ListView 的头部 cell"></a>实现 ListView 的头部 cell</h2><p>可以看到我们的 _MinePageState 的 build方 法已经够长了，所以关于头部 cell 的代码我们可以封装为一个方法写在其他的地方。</p>
+<img src="/2021/07/25/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%9B%9B/f8f135dee51247708051b102a0cdf2d9~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>关于头部 cell 这里除了布局稍微复杂了一些之外，就只有给图片加圆角是没有讲过的。要设置圆角图片的话，就不能使用 Image 类了。需要使用到 <code>BoxDecoration</code> 类，它可以设置圆角半径 <code>borderRadius</code> 和图片 <code>image</code>。完整代码如下：</p>
+<img src="/2021/07/25/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%9B%9B/609e9067e74f4ca78908c3d3986a7589~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+<p>APP 显示效果如图： </p>
+<div align=center>
+<img src="8天让iOS开发者上手Flutter之四/b05e536a5a344eb2af3049b88472054c~tplv-k3u1fbpfcp-watermark.png"/>
+</div>
+
+<p>我的页面就这样完成了。发现页面和我的页面这两个页面主要是对布局的灵活运用，都还是比较简单的。</p>
+<h1 id="通讯录页面"><a href="#通讯录页面" class="headerlink" title="通讯录页面"></a>通讯录页面</h1><p>接下来实现通讯录界面，这节课先只实现到下图这样，边上的索引下节课再实现。</p>
+<div align=center>
+<img src="8天让iOS开发者上手Flutter之四/9e1c9e054a92483d9a0da553a3c5745e~tplv-k3u1fbpfcp-watermark.png"/>
+</div>
+
+<h2 id="设置-APP-启动默认展示通讯录页面"><a href="#设置-APP-启动默认展示通讯录页面" class="headerlink" title="设置 APP 启动默认展示通讯录页面"></a>设置 APP 启动默认展示通讯录页面</h2><p>这一步已经讲过 2 次了，就不再贴图了…</p>
+<h2 id="设置通讯录页面导航栏"><a href="#设置通讯录页面导航栏" class="headerlink" title="设置通讯录页面导航栏"></a>设置通讯录页面导航栏</h2><p>导航栏的颜色，我们修改了好几次了。这个颜色可以放在一个 const.dart 的公用文件里。以后统一使用这个颜色，也方便以后统一修改。</p>
+<img src="/2021/07/25/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%9B%9B/5b11ecbb41ec479ca4289993173347b8~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>然后是通讯录页面的导航条，除了标题之外，右侧还有一个添加好友的按钮，可以使用 AppBar 的 title 实现一个复杂的导航条，但其实没那个必要。AppBar 提供了一个 actions 属性，这个属性就是展示在导航条右侧的，直接使用这个 actions 就可以了。代码如下：</p>
+<img src="/2021/07/25/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%9B%9B/b36b444a710a4e30b0a2bdc4eac87790~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<h2 id="实现通讯录列表-cell"><a href="#实现通讯录列表-cell" class="headerlink" title="实现通讯录列表 cell"></a>实现通讯录列表 cell</h2><p>通讯录列表 cell 可以使用一种 cell 来完成，也可以使用两种不同的 cell 来完成，如果使用一种 cell 的话，代码里面需要判断的逻辑就会有点多。所以我这里推荐使用两种 cell 来完成。第一种就是头部的 4 个 cell，这几个属于一类，我们使用类 <code>_FriendLocalCell</code> 来表示，而其余的都是属于好友 cell 属于一类，用类 <code>_FriendNetworkCell</code> 表示。关于这两种 cell 我们暂时先不新建文件存放，直接在 friends_page.dart 文件中写。</p>
+<h3 id="实现-FriendLocalCell"><a href="#实现-FriendLocalCell" class="headerlink" title="实现 _FriendLocalCell"></a>实现 <code>_FriendLocalCell</code></h3><p>这一类 cell 主要是用来展示当前列表头部的几个 cell 的，这几个 cell 的图片都是从本地加载的。从效果图上可以看出，这个 cell 只需要 title，和 imageName 这两个必传参数就够了。然后是关于布局。最外层使用一个 Row 进行左右布局，左侧使用一个能显示圆角的图片。右侧再用一个 Column 进行上下布局，将文本和底部的分隔线上下排列。这里主要有一个地方没有讲到过，就是在 flutter 中获取屏幕的宽高，我们会抽成一个方法，放在 const.dart 文件中。如下图所示：</p>
+<img src="/2021/07/25/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%9B%9B/a5731eb671cc4d43b4561f53bcf137ba~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p><code>_FriendLocalCell</code> 完整代码如下：</p>
+<img src="/2021/07/25/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%9B%9B/5664732c2af244769cd8c120d9cb6390~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<h3 id="实现-FriendNetworkCell"><a href="#实现-FriendNetworkCell" class="headerlink" title="实现 _FriendNetworkCell"></a>实现 <code>_FriendNetworkCell</code></h3><p>关于 <code>_FriendNetworkCell</code>，可能乍一看之下，会觉得应该和上面的 cell 差不太多。但是实际上还是有那么些区别的。首先 flutter 的 ListView 的是没有组的概念的，所以关于组标题就需要我们自己来动手实现了，这里的做法就是，除了上面的 <code>_FriendLocalCell</code> 所有的子控件之外，每一个 cell 都带上一个组标题，然后根据组标题是否有值，来显示或不显示组标题。那么在布局方面，就需要对上面的 cell，再包装一个 Column，将组标题和头像名称部分包起来。所以当前 cell 所需要的属性，除了好友的名字 <code>name</code> 和头像 <code>imageUrl</code> 为必须之外，还需要一个 <code>groupTitle</code> 为可选参数。</p>
+<p>完整的代码如下：</p>
+<img src="/2021/07/25/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%9B%9B/8f3622e493514fed80132a2783a8e40e~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<h2 id="准备数据模型"><a href="#准备数据模型" class="headerlink" title="准备数据模型"></a>准备数据模型</h2><p>同样的，数据我们也分为两种，一种我们就叫作通讯录，使用 <code>AddressBook</code> 来表示。另一种叫好友用 <code>Friends</code> 表示。我们将好友列表用到的数据模型都放在新的文件 friends_data.dart 文件中。</p>
+<h3 id="准备-AddressBook-模型数组"><a href="#准备-AddressBook-模型数组" class="headerlink" title="准备 AddressBook 模型数组"></a>准备 <code>AddressBook</code> 模型数组</h3><p>这个模型数组，可以直接根据我们在效果图上看到的东西，生成对应的模型，和数组就好了。完整代码如下：</p>
+<img src="/2021/07/25/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%9B%9B/6769dce1c0a241238c9b687c316e685b~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<h3 id="准备-Friends-模型数组"><a href="#准备-Friends-模型数组" class="headerlink" title="准备 Friends 模型数组"></a>准备 <code>Friends</code> 模型数组</h3><p>这里的数据源已经准备好了，我们只需要根据数据源创建出对应的模型。这个数组是好友数组,有需要的可以自行前往<a href="https://github.com/masterKing/wechatDemo">下载</a>。</p>
+<img src="/2021/07/25/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%9B%9B/4f37de210e874b6b87611bb8b24940c6~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<h2 id="实现部分通讯录页面"><a href="#实现部分通讯录页面" class="headerlink" title="实现部分通讯录页面"></a>实现部分通讯录页面</h2><p>现在我们的视图和数据都已经准备好了。接下来就是直接使用了，我们之前在发现页面使用 ListView 的方式，没有使用 builder，是直接使用的方式，就跟我们在 iOS 中的 cellForRow 方法中每次创建一个新的 cell 的方式一样，cell 没有重复利用。而今天我们使用 builder 的这种方式，就是 cell 被放入缓存池中被重复利用的方式。使用 <code>ListView.builder()</code> 的方式，需要传入两个参数，一个是 itemCount 元素的个数。一个是 itemBuilder，类似于 cellForRowAtIndexPath 方法，需要我们创建 cell 并返回。完整的代码如下：</p>
+<img src="/2021/07/25/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%9B%9B/3849d87dabcb414fbabcb46e04ffc067~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>这里再说一下对 datas 进行排序的地方。这个方法 <code>initState()</code> 有一个 @override 修饰，意思就会重写父类的方法，而且这个方法应该是调用的比 build 要早的。这样才能保证展示数据的时候，数据是已经经过排序过的。而这个排序的方法，其实跟 iOS 中的 <code>sortedArrayUsingComparator:</code> 排序也非常的像，传入一个代码块的方式。所以有开发经验的同学，会发现真的有些东西，各个平台都是通用的，学起来也会更快更容易上手。最后 APP 的显示如下图：</p>
+<div align=center>
+<img src="8天让iOS开发者上手Flutter之四/b9f94392e09f449f8bb8f73879d2a793~tplv-k3u1fbpfcp-watermark.png"/>
+</div>
+
+
+]]></content>
+      <categories>
+        <category>flutter</category>
+      </categories>
+      <tags>
+        <tag>flutter</tag>
+      </tags>
   </entry>
   <entry>
     <title>8天让iOS开发者上手Flutter之六</title>
@@ -1107,85 +1301,6 @@
 <h3 id="使用滑动切换，解决-bug"><a href="#使用滑动切换，解决-bug" class="headerlink" title="使用滑动切换，解决 bug"></a>使用滑动切换，解决 bug</h3><img src="/2021/08/17/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AD/44cb9bc186724397b471136abbcc44ea~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
 
 <h3 id="禁用滑动切换"><a href="#禁用滑动切换" class="headerlink" title="禁用滑动切换"></a>禁用滑动切换</h3><img src="/2021/08/17/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AD/e9d533514d734781bd6a13e6c43e738a~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-
-]]></content>
-      <categories>
-        <category>flutter</category>
-      </categories>
-      <tags>
-        <tag>flutter</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>8天让iOS开发者上手Flutter之四</title>
-    <url>/2021/07/25/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%9B%9B/</url>
-    <content><![CDATA[<p>上一篇文章我们已经完成了发现页面的搭建，下一步我们实现微信的我的页面</p>
-<h1 id="我的页面"><a href="#我的页面" class="headerlink" title="我的页面"></a>我的页面</h1><p>在着手开发我的页面之前，先新建一个 discover 目录，将发现页面相关的文件统一挪动到这个目录下。这里会发现 Android Studio 一个比较特别的地方，新建一个目录后，挪动了的文件不需要重新导入头文件。AndroidStudio 会在需要的地方自动补全路径。这点感觉还是蛮智能的。</p>
-<img src="/2021/07/25/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%9B%9B/528d39f8d678470ca40e1823f8b0af82~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<h2 id="设置APP启动默认展示我的页面"><a href="#设置APP启动默认展示我的页面" class="headerlink" title="设置APP启动默认展示我的页面"></a>设置APP启动默认展示我的页面</h2><p>这个设置在上一篇文章开发发现页面的时候也说过了，就是修改 rootPage.dart 文件里 _currentIndex 的值。</p>
-<img src="/2021/07/25/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%9B%9B/49c0b0536b3a48c09cb0f9a3ec6ad539~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<h2 id="布局右上角的拍照按钮"><a href="#布局右上角的拍照按钮" class="headerlink" title="布局右上角的拍照按钮"></a>布局右上角的拍照按钮</h2><p>观察这个右上角的拍照按钮，会发现上下拖动列表的时候，这个拍照按钮的位置是不会发生变化的。意思是拍照按钮和列表是同级的关系，不是父子控件的关系。所以这里的布局我们可以使用 Stack 来实现，ListView 放在底下，这个拍照按钮放在上面。布局的方式多种多样，只要是能实现需求效果的都是可行的。这个 flutter 的 UI 布局有时候写着写着就会发现括号对不上，使用 command + option + L 也不管用，依然对不齐，这对于某些强迫症的人看起来是真的挺难受的，下图里都还是我一行一行调整了之后的。</p>
-<img src="/2021/07/25/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%9B%9B/97c360d9da944ae58e159ca1c540cfe3~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<h2 id="实现-ListView-的普通-cell-部分"><a href="#实现-ListView-的普通-cell-部分" class="headerlink" title="实现 ListView 的普通 cell 部分"></a>实现 ListView 的普通 cell 部分</h2><p>我的页面的 ListView 的头部那个 cell 明显和它其他的 cell 不同，其他的 cell 跟我们上一篇文章里开发的 discover_cell 基本上是类似的，所以可以直接拿过来使用。做过 iOS 开发的都知道，tableView 等滚动视图作为控制器的根视图的时候，顶部都会有一个间距，在 flutter 里面也有这样的情况，如果需要干掉，就需要将我们的 ListView 包装在一个 <code>MediaQuery.removePadding()</code> 里面，然后设置它的属性 <code>removeTop: true</code>。这样就可以去掉顶部的间距了。完整代码如下：</p>
-<img src="/2021/07/25/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%9B%9B/62a1932e2d984c959c5cded8cbc3052a~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>此时APP显示如图：</p>
-<div align=center>
-<img src="8天让iOS开发者上手Flutter之四/7de9c40bd8f44ecf8478bc0f6c96c1f2~tplv-k3u1fbpfcp-watermark.png"/>
-</div>
-
-<h2 id="实现-ListView-的头部-cell"><a href="#实现-ListView-的头部-cell" class="headerlink" title="实现 ListView 的头部 cell"></a>实现 ListView 的头部 cell</h2><p>可以看到我们的 _MinePageState 的 build方 法已经够长了，所以关于头部 cell 的代码我们可以封装为一个方法写在其他的地方。</p>
-<img src="/2021/07/25/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%9B%9B/f8f135dee51247708051b102a0cdf2d9~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>关于头部 cell 这里除了布局稍微复杂了一些之外，就只有给图片加圆角是没有讲过的。要设置圆角图片的话，就不能使用 Image 类了。需要使用到 <code>BoxDecoration</code> 类，它可以设置圆角半径 <code>borderRadius</code> 和图片 <code>image</code>。完整代码如下：</p>
-<img src="/2021/07/25/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%9B%9B/609e9067e74f4ca78908c3d3986a7589~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-<p>APP 显示效果如图： </p>
-<div align=center>
-<img src="8天让iOS开发者上手Flutter之四/b05e536a5a344eb2af3049b88472054c~tplv-k3u1fbpfcp-watermark.png"/>
-</div>
-
-<p>我的页面就这样完成了。发现页面和我的页面这两个页面主要是对布局的灵活运用，都还是比较简单的。</p>
-<h1 id="通讯录页面"><a href="#通讯录页面" class="headerlink" title="通讯录页面"></a>通讯录页面</h1><p>接下来实现通讯录界面，这节课先只实现到下图这样，边上的索引下节课再实现。</p>
-<div align=center>
-<img src="8天让iOS开发者上手Flutter之四/9e1c9e054a92483d9a0da553a3c5745e~tplv-k3u1fbpfcp-watermark.png"/>
-</div>
-
-<h2 id="设置-APP-启动默认展示通讯录页面"><a href="#设置-APP-启动默认展示通讯录页面" class="headerlink" title="设置 APP 启动默认展示通讯录页面"></a>设置 APP 启动默认展示通讯录页面</h2><p>这一步已经讲过 2 次了，就不再贴图了…</p>
-<h2 id="设置通讯录页面导航栏"><a href="#设置通讯录页面导航栏" class="headerlink" title="设置通讯录页面导航栏"></a>设置通讯录页面导航栏</h2><p>导航栏的颜色，我们修改了好几次了。这个颜色可以放在一个 const.dart 的公用文件里。以后统一使用这个颜色，也方便以后统一修改。</p>
-<img src="/2021/07/25/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%9B%9B/5b11ecbb41ec479ca4289993173347b8~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>然后是通讯录页面的导航条，除了标题之外，右侧还有一个添加好友的按钮，可以使用 AppBar 的 title 实现一个复杂的导航条，但其实没那个必要。AppBar 提供了一个 actions 属性，这个属性就是展示在导航条右侧的，直接使用这个 actions 就可以了。代码如下：</p>
-<img src="/2021/07/25/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%9B%9B/b36b444a710a4e30b0a2bdc4eac87790~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<h2 id="实现通讯录列表-cell"><a href="#实现通讯录列表-cell" class="headerlink" title="实现通讯录列表 cell"></a>实现通讯录列表 cell</h2><p>通讯录列表 cell 可以使用一种 cell 来完成，也可以使用两种不同的 cell 来完成，如果使用一种 cell 的话，代码里面需要判断的逻辑就会有点多。所以我这里推荐使用两种 cell 来完成。第一种就是头部的 4 个 cell，这几个属于一类，我们使用类 <code>_FriendLocalCell</code> 来表示，而其余的都是属于好友 cell 属于一类，用类 <code>_FriendNetworkCell</code> 表示。关于这两种 cell 我们暂时先不新建文件存放，直接在 friends_page.dart 文件中写。</p>
-<h3 id="实现-FriendLocalCell"><a href="#实现-FriendLocalCell" class="headerlink" title="实现 _FriendLocalCell"></a>实现 <code>_FriendLocalCell</code></h3><p>这一类 cell 主要是用来展示当前列表头部的几个 cell 的，这几个 cell 的图片都是从本地加载的。从效果图上可以看出，这个 cell 只需要 title，和 imageName 这两个必传参数就够了。然后是关于布局。最外层使用一个 Row 进行左右布局，左侧使用一个能显示圆角的图片。右侧再用一个 Column 进行上下布局，将文本和底部的分隔线上下排列。这里主要有一个地方没有讲到过，就是在 flutter 中获取屏幕的宽高，我们会抽成一个方法，放在 const.dart 文件中。如下图所示：</p>
-<img src="/2021/07/25/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%9B%9B/a5731eb671cc4d43b4561f53bcf137ba~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p><code>_FriendLocalCell</code> 完整代码如下：</p>
-<img src="/2021/07/25/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%9B%9B/5664732c2af244769cd8c120d9cb6390~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<h3 id="实现-FriendNetworkCell"><a href="#实现-FriendNetworkCell" class="headerlink" title="实现 _FriendNetworkCell"></a>实现 <code>_FriendNetworkCell</code></h3><p>关于 <code>_FriendNetworkCell</code>，可能乍一看之下，会觉得应该和上面的 cell 差不太多。但是实际上还是有那么些区别的。首先 flutter 的 ListView 的是没有组的概念的，所以关于组标题就需要我们自己来动手实现了，这里的做法就是，除了上面的 <code>_FriendLocalCell</code> 所有的子控件之外，每一个 cell 都带上一个组标题，然后根据组标题是否有值，来显示或不显示组标题。那么在布局方面，就需要对上面的 cell，再包装一个 Column，将组标题和头像名称部分包起来。所以当前 cell 所需要的属性，除了好友的名字 <code>name</code> 和头像 <code>imageUrl</code> 为必须之外，还需要一个 <code>groupTitle</code> 为可选参数。</p>
-<p>完整的代码如下：</p>
-<img src="/2021/07/25/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%9B%9B/8f3622e493514fed80132a2783a8e40e~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<h2 id="准备数据模型"><a href="#准备数据模型" class="headerlink" title="准备数据模型"></a>准备数据模型</h2><p>同样的，数据我们也分为两种，一种我们就叫作通讯录，使用 <code>AddressBook</code> 来表示。另一种叫好友用 <code>Friends</code> 表示。我们将好友列表用到的数据模型都放在新的文件 friends_data.dart 文件中。</p>
-<h3 id="准备-AddressBook-模型数组"><a href="#准备-AddressBook-模型数组" class="headerlink" title="准备 AddressBook 模型数组"></a>准备 <code>AddressBook</code> 模型数组</h3><p>这个模型数组，可以直接根据我们在效果图上看到的东西，生成对应的模型，和数组就好了。完整代码如下：</p>
-<img src="/2021/07/25/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%9B%9B/6769dce1c0a241238c9b687c316e685b~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<h3 id="准备-Friends-模型数组"><a href="#准备-Friends-模型数组" class="headerlink" title="准备 Friends 模型数组"></a>准备 <code>Friends</code> 模型数组</h3><p>这里的数据源已经准备好了，我们只需要根据数据源创建出对应的模型。这个数组是好友数组,有需要的可以自行前往<a href="https://github.com/masterKing/wechatDemo">下载</a>。</p>
-<img src="/2021/07/25/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%9B%9B/4f37de210e874b6b87611bb8b24940c6~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<h2 id="实现部分通讯录页面"><a href="#实现部分通讯录页面" class="headerlink" title="实现部分通讯录页面"></a>实现部分通讯录页面</h2><p>现在我们的视图和数据都已经准备好了。接下来就是直接使用了，我们之前在发现页面使用 ListView 的方式，没有使用 builder，是直接使用的方式，就跟我们在 iOS 中的 cellForRow 方法中每次创建一个新的 cell 的方式一样，cell 没有重复利用。而今天我们使用 builder 的这种方式，就是 cell 被放入缓存池中被重复利用的方式。使用 <code>ListView.builder()</code> 的方式，需要传入两个参数，一个是 itemCount 元素的个数。一个是 itemBuilder，类似于 cellForRowAtIndexPath 方法，需要我们创建 cell 并返回。完整的代码如下：</p>
-<img src="/2021/07/25/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%9B%9B/3849d87dabcb414fbabcb46e04ffc067~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>这里再说一下对 datas 进行排序的地方。这个方法 <code>initState()</code> 有一个 @override 修饰，意思就会重写父类的方法，而且这个方法应该是调用的比 build 要早的。这样才能保证展示数据的时候，数据是已经经过排序过的。而这个排序的方法，其实跟 iOS 中的 <code>sortedArrayUsingComparator:</code> 排序也非常的像，传入一个代码块的方式。所以有开发经验的同学，会发现真的有些东西，各个平台都是通用的，学起来也会更快更容易上手。最后 APP 的显示如下图：</p>
-<div align=center>
-<img src="8天让iOS开发者上手Flutter之四/b9f94392e09f449f8bb8f73879d2a793~tplv-k3u1fbpfcp-watermark.png"/>
-</div>
 
 
 ]]></content>
@@ -1676,6 +1791,251 @@ Block 的 hook ？应用场景？埋点
       <categories>
         <category>iOS 底层原理</category>
       </categories>
+  </entry>
+  <entry>
+    <title>Calendar 和 Reminders 编程指南</title>
+    <url>/2021/09/24/Calendar-%E5%92%8C-Reminders-%E7%BC%96%E7%A8%8B%E6%8C%87%E5%8D%97/</url>
+    <content><![CDATA[<p>最近的项目需要用到 EventKit 来实现，于是在官网找到了这篇文章，虽然属于老文档了，但是对于需要接入 EventKit 的人来说还是有必要了解一下的。最新的文档也只是在这个基础上做了些更新，对于英语好的读者，完全可以直接看 <a href="https://developer.apple.com/library/archive/documentation/DataManagement/Conceptual/EventKitProgGuide/Introduction/Introduction.html#//apple_ref/doc/uid/TP40004759-SW1">官网介绍</a>就好了，我这里是对官方文档的一遍翻译，再加上自己实践的一点点内容。</p>
+<h1 id="介绍-Calendars-和-Reminders"><a href="#介绍-Calendars-和-Reminders" class="headerlink" title="介绍 Calendars 和 Reminders"></a>介绍 Calendars 和 Reminders</h1><p>EventKit 框架帮助您访问用户的日历和提醒信息。虽然两个不同的应用程序显示用户的日历和提醒数据，但操作数据的框架是相同的。类似地，存储该数据的数据库(称为 Calendar 数据库)同时保存日历和提醒信息。</p>
+<p>EventKit architecture</p>
+<img src="/2021/09/24/Calendar-%E5%92%8C-Reminders-%E7%BC%96%E7%A8%8B%E6%8C%87%E5%8D%97/fef9077ce10b4ef9a8aeac41192992d2~tplv-k3u1fbpfcp-zoom-1.png" class="">
+
+<blockquote>
+<p>重要： iOS10.0 及之后的 APP 必须在它们的 Info.plist 文件中配置需要访问这些数据的使用说明，否则 APP 将会崩溃。来访问 Calendars 和 Reminders 数据，Info.plist 必须分别包含 NSRemindersUsageDescription 和 NSCalendarsUsageDescription 这两个键。</p>
+</blockquote>
+<p>EventKit 不仅允许你的应用程序检索用户现有的日历和提醒数据，它也可以让你的应用程序为任何日历创建新的事件和提醒。此外，EventKit还允许用户编辑和删除他们的事件和提醒(统称为“日历项”)。更高级的任务，如添加闹铃或指定重复事件，也可以通过 EventKit 实现。如果你的应用程序外部发生了日历数据库的变化，EventKit 能够通过通知检测到变化，这样你的应用程序就可以适当地运行。使用 EventKit 对日历项所做的更改会自动同步到相关的日历(CalDAV, Exchange，等等)。</p>
+<p>本文档描述了 EventKit 的概念和常见的编程任务。如果你想在应用程序中显示或编辑日历事件和&#x2F;或提醒数据，你应该阅读本文档。EventKit  提供对用户日历数据库的有限访问。它不包括实现一个功能齐全的日历或提醒应用程序所需的所有内容，比如添加与会者或账户。</p>
+<h2 id="At-a-Glance"><a href="#At-a-Glance" class="headerlink" title="At a Glance"></a>At a Glance</h2><p>本文档包含以下章节，描述了如何在应用程序中集成用户的日历和提醒数据:</p>
+<ul>
+<li>读和写日历事件：说明如何检索、创建和修改日历事件。</li>
+<li>读和写提醒：说明如何检索、创建和修改提醒。</li>
+<li>配置闹铃：说明如何将闹铃附加到日程表项目。</li>
+<li>创建重复事件：解释如何将事件设置为重复事件。</li>
+<li>观察日历数据库的外部更改：说明如何注册与 Calendar 数据库的外部更改有关的通知</li>
+<li>为事件提供接口：说明如何显示事件视图控制器以允许用户创建和编辑事件</li>
+</ul>
+<h1 id="读和写日历事件"><a href="#读和写日历事件" class="headerlink" title="读和写日历事件"></a>读和写日历事件</h1><p>您可以使用 <code>EKEventStore</code> 类从用户的 Calendar 数据库中获取、创建、编辑和删除事件。您可以获取与您提供的谓词匹配的自定义事件集，也可以通过其惟一标识符获取单个事件。获取事件后，可以通过<code>EKEvent</code>类的属性访问其关联的日历信息。同样，您可以通过设置<code>EKEvent</code>类的属性来修改它的日历信息。</p>
+<blockquote>
+<p>重要：iOS10.0 之后的 APP，如果需要访问日历数据，需要在你的 APP 的 Info.plist 文件中包含 NSCalendarsUsageDescription 的键，说明写不写都不重要，不过为了更好的用户体验建议写上</p>
+</blockquote>
+<h2 id="连接到-Event-Store"><a href="#连接到-Event-Store" class="headerlink" title="连接到 Event Store"></a>连接到 Event Store</h2><p>使用指定的初始化器初始化一个 <code>EKEventStore</code> 对象：</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line">EKEventStore *store = [[EKEventStore alloc] initWithAccessToEntityTypes:EKEntityMaskEvent];</span><br></pre></td></tr></table></figure>
+
+<p>实践发现上面的初始化方式已经废弃了，而且仅在 MacOS10.8-10.9 可用。现在使用直接 alloc，init 初始化就行了。初始化 <code>EKEventStore</code> 后，在试图获取或创建实体类型的数据之前，必须调用 <code>requestAccessToEntityType:completion:</code>。</p>
+<p>一个 <code>EKEventStore</code> 对象需要相当多的时间来初始化和释放，因此，不应该为每个与事件相关的任务初始化和释放单独的 <code>EKEventStore</code> 对象。相反，在应用程序加载时初始化单个 <code>EKEventStore</code> 对象，并重复使用它，以确保您的连接是长期的。</p>
+<p><code>EKEventStore</code> 对象不能在其他 EventKit 对象之前被释放。否则，可能会出现未知的行为。</p>
+<h2 id="检索事件"><a href="#检索事件" class="headerlink" title="检索事件"></a>检索事件</h2><p>检索事件有两种方法</p>
+<ul>
+<li>通过谓词或搜索查询进行的获取将返回零个或多个与给定查询匹配的事件。</li>
+<li>通过唯一标识符获取将返回与给定标识符对应的单个事件。</li>
+</ul>
+<blockquote>
+<p>请注意：从 Calendar 数据库检索事件并不一定会按时间顺序返回事件。要按日期对一个 EKEvent 对象数组排序，在数组中调用 <code>sortedArrayUsingSelector:</code>，为 <code>compareStartDateWithEvent:</code> 方法提供选择器。</p>
+</blockquote>
+<h3 id="使用谓词"><a href="#使用谓词" class="headerlink" title="使用谓词"></a>使用谓词</h3><p>获取日期范围内的事件是很常见的。<code>EKEventStore</code> 方法 <code>eventsMatchingPredicate:</code> 获取在你提供的谓词中指定的日期范围内的所有事件。以下代码演示了如何获取当前日期前一天到之后一年之间发生的所有事件。</p>
+<blockquote>
+<p>请注意：尽管 <code>eventsMatchingPredicate:</code> 方法接受 <code>NSPredicate</code> 类型的参数，但你必须提供一个由 <code>EKEventStore</code> 方法 <code>predicateForEventsWithStartDate:endDate:calendar:</code> 创建的谓词。</p>
+</blockquote>
+<p>使用谓词获取事件代码</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="built_in">NSCalendar</span> *calendar = [<span class="built_in">NSCalendar</span> currentCalendar];</span><br><span class="line"></span><br><span class="line">    <span class="built_in">NSDateComponents</span> *oneDayAgoComponents = [[<span class="built_in">NSDateComponents</span> alloc] init];</span><br><span class="line">    oneDayAgoComponents.day = <span class="number">-1</span>;</span><br><span class="line">    <span class="built_in">NSDate</span> *oneDayAgo = [calendar dateByAddingComponents:oneDayAgoComponents</span><br><span class="line">                                                  toDate:[<span class="built_in">NSDate</span> date]</span><br><span class="line">                                                 options:<span class="number">0</span>];</span><br><span class="line">                                             </span><br><span class="line">    <span class="built_in">NSDateComponents</span> *oneYearFromNorComponents = [[<span class="built_in">NSDateComponents</span> alloc] init];</span><br><span class="line">    oneYearFromNorComponents.year = <span class="number">1</span>;</span><br><span class="line">    <span class="built_in">NSDate</span> *oneYearFromNow = [calendar dateByAddingComponents:oneYearFromNorComponents</span><br><span class="line">                                                       toDate:[<span class="built_in">NSDate</span> date]</span><br><span class="line">                                                      options:<span class="number">0</span>];</span><br><span class="line"></span><br><span class="line">    EKEventStore *store = [(AppDelegate *)<span class="built_in">UIApplication</span>.sharedApplication.delegate eventStore];</span><br><span class="line">    <span class="built_in">NSPredicate</span> *predicate = [store predicateForEventsWithStartDate:oneDayAgo</span><br><span class="line">                                                            endDate:oneYearFromNow</span><br><span class="line">                                                          calendars:<span class="literal">nil</span>];</span><br><span class="line">    <span class="built_in">NSArray</span> *events = [store eventsMatchingPredicate:predicate];</span><br><span class="line"></span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@&quot;%zd,%@&quot;</span>,events.count,events);</span><br></pre></td></tr></table></figure>
+
+<p>通过传递一个 EKCalendar 对象数组作为 <code>predicateForEventsWithStartDate:endDate:calendar:</code> 方法的日历参数，可以指定要搜索的日历子集。您可以从 <code>EKEventStore</code> 对象的 <code>calendarsForEntityType:</code> 方法中获取用户的日历。传递 <code>kNilOptions</code> 告诉方法从用户的所有日历中获取。</p>
+<p>因为 <code>eventsMatchingPredicate:</code> 方法是同步的，所以你可能不想在应用的主线程上运行它。对于异步行为，使用 <code>dispatch_async</code> 函数或 <code>NSOperation</code> 对象在另一个线程上运行该方法。</p>
+<h3 id="使用惟一标识符"><a href="#使用惟一标识符" class="headerlink" title="使用惟一标识符"></a>使用惟一标识符</h3><p>如果您之前通过谓词获取到了事件的唯一标识符，那么您可以使用 <code>EKEventStore</code> 对象的方法 <code>eventWithIdentifier:</code> 来获取事件。如果是循环事件，此方法将返回该事件的第一次出现。您可以使用 <code>eventIdentifier</code> 属性获得事件的唯一标识符。</p>
+<h2 id="创建和编辑事件"><a href="#创建和编辑事件" class="headerlink" title="创建和编辑事件"></a>创建和编辑事件</h2><blockquote>
+<p>注意:如果你是在 iOS 上开发，你可以选择让用户使用 EventKit UI 框架提供的事件视图控制器修改事件数据。有关如何使用这些事件视图控制器的信息，请参见为事件提供接口。</p>
+</blockquote>
+<p>使用 EKEvent 类的 eventWithEventStore: 方法创建一个新事件。</p>
+<p>您可以编辑事件的细节通过设置事件的相应属性，不管是新创建的事件，还是之前从日历数据库中获取到的事件。你可以编辑的一些细节包括以下几个方法：</p>
+<ul>
+<li><code>title</code> 属性，编辑事件的标题</li>
+<li><code>startDate</code> 和 <code>endDate</code> 属性，编辑事件的开始日期和结束日期</li>
+<li><code>calendar</code> 属性，编辑与事件相关联的日历</li>
+<li><code>alarms</code> 属性，编辑与事件相关联的警报（有关详细信息，请看后面的配置警报）</li>
+<li><code>recurrenceRules</code> 属性，编辑事件的循环规则（如果它是一个重复事件，有关更多细节，请看后面的创建重复事件）</li>
+</ul>
+<h2 id="保存和删除事件"><a href="#保存和删除事件" class="headerlink" title="保存和删除事件"></a>保存和删除事件</h2><blockquote>
+<p>重要提示:如果你的应用修改了用户的日历数据库，那么它必须在修改之前得到用户的确认。如果没有用户的特定指令，应用程序永远不应该修改日历数据库。</p>
+</blockquote>
+<p>在保存事件之前，对事件所做的更改不是永久的。通过 <code>EKEventStore</code> 的方法 <code>saveEvent:span:commit:error:</code> 保存你对事件的更改。如果你想从日历数据库中删除一条事件，使用 <code>EKEventStore</code> 的方法 <code>removeEvent:span:commit:error:</code>。无论您是保存还是删除事件，实现相应的方法都会自动将您的更改与事件所属的日历(CalDAV、Exchange等)同步。</p>
+<p>如果您正在保存一个重复发生的事件，则您所做的更改可以应用于将来发生的所有事件，通过为 <code>saveEvent:span:commit:error:</code> 方法的 <code>span</code> 参数指定 <code>EKSpanFutureEvents</code>。同样地，你可以通过为 <code>removeEvent:span:commit:error:</code> 方法的 <code>span</code> 参数指定 <code>EKSpanFutureEvents</code> 来删除所有将来发生的事件</p>
+<blockquote>
+<p>注意:如果向 commit 参数传递 NO，请确保稍后调用 commit: 方法永久保存更改。意思是如果上面这些方法的 commit 参数你传了 NO，那么就需要在后面的代码手动调用 commit 方法来保存更改</p>
+</blockquote>
+<h2 id="对事件执行批量操作"><a href="#对事件执行批量操作" class="headerlink" title="对事件执行批量操作"></a>对事件执行批量操作</h2><p>你可以使用 <code>EKEventStore</code> 方法 <code>enumerateEventsMatchingPredicate</code> 对所有谓词匹配的事件执行操作:你必须通过 <code>EKEventStore</code> 的方法 <code>predicateForEventsWithStartDate:endDate:calendars:</code> 来创建上述方法中用到的谓词。你提供的操作是一个类型为 EKEventSearchCallback的Block。</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="type">void</span> (^EKEventSearchCallback)(EKEvent *event, <span class="type">BOOL</span> *stop);</span><br></pre></td></tr></table></figure>
+
+<p>block 被传递两个参数:<br></p>
+<p>event<br><br>&emsp;&emsp;当前正在操作的事件。<br><br>stop<br><br>&emsp;&emsp;一个布尔值，确定</p>
+<p><code>enumerateEventsMatchingPredicate:usingBlock:</code> 是否应该停止处理事件。如果是，则任何与谓词匹配但尚未处理的事件将保持未处理状态。</p>
+<blockquote>
+<p>重要提示:请记住，使用此方法可能会对用户的 Calendar 数据库造成重大更改。当您请求用户确认时，请确保用户完全了解将要执行的操作。</p>
+</blockquote>
+<p>因为 <code>enumerateEventsMatchingPredicate:usingBlock:</code> 方法是同步的，所以你可能不想在你的应用程序的主线程上运行它。对于异步行为，使用 <code>dispatch_async</code> 函数或 <code>NSOperation</code> 对象在另一个线程上运行该方法。</p>
+<h1 id="读和写提醒"><a href="#读和写提醒" class="headerlink" title="读和写提醒"></a>读和写提醒</h1><p>提醒是与特定时间或地点相关联的任务。提醒是与特定时间或地点相关联的任务。它们类似于日历事件，但是可以标记为完成，并且不一定跨越一个确切的时间段。</p>
+<p>因为 <code>EKReminder</code> 继承自 <code>EKCalendarItem</code>，所以你可以像处理事件一样对提醒执行相同的方法，比如使用 <code>addAlarm:</code> 添加一个告警，或者使用 <code>addRecurrenceRule:</code> 设置一个递归规则。</p>
+<blockquote>
+<p>重要提示:如果你的 iOS 应用链接在 iOS 10.0 或之后，你需要访问提醒数据，请确保在你的 Info.plist 文件中包含 NSRemindersUsageDescription 关键字</p>
+</blockquote>
+<h2 id="检索提示"><a href="#检索提示" class="headerlink" title="检索提示"></a>检索提示</h2><p>与事件一样，您必须首先建立到 <code>EKEventStore</code> 的连接，以访问现有提醒。如果尚未连接到 Event Store，请参见连接到 Event Store。</p>
+<p>初始化连接并访问提醒，传递 <code>EKEntityMaskReminder</code> 而不是<code>EKEntityMaskEvent</code>。</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line">EKEventStore *store = [[EKEventStore alloc] initWithAccessToEntityTypes:EKEntityMaskReminder];</span><br></pre></td></tr></table></figure>
+
+<p>同样的，上面这段代码也是废弃了，直接创建<code>alloc init</code>创建 EKEventStore 对象就好了。</p>
+<p>就像搜索事件一样，有两种方法可以检索提醒。</p>
+<h3 id="使用谓词-1"><a href="#使用谓词-1" class="headerlink" title="使用谓词"></a>使用谓词</h3><p>你可以调用 <code>fetchRemindersMatchingPredicate:completion:</code> 来访问多个与谓词匹配的提醒。传递由下列方法返回的谓词:</p>
+<ul>
+<li><code>predicateForIncompleteRemindersWithDueDateStarting:ending:calendars:</code> 在可选的时间段内找到未完成的提醒</li>
+<li><code>predicateForCompletedRemindersWithCompletionDateStarting:ending:calendars:</code> 在可选的时间段内找到完成的提醒</li>
+<li><code>predicateForRemindersInCalendars:</code> 查找所有的提醒</li>
+</ul>
+<p>通过将 block 传递给 completion 参数，可以在匹配的提醒之间进行迭代，如下面代码所示。</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="built_in">NSPredicate</span> *predicate = [store predicateForRemindersInCalendars:<span class="literal">nil</span>];</span><br><span class="line">    [store fetchRemindersMatchingPredicate:predicate completion:^(<span class="built_in">NSArray</span> *reminders) &#123;</span><br><span class="line">        <span class="keyword">for</span> (EKReminder *reminder <span class="keyword">in</span> reminders) &#123;</span><br><span class="line">            <span class="comment">// do something for each reminder</span></span><br><span class="line">        </span><br><span class="line">        &#125;</span><br><span class="line">    &#125;];</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>注意:与通过谓词获取事件不同(参见使用谓词)，您可以通过谓词异步获取提醒，而无需分派给另一个线程。如果你想通过谓词终止取回请求，调用 <code>cancelFetchRequest:</code>，参数是 <code>fetchRemindersMatchingPredicate:completion:</code> 返回的标识符。</p>
+</blockquote>
+<h3 id="使用惟一标识符-1"><a href="#使用惟一标识符-1" class="headerlink" title="使用惟一标识符"></a>使用惟一标识符</h3><p>如果您知道某个特定提醒的唯一标识符，那么您可以调用 <code>calendarItemWithIdentifier:</code> 对象方法。 <code>calendarItemWithIdentifier:</code> 可以获取任何日历项(提醒和事件)，而 <code>eventWithIdentifier:</code> 只获取事件。</p>
+<h2 id="创建和编辑提醒"><a href="#创建和编辑提醒" class="headerlink" title="创建和编辑提醒"></a>创建和编辑提醒</h2><p>你可以使用 <code>EKReminder</code> 的 <code>reminderWithEventStore:</code> 类方法来创建提醒。标题和日历属性是必需的。提醒的日历属性是将其分组的列表。</p>
+<p>像事件一样，提醒可以触发基于时间或位置的闹铃，提醒用户某项任务。有关如何将闹铃附加到日历项目的详细信息，请参阅配置闹铃。</p>
+<p>要将开始日期或到期日期与提醒关联，请使用 <code>startDateComponents</code> 和 <code>dueDateComponents</code> 属性。要完成提醒，请将 completed 属性设置为 YES，它会自动将 completionDate 设置为当前日期。</p>
+<h2 id="保存和删除提醒"><a href="#保存和删除提醒" class="headerlink" title="保存和删除提醒"></a>保存和删除提醒</h2><blockquote>
+<p>重要提示:如果你的应用修改了用户的日历数据库，那么它必须在修改之前得到用户的确认。如果没有用户的特定指令，应用程序永远不应该修改日历数据库。</p>
+</blockquote>
+<p>提醒以类似于事件的方式保存。要将提醒保存到 Calendar 数据库，调用 <code>saveReminder:commit:error:</code> 方法。要删除一个事件，调用 <code>removeReminder:commit:error:</code> 方法。</p>
+<p>记住，在保存提醒之前，必须显式设置标题和日历属性。</p>
+<blockquote>
+<p>注意:与保存或删除事件时一样，请确保如果将 NO 传递给 commit 参数，稍后调用 commit: 方法来保存更改。</p>
+</blockquote>
+<h1 id="配置闹铃"><a href="#配置闹铃" class="headerlink" title="配置闹铃"></a>配置闹铃</h1><p>提醒用户即将发生的事件的一个简单方法是为他们的日历项目设置闹铃。无论当前运行的应用程序是什么，闹铃都会以通知的形式出现在前台，提醒用户有预定的事件。如果将闹铃设置为日历事件，则通知来自日历应用程序。如果一个闹铃被设置为提醒，通知来自提醒应用程序。闹铃可以是基于时间的，在指定的时间触发。或者是基于位置的，当穿越地理围栏时触发。</p>
+<p>闹铃可以应用于日历事件和提醒。</p>
+<blockquote>
+<p>注意:闹铃不打算作为 UILocalNotification。闹铃需要你创建一个事件或提醒，在用户的日历或提醒应用程序中可见。 UILocalNotification 更适合于不涉及 Calendar 数据库的一般用途。</p>
+</blockquote>
+<h2 id="挂载和移除闹铃"><a href="#挂载和移除闹铃" class="headerlink" title="挂载和移除闹铃"></a>挂载和移除闹铃</h2><p>可以使用 <code>addAlarm:</code> 方法将告警添加到事件中。可以使用绝对日期或相对于事件开始日期的偏移量创建闹铃。使用相对偏移量创建的警报必须发生在事件的开始日期之前或开始日期。</p>
+<p>在 OS X 中，你可以在发出警报的同时触发一个动作;例如,设置:</p>
+<ul>
+<li>发送电子邮件的 emailAddress 属性</li>
+<li>用于播放声音的 soundName 属性</li>
+<li>打开 url 的 url 属性</li>
+</ul>
+<p>您可以使用 removeAlarm: 方法从事件中删除闹铃。</p>
+<h2 id="设置地理围栏"><a href="#设置地理围栏" class="headerlink" title="设置地理围栏"></a>设置地理围栏</h2><blockquote>
+<p>注意:地理围栏在 OS X 和 iOS 上都得到支持，但它们在移动设备上更有效。</p>
+</blockquote>
+<p>“地理围栏”是一个围绕着某个地理位置的虚拟边界，当它被越过时，就会触发某个事件的警报。地理围栏是一种有用的方法，可以提醒用户在进入或离开某个区域时需要执行的任务。例如，当用户离开他们的工作场所时，警报器就会响起，提醒他们在杂货店停下来。作为开发人员，您可以控制中心的纬度和经度，以及地理围栏的半径。</p>
+<p>通过创建闹铃并设置其结构位置和接近度，为事件配置一个地理围栏。调用 <code>locationWithTitle:</code> 方法来创建一个结构化位置。要设置经度和纬度坐标，请将 <code>CLLocation</code> 传递给返回的结构化位置的 <code>geoLocation</code> 属性。radius 属性的值为 0 将使用系统的默认 radius。要选择自己的半径，请指定一个以米为单位的值。</p>
+<p>虽然启用了地理围栏功能的闹铃可以应用于事件，但它们更适合用于提醒。</p>
+<h1 id="创建重复事件"><a href="#创建重复事件" class="headerlink" title="创建重复事件"></a>创建重复事件</h1><p>重复事件在指定的时间间隔内重复。要使一个事件成为一个重复发生的事件，请为它分配一个重复发生规则，该规则描述事件发生的时间。递归规则由 <code>EKRecurrenceRule</code> 类的实例表示。</p>
+<p>递归适用于日历事件和提醒。与重复事件不同，只有重复集的第一个未完成提醒是可获得的。EventKit 和提醒应用都是如此。当提醒完成时，递归集中的下一个提醒就可用了。</p>
+<h2 id="使用基本的规则"><a href="#使用基本的规则" class="headerlink" title="使用基本的规则"></a>使用基本的规则</h2><p>可以使用 <code>initRecurrenceWithFrequency:interval:end:</code> 方法创建简单的日、周、月或年模式的递归规则。你给这个方法提供了三个值:</p>
+<ul>
+<li>递归频率。这是 <code>EKRecurrenceFrequency</code> 类型的值，表示复发规则是每天、每周、每月还是每年。</li>
+<li>递归间隔。这是一个大于0的整数，用于指定模式重复的频率。例如，如果递归规则是每周递归规则，并且它的间隔是1，那么模式每周重复一次。如果递归规则是月递归规则，且其间隔为3，则模式每三个月重复一次。</li>
+<li>递归结束。这个可选参数是 <code>EKRecurrenceEnd</code> 类的一个实例，它指示递归规则何时结束。递归结束可以基于一个特定的结束日期或出现的数量。如果你不想为递归规则指定结束，则传递 nil。</li>
+</ul>
+<h2 id="使用复杂的规则"><a href="#使用复杂的规则" class="headerlink" title="使用复杂的规则"></a>使用复杂的规则</h2><p>你可以使用</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line">initRecurrenceWithFrequency:</span><br><span class="line">                   interval:</span><br><span class="line">              daysOfTheWeek:</span><br><span class="line">             daysOfTheMonth:</span><br><span class="line">            monthsOfTheYear:</span><br><span class="line">             weeksOfTheYear:</span><br><span class="line">              daysOfTheYear:</span><br><span class="line">               setPositions:</span><br><span class="line">                        end:</span><br></pre></td></tr></table></figure>
+
+<p>方法来创建一个复杂的递归规则。对于基本的递归规则，您可以为重复发生的事件提供频率、间隔和可选的结束。此外，还可以提供描述自定义规则的可选值组合，如下表中所示</p>
+<p>复杂递归规则分解</p>
+<table>
+<thead>
+<tr>
+<th>参数名称</th>
+<th>接受的值</th>
+<th>可以组合什么</th>
+<th>例子</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>天:事件发生的星期几</td>
+<td>一个<code>EKRecurrenceDayOfWeek</code>对象数组</td>
+<td>除每日递归规则外,所有递归规则</td>
+<td>包含<code>EKTuesday</code>和<code>EKFriday</code>对象的数组将创建一个每周二和周五发生的递归。</td>
+</tr>
+<tr>
+<td>月日:事件发生的月份中的天数</td>
+<td>一个非零NSNumber对象数组，范围为-31 ~ 31。负值表示从月末开始倒数计数。</td>
+<td>仅限每月重复规则。</td>
+<td>包含值1和-1的数组将创建一个在每个月的第一天和最后一天发生的递归。</td>
+</tr>
+<tr>
+<td>个月:一年中发生事件的月份。</td>
+<td>NSNumber对象数组，取值范围为1 ~ 12，对应于公历月份。</td>
+<td>仅限每年重复规则。</td>
+<td>如果初始事件发生在1月10日，则可以提供一个包含值1和2的数组，以创建每年1月10日和2月10日发生的递归。</td>
+</tr>
+<tr>
+<td>周年:一年中发生事件的几周。</td>
+<td>一个非零NSNumber对象数组，范围为-53 ~ 53。负值表示从年末开始向后计数。</td>
+<td>仅限每年重复规则。</td>
+<td>如果初始事件发生在星期三，则可以提供一个包含值1和-1的数组，以创建在每年第一周和最后一周的星期三发生的递归。如果指定的星期不包含当前年度中的星期三(可以是一年的第一个或最后一个星期)，则不会发生事件。</td>
+</tr>
+<tr>
+<td>日年：一年中发生事件的日子。</td>
+<td>一个非零NSNumber对象数组，范围为-366 ~ 366。负值表示从年末开始向后计数。</td>
+<td>仅限每年重复规则。</td>
+<td>您可以提供一个包含值1和-1的数组，以创建在每年的第一天和最后一天发生的递归。</td>
+</tr>
+<tr>
+<td>设置位置：递归规则中包含的次数。此筛选器应用于根据您提供的其他参数确定的事件集。</td>
+<td>一个非零NSNumber对象数组，范围为-366 ~ 366。负值表示从出现列表的末尾向后计数。</td>
+<td>除每日递归规则外,所有递归规则</td>
+<td>如果为一个年递归规则提供一个包含值1和-1的数组，该规则将周一到周五指定为其值，表示每周的天数，则递归仅在每年的第一个和最后一个工作日发生。</td>
+</tr>
+</tbody></table>
+<p>您可以为上表中的任意多个参数提供值。不应用于特定递归规则的参数将被忽略。如果您为上述多个参数提供了一个值，则递归仅在应用于所有提供的值的日子发生。</p>
+<p>一旦创建了递归规则，就可以使用 <code>EKCalendarItem</code> 的 <code>addRecurrenceRule:</code> 对象方法将其应用到日历事件或提醒。</p>
+<h1 id="观察日历数据库的外部更改"><a href="#观察日历数据库的外部更改" class="headerlink" title="观察日历数据库的外部更改"></a>观察日历数据库的外部更改</h1><p>在你的应用程序运行时，其他进程或应用程序有可能修改日历数据库。如果你的应用程序获取日历事件或提醒，你应该注册以获得日历数据库的更改通知。通过这样做，可以确保向用户显示的日历和提醒信息是当前的。</p>
+<h2 id="注册通知"><a href="#注册通知" class="headerlink" title="注册通知"></a>注册通知</h2><p>当 <code>EKEventStore</code> 对象检测到日历数据库发生变化时，它会发送一个 <code>EKEventStoreChangedNotification</code> 通知。如果你的应用程序处理事件或提醒数据，请注册此通知。</p>
+<p>下面的代码注册了 EKEventStoreChangedNotification 通知，如下所示。</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line">[[<span class="built_in">NSNotificationCenter</span> defaultCenter] addObserver:<span class="keyword">self</span></span><br><span class="line">                                         selector:<span class="keyword">@selector</span>(storeChanged:)</span><br><span class="line">                                             name:EKEventStoreChangedNotification</span><br><span class="line">                                           object:eventStore];</span><br></pre></td></tr></table></figure>
+
+<h2 id="响应通知"><a href="#响应通知" class="headerlink" title="响应通知"></a>响应通知</h2><p>当你收到一个 <code>EKEventStoreChangedNotification</code> 通知时，你获取的对象——比如 <code>EKEvent</code>、<code>EKReminder</code> 或 <code>EKCalendar</code> —— 可能已经发生了变化。这些更改的效果取决于是否添加、修改或删除了事件。</p>
+<ul>
+<li>如果添加了一个事件，它不会影响你之前获取的任何事件或提醒，但是添加的事件可能会在你显示给用户的事件的日期范围内。</li>
+<li>如果一个事件被修改或删除，则表示该事件的 <code>EKEvent</code> 和 <code>EKRemindr</code> 对象的属性可能会过期。</li>
+</ul>
+<p>由于在 Calendar 数据库中发生更改时，您的本地数据通常是无效的或不完整的，所以当您收到 <code>EKEventStoreChangedNotification</code> 通知时，应该重新获取事件的当前日期范围。如果你正在修改一个事件，除非绝对有必要，否则你不想重新取回它,您可以调用事件的刷新 <code>refresh</code> 方法。如果方法返回 YES，则可以继续使用该事件;否则，需要重新获取。</p>
+<blockquote>
+<p>注意:当日历数据库发生变化时，在带有 EventKit UI 的事件视图控制器中被修改的事件会自动更新。要更深入地了解 EventKit UI，请阅读下一章，为事件提供接口。</p>
+</blockquote>
+<h1 id="为事件提供接口"><a href="#为事件提供接口" class="headerlink" title="为事件提供接口"></a>为事件提供接口</h1><blockquote>
+<p>重要提示:本章引用的 EventKit UI 框架仅适用于 iOS。如果你是为 OS X 开发，你要负责构建自己的事件视图控制器;更多信息，请阅读 NSViewController 类参考。</p>
+</blockquote>
+<p>EventKit UI 框架提供了两种类型的视图控制器来操作事件:</p>
+<ul>
+<li>EKEventViewController: 如果你有一个想要显示的事件，请使用这个类。</li>
+<li>EKEventEditViewController: 使用这个类允许用户创建、编辑或删除事件。</li>
+</ul>
+<h2 id="显示事件数据"><a href="#显示事件数据" class="headerlink" title="显示事件数据"></a>显示事件数据</h2><p>要使用 EKEventViewController 类，你必须有一个从事件存储中获得的现有事件。在呈现这类视图控制器之前，你需要设置事件属性和任何其他显示选项。下面代码展示了如何创建事件视图控制器并将其添加到导航控制器中，假设 myEvent 已经存在。如果不允许用户编辑事件，则将 allowsEditing 属性设置为 NO。</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line">EKEventViewController *eventViewController = [[EKEventViewController alloc] init];</span><br><span class="line">    eventViewController.event = myEvent;</span><br><span class="line">    eventViewController.allowsEditing = <span class="literal">YES</span>;</span><br><span class="line">    navigationController = [[<span class="built_in">UINavigationController</span> alloc] initWithRootViewController:eventViewController];</span><br></pre></td></tr></table></figure>
+
+<p>您需要为事件视图控制器分配一个委托，以便在用户完成查看事件时接收通知。该委托符合 <code>EKEventViewDelegate</code> 协议，并且必须实现 <code>eventViewController:didCompleteWithAction:</code> 方法。</p>
+<h2 id="修改事件数据"><a href="#修改事件数据" class="headerlink" title="修改事件数据"></a>修改事件数据</h2><p>要允许用户创建、编辑或删除事件，请使用 <code>EKEventEditViewController</code> 类和 <code>EKEventEditViewDelegate</code> 协议。您可以创建一个类似于事件视图控制器的事件编辑视图控制器，但是必须设置 eventStore 属性(设置事件属性是可选的)。</p>
+<ul>
+<li>当你呈现视图控制器时，如果 event 属性为 nil，用户就会在默认日历中创建一个新事件，并将其保存到指定的事件存储中。</li>
+<li>如果 event 属性不为 nil，则用户编辑一个现有的事件。事件必须驻留在指定的事件存储区中，否则将引发异常。</li>
+</ul>
+<p><code>EKEventEditViewController</code> 类的实例被设计为模态显示，如下面代码所示。在这段代码中，self 是导航控制器的顶视图控制器。关于模态视图控制器的详细信息，请阅读 modal Presenting a view Controller。</p>
+<p>模态地呈现事件编辑视图控制器</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line">EKEventEditViewController* controller = [[EKEventEditViewController alloc] init];</span><br><span class="line">    controller.eventStore = myEventStore;</span><br><span class="line">    controller.editViewDelegate = <span class="keyword">self</span>;</span><br><span class="line">    [<span class="keyword">self</span> presentModalViewController:controller animated:<span class="literal">YES</span>];</span><br></pre></td></tr></table></figure>
+
+<p>您还必须指定一个委托，以便在用户完成事件编辑后接收通知。该委托符合 <code>EKEventEditViewDelegate</code> 协议，并且必须实现 <code>eventteditviewcontroller:didCompleteWithAction:</code> 方法来解散模态视图控制器。通常，模态地呈现视图控制器的对象负责解散它。</p>
+<p>委托将解散模态视图</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line">- (<span class="type">void</span>)eventEditViewController:(EKEventEditViewController *)controller</span><br><span class="line">          didCompleteWithAction:(EKEventEditViewAction)action</span><br><span class="line">    &#123;</span><br><span class="line">        [<span class="keyword">self</span> dismissModalViewControllerAnimated:<span class="literal">YES</span>];</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>委托还传递了用户在完成编辑时所采取的操作。用户可以取消更改、保存事件或删除事件。如果你需要在用户退出模态视图后执行更多代码，实现 <code>eventteditviewcontroller:didCompleteWithAction: delegate</code> 方法。</p>
+]]></content>
+      <categories>
+        <category>Apple 文档翻译</category>
+      </categories>
+      <tags>
+        <tag>EventKit</tag>
+        <tag>Calendar</tag>
+        <tag>Reminders</tag>
+      </tags>
   </entry>
   <entry>
     <title>Category</title>
@@ -2628,121 +2988,6 @@ Block 的 hook ？应用场景？埋点
       </tags>
   </entry>
   <entry>
-    <title>8天让iOS开发者上手Flutter之八</title>
-    <url>/2021/08/29/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AB/</url>
-    <content><![CDATA[<h1 id="介绍四种-Flutter-Project"><a href="#介绍四种-Flutter-Project" class="headerlink" title="介绍四种 Flutter Project"></a>介绍四种 Flutter Project</h1><p>先介绍一下这四个的差别和使用的场景。</p>
-<img src="/2021/08/29/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AB/4c14a47588414f198ca94d7fb4799997~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<h2 id="Flutter-App"><a href="#Flutter-App" class="headerlink" title="Flutter App"></a>Flutter App</h2><p>如果是想要使用 flutter 开发一个新的项目，那么就选择 Flutter App。就像我们之前的 <code>wechat_demo</code></p>
-<h2 id="Flutter-Module"><a href="#Flutter-Module" class="headerlink" title="Flutter Module"></a>Flutter Module</h2><p>但是很多时候我们目前手上的原生 APP 可能会很庞大，不是随便就可以重新使用 flutter 重新再写一遍的。但是又想在现有的 APP 中体验一下 flutter，那么就选择 Flutter Module</p>
-<h2 id="Flutter-Package"><a href="#Flutter-Package" class="headerlink" title="Flutter Package"></a>Flutter Package</h2><p>Flutter 支持使用其他开发者向 Flutter 和 Dart 生态系统贡献的共享 package(类似于 iOS 中的第三方库吧，AFNetworking，YYKit等等…)，这意味着你可以快速构建应用而不是一切从零开始。</p>
-<p>Package 最低要求是包含一个 <code>pubspec.yaml</code> 文件。此外，一个 package 可以包含依赖关系 (在 <code>pubspec.yaml</code> 文件里声明)、 Dart 库、应用、资源、测试、图片和例子等。 pub.dev 上列出了很多 package，由 Google 工程师和 Flutter 和 Dart 社区的开发者开发和发布，你可以用在自己的应用里。</p>
-<h2 id="Flutter-Plugin"><a href="#Flutter-Plugin" class="headerlink" title="Flutter Plugin"></a>Flutter Plugin</h2><p>插件 (plugin) 是 package 的一种，全称是 plugin package，我们简称为 plugin，中文叫插件。插件 (plugin package) 是一种特别的 package，特别指那些帮助你获得原生平台特性的 package。插件可以为 Android (使用 Kotlin 或 Java 语言)、 iOS (使用 Swift 或 Objective-C 语言)、Web、macOS、Windows、Linux 平台，或其任意组合的平台编写。比如：某个插件可以为 Flutter 应用提供使用原生平台的摄像头的功能。</p>
-<h1 id="使用-Flutter-Module-进行混合开发"><a href="#使用-Flutter-Module-进行混合开发" class="headerlink" title="使用 Flutter Module 进行混合开发"></a>使用 Flutter Module 进行混合开发</h1><p>我们前七天开发的项目就是 Flutter App，今天主要介绍如何使用 Flutter Module 进行混合开发。混合开发官方推荐只使用单个 Flutter 页面，多个 Flutter 页面也能支持，但有可能会出现稳定性、性能问题以及 API 仍然可能变动的问题。请大家谨慎使用。<a href="https://flutter.cn/docs/development/add-to-app/multiple-flutters">官方介绍链接</a></p>
-<h1 id="iOS-原生项目中导入-Flutter"><a href="#iOS-原生项目中导入-Flutter" class="headerlink" title="iOS 原生项目中导入 Flutter"></a>iOS 原生项目中导入 Flutter</h1><h2 id="准备一个原生-iOS-项目"><a href="#准备一个原生-iOS-项目" class="headerlink" title="准备一个原生 iOS 项目"></a>准备一个原生 iOS 项目</h2><p>进行混合开发就一定需要一个原生项目，根据你的需求，可以使用目前手上的 APP，也可以临时创建一个 Demo 来先练练手。我们这里就临时新建一个 iOS 原生 Demo。</p>
-<img src="/2021/08/29/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AB/05dd3ccc43394ae4bbcd492293eee1b1~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>这个原生项目很简单，就这么两行代码。</p>
-<h2 id="新建-Flutter-Module-项目"><a href="#新建-Flutter-Module-项目" class="headerlink" title="新建 Flutter Module 项目"></a>新建 Flutter Module 项目</h2><p>新建一个 Flutter Module 项目，项目名就叫 module。</p>
-<img src="/2021/08/29/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AB/76de47c4dafc48f3bc1dfe7b8e9af0c0~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>最好将两个项目放在同级目录下，因为原生项目需要知道 Flutter Module 项目的位置。</p>
-<img src="/2021/08/29/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AB/c3ccd6384a4a4c9ea5a35c9acf783ec3~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<h2 id="使用-cocoapods-建立关联"><a href="#使用-cocoapods-建立关联" class="headerlink" title="使用 cocoapods 建立关联"></a>使用 cocoapods 建立关联</h2><p>在原生项目 Demo 里建立 Podfile 文件,然后编辑 Podfile。</p>
-<figure class="highlight dart"><table><tr><td class="code"><pre><span class="line">flutter_application_path = <span class="string">&#x27;Podfile相对flutter module的路径&#x27;</span></span><br><span class="line">load File.join(flutter_application_path, <span class="string">&#x27;.ios&#x27;</span>, <span class="string">&#x27;Flutter&#x27;</span>, <span class="string">&#x27;podhelper.rb&#x27;</span>)</span><br></pre></td></tr></table></figure>
-
-<p>在每个需要集成 flutter module 的 target 添加如下代码</p>
-<figure class="highlight ruby"><table><tr><td class="code"><pre><span class="line">target <span class="string">&#x27;你的APP&#x27;</span> <span class="keyword">do</span></span><br><span class="line">  install_all_flutter_pods(flutter_application_path)</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
-
-<p>编辑完之后的 Podfile 如下。</p>
-<img src="/2021/08/29/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AB/6f23d64afaad48af93ad329beaed0195~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>然后执行 <code>pod install</code> 命令</p>
-<img src="/2021/08/29/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AB/091aa3f14c0a48849a1069034a995ae5~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>如上图所示就表示集成好了。就接下来就是如何在原生项目中展示 flutter 的内容了。</p>
-<h2 id="展示单个-Flutter-页面"><a href="#展示单个-Flutter-页面" class="headerlink" title="展示单个 Flutter 页面"></a>展示单个 Flutter 页面</h2><p>展示单个 Flutter 页面的方式有两种，一种是使用 FlutterEngine 的方式，一种是不使用 FlutterEngine 的方式，其实不使用 FlutterEngine 的说法是不严谨的，只是我们没有使用代码创建 FlutterEngine 而已，Flutter 框架内部自己创建了 FlutterEngine，但是为了方便记忆，我们可以这么理解。但是这种不使用 FlutterEngine 的方式<a href="https://flutter.cn/docs/development/add-to-app/ios/add-flutter-screen#alternatively---create-a-flutterviewcontroller-with-an-implicit-flutterengine">官方并不推荐</a>。</p>
-<p>因为按需创建 <code>FlutterEngine</code> 的话，在 <code>FlutterViewController</code> 被 present 出来之后，第一帧图像渲染完之前，将会引入明显的延迟。但是当 Flutter 页面很少被展示时，当对决定何时启动 Dart VM 没有好的启发时，当 Flutter 无需在页面（view controller）之间保持状态时，此方式可能会有用。</p>
-<h3 id="不使用-FlutterEngine-展示单个-Flutter-页面-官方并不推荐"><a href="#不使用-FlutterEngine-展示单个-Flutter-页面-官方并不推荐" class="headerlink" title="不使用 FlutterEngine 展示单个 Flutter 页面(官方并不推荐)"></a>不使用 FlutterEngine 展示单个 Flutter 页面(官方并不推荐)</h3><p>来到 <code>ViewController.m</code> 文件中导入 <code>Flutter</code> 的头文件</p>
-<img src="/2021/08/29/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AB/a07fce1803d941e9bce3a14c91c0a02c~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>直接创建 <code>FlutterViewController</code> 对象，并使用 present 和 push 两种方式展示</p>
-<img src="/2021/08/29/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AB/9cc03a3c599f4a9b9364d3be40f47f68~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>APP显示如下图所示：<br></p>
-<p>present方式显示如图：</p>
-<div align=center>
-<img src="8天让iOS开发者上手Flutter之八/4fc895fa4a0d40329a77e4f982bc97df~tplv-k3u1fbpfcp-watermark.png">
-</div>
-
-<p>push方式显示如图：</p>
-<div align=center>
-<img src="8天让iOS开发者上手Flutter之八/3ed33eafd5744d229a3fa6522dc9e47c~tplv-k3u1fbpfcp-watermark.png">
-</div>
-
-<h3 id="使用-FlutterEngine-展示单个-Flutter-页面"><a href="#使用-FlutterEngine-展示单个-Flutter-页面" class="headerlink" title="使用 FlutterEngine 展示单个 Flutter 页面"></a>使用 FlutterEngine 展示单个 Flutter 页面</h3><h4 id="创建-FlutterEngine"><a href="#创建-FlutterEngine" class="headerlink" title="创建 FlutterEngine"></a>创建 FlutterEngine</h4><p>创建 <code>FlutterEngine</code> 的合适位置取决于您的应用。作为示例，我们将在应用启动的 <code>AppDelegate</code> 中创建一个 <code>FlutterEngine</code>，并作为属性暴露给外界。</p>
-<p>在 <code>AppDelegate.h</code> 中</p>
-<img src="/2021/08/29/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AB/ded0c838a6f94e83a17f8a0f7e437d3c~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>在<code>AppDelegate.m</code>中</p>
-<img src="/2021/08/29/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AB/d409152918c444dab8b008e6e1772723~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<h4 id="展示-FlutterViewController"><a href="#展示-FlutterViewController" class="headerlink" title="展示 FlutterViewController"></a>展示 FlutterViewController</h4><img src="/2021/08/29/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AB/8629028d1cf04881bb4e9902a5cd8a30~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>现在，你的 iOS 应用中集成了一个 Flutter 页面。</p>
-<h2 id="展示多个-Flutter-页面"><a href="#展示多个-Flutter-页面" class="headerlink" title="展示多个 Flutter 页面"></a>展示多个 Flutter 页面</h2><p>使用上面的方式，最终展示的 Flutter 页面都是同一个页面。而在实际混合开发中，想要展示多个不同的 Flutter 页面的需求应该是普遍的。那么 Flutter 能做到吗？答案是可以的，官方的说法是自 Flutter 2.0.0 开始，可以同时添加多个 Flutter 实例。由于稳定性，性能问题以及 API 任然可能变动，请谨慎使用。<a href="https://flutter.cn/docs/development/add-to-app/multiple-flutters">链接</a></p>
-<h3 id="使用-FlutterEngineGroup"><a href="#使用-FlutterEngineGroup" class="headerlink" title="使用 FlutterEngineGroup"></a>使用 FlutterEngineGroup</h3><p>展示多个 Flutter 页面需要使用到 <code>FlutterEngineGroup</code> 来创建 <code>FlutterEngine</code>,而不是上面直接使用 <code>FlutterEngine</code> 的方式。</p>
-<p>在<code>AppDelegate.h</code>中</p>
-<img src="/2021/08/29/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AB/a543a5a2a1854fa291bf8e2120c6fe90~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>在<code>AppDelegate.m</code>中</p>
-<img src="/2021/08/29/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AB/27d732aecdc9406884024b447df68faa~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<h3 id="新建一个-flutter-页面"><a href="#新建一个-flutter-页面" class="headerlink" title="新建一个 flutter 页面"></a>新建一个 flutter 页面</h3><p>来到 Android Studio 中的 Flutter module 项目，新建一个 page_two.dart 文件，并做些简单的展示</p>
-<img src="/2021/08/29/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AB/26b655d067424c298a28d5cff4d3ea1e~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p><code>PageTwo</code> 页面写好之后，还需要到 main.dart 文件中声明一个新的 dart 入口。这样才能在原生中找到这个 <code>PageTwo</code> 页面,代码如图：</p>
-<img src="/2021/08/29/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AB/beae4201c18346d1a3c10e698d1dbd44~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png"><br>
-
-<p><code>page_two</code> 就是 <code>PageTwo</code> 的入口函数，在原生中待会就会用到。</p>
-<h3 id="展示两个-Flutter-页面"><a href="#展示两个-Flutter-页面" class="headerlink" title="展示两个 Flutter 页面"></a>展示两个 Flutter 页面</h3><p>回到原生项目的 ViewController.m 文件中，实现如下代码：</p>
-<img src="/2021/08/29/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AB/f0fba33c2802457588b86c41086ae6d5~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>在第0行，我们创建 <code>engine</code> 的时候，并没有传入 Entrypoint 参数，所以就会展示默认的入口函数 <code>main</code> 对应的页面。在第 1 行中，我们创建 <code>engine</code> 的时候，指定了入口函数为 <code>page_two</code>，那么就会展示 page_two() 所对应的页面。</p>
-<p>present 展示的页面如图：</p>
-<div align=center>
-<img src='8天让iOS开发者上手Flutter之八/f04e4be2fa0f415e8931f017ad091e71~tplv-k3u1fbpfcp-watermark.png'>
-</div>
-
-<p>push展示的页面如图：</p>
-<div align=center>
-<img src='8天让iOS开发者上手Flutter之八/a20cf2162ca24b3d816c8938d5d3d8c2~tplv-k3u1fbpfcp-watermark.png'>
-</div>
-
-<h1 id="Flutter-与-iOS-端通信"><a href="#Flutter-与-iOS-端通信" class="headerlink" title="Flutter 与 iOS 端通信"></a>Flutter 与 iOS 端通信</h1><p>Flutter 和 iOS 端的通信主要是使用各种通道。有<code>MethodChannel</code>，<code>BasicMessageChannel</code>,<code>EventChannel</code>等等，这里主要介绍前面两种通道。通道通过名称来建立联系，所以通道的名称需要确保是唯一的。如果有同名的通道，通信会受到干扰</p>
-<h2 id="MethodChannel-方法通道"><a href="#MethodChannel-方法通道" class="headerlink" title="MethodChannel 方法通道"></a>MethodChannel 方法通道</h2><p>方法通道主要用了传递方法名称和参数。在前面我们新建 PageTwo 的时候，就已经创建了一个 <code>MethodChannel</code> 了，名字为 <code>page_two_channel</code>。然后在文本‘返回上一页’的点击手势里面调用了一个方法 <code>invokeMethod()</code>。这个方法可以传递多个参数，第一个参数就是方法名称，后面是方法参数。我们这里没有参数，就只传入一个方法名 <code>pop</code>。那么 Flutter 端的工作就完成了，再回到我们的 iOS 原生端，ViewController.m 里面。实现如下代码：</p>
-<img src="/2021/08/29/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AB/45acb3a2d3af47278d290b0a24534ac5~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>在 iOS 中给 <code>MethodChannel</code> 加了一个 <code>Flutter</code> 前缀。然后初始化 <code>FlutterMethodChannel</code> 的时候，传入的名字一定要和 flutter 端是一致的，不然是无法建立通讯的。然后调用 <code>setMethodCallHandler:</code> 方法传入一个 block 参数。block 参数会在 channel.invokeMethod() 的时候被调用。block 参数 <code>call</code> 就是对 invokeMethod 参数的一个封装。<code>call</code> 的 <code>method</code> 就是方法名，还有一个 <code>arguments</code> 就是方法参数。这样就可以根据方法名进行判断后作出处理了。现在是从 flutter 向 iOS 原生通信，实现了在 flutter 中点击方法实现了 pop 回到上个页面的。相反的，也可以从 iOS 端向 flutter 端通信。在 iOS 端，使用 <code>channel</code> 调用 <code>invokeMethod()</code> 就可以向 flutter 发送消息了，在 flutter 端同样设置 <code>channel</code> 的 <code>setMethodCallHandler</code> 就可以接收了。</p>
-<p>flutter 端 <code>setMethodCallHandler</code> 代码如下：</p>
-<img src="/2021/08/29/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AB/6eae59f6154f455d82eca2588c6be0fc~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>这里说一句，这些通道不能在无状态的 Widget 里使用，改为有状态的就可以了。</p>
-<h2 id="BasicMessageChannel-基础消息通道"><a href="#BasicMessageChannel-基础消息通道" class="headerlink" title="BasicMessageChannel 基础消息通道"></a>BasicMessageChannel 基础消息通道</h2><p>除了上面提到的 <code>MethodChannel</code>，你还可以使用<a href="https://docs.flutter.io/flutter/services/BasicMessageChannel-class.html"><code>BasicMessageChannel</code></a>，它支持使用自定义消息编解码器进行基本的异步消息传递。 此外，您可以使用专门的 <a href="https://docs.flutter.io/flutter/services/BinaryCodec-class.html"><code>BinaryCodec</code></a>，<a href="https://docs.flutter.io/flutter/services/StringCodec-class.html"><code>StringCodec</code></a>和 <a href="https://docs.flutter.io/flutter/services/JSONMessageCodec-class.html"><code>JSONMessageCodec</code></a>类，或创建自己的编解码器。</p>
-<p><code>BasicMessageChannel</code> 这个通道的使用方法跟上面的 <code>MethodChannel</code> 是一样的，不同点是在 flutter 中创建 <code>BasicMessageChannel</code> 这个通道需要传入一个编解码器，使用一个标准的编解码器 <code>StandardMessageCodec</code> 可以将基本的数据类型进行编解码。<code>BasicMessageChannel</code> 通道可以实现基础数据类型的通讯。iOS 和 flutter 的基础数据类型对应编解码关系：</p>
-<img src="/2021/08/29/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AB/992500b07cb845a8afe0039b21cc9384~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>本来还想写一个混合开发的实际案例的，但是鉴于本人目前的重点并不是 flutter，而且网上也有较多的介绍这种混合开发的实际案例，所以这里篇文章就写到这里了。这 8 篇文章的内容应该说只是一个 iOSer 入门 flutter 的教程，只是些皮毛东西，离掌握 flutter，Dart 还差的很远。而 flutter 的出现也并不是说会完全取代 Android 和 iOS 开发者，flutter 只能用来搭建一套各平台统一的 UI，而各个平台相关的功能，和硬件相关的需求，都依然需要各个平台的开发者去实现。</p>
-]]></content>
-      <categories>
-        <category>flutter</category>
-      </categories>
-      <tags>
-        <tag>flutter</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>KVO</title>
     <url>/2025/02/23/KVO/</url>
     <content><![CDATA[<h1 id="KVO-的基本和高级使用"><a href="#KVO-的基本和高级使用" class="headerlink" title="KVO 的基本和高级使用"></a>KVO 的基本和高级使用</h1><ol>
@@ -3395,6 +3640,33 @@ Block 的 hook ？应用场景？埋点
       </categories>
   </entry>
   <entry>
+    <title>SDWebimage设置图片时URL不变，但图片改变的解决办法</title>
+    <url>/2018/07/17/SDWebimage%E8%AE%BE%E7%BD%AE%E5%9B%BE%E7%89%87%E6%97%B6URL%E4%B8%8D%E5%8F%98%EF%BC%8C%E4%BD%86%E5%9B%BE%E7%89%87%E6%94%B9%E5%8F%98%E7%9A%84%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95/</url>
+    <content><![CDATA[<p>本篇文章转载自<a href="https://blog.csdn.net/xumugui007/article/details/51605546">SDWebImage支持URL不变时更新图片内容</a></p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">SDWebImage在iOS项目中是一个很常用的开源库，而且众所周知的是，它是基于URL作为Key来实现图片缓存机制的。在90%左右的情况下，</span><br><span class="line">图片与URL是一一对应的，即使服务器修改了图片也会相应的变更URL。但是在少数情况下，服务器修改了图片后不会变更相应的URL，也就是</span><br><span class="line">说图片本身的内容变了然而它的URL没有变化，那么按照对SDWebImage的常规使用方法的话，客户端肯定更新不到同一URL对应到服务器已变</span><br><span class="line">更的图片内容。</span><br></pre></td></tr></table></figure>
+
+<p>基于这一现象，我们来进行分析。</p>
+<p>客户端第一次请求图片时，Charles抓包得知response header里有一个名为Last-Modified、数据是时间戳的键值对。</p>
+<p>客户端第二次及以后请求图片时，通过Charles抓包发现，服务器返回304 not modified状态，说明服务器在接收客户端请求后通过某种判断逻辑得出结论：“客户端已缓存的图片与服务器图片都是最新的”，那么服务器如何判断的呢？</p>
+<p>通过查阅HTTP协议相关的资料得知，与服务器返回的Last-Modified相对应的request header里可以加一个名为If-Modified-Since的key，value即是服务器回传的服务端图片最后被修改的时间，第一次图片请求时If-Modified-Since的值为空，第二次及以后的客户端请求会把服务器回传的Last-Modified值作为If-Modified-Since的值传给服务器，这样服务器每次接收到图片请求时就将If-Modified-Since与Last-Modified进行比较，如果客户端图片已陈旧那么返回状态码200、Last-Modified、图片内容，客户端存储Last-Modified和图片；如果客户端图片是最新的那么返回304 Not Modified、不会返回Last-Modified、图片内容。</p>
+<p>关于服务器的比较逻辑，需要强调一下。</p>
+<p>经查资料得知，Apache比较时是看If-Modified-Since之后有没有更新图片，Nginx比较时是看If-Modified-Since与Last-Modified是否相等，所以对于Apache服务器环境客户端每次都要严格的存储服务器回传的Last-Modified以便下次请求时作为If-Modified-Since的值传给服务器，对于Nginx服务器环境客户端不必存储服务器回传的Last-Modified，每次请求时只需将图片自身的fileModificationDate作为If-Modified-Since的值传服务器即可。在实际开发中，如果遇到明明传了If-Modified-Since、服务器图片也变更了、但是客户端却请求不到最新的图片的情况时，那么就需要查看一下服务器对这两个时间戳的比较逻辑。</p>
+<p>那么，现在我们可以回到SDWebImage上来了。通过查看SDWebImageDownloader的源码得知，它开放了一个headersFilter的block，意在让开发者可以对所有图片请求追加一些额外的header，这正合我意。那么我们就可以在诸如AppDelegate didFinishLaunching的地方追加如下代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">SDWebImageDownloader *imgDownloader = SDWebImageManager.sharedManager.imageDownloader;</span><br><span class="line">imgDownloader.headersFilter  = ^NSDictionary *(NSURL *url, NSDictionary *headers) &#123;</span><br><span class="line"> </span><br><span class="line">    NSFileManager *fm = [[NSFileManager alloc] init];</span><br><span class="line">    NSString *imgKey = [SDWebImageManager.sharedManager cacheKeyForURL:url];</span><br><span class="line">    NSString *imgPath = [SDWebImageManager.sharedManager.imageCache defaultCachePathForKey:imgKey];</span><br><span class="line">    NSDictionary *fileAttr = [fm attributesOfItemAtPath:imgPath error:nil];</span><br><span class="line"> </span><br><span class="line">    NSMutableDictionary *mutableHeaders = [headers mutableCopy];</span><br><span class="line"> </span><br><span class="line">    NSDate *lastModifiedDate = nil;</span><br><span class="line"> </span><br><span class="line">    if (fileAttr.count &gt; 0) &#123;</span><br><span class="line">        if (fileAttr.count &gt; 0) &#123;</span><br><span class="line">            lastModifiedDate = (NSDate *)fileAttr[NSFileModificationDate];</span><br><span class="line">        &#125;</span><br><span class="line"> </span><br><span class="line">    &#125;</span><br><span class="line">    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];</span><br><span class="line">    formatter.timeZone = [NSTimeZone timeZoneWithAbbreviation:@&quot;GMT&quot;];</span><br><span class="line">    formatter.locale = [[NSLocale alloc] initWithLocaleIdentifier:@&quot;en_US&quot;];</span><br><span class="line">    formatter.dateFormat = @&quot;EEE, dd MMM yyyy HH:mm:ss z&quot;;</span><br><span class="line"> </span><br><span class="line">    NSString *lastModifiedStr = [formatter stringFromDate:lastModifiedDate];</span><br><span class="line">    lastModifiedStr = lastModifiedStr.length &gt; 0 ? lastModifiedStr : @&quot;&quot;;</span><br><span class="line">    [mutableHeaders setValue:lastModifiedStr forKey:@&quot;If-Modified-Since&quot;];</span><br><span class="line"> </span><br><span class="line">    return mutableHeaders;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>然后，加载图片的地方以前怎么写还是怎么写，但别忘了Option是SDWebImageRefreshCached</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">NSURL *imgURL = [NSURL URLWithString:@&quot;http://handy-img-storage.b0.upaiyun.com/3.jpg&quot;];</span><br><span class="line">[[self imageView] sd_setImageWithURL:imgURL</span><br><span class="line">                    placeholderImage:nil</span><br><span class="line">                             options:SDWebImageRefreshCached];</span><br></pre></td></tr></table></figure>
+
+<p>经测试，服务器只修改图片不变更URL的时候，客户端也可以更新到最新的图片。</p>
+<p>从以上第一段代码内容可以看出我采用的是与ngix服务器比较逻辑对应的代码，BTW:我测试的服务器是又拍云，说明又拍云的比较逻辑是等与不等的关系判断，不是大小关系的判断。</p>
+<p>这里顺便说一下，如果服务器的环境是类似于Apache的比较逻辑时，客户端可以把Last-Modified存放在图片的名称上(这需要修改SDWebImage源码，不建议)，或者用一个plist文件存放图片key名称与时间的对应关系(这个不用修改源码)。</p>
+<p>OK，到此这次的主题已得到完美解决。</p>
+]]></content>
+      <tags>
+        <tag>bug</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Runloop</title>
     <url>/2025/05/09/Runloop/</url>
     <content><![CDATA[<!--
@@ -3592,249 +3864,69 @@ commonModes并不是一个真正单独的模式
       </categories>
   </entry>
   <entry>
-    <title>Calendar 和 Reminders 编程指南</title>
-    <url>/2021/09/24/Calendar-%E5%92%8C-Reminders-%E7%BC%96%E7%A8%8B%E6%8C%87%E5%8D%97/</url>
-    <content><![CDATA[<p>最近的项目需要用到 EventKit 来实现，于是在官网找到了这篇文章，虽然属于老文档了，但是对于需要接入 EventKit 的人来说还是有必要了解一下的。最新的文档也只是在这个基础上做了些更新，对于英语好的读者，完全可以直接看 <a href="https://developer.apple.com/library/archive/documentation/DataManagement/Conceptual/EventKitProgGuide/Introduction/Introduction.html#//apple_ref/doc/uid/TP40004759-SW1">官网介绍</a>就好了，我这里是对官方文档的一遍翻译，再加上自己实践的一点点内容。</p>
-<h1 id="介绍-Calendars-和-Reminders"><a href="#介绍-Calendars-和-Reminders" class="headerlink" title="介绍 Calendars 和 Reminders"></a>介绍 Calendars 和 Reminders</h1><p>EventKit 框架帮助您访问用户的日历和提醒信息。虽然两个不同的应用程序显示用户的日历和提醒数据，但操作数据的框架是相同的。类似地，存储该数据的数据库(称为 Calendar 数据库)同时保存日历和提醒信息。</p>
-<p>EventKit architecture</p>
-<img src="/2021/09/24/Calendar-%E5%92%8C-Reminders-%E7%BC%96%E7%A8%8B%E6%8C%87%E5%8D%97/fef9077ce10b4ef9a8aeac41192992d2~tplv-k3u1fbpfcp-zoom-1.png" class="">
-
-<blockquote>
-<p>重要： iOS10.0 及之后的 APP 必须在它们的 Info.plist 文件中配置需要访问这些数据的使用说明，否则 APP 将会崩溃。来访问 Calendars 和 Reminders 数据，Info.plist 必须分别包含 NSRemindersUsageDescription 和 NSCalendarsUsageDescription 这两个键。</p>
-</blockquote>
-<p>EventKit 不仅允许你的应用程序检索用户现有的日历和提醒数据，它也可以让你的应用程序为任何日历创建新的事件和提醒。此外，EventKit还允许用户编辑和删除他们的事件和提醒(统称为“日历项”)。更高级的任务，如添加闹铃或指定重复事件，也可以通过 EventKit 实现。如果你的应用程序外部发生了日历数据库的变化，EventKit 能够通过通知检测到变化，这样你的应用程序就可以适当地运行。使用 EventKit 对日历项所做的更改会自动同步到相关的日历(CalDAV, Exchange，等等)。</p>
-<p>本文档描述了 EventKit 的概念和常见的编程任务。如果你想在应用程序中显示或编辑日历事件和&#x2F;或提醒数据，你应该阅读本文档。EventKit  提供对用户日历数据库的有限访问。它不包括实现一个功能齐全的日历或提醒应用程序所需的所有内容，比如添加与会者或账户。</p>
-<h2 id="At-a-Glance"><a href="#At-a-Glance" class="headerlink" title="At a Glance"></a>At a Glance</h2><p>本文档包含以下章节，描述了如何在应用程序中集成用户的日历和提醒数据:</p>
-<ul>
-<li>读和写日历事件：说明如何检索、创建和修改日历事件。</li>
-<li>读和写提醒：说明如何检索、创建和修改提醒。</li>
-<li>配置闹铃：说明如何将闹铃附加到日程表项目。</li>
-<li>创建重复事件：解释如何将事件设置为重复事件。</li>
-<li>观察日历数据库的外部更改：说明如何注册与 Calendar 数据库的外部更改有关的通知</li>
-<li>为事件提供接口：说明如何显示事件视图控制器以允许用户创建和编辑事件</li>
+    <title>iOS 应用砸壳</title>
+    <url>/2024/10/27/iOS-%E5%BA%94%E7%94%A8%E7%A0%B8%E5%A3%B3/</url>
+    <content><![CDATA[<h1 id="什么是壳"><a href="#什么是壳" class="headerlink" title="什么是壳"></a>什么是壳</h1><p>在软件保护和安全领域，“壳”指的是利用特殊的算法对应用程序的二进制文件进行加密或包装的保护层，通常被称为 “加壳”。壳的作用是保护应用程序的代码，防止未经授权的访问、篡改和逆向工程。壳通常会在应用程序启动时将其解密到内存中，以便正常运行。</p>
+<p>苹果会在应用发布到 App Store 时，对应用程序进行 DRM（数字版权管理）保护，这种保护即一种壳，目的是防止非法分发。所以从 App Store 下载的应用程序，我们无法使用 hopper，ghidra，ida 等逆向工具进行静态分析，也无法使用 class-dump 这样的工具导出头文件。需要对其进行解密也就是砸壳，也有人喜欢称脱壳之后，才能进行逆向分析。</p>
+<p>iOS 应用加壳只有苹果公司内部自己能处理，所以我们只讨论砸壳的方式：</p>
+<h1 id="砸壳的方式"><a href="#砸壳的方式" class="headerlink" title="砸壳的方式"></a>砸壳的方式</h1><ol>
+<li><p><strong>静态砸壳或硬砸壳：</strong>就是在已经掌握和了解壳的加密算法和逻辑之后在不运行应用程序的情况下将应用程序的壳进行解密处理。静态砸壳的方法难度大，而且加密方发现应用被破解之后就可能会该用更高级和复杂的加密技术。</p>
+</li>
+<li><p><strong>动态砸壳：</strong>动态砸壳就是从运行在进程内存空间中的可执行文件镜像入手，将内存中的内容进行转储（dump）处理实现脱壳。这种方式实现起来相对简单且不必关心使用的是什么加密技术。</p>
+</li>
+</ol>
+<p>iOS 砸壳大多采用动态砸壳的方式。</p>
+<h1 id="查看-iOS-应用的壳状态"><a href="#查看-iOS-应用的壳状态" class="headerlink" title="查看 iOS 应用的壳状态"></a>查看 iOS 应用的壳状态</h1><p><code>LC_ENCRYPTION_INFO_64</code> 是 Mach-O 文件格式中的一个加载命令（load command），用于描述 64 位 Mach-O 文件的加密信息。该加载命令常见于 macOS 和 iOS 应用程序的可执行文件中，主要包含应用程序是否加密及其相关的加密信息。</p>
+<h2 id="主要字段"><a href="#主要字段" class="headerlink" title="主要字段"></a>主要字段</h2><ul>
+<li><strong>cryptoff</strong>：加密数据的偏移量，表示从文件的哪个位置开始加密数据。</li>
+<li><strong>cryptsize</strong>：加密数据的大小，以字节为单位，指示被加密的范围。</li>
+<li><strong>cryptid</strong>：加密标识符，用于表明数据是否被加密。值为 0 表示数据未加密；其他值表示数据已加密。</li>
 </ul>
-<h1 id="读和写日历事件"><a href="#读和写日历事件" class="headerlink" title="读和写日历事件"></a>读和写日历事件</h1><p>您可以使用 <code>EKEventStore</code> 类从用户的 Calendar 数据库中获取、创建、编辑和删除事件。您可以获取与您提供的谓词匹配的自定义事件集，也可以通过其惟一标识符获取单个事件。获取事件后，可以通过<code>EKEvent</code>类的属性访问其关联的日历信息。同样，您可以通过设置<code>EKEvent</code>类的属性来修改它的日历信息。</p>
-<blockquote>
-<p>重要：iOS10.0 之后的 APP，如果需要访问日历数据，需要在你的 APP 的 Info.plist 文件中包含 NSCalendarsUsageDescription 的键，说明写不写都不重要，不过为了更好的用户体验建议写上</p>
-</blockquote>
-<h2 id="连接到-Event-Store"><a href="#连接到-Event-Store" class="headerlink" title="连接到 Event Store"></a>连接到 Event Store</h2><p>使用指定的初始化器初始化一个 <code>EKEventStore</code> 对象：</p>
-<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line">EKEventStore *store = [[EKEventStore alloc] initWithAccessToEntityTypes:EKEntityMaskEvent];</span><br></pre></td></tr></table></figure>
-
-<p>实践发现上面的初始化方式已经废弃了，而且仅在 MacOS10.8-10.9 可用。现在使用直接 alloc，init 初始化就行了。初始化 <code>EKEventStore</code> 后，在试图获取或创建实体类型的数据之前，必须调用 <code>requestAccessToEntityType:completion:</code>。</p>
-<p>一个 <code>EKEventStore</code> 对象需要相当多的时间来初始化和释放，因此，不应该为每个与事件相关的任务初始化和释放单独的 <code>EKEventStore</code> 对象。相反，在应用程序加载时初始化单个 <code>EKEventStore</code> 对象，并重复使用它，以确保您的连接是长期的。</p>
-<p><code>EKEventStore</code> 对象不能在其他 EventKit 对象之前被释放。否则，可能会出现未知的行为。</p>
-<h2 id="检索事件"><a href="#检索事件" class="headerlink" title="检索事件"></a>检索事件</h2><p>检索事件有两种方法</p>
-<ul>
-<li>通过谓词或搜索查询进行的获取将返回零个或多个与给定查询匹配的事件。</li>
-<li>通过唯一标识符获取将返回与给定标识符对应的单个事件。</li>
+<h2 id="用途"><a href="#用途" class="headerlink" title="用途"></a>用途</h2><p>在 iOS 应用中，<code>LC_ENCRYPTION_INFO_64</code> 常用于 <strong>FairPlay</strong> DRM（数字版权管理）保护。iOS 应用在上传到 App Store 时，苹果会对其进行加密保护，以防止未经授权的访问或修改。通过检查 <code>LC_ENCRYPTION_INFO_64</code> 的字段值，可以判断应用是否经过 DRM 加密保护。</p>
+<h2 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h2><p>查看 <code>LC_ENCRYPTION_INFO_64</code> 信息有以下两种方式：</p>
+<ol>
+<li><strong>图形化工具：</strong>MachOView</li>
+<li><strong>命令行工具：</strong>otool</li>
+</ol>
+<h3 id="MachOView"><a href="#MachOView" class="headerlink" title="MachOView"></a><a href="https://github.com/gdbinit/MachOView">MachOView</a></h3><p><strong>MachOView</strong> 是一款用于 macOS 的图形化工具，专门设计用于分析和查看 Mach-O 文件格式。Mach-O（Mach Object）是 macOS 和 iOS 操作系统使用的可执行文件格式，包含了二进制可执行文件、库文件、内核扩展等。</p>
+<p>MachOView 提供了一个直观的界面，可以帮助开发者和逆向工程人员深入分析 Mach-O 文件的结构和内容。它展示了文件头、加载命令、段（segments）、节（sections）、符号表（symbol table）、动态符号、字符串表等各种信息。</p>
+<h4 id="主要功能"><a href="#主要功能" class="headerlink" title="主要功能"></a>主要功能</h4><ul>
+<li><strong>查看文件头</strong>：展示 Mach-O 文件的文件头信息，例如文件类型、CPU 架构等。</li>
+<li><strong>加载命令</strong>：列出所有的加载命令，包括动态库依赖、入口点、数据段等。</li>
+<li><strong>段和节</strong>：显示所有的段和节信息，并可以查看它们的详细内容。</li>
+<li><strong>符号表</strong>：解析并显示符号表和动态符号，包括全局符号和本地符号。</li>
+<li><strong>反汇编</strong>：支持代码段的反汇编，以查看可执行代码的汇编指令。</li>
+<li><strong>导出功能</strong>：可以将分析结果导出为文本格式，以供进一步分析。</li>
 </ul>
-<blockquote>
-<p>请注意：从 Calendar 数据库检索事件并不一定会按时间顺序返回事件。要按日期对一个 EKEvent 对象数组排序，在数组中调用 <code>sortedArrayUsingSelector:</code>，为 <code>compareStartDateWithEvent:</code> 方法提供选择器。</p>
-</blockquote>
-<h3 id="使用谓词"><a href="#使用谓词" class="headerlink" title="使用谓词"></a>使用谓词</h3><p>获取日期范围内的事件是很常见的。<code>EKEventStore</code> 方法 <code>eventsMatchingPredicate:</code> 获取在你提供的谓词中指定的日期范围内的所有事件。以下代码演示了如何获取当前日期前一天到之后一年之间发生的所有事件。</p>
-<blockquote>
-<p>请注意：尽管 <code>eventsMatchingPredicate:</code> 方法接受 <code>NSPredicate</code> 类型的参数，但你必须提供一个由 <code>EKEventStore</code> 方法 <code>predicateForEventsWithStartDate:endDate:calendar:</code> 创建的谓词。</p>
-</blockquote>
-<p>使用谓词获取事件代码</p>
-<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="built_in">NSCalendar</span> *calendar = [<span class="built_in">NSCalendar</span> currentCalendar];</span><br><span class="line"></span><br><span class="line">    <span class="built_in">NSDateComponents</span> *oneDayAgoComponents = [[<span class="built_in">NSDateComponents</span> alloc] init];</span><br><span class="line">    oneDayAgoComponents.day = <span class="number">-1</span>;</span><br><span class="line">    <span class="built_in">NSDate</span> *oneDayAgo = [calendar dateByAddingComponents:oneDayAgoComponents</span><br><span class="line">                                                  toDate:[<span class="built_in">NSDate</span> date]</span><br><span class="line">                                                 options:<span class="number">0</span>];</span><br><span class="line">                                             </span><br><span class="line">    <span class="built_in">NSDateComponents</span> *oneYearFromNorComponents = [[<span class="built_in">NSDateComponents</span> alloc] init];</span><br><span class="line">    oneYearFromNorComponents.year = <span class="number">1</span>;</span><br><span class="line">    <span class="built_in">NSDate</span> *oneYearFromNow = [calendar dateByAddingComponents:oneYearFromNorComponents</span><br><span class="line">                                                       toDate:[<span class="built_in">NSDate</span> date]</span><br><span class="line">                                                      options:<span class="number">0</span>];</span><br><span class="line"></span><br><span class="line">    EKEventStore *store = [(AppDelegate *)<span class="built_in">UIApplication</span>.sharedApplication.delegate eventStore];</span><br><span class="line">    <span class="built_in">NSPredicate</span> *predicate = [store predicateForEventsWithStartDate:oneDayAgo</span><br><span class="line">                                                            endDate:oneYearFromNow</span><br><span class="line">                                                          calendars:<span class="literal">nil</span>];</span><br><span class="line">    <span class="built_in">NSArray</span> *events = [store eventsMatchingPredicate:predicate];</span><br><span class="line"></span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@&quot;%zd,%@&quot;</span>,events.count,events);</span><br></pre></td></tr></table></figure>
-
-<p>通过传递一个 EKCalendar 对象数组作为 <code>predicateForEventsWithStartDate:endDate:calendar:</code> 方法的日历参数，可以指定要搜索的日历子集。您可以从 <code>EKEventStore</code> 对象的 <code>calendarsForEntityType:</code> 方法中获取用户的日历。传递 <code>kNilOptions</code> 告诉方法从用户的所有日历中获取。</p>
-<p>因为 <code>eventsMatchingPredicate:</code> 方法是同步的，所以你可能不想在应用的主线程上运行它。对于异步行为，使用 <code>dispatch_async</code> 函数或 <code>NSOperation</code> 对象在另一个线程上运行该方法。</p>
-<h3 id="使用惟一标识符"><a href="#使用惟一标识符" class="headerlink" title="使用惟一标识符"></a>使用惟一标识符</h3><p>如果您之前通过谓词获取到了事件的唯一标识符，那么您可以使用 <code>EKEventStore</code> 对象的方法 <code>eventWithIdentifier:</code> 来获取事件。如果是循环事件，此方法将返回该事件的第一次出现。您可以使用 <code>eventIdentifier</code> 属性获得事件的唯一标识符。</p>
-<h2 id="创建和编辑事件"><a href="#创建和编辑事件" class="headerlink" title="创建和编辑事件"></a>创建和编辑事件</h2><blockquote>
-<p>注意:如果你是在 iOS 上开发，你可以选择让用户使用 EventKit UI 框架提供的事件视图控制器修改事件数据。有关如何使用这些事件视图控制器的信息，请参见为事件提供接口。</p>
-</blockquote>
-<p>使用 EKEvent 类的 eventWithEventStore: 方法创建一个新事件。</p>
-<p>您可以编辑事件的细节通过设置事件的相应属性，不管是新创建的事件，还是之前从日历数据库中获取到的事件。你可以编辑的一些细节包括以下几个方法：</p>
+<h4 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h4><p>MachOView 是 macOS 和 iOS 逆向工程、应用开发及安全研究的重要工具。它使得用户可以深入了解 Mach-O 文件的内部结构，适合用于以下场景：</p>
 <ul>
-<li><code>title</code> 属性，编辑事件的标题</li>
-<li><code>startDate</code> 和 <code>endDate</code> 属性，编辑事件的开始日期和结束日期</li>
-<li><code>calendar</code> 属性，编辑与事件相关联的日历</li>
-<li><code>alarms</code> 属性，编辑与事件相关联的警报（有关详细信息，请看后面的配置警报）</li>
-<li><code>recurrenceRules</code> 属性，编辑事件的循环规则（如果它是一个重复事件，有关更多细节，请看后面的创建重复事件）</li>
+<li><strong>应用逆向工程</strong>：了解应用内部的函数、符号等信息。</li>
+<li><strong>安全研究</strong>：分析应用是否进行了加密保护，研究其安全机制。</li>
+<li><strong>调试和开发</strong>：查看动态库依赖、文件结构等信息，以帮助调试和优化。</li>
 </ul>
-<h2 id="保存和删除事件"><a href="#保存和删除事件" class="headerlink" title="保存和删除事件"></a>保存和删除事件</h2><blockquote>
-<p>重要提示:如果你的应用修改了用户的日历数据库，那么它必须在修改之前得到用户的确认。如果没有用户的特定指令，应用程序永远不应该修改日历数据库。</p>
-</blockquote>
-<p>在保存事件之前，对事件所做的更改不是永久的。通过 <code>EKEventStore</code> 的方法 <code>saveEvent:span:commit:error:</code> 保存你对事件的更改。如果你想从日历数据库中删除一条事件，使用 <code>EKEventStore</code> 的方法 <code>removeEvent:span:commit:error:</code>。无论您是保存还是删除事件，实现相应的方法都会自动将您的更改与事件所属的日历(CalDAV、Exchange等)同步。</p>
-<p>如果您正在保存一个重复发生的事件，则您所做的更改可以应用于将来发生的所有事件，通过为 <code>saveEvent:span:commit:error:</code> 方法的 <code>span</code> 参数指定 <code>EKSpanFutureEvents</code>。同样地，你可以通过为 <code>removeEvent:span:commit:error:</code> 方法的 <code>span</code> 参数指定 <code>EKSpanFutureEvents</code> 来删除所有将来发生的事件</p>
-<blockquote>
-<p>注意:如果向 commit 参数传递 NO，请确保稍后调用 commit: 方法永久保存更改。意思是如果上面这些方法的 commit 参数你传了 NO，那么就需要在后面的代码手动调用 commit 方法来保存更改</p>
-</blockquote>
-<h2 id="对事件执行批量操作"><a href="#对事件执行批量操作" class="headerlink" title="对事件执行批量操作"></a>对事件执行批量操作</h2><p>你可以使用 <code>EKEventStore</code> 方法 <code>enumerateEventsMatchingPredicate</code> 对所有谓词匹配的事件执行操作:你必须通过 <code>EKEventStore</code> 的方法 <code>predicateForEventsWithStartDate:endDate:calendars:</code> 来创建上述方法中用到的谓词。你提供的操作是一个类型为 EKEventSearchCallback的Block。</p>
-<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="type">void</span> (^EKEventSearchCallback)(EKEvent *event, <span class="type">BOOL</span> *stop);</span><br></pre></td></tr></table></figure>
+<h4 id="下载和安装"><a href="#下载和安装" class="headerlink" title="下载和安装"></a>下载和安装</h4><p>MachOView 可以通过项目的 GitHub 页面进行下载，支持 macOS 平台。使用者可以直接下载预编译的二进制文件，或通过源码自行编译安装。</p>
+<p>使用 MachOView 查看可执行文件的 <code>LC_ENCRYPTION_INFO_64</code> 信息</p>
+<img src="/2024/10/27/iOS-%E5%BA%94%E7%94%A8%E7%A0%B8%E5%A3%B3/Xnip2024-10-14_16-56-13.jpg" class="">
 
-<p>block 被传递两个参数:<br></p>
-<p>event<br><br>&emsp;&emsp;当前正在操作的事件。<br><br>stop<br><br>&emsp;&emsp;一个布尔值，确定</p>
-<p><code>enumerateEventsMatchingPredicate:usingBlock:</code> 是否应该停止处理事件。如果是，则任何与谓词匹配但尚未处理的事件将保持未处理状态。</p>
-<blockquote>
-<p>重要提示:请记住，使用此方法可能会对用户的 Calendar 数据库造成重大更改。当您请求用户确认时，请确保用户完全了解将要执行的操作。</p>
-</blockquote>
-<p>因为 <code>enumerateEventsMatchingPredicate:usingBlock:</code> 方法是同步的，所以你可能不想在你的应用程序的主线程上运行它。对于异步行为，使用 <code>dispatch_async</code> 函数或 <code>NSOperation</code> 对象在另一个线程上运行该方法。</p>
-<h1 id="读和写提醒"><a href="#读和写提醒" class="headerlink" title="读和写提醒"></a>读和写提醒</h1><p>提醒是与特定时间或地点相关联的任务。提醒是与特定时间或地点相关联的任务。它们类似于日历事件，但是可以标记为完成，并且不一定跨越一个确切的时间段。</p>
-<p>因为 <code>EKReminder</code> 继承自 <code>EKCalendarItem</code>，所以你可以像处理事件一样对提醒执行相同的方法，比如使用 <code>addAlarm:</code> 添加一个告警，或者使用 <code>addRecurrenceRule:</code> 设置一个递归规则。</p>
-<blockquote>
-<p>重要提示:如果你的 iOS 应用链接在 iOS 10.0 或之后，你需要访问提醒数据，请确保在你的 Info.plist 文件中包含 NSRemindersUsageDescription 关键字</p>
-</blockquote>
-<h2 id="检索提示"><a href="#检索提示" class="headerlink" title="检索提示"></a>检索提示</h2><p>与事件一样，您必须首先建立到 <code>EKEventStore</code> 的连接，以访问现有提醒。如果尚未连接到 Event Store，请参见连接到 Event Store。</p>
-<p>初始化连接并访问提醒，传递 <code>EKEntityMaskReminder</code> 而不是<code>EKEntityMaskEvent</code>。</p>
-<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line">EKEventStore *store = [[EKEventStore alloc] initWithAccessToEntityTypes:EKEntityMaskReminder];</span><br></pre></td></tr></table></figure>
+<h3 id="otool"><a href="#otool" class="headerlink" title="otool"></a>otool</h3><p><code>otool</code> 是 macOS 上的一个命令行工具，用于显示可执行文件、动态库和目标文件的各种低级信息。它是开发者用来分析、调试和检查 Mach-O 文件结构的重要工具。Mach-O（Mach Object）文件格式是 macOS 和 iOS 使用的可执行文件格式，包括应用程序、动态库和内核扩展等。对于从事 macOS 或 iOS 应用开发及逆向工程的人员，<code>otool</code> 是一个非常有用的工具。</p>
+<p><code>otool</code> 并非 macOS 系统自带的，而是随 <strong>Xcode Command Line Tools</strong> 一起提供的。因此，默认情况下 macOS 并不包含 <code>otool</code>。要使用 <code>otool</code>，需要先安装 <strong>Xcode Command Line Tools</strong>。幸运的是，不需要安装完整的 Xcode 应用，只需安装命令行工具即可获取 otool。</p>
+<p>可以通过以下命令快速安装 Xcode Command Line Tools：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">xcode-select --install</span><br></pre></td></tr></table></figure>
 
-<p>同样的，上面这段代码也是废弃了，直接创建<code>alloc init</code>创建 EKEventStore 对象就好了。</p>
-<p>就像搜索事件一样，有两种方法可以检索提醒。</p>
-<h3 id="使用谓词-1"><a href="#使用谓词-1" class="headerlink" title="使用谓词"></a>使用谓词</h3><p>你可以调用 <code>fetchRemindersMatchingPredicate:completion:</code> 来访问多个与谓词匹配的提醒。传递由下列方法返回的谓词:</p>
-<ul>
-<li><code>predicateForIncompleteRemindersWithDueDateStarting:ending:calendars:</code> 在可选的时间段内找到未完成的提醒</li>
-<li><code>predicateForCompletedRemindersWithCompletionDateStarting:ending:calendars:</code> 在可选的时间段内找到完成的提醒</li>
-<li><code>predicateForRemindersInCalendars:</code> 查找所有的提醒</li>
-</ul>
-<p>通过将 block 传递给 completion 参数，可以在匹配的提醒之间进行迭代，如下面代码所示。</p>
-<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="built_in">NSPredicate</span> *predicate = [store predicateForRemindersInCalendars:<span class="literal">nil</span>];</span><br><span class="line">    [store fetchRemindersMatchingPredicate:predicate completion:^(<span class="built_in">NSArray</span> *reminders) &#123;</span><br><span class="line">        <span class="keyword">for</span> (EKReminder *reminder <span class="keyword">in</span> reminders) &#123;</span><br><span class="line">            <span class="comment">// do something for each reminder</span></span><br><span class="line">        </span><br><span class="line">        &#125;</span><br><span class="line">    &#125;];</span><br></pre></td></tr></table></figure>
+<h4 id="示例-1"><a href="#示例-1" class="headerlink" title="示例"></a>示例</h4><p>假设我们有一个 Mach-O 文件 <code>example</code>，可以用以下命令查看其是壳的状态：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"> ~/ otool -l MachO文件 | grep crypt</span><br><span class="line">     cryptoff 16384</span><br><span class="line">    cryptsize 265289728</span><br><span class="line">      cryptid 0</span><br></pre></td></tr></table></figure>
 
-<blockquote>
-<p>注意:与通过谓词获取事件不同(参见使用谓词)，您可以通过谓词异步获取提醒，而无需分派给另一个线程。如果你想通过谓词终止取回请求，调用 <code>cancelFetchRequest:</code>，参数是 <code>fetchRemindersMatchingPredicate:completion:</code> 返回的标识符。</p>
-</blockquote>
-<h3 id="使用惟一标识符-1"><a href="#使用惟一标识符-1" class="headerlink" title="使用惟一标识符"></a>使用惟一标识符</h3><p>如果您知道某个特定提醒的唯一标识符，那么您可以调用 <code>calendarItemWithIdentifier:</code> 对象方法。 <code>calendarItemWithIdentifier:</code> 可以获取任何日历项(提醒和事件)，而 <code>eventWithIdentifier:</code> 只获取事件。</p>
-<h2 id="创建和编辑提醒"><a href="#创建和编辑提醒" class="headerlink" title="创建和编辑提醒"></a>创建和编辑提醒</h2><p>你可以使用 <code>EKReminder</code> 的 <code>reminderWithEventStore:</code> 类方法来创建提醒。标题和日历属性是必需的。提醒的日历属性是将其分组的列表。</p>
-<p>像事件一样，提醒可以触发基于时间或位置的闹铃，提醒用户某项任务。有关如何将闹铃附加到日历项目的详细信息，请参阅配置闹铃。</p>
-<p>要将开始日期或到期日期与提醒关联，请使用 <code>startDateComponents</code> 和 <code>dueDateComponents</code> 属性。要完成提醒，请将 completed 属性设置为 YES，它会自动将 completionDate 设置为当前日期。</p>
-<h2 id="保存和删除提醒"><a href="#保存和删除提醒" class="headerlink" title="保存和删除提醒"></a>保存和删除提醒</h2><blockquote>
-<p>重要提示:如果你的应用修改了用户的日历数据库，那么它必须在修改之前得到用户的确认。如果没有用户的特定指令，应用程序永远不应该修改日历数据库。</p>
-</blockquote>
-<p>提醒以类似于事件的方式保存。要将提醒保存到 Calendar 数据库，调用 <code>saveReminder:commit:error:</code> 方法。要删除一个事件，调用 <code>removeReminder:commit:error:</code> 方法。</p>
-<p>记住，在保存提醒之前，必须显式设置标题和日历属性。</p>
-<blockquote>
-<p>注意:与保存或删除事件时一样，请确保如果将 NO 传递给 commit 参数，稍后调用 commit: 方法来保存更改。</p>
-</blockquote>
-<h1 id="配置闹铃"><a href="#配置闹铃" class="headerlink" title="配置闹铃"></a>配置闹铃</h1><p>提醒用户即将发生的事件的一个简单方法是为他们的日历项目设置闹铃。无论当前运行的应用程序是什么，闹铃都会以通知的形式出现在前台，提醒用户有预定的事件。如果将闹铃设置为日历事件，则通知来自日历应用程序。如果一个闹铃被设置为提醒，通知来自提醒应用程序。闹铃可以是基于时间的，在指定的时间触发。或者是基于位置的，当穿越地理围栏时触发。</p>
-<p>闹铃可以应用于日历事件和提醒。</p>
-<blockquote>
-<p>注意:闹铃不打算作为 UILocalNotification。闹铃需要你创建一个事件或提醒，在用户的日历或提醒应用程序中可见。 UILocalNotification 更适合于不涉及 Calendar 数据库的一般用途。</p>
-</blockquote>
-<h2 id="挂载和移除闹铃"><a href="#挂载和移除闹铃" class="headerlink" title="挂载和移除闹铃"></a>挂载和移除闹铃</h2><p>可以使用 <code>addAlarm:</code> 方法将告警添加到事件中。可以使用绝对日期或相对于事件开始日期的偏移量创建闹铃。使用相对偏移量创建的警报必须发生在事件的开始日期之前或开始日期。</p>
-<p>在 OS X 中，你可以在发出警报的同时触发一个动作;例如,设置:</p>
-<ul>
-<li>发送电子邮件的 emailAddress 属性</li>
-<li>用于播放声音的 soundName 属性</li>
-<li>打开 url 的 url 属性</li>
-</ul>
-<p>您可以使用 removeAlarm: 方法从事件中删除闹铃。</p>
-<h2 id="设置地理围栏"><a href="#设置地理围栏" class="headerlink" title="设置地理围栏"></a>设置地理围栏</h2><blockquote>
-<p>注意:地理围栏在 OS X 和 iOS 上都得到支持，但它们在移动设备上更有效。</p>
-</blockquote>
-<p>“地理围栏”是一个围绕着某个地理位置的虚拟边界，当它被越过时，就会触发某个事件的警报。地理围栏是一种有用的方法，可以提醒用户在进入或离开某个区域时需要执行的任务。例如，当用户离开他们的工作场所时，警报器就会响起，提醒他们在杂货店停下来。作为开发人员，您可以控制中心的纬度和经度，以及地理围栏的半径。</p>
-<p>通过创建闹铃并设置其结构位置和接近度，为事件配置一个地理围栏。调用 <code>locationWithTitle:</code> 方法来创建一个结构化位置。要设置经度和纬度坐标，请将 <code>CLLocation</code> 传递给返回的结构化位置的 <code>geoLocation</code> 属性。radius 属性的值为 0 将使用系统的默认 radius。要选择自己的半径，请指定一个以米为单位的值。</p>
-<p>虽然启用了地理围栏功能的闹铃可以应用于事件，但它们更适合用于提醒。</p>
-<h1 id="创建重复事件"><a href="#创建重复事件" class="headerlink" title="创建重复事件"></a>创建重复事件</h1><p>重复事件在指定的时间间隔内重复。要使一个事件成为一个重复发生的事件，请为它分配一个重复发生规则，该规则描述事件发生的时间。递归规则由 <code>EKRecurrenceRule</code> 类的实例表示。</p>
-<p>递归适用于日历事件和提醒。与重复事件不同，只有重复集的第一个未完成提醒是可获得的。EventKit 和提醒应用都是如此。当提醒完成时，递归集中的下一个提醒就可用了。</p>
-<h2 id="使用基本的规则"><a href="#使用基本的规则" class="headerlink" title="使用基本的规则"></a>使用基本的规则</h2><p>可以使用 <code>initRecurrenceWithFrequency:interval:end:</code> 方法创建简单的日、周、月或年模式的递归规则。你给这个方法提供了三个值:</p>
-<ul>
-<li>递归频率。这是 <code>EKRecurrenceFrequency</code> 类型的值，表示复发规则是每天、每周、每月还是每年。</li>
-<li>递归间隔。这是一个大于0的整数，用于指定模式重复的频率。例如，如果递归规则是每周递归规则，并且它的间隔是1，那么模式每周重复一次。如果递归规则是月递归规则，且其间隔为3，则模式每三个月重复一次。</li>
-<li>递归结束。这个可选参数是 <code>EKRecurrenceEnd</code> 类的一个实例，它指示递归规则何时结束。递归结束可以基于一个特定的结束日期或出现的数量。如果你不想为递归规则指定结束，则传递 nil。</li>
-</ul>
-<h2 id="使用复杂的规则"><a href="#使用复杂的规则" class="headerlink" title="使用复杂的规则"></a>使用复杂的规则</h2><p>你可以使用</p>
-<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line">initRecurrenceWithFrequency:</span><br><span class="line">                   interval:</span><br><span class="line">              daysOfTheWeek:</span><br><span class="line">             daysOfTheMonth:</span><br><span class="line">            monthsOfTheYear:</span><br><span class="line">             weeksOfTheYear:</span><br><span class="line">              daysOfTheYear:</span><br><span class="line">               setPositions:</span><br><span class="line">                        end:</span><br></pre></td></tr></table></figure>
-
-<p>方法来创建一个复杂的递归规则。对于基本的递归规则，您可以为重复发生的事件提供频率、间隔和可选的结束。此外，还可以提供描述自定义规则的可选值组合，如下表中所示</p>
-<p>复杂递归规则分解</p>
-<table>
-<thead>
-<tr>
-<th>参数名称</th>
-<th>接受的值</th>
-<th>可以组合什么</th>
-<th>例子</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>天:事件发生的星期几</td>
-<td>一个<code>EKRecurrenceDayOfWeek</code>对象数组</td>
-<td>除每日递归规则外,所有递归规则</td>
-<td>包含<code>EKTuesday</code>和<code>EKFriday</code>对象的数组将创建一个每周二和周五发生的递归。</td>
-</tr>
-<tr>
-<td>月日:事件发生的月份中的天数</td>
-<td>一个非零NSNumber对象数组，范围为-31 ~ 31。负值表示从月末开始倒数计数。</td>
-<td>仅限每月重复规则。</td>
-<td>包含值1和-1的数组将创建一个在每个月的第一天和最后一天发生的递归。</td>
-</tr>
-<tr>
-<td>个月:一年中发生事件的月份。</td>
-<td>NSNumber对象数组，取值范围为1 ~ 12，对应于公历月份。</td>
-<td>仅限每年重复规则。</td>
-<td>如果初始事件发生在1月10日，则可以提供一个包含值1和2的数组，以创建每年1月10日和2月10日发生的递归。</td>
-</tr>
-<tr>
-<td>周年:一年中发生事件的几周。</td>
-<td>一个非零NSNumber对象数组，范围为-53 ~ 53。负值表示从年末开始向后计数。</td>
-<td>仅限每年重复规则。</td>
-<td>如果初始事件发生在星期三，则可以提供一个包含值1和-1的数组，以创建在每年第一周和最后一周的星期三发生的递归。如果指定的星期不包含当前年度中的星期三(可以是一年的第一个或最后一个星期)，则不会发生事件。</td>
-</tr>
-<tr>
-<td>日年：一年中发生事件的日子。</td>
-<td>一个非零NSNumber对象数组，范围为-366 ~ 366。负值表示从年末开始向后计数。</td>
-<td>仅限每年重复规则。</td>
-<td>您可以提供一个包含值1和-1的数组，以创建在每年的第一天和最后一天发生的递归。</td>
-</tr>
-<tr>
-<td>设置位置：递归规则中包含的次数。此筛选器应用于根据您提供的其他参数确定的事件集。</td>
-<td>一个非零NSNumber对象数组，范围为-366 ~ 366。负值表示从出现列表的末尾向后计数。</td>
-<td>除每日递归规则外,所有递归规则</td>
-<td>如果为一个年递归规则提供一个包含值1和-1的数组，该规则将周一到周五指定为其值，表示每周的天数，则递归仅在每年的第一个和最后一个工作日发生。</td>
-</tr>
-</tbody></table>
-<p>您可以为上表中的任意多个参数提供值。不应用于特定递归规则的参数将被忽略。如果您为上述多个参数提供了一个值，则递归仅在应用于所有提供的值的日子发生。</p>
-<p>一旦创建了递归规则，就可以使用 <code>EKCalendarItem</code> 的 <code>addRecurrenceRule:</code> 对象方法将其应用到日历事件或提醒。</p>
-<h1 id="观察日历数据库的外部更改"><a href="#观察日历数据库的外部更改" class="headerlink" title="观察日历数据库的外部更改"></a>观察日历数据库的外部更改</h1><p>在你的应用程序运行时，其他进程或应用程序有可能修改日历数据库。如果你的应用程序获取日历事件或提醒，你应该注册以获得日历数据库的更改通知。通过这样做，可以确保向用户显示的日历和提醒信息是当前的。</p>
-<h2 id="注册通知"><a href="#注册通知" class="headerlink" title="注册通知"></a>注册通知</h2><p>当 <code>EKEventStore</code> 对象检测到日历数据库发生变化时，它会发送一个 <code>EKEventStoreChangedNotification</code> 通知。如果你的应用程序处理事件或提醒数据，请注册此通知。</p>
-<p>下面的代码注册了 EKEventStoreChangedNotification 通知，如下所示。</p>
-<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line">[[<span class="built_in">NSNotificationCenter</span> defaultCenter] addObserver:<span class="keyword">self</span></span><br><span class="line">                                         selector:<span class="keyword">@selector</span>(storeChanged:)</span><br><span class="line">                                             name:EKEventStoreChangedNotification</span><br><span class="line">                                           object:eventStore];</span><br></pre></td></tr></table></figure>
-
-<h2 id="响应通知"><a href="#响应通知" class="headerlink" title="响应通知"></a>响应通知</h2><p>当你收到一个 <code>EKEventStoreChangedNotification</code> 通知时，你获取的对象——比如 <code>EKEvent</code>、<code>EKReminder</code> 或 <code>EKCalendar</code> —— 可能已经发生了变化。这些更改的效果取决于是否添加、修改或删除了事件。</p>
-<ul>
-<li>如果添加了一个事件，它不会影响你之前获取的任何事件或提醒，但是添加的事件可能会在你显示给用户的事件的日期范围内。</li>
-<li>如果一个事件被修改或删除，则表示该事件的 <code>EKEvent</code> 和 <code>EKRemindr</code> 对象的属性可能会过期。</li>
-</ul>
-<p>由于在 Calendar 数据库中发生更改时，您的本地数据通常是无效的或不完整的，所以当您收到 <code>EKEventStoreChangedNotification</code> 通知时，应该重新获取事件的当前日期范围。如果你正在修改一个事件，除非绝对有必要，否则你不想重新取回它,您可以调用事件的刷新 <code>refresh</code> 方法。如果方法返回 YES，则可以继续使用该事件;否则，需要重新获取。</p>
-<blockquote>
-<p>注意:当日历数据库发生变化时，在带有 EventKit UI 的事件视图控制器中被修改的事件会自动更新。要更深入地了解 EventKit UI，请阅读下一章，为事件提供接口。</p>
-</blockquote>
-<h1 id="为事件提供接口"><a href="#为事件提供接口" class="headerlink" title="为事件提供接口"></a>为事件提供接口</h1><blockquote>
-<p>重要提示:本章引用的 EventKit UI 框架仅适用于 iOS。如果你是为 OS X 开发，你要负责构建自己的事件视图控制器;更多信息，请阅读 NSViewController 类参考。</p>
-</blockquote>
-<p>EventKit UI 框架提供了两种类型的视图控制器来操作事件:</p>
-<ul>
-<li>EKEventViewController: 如果你有一个想要显示的事件，请使用这个类。</li>
-<li>EKEventEditViewController: 使用这个类允许用户创建、编辑或删除事件。</li>
-</ul>
-<h2 id="显示事件数据"><a href="#显示事件数据" class="headerlink" title="显示事件数据"></a>显示事件数据</h2><p>要使用 EKEventViewController 类，你必须有一个从事件存储中获得的现有事件。在呈现这类视图控制器之前，你需要设置事件属性和任何其他显示选项。下面代码展示了如何创建事件视图控制器并将其添加到导航控制器中，假设 myEvent 已经存在。如果不允许用户编辑事件，则将 allowsEditing 属性设置为 NO。</p>
-<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line">EKEventViewController *eventViewController = [[EKEventViewController alloc] init];</span><br><span class="line">    eventViewController.event = myEvent;</span><br><span class="line">    eventViewController.allowsEditing = <span class="literal">YES</span>;</span><br><span class="line">    navigationController = [[<span class="built_in">UINavigationController</span> alloc] initWithRootViewController:eventViewController];</span><br></pre></td></tr></table></figure>
-
-<p>您需要为事件视图控制器分配一个委托，以便在用户完成查看事件时接收通知。该委托符合 <code>EKEventViewDelegate</code> 协议，并且必须实现 <code>eventViewController:didCompleteWithAction:</code> 方法。</p>
-<h2 id="修改事件数据"><a href="#修改事件数据" class="headerlink" title="修改事件数据"></a>修改事件数据</h2><p>要允许用户创建、编辑或删除事件，请使用 <code>EKEventEditViewController</code> 类和 <code>EKEventEditViewDelegate</code> 协议。您可以创建一个类似于事件视图控制器的事件编辑视图控制器，但是必须设置 eventStore 属性(设置事件属性是可选的)。</p>
-<ul>
-<li>当你呈现视图控制器时，如果 event 属性为 nil，用户就会在默认日历中创建一个新事件，并将其保存到指定的事件存储中。</li>
-<li>如果 event 属性不为 nil，则用户编辑一个现有的事件。事件必须驻留在指定的事件存储区中，否则将引发异常。</li>
-</ul>
-<p><code>EKEventEditViewController</code> 类的实例被设计为模态显示，如下面代码所示。在这段代码中，self 是导航控制器的顶视图控制器。关于模态视图控制器的详细信息，请阅读 modal Presenting a view Controller。</p>
-<p>模态地呈现事件编辑视图控制器</p>
-<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line">EKEventEditViewController* controller = [[EKEventEditViewController alloc] init];</span><br><span class="line">    controller.eventStore = myEventStore;</span><br><span class="line">    controller.editViewDelegate = <span class="keyword">self</span>;</span><br><span class="line">    [<span class="keyword">self</span> presentModalViewController:controller animated:<span class="literal">YES</span>];</span><br></pre></td></tr></table></figure>
-
-<p>您还必须指定一个委托，以便在用户完成事件编辑后接收通知。该委托符合 <code>EKEventEditViewDelegate</code> 协议，并且必须实现 <code>eventteditviewcontroller:didCompleteWithAction:</code> 方法来解散模态视图控制器。通常，模态地呈现视图控制器的对象负责解散它。</p>
-<p>委托将解散模态视图</p>
-<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line">- (<span class="type">void</span>)eventEditViewController:(EKEventEditViewController *)controller</span><br><span class="line">          didCompleteWithAction:(EKEventEditViewAction)action</span><br><span class="line">    &#123;</span><br><span class="line">        [<span class="keyword">self</span> dismissModalViewControllerAnimated:<span class="literal">YES</span>];</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-
-<p>委托还传递了用户在完成编辑时所采取的操作。用户可以取消更改、保存事件或删除事件。如果你需要在用户退出模态视图后执行更多代码，实现 <code>eventteditviewcontroller:didCompleteWithAction: delegate</code> 方法。</p>
+<p>显示 <code>cryptid 0</code> 表示壳已经被解密。</p>
+<h1 id="iOS-应用砸壳工具"><a href="#iOS-应用砸壳工具" class="headerlink" title="iOS 应用砸壳工具"></a>iOS 应用砸壳工具</h1><p>以下这些砸壳工具是目前为止作者本人知道并动手实践过的，鉴于作者知识储备有限，可能并不是 iOS 平台全部的砸壳工具。某些工具作者没有亲自动手实践过的就不列举了，如 xia0LLDB …</p>
+<h2 id="dumpdecrypted"><a href="#dumpdecrypted" class="headerlink" title="dumpdecrypted"></a><a href="https://github.com/stefanesser/dumpdecrypted">dumpdecrypted</a></h2><p>是一个动态库，利用 DYLD 的环境变量，将自己插入需要砸壳的进程中，但是很多年没有维护更新了。。。</p>
+<h2 id="Clutch"><a href="#Clutch" class="headerlink" title="Clutch"></a><a href="https://github.com/KJCracks/Clutch">Clutch</a></h2><p>是一个 iOS 上命令行程序，也是很多年没有维护更新了。下载编译后在 iOS12.5.7 上，能砸壳一些简单的 app，但是像微信，支付宝这样的 app 会失败。</p>
+<h2 id="frida-ios-dump"><a href="#frida-ios-dump" class="headerlink" title="frida-ios-dump"></a><a href="https://github.com/AloneMonkey/frida-ios-dump">frida-ios-dump</a></h2><p>是一个基于 frida 的 python 脚本，目前最强的 iOS 砸壳脚本，支持最新版本微信，支付宝等。但是需要注意版本的问题，一是 Mac 上安装的 frida 版本需要和 iPhone 上安装的 frida 版本一致。其次需要注意 frida 版本并不是越新越好，我以前明明可以成功砸壳的，结果更新 frida 版本之后反而无法成功砸壳了。记录一下 2025年06月19日 前后使用的越狱手机是 iPhone8Plus iOS16.7.10 使用的 palera1n 的 rootful 越狱，运行 frida 的 16.2.0 是可以砸壳成功的。前后某几个版本我都试过了砸壳不成功，但不代表都不成功，因为前后版本太多了我并没有精力一个个版本尝试。</p>
+<h2 id="LLDB"><a href="#LLDB" class="headerlink" title="LLDB"></a>LLDB</h2><p>Xcode 自带的调试器，使用 lldb 命令手动实现砸壳。</p>
+<h2 id="AppDump2"><a href="#AppDump2" class="headerlink" title="AppDump2"></a>AppDump2</h2><p>是一个 iOS App，不需要越狱设备，但是设备需要安装巨魔才能安装 AppDump2 实现砸壳。。。而巨魔又有 iOS 系统的限制，所以仅作为参考吧。</p>
 ]]></content>
       <categories>
-        <category>Apple 文档翻译</category>
+        <category>iOS 逆向与安全</category>
       </categories>
-      <tags>
-        <tag>EventKit</tag>
-        <tag>Calendar</tag>
-        <tag>Reminders</tag>
-      </tags>
   </entry>
   <entry>
     <title>dyld</title>
@@ -4020,71 +4112,6 @@ commonModes并不是一个真正单独的模式
         <tag>load</tag>
         <tag>initialize</tag>
       </tags>
-  </entry>
-  <entry>
-    <title>iOS 应用砸壳</title>
-    <url>/2024/10/27/iOS-%E5%BA%94%E7%94%A8%E7%A0%B8%E5%A3%B3/</url>
-    <content><![CDATA[<h1 id="什么是壳"><a href="#什么是壳" class="headerlink" title="什么是壳"></a>什么是壳</h1><p>在软件保护和安全领域，“壳”指的是利用特殊的算法对应用程序的二进制文件进行加密或包装的保护层，通常被称为 “加壳”。壳的作用是保护应用程序的代码，防止未经授权的访问、篡改和逆向工程。壳通常会在应用程序启动时将其解密到内存中，以便正常运行。</p>
-<p>苹果会在应用发布到 App Store 时，对应用程序进行 DRM（数字版权管理）保护，这种保护即一种壳，目的是防止非法分发。所以从 App Store 下载的应用程序，我们无法使用 hopper，ghidra，ida 等逆向工具进行静态分析，也无法使用 class-dump 这样的工具导出头文件。需要对其进行解密也就是砸壳，也有人喜欢称脱壳之后，才能进行逆向分析。</p>
-<p>iOS 应用加壳只有苹果公司内部自己能处理，所以我们只讨论砸壳的方式：</p>
-<h1 id="砸壳的方式"><a href="#砸壳的方式" class="headerlink" title="砸壳的方式"></a>砸壳的方式</h1><ol>
-<li><p><strong>静态砸壳或硬砸壳：</strong>就是在已经掌握和了解壳的加密算法和逻辑之后在不运行应用程序的情况下将应用程序的壳进行解密处理。静态砸壳的方法难度大，而且加密方发现应用被破解之后就可能会该用更高级和复杂的加密技术。</p>
-</li>
-<li><p><strong>动态砸壳：</strong>动态砸壳就是从运行在进程内存空间中的可执行文件镜像入手，将内存中的内容进行转储（dump）处理实现脱壳。这种方式实现起来相对简单且不必关心使用的是什么加密技术。</p>
-</li>
-</ol>
-<p>iOS 砸壳大多采用动态砸壳的方式。</p>
-<h1 id="查看-iOS-应用的壳状态"><a href="#查看-iOS-应用的壳状态" class="headerlink" title="查看 iOS 应用的壳状态"></a>查看 iOS 应用的壳状态</h1><p><code>LC_ENCRYPTION_INFO_64</code> 是 Mach-O 文件格式中的一个加载命令（load command），用于描述 64 位 Mach-O 文件的加密信息。该加载命令常见于 macOS 和 iOS 应用程序的可执行文件中，主要包含应用程序是否加密及其相关的加密信息。</p>
-<h2 id="主要字段"><a href="#主要字段" class="headerlink" title="主要字段"></a>主要字段</h2><ul>
-<li><strong>cryptoff</strong>：加密数据的偏移量，表示从文件的哪个位置开始加密数据。</li>
-<li><strong>cryptsize</strong>：加密数据的大小，以字节为单位，指示被加密的范围。</li>
-<li><strong>cryptid</strong>：加密标识符，用于表明数据是否被加密。值为 0 表示数据未加密；其他值表示数据已加密。</li>
-</ul>
-<h2 id="用途"><a href="#用途" class="headerlink" title="用途"></a>用途</h2><p>在 iOS 应用中，<code>LC_ENCRYPTION_INFO_64</code> 常用于 <strong>FairPlay</strong> DRM（数字版权管理）保护。iOS 应用在上传到 App Store 时，苹果会对其进行加密保护，以防止未经授权的访问或修改。通过检查 <code>LC_ENCRYPTION_INFO_64</code> 的字段值，可以判断应用是否经过 DRM 加密保护。</p>
-<h2 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h2><p>查看 <code>LC_ENCRYPTION_INFO_64</code> 信息有以下两种方式：</p>
-<ol>
-<li><strong>图形化工具：</strong>MachOView</li>
-<li><strong>命令行工具：</strong>otool</li>
-</ol>
-<h3 id="MachOView"><a href="#MachOView" class="headerlink" title="MachOView"></a><a href="https://github.com/gdbinit/MachOView">MachOView</a></h3><p><strong>MachOView</strong> 是一款用于 macOS 的图形化工具，专门设计用于分析和查看 Mach-O 文件格式。Mach-O（Mach Object）是 macOS 和 iOS 操作系统使用的可执行文件格式，包含了二进制可执行文件、库文件、内核扩展等。</p>
-<p>MachOView 提供了一个直观的界面，可以帮助开发者和逆向工程人员深入分析 Mach-O 文件的结构和内容。它展示了文件头、加载命令、段（segments）、节（sections）、符号表（symbol table）、动态符号、字符串表等各种信息。</p>
-<h4 id="主要功能"><a href="#主要功能" class="headerlink" title="主要功能"></a>主要功能</h4><ul>
-<li><strong>查看文件头</strong>：展示 Mach-O 文件的文件头信息，例如文件类型、CPU 架构等。</li>
-<li><strong>加载命令</strong>：列出所有的加载命令，包括动态库依赖、入口点、数据段等。</li>
-<li><strong>段和节</strong>：显示所有的段和节信息，并可以查看它们的详细内容。</li>
-<li><strong>符号表</strong>：解析并显示符号表和动态符号，包括全局符号和本地符号。</li>
-<li><strong>反汇编</strong>：支持代码段的反汇编，以查看可执行代码的汇编指令。</li>
-<li><strong>导出功能</strong>：可以将分析结果导出为文本格式，以供进一步分析。</li>
-</ul>
-<h4 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h4><p>MachOView 是 macOS 和 iOS 逆向工程、应用开发及安全研究的重要工具。它使得用户可以深入了解 Mach-O 文件的内部结构，适合用于以下场景：</p>
-<ul>
-<li><strong>应用逆向工程</strong>：了解应用内部的函数、符号等信息。</li>
-<li><strong>安全研究</strong>：分析应用是否进行了加密保护，研究其安全机制。</li>
-<li><strong>调试和开发</strong>：查看动态库依赖、文件结构等信息，以帮助调试和优化。</li>
-</ul>
-<h4 id="下载和安装"><a href="#下载和安装" class="headerlink" title="下载和安装"></a>下载和安装</h4><p>MachOView 可以通过项目的 GitHub 页面进行下载，支持 macOS 平台。使用者可以直接下载预编译的二进制文件，或通过源码自行编译安装。</p>
-<p>使用 MachOView 查看可执行文件的 <code>LC_ENCRYPTION_INFO_64</code> 信息</p>
-<img src="/2024/10/27/iOS-%E5%BA%94%E7%94%A8%E7%A0%B8%E5%A3%B3/Xnip2024-10-14_16-56-13.jpg" class="">
-
-<h3 id="otool"><a href="#otool" class="headerlink" title="otool"></a>otool</h3><p><code>otool</code> 是 macOS 上的一个命令行工具，用于显示可执行文件、动态库和目标文件的各种低级信息。它是开发者用来分析、调试和检查 Mach-O 文件结构的重要工具。Mach-O（Mach Object）文件格式是 macOS 和 iOS 使用的可执行文件格式，包括应用程序、动态库和内核扩展等。对于从事 macOS 或 iOS 应用开发及逆向工程的人员，<code>otool</code> 是一个非常有用的工具。</p>
-<p><code>otool</code> 并非 macOS 系统自带的，而是随 <strong>Xcode Command Line Tools</strong> 一起提供的。因此，默认情况下 macOS 并不包含 <code>otool</code>。要使用 <code>otool</code>，需要先安装 <strong>Xcode Command Line Tools</strong>。幸运的是，不需要安装完整的 Xcode 应用，只需安装命令行工具即可获取 otool。</p>
-<p>可以通过以下命令快速安装 Xcode Command Line Tools：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">xcode-select --install</span><br></pre></td></tr></table></figure>
-
-<h4 id="示例-1"><a href="#示例-1" class="headerlink" title="示例"></a>示例</h4><p>假设我们有一个 Mach-O 文件 <code>example</code>，可以用以下命令查看其是壳的状态：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"> ~/ otool -l MachO文件 | grep crypt</span><br><span class="line">     cryptoff 16384</span><br><span class="line">    cryptsize 265289728</span><br><span class="line">      cryptid 0</span><br></pre></td></tr></table></figure>
-
-<p>显示 <code>cryptid 0</code> 表示壳已经被解密。</p>
-<h1 id="iOS-应用砸壳工具"><a href="#iOS-应用砸壳工具" class="headerlink" title="iOS 应用砸壳工具"></a>iOS 应用砸壳工具</h1><p>以下这些砸壳工具是目前为止作者本人知道并动手实践过的，鉴于作者知识储备有限，可能并不是 iOS 平台全部的砸壳工具。某些工具作者没有亲自动手实践过的就不列举了，如 xia0LLDB …</p>
-<h2 id="dumpdecrypted"><a href="#dumpdecrypted" class="headerlink" title="dumpdecrypted"></a><a href="https://github.com/stefanesser/dumpdecrypted">dumpdecrypted</a></h2><p>是一个动态库，利用 DYLD 的环境变量，将自己插入需要砸壳的进程中，但是很多年没有维护更新了。。。</p>
-<h2 id="Clutch"><a href="#Clutch" class="headerlink" title="Clutch"></a><a href="https://github.com/KJCracks/Clutch">Clutch</a></h2><p>是一个 iOS 上命令行程序，也是很多年没有维护更新了。下载编译后在 iOS12.5.7 上，能砸壳一些简单的 app，但是像微信，支付宝这样的 app 会失败。</p>
-<h2 id="frida-ios-dump"><a href="#frida-ios-dump" class="headerlink" title="frida-ios-dump"></a><a href="https://github.com/AloneMonkey/frida-ios-dump">frida-ios-dump</a></h2><p>是一个基于 frida 的 python 脚本，目前最强的 iOS 砸壳脚本，支持最新版本微信，支付宝等。但是需要注意版本的问题，一是 Mac 上安装的 frida 版本需要和 iPhone 上安装的 frida 版本一致。其次需要注意 frida 版本并不是越新越好，我以前明明可以成功砸壳的，结果更新 frida 版本之后反而无法成功砸壳了。记录一下 2025年06月19日 前后使用的越狱手机是 iPhone8Plus iOS16.7.10 使用的 palera1n 的 rootful 越狱，运行 frida 的 16.2.0 是可以砸壳成功的。前后某几个版本我都试过了砸壳不成功，但不代表都不成功，因为前后版本太多了我并没有精力一个个版本尝试。</p>
-<h2 id="LLDB"><a href="#LLDB" class="headerlink" title="LLDB"></a>LLDB</h2><p>Xcode 自带的调试器，使用 lldb 命令手动实现砸壳。</p>
-<h2 id="AppDump2"><a href="#AppDump2" class="headerlink" title="AppDump2"></a>AppDump2</h2><p>是一个 iOS App，不需要越狱设备，但是设备需要安装巨魔才能安装 AppDump2 实现砸壳。。。而巨魔又有 iOS 系统的限制，所以仅作为参考吧。</p>
-]]></content>
-      <categories>
-        <category>iOS 逆向与安全</category>
-      </categories>
   </entry>
   <entry>
     <title>iOS 应用签名原理</title>
@@ -4821,33 +4848,6 @@ commonModes并不是一个真正单独的模式
 ]]></content>
       <tags>
         <tag>iOS</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>SDWebimage设置图片时URL不变，但图片改变的解决办法</title>
-    <url>/2018/07/17/SDWebimage%E8%AE%BE%E7%BD%AE%E5%9B%BE%E7%89%87%E6%97%B6URL%E4%B8%8D%E5%8F%98%EF%BC%8C%E4%BD%86%E5%9B%BE%E7%89%87%E6%94%B9%E5%8F%98%E7%9A%84%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95/</url>
-    <content><![CDATA[<p>本篇文章转载自<a href="https://blog.csdn.net/xumugui007/article/details/51605546">SDWebImage支持URL不变时更新图片内容</a></p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">SDWebImage在iOS项目中是一个很常用的开源库，而且众所周知的是，它是基于URL作为Key来实现图片缓存机制的。在90%左右的情况下，</span><br><span class="line">图片与URL是一一对应的，即使服务器修改了图片也会相应的变更URL。但是在少数情况下，服务器修改了图片后不会变更相应的URL，也就是</span><br><span class="line">说图片本身的内容变了然而它的URL没有变化，那么按照对SDWebImage的常规使用方法的话，客户端肯定更新不到同一URL对应到服务器已变</span><br><span class="line">更的图片内容。</span><br></pre></td></tr></table></figure>
-
-<p>基于这一现象，我们来进行分析。</p>
-<p>客户端第一次请求图片时，Charles抓包得知response header里有一个名为Last-Modified、数据是时间戳的键值对。</p>
-<p>客户端第二次及以后请求图片时，通过Charles抓包发现，服务器返回304 not modified状态，说明服务器在接收客户端请求后通过某种判断逻辑得出结论：“客户端已缓存的图片与服务器图片都是最新的”，那么服务器如何判断的呢？</p>
-<p>通过查阅HTTP协议相关的资料得知，与服务器返回的Last-Modified相对应的request header里可以加一个名为If-Modified-Since的key，value即是服务器回传的服务端图片最后被修改的时间，第一次图片请求时If-Modified-Since的值为空，第二次及以后的客户端请求会把服务器回传的Last-Modified值作为If-Modified-Since的值传给服务器，这样服务器每次接收到图片请求时就将If-Modified-Since与Last-Modified进行比较，如果客户端图片已陈旧那么返回状态码200、Last-Modified、图片内容，客户端存储Last-Modified和图片；如果客户端图片是最新的那么返回304 Not Modified、不会返回Last-Modified、图片内容。</p>
-<p>关于服务器的比较逻辑，需要强调一下。</p>
-<p>经查资料得知，Apache比较时是看If-Modified-Since之后有没有更新图片，Nginx比较时是看If-Modified-Since与Last-Modified是否相等，所以对于Apache服务器环境客户端每次都要严格的存储服务器回传的Last-Modified以便下次请求时作为If-Modified-Since的值传给服务器，对于Nginx服务器环境客户端不必存储服务器回传的Last-Modified，每次请求时只需将图片自身的fileModificationDate作为If-Modified-Since的值传服务器即可。在实际开发中，如果遇到明明传了If-Modified-Since、服务器图片也变更了、但是客户端却请求不到最新的图片的情况时，那么就需要查看一下服务器对这两个时间戳的比较逻辑。</p>
-<p>那么，现在我们可以回到SDWebImage上来了。通过查看SDWebImageDownloader的源码得知，它开放了一个headersFilter的block，意在让开发者可以对所有图片请求追加一些额外的header，这正合我意。那么我们就可以在诸如AppDelegate didFinishLaunching的地方追加如下代码：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">SDWebImageDownloader *imgDownloader = SDWebImageManager.sharedManager.imageDownloader;</span><br><span class="line">imgDownloader.headersFilter  = ^NSDictionary *(NSURL *url, NSDictionary *headers) &#123;</span><br><span class="line"> </span><br><span class="line">    NSFileManager *fm = [[NSFileManager alloc] init];</span><br><span class="line">    NSString *imgKey = [SDWebImageManager.sharedManager cacheKeyForURL:url];</span><br><span class="line">    NSString *imgPath = [SDWebImageManager.sharedManager.imageCache defaultCachePathForKey:imgKey];</span><br><span class="line">    NSDictionary *fileAttr = [fm attributesOfItemAtPath:imgPath error:nil];</span><br><span class="line"> </span><br><span class="line">    NSMutableDictionary *mutableHeaders = [headers mutableCopy];</span><br><span class="line"> </span><br><span class="line">    NSDate *lastModifiedDate = nil;</span><br><span class="line"> </span><br><span class="line">    if (fileAttr.count &gt; 0) &#123;</span><br><span class="line">        if (fileAttr.count &gt; 0) &#123;</span><br><span class="line">            lastModifiedDate = (NSDate *)fileAttr[NSFileModificationDate];</span><br><span class="line">        &#125;</span><br><span class="line"> </span><br><span class="line">    &#125;</span><br><span class="line">    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];</span><br><span class="line">    formatter.timeZone = [NSTimeZone timeZoneWithAbbreviation:@&quot;GMT&quot;];</span><br><span class="line">    formatter.locale = [[NSLocale alloc] initWithLocaleIdentifier:@&quot;en_US&quot;];</span><br><span class="line">    formatter.dateFormat = @&quot;EEE, dd MMM yyyy HH:mm:ss z&quot;;</span><br><span class="line"> </span><br><span class="line">    NSString *lastModifiedStr = [formatter stringFromDate:lastModifiedDate];</span><br><span class="line">    lastModifiedStr = lastModifiedStr.length &gt; 0 ? lastModifiedStr : @&quot;&quot;;</span><br><span class="line">    [mutableHeaders setValue:lastModifiedStr forKey:@&quot;If-Modified-Since&quot;];</span><br><span class="line"> </span><br><span class="line">    return mutableHeaders;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-<p>然后，加载图片的地方以前怎么写还是怎么写，但别忘了Option是SDWebImageRefreshCached</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">NSURL *imgURL = [NSURL URLWithString:@&quot;http://handy-img-storage.b0.upaiyun.com/3.jpg&quot;];</span><br><span class="line">[[self imageView] sd_setImageWithURL:imgURL</span><br><span class="line">                    placeholderImage:nil</span><br><span class="line">                             options:SDWebImageRefreshCached];</span><br></pre></td></tr></table></figure>
-
-<p>经测试，服务器只修改图片不变更URL的时候，客户端也可以更新到最新的图片。</p>
-<p>从以上第一段代码内容可以看出我采用的是与ngix服务器比较逻辑对应的代码，BTW:我测试的服务器是又拍云，说明又拍云的比较逻辑是等与不等的关系判断，不是大小关系的判断。</p>
-<p>这里顺便说一下，如果服务器的环境是类似于Apache的比较逻辑时，客户端可以把Last-Modified存放在图片的名称上(这需要修改SDWebImage源码，不建议)，或者用一个plist文件存放图片key名称与时间的对应关系(这个不用修改源码)。</p>
-<p>OK，到此这次的主题已得到完美解决。</p>
-]]></content>
-      <tags>
-        <tag>bug</tag>
       </tags>
   </entry>
   <entry>
