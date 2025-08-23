@@ -2314,636 +2314,244 @@ Block 的 hook ？应用场景？埋点
   <entry>
     <title>KVC</title>
     <url>/2025/07/29/KVC/</url>
-    <content><![CDATA[<p>我不知道有多少人像本人一样，n 年来查看过不知道多少次这个 <a href="https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/KeyValueCoding/index.html#//apple_ref/doc/uid/10000107-SW1">KVC 文档</a>，但是每次通篇读下来总是会遇到读不懂的地方，总是莫名其妙的出现一个章节完全不知道在讲什么东西，不论是用传统的 Google 翻译或者目前主流的 AI 翻译翻译了，也还是会遇到读起来狗屁不通的情况。其实根本原因是原始文档的英文描述就有问题，有歧义，导致不论你是直译还是意译都是让人摸不着头脑的翻译，只能根据上下文的理解才能正确翻译。这次作者决定结合 AI 和个人的理解将 KVC 文档彻底弄清楚，即使不能完全弄明白也要留下一个深刻的印象，方便后续遇到文章中的场景时能够回想起来。</p>
+    <content><![CDATA[<p>我不知道有多少人像本人一样，n 年来查看过不知道多少次这个 <a href="https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/KeyValueCoding/index.html#//apple_ref/doc/uid/10000107-SW1">KVC 文档</a>，但是每次通篇读下来总是会遇到读不懂的地方，总是莫名其妙的出现一个章节完全不知道在讲什么东西，不论是用传统的 Google 翻译或者目前主流的 AI 翻译翻译了，也还是会遇到读起来狗屁不通的情况。</p>
+<ul>
+<li>其实根本原因是原始文档就有问题，东拼西凑的一坨屎，有歧义，导致不论你是直译还是意译都是让人摸不着头脑的翻译，只能根据上下文的理解才能正确翻译。为此作者将这份文档结合AI和个人理解做了全篇翻译，有需要的可以自行<a href="./book.zip">下载</a>。</li>
+<li>还有原始文档很多地方只写了要怎么做，但是没有告诉你为什么要这么做，就会让人觉得莫名其妙。</li>
+<li>文档的有些内容太古老了，某些内容只在早期的 MacOS 开发中使用，在 iOS 开发中几乎接触，使用不到，但是也没有做任何说明。</li>
+</ul>
+<p>这次作者决定结合 AI 和个人的理解将 KVC 文档彻底弄清楚，即使不能完全弄明白也要留下一个深刻的印象，方便后续遇到文章中的场景时能够回想起来。</p>
 <hr>
-<h1 id="入门指南"><a href="#入门指南" class="headerlink" title="入门指南"></a>入门指南</h1><h2 id="关于键值编码"><a href="#关于键值编码" class="headerlink" title="关于键值编码"></a>关于键值编码</h2><p>键值编码是由 NSKeyValueCoding 非正式协议启用的一种机制，对象采用该机制来提供对其属性的间接访问。当对象实现了 NSKeyValueCoding 协议时（文章后续提到的实现了键值编码协议，实现了键值编码都是一个意思），其属性可以通过简洁、统一的接口通过字符串参数进行寻址。这种间接访问机制补充了实例变量及其相关访问方法所提供的直接访问。</p>
-<p>通常使用访问器方法来访问对象的属性。get 访问器（或 getter）返回属性的值。set 访问器（或 setter）设置属性的值。在 Objective-C 中，您还可以直接访问属性的底层实例变量。通过上面任何一种方式访问对象属性都很简单，但需要调用特定于属性的方法或变量名（如属性名是 name 那么 getter 方法就是 name，setter 方法就是 setName: 或者直接访问实例变量 _name）。随着属性列表的增长或变化，访问这些属性的代码也必须随之变化。相比之下，实现了键值编码协议的对象提供了一个简单的编程接口，该接口在其所有属性之间保持一致。</p>
-<p>键值编码是许多其他 Cocoa 技术（例如键值观察、Cocoa 绑定、Core Data 和 AppleScript 能力）的基础概念。在某些情况下，键值编码还可以帮助简化代码。</p>
-<blockquote>
-<p>解释一下非正式协议</p>
-<p>在 Objective-C 中，协议的语法是以下形式:</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">@protocol &lt;#protocol name#&gt; &lt;NSObject&gt;</span><br><span class="line">&lt;#methods#&gt;</span><br><span class="line">@end</span><br></pre></td></tr></table></figure>
-<p>使用这种形式声明的协议就是正式协议，比如 AppKit 中的 NSTableViewDelegate, NSTableViewDataSource 或者 UIKit 中的 UITableViewDelegate，NSTableViewDataSource。而 NSKeyValueCoding 并没有这样显示的声明为一个协议，所以称之为非正式协议。</p>
-<p>它的实现方式是在 Foundation 框架内创建名为 NSKeyValueCoding.h 和 NSKeyValueCoding.m 的文件。其中 .h 头文件是我们大家都可以阅读的，而 .m 实现文件在编译 Foundation 框架时被处理成二进制形式的库文件了。除了 Apple 公司 Foundation 框架组内的成员可以阅读以外，其他人几乎都看不到 NSKeyValueCoding.m 文件。除了 Foundation 框架开发人员以外，其他人就像大部分开发者也完全没有必要阅读或者查看 NSKeyValueCoding.m 文件。</p>
-<p>通过对 NSKeyValueCoding.h 的阅读可以知道，键值编码协议的实现就是为 NSObject、NSArray、NSDictionary、NSSet 等相关类提供一个 NSKeyValueCoding 分类，这个分类实现了一些键值编码有关的方法。</p>
-</blockquote>
-<h3 id="使用符合键值编码的对象"><a href="#使用符合键值编码的对象" class="headerlink" title="使用符合键值编码的对象"></a>使用符合键值编码的对象</h3><p>对象通常从 NSObject（直接或间接）继承时就符合了键值编码协议，NSObject 它实现了 NSKeyValueCoding 协议，又为必要方法提供默认实现。此类对象（基本可以认为是所有 Objective-C 对象）允许其他对象通过紧凑的消息传递接口执行以下操作：</p>
-<ul>
-<li><p><strong>访问对象属性。</strong> 该协议指定了方法，例如通用 getter <code>valueForKey:</code> 和通用 setter <code>setValue:forKey:</code> 用于通过名称或键（以字符串为参数）访问对象属性。这些方法和相关方法的默认实现使用键来定位和与底层数据交互，如<a href="#%E8%AE%BF%E9%97%AE%E5%AF%B9%E8%B1%A1%E5%B1%9E%E6%80%A7">访问对象属性</a>中所述。</p>
-</li>
-<li><p><strong>操作集合属性。</strong> 访问方法的默认实现与对象的集合属性（例如 NSArray 对象）一起工作，就像任何其他属性一样。此外，如果对象为属性定义了集合访问器方法，它就可以实现对集合内容的键值访问。这通常比直接访问更有效，并且允许您通过标准化接口使用自定义集合对象，如<a href="#%E8%AE%BF%E9%97%AE%E9%9B%86%E5%90%88%E5%B1%9E%E6%80%A7">访问集合属性</a>中所述。</p>
-</li>
-<li><p><strong>在集合对象上调用集合操作符。</strong> 当访问符合键值编码的对象中的集合属性时，可以将集合操作符插入到键字符串中，如<a href="#%E4%BD%BF%E7%94%A8%E9%9B%86%E5%90%88%E6%93%8D%E4%BD%9C%E7%AC%A6">使用集合操作符</a>中所述。集合操作符指示默认的 NSKeyValueCoding 获取器实现对集合执行操作，然后返回集合的新过滤版本，或代表集合某些特征的单个值。</p>
-</li>
-<li><p><strong>访问非对象属性。</strong> 协议的默认实现检测非对象属性，包括标量和结构，并自动将它们包装为对象和解包装为原始数据类型以便在协议接口上使用，如<a href="#%E9%9D%9E%E5%AF%B9%E8%B1%A1%E5%B1%9E%E6%80%A7%E7%9A%84%E5%A4%84%E7%90%86">非对象属性的处理</a>中所述。此外，该协议声明了一种方法，允许兼容对象为通过键值编码接口在非对象属性上设置 nil 值的情况提供适当的操作。</p>
-</li>
-<li><p><strong>通过键路径访问属性。</strong> 当您拥有一个符合键值编码的对象层次结构时，您可以使用基于键路径的方法调用来深入研究，使用单个调用获取或设置层次结构深处的值。</p>
-</li>
+<h1 id="章节概览"><a href="#章节概览" class="headerlink" title="章节概览"></a>章节概览</h1><ul>
+<li><input checked="" disabled="" type="checkbox"> 建议阅读 </li>
+<li><input disabled="" type="checkbox"> 不建议阅读</li>
 </ul>
-<blockquote>
-<p>个人小结</p>
-<p>呃，看上去提供了 1，2，3，4，5 很多功能啰里八嗦的其实就一句话可以利用 KVC 协议提供的方法访问对象的所有属性。。。感觉像是按字数拿稿费的作者想方设法多凑点儿字数出来</p>
-</blockquote>
-<h3 id="使对象符合键值编码"><a href="#使对象符合键值编码" class="headerlink" title="使对象符合键值编码"></a>使对象符合键值编码</h3><p>为了使你自己的对象符合键值编码，您应该确保它们采用 NSKeyValueCoding 非正式协议并实现相应的方法，例如 valueForKey: 作为通用 getter 和 setValue:forKey: 作为通用 setter。幸运的是，如前面所述，NSObject 采用了该协议并为其必要方法提供了默认实现。因此，如果您从 NSObject（或其众多子类中的任何一个）派生对象，那么大部分工作已经为您完成。</p>
-<p>为了使默认方法能够发挥作用，您需要确保对象的访问器方法和实例变量遵循某些明确定义的规则。这允许默认实现根据键值编码消息来查找对象的属性。然后，您可以选择通过提供验证方法和处理某些特殊情况的方法来扩展和定制键值编码。</p>
-<blockquote>
-<p>个人小结</p>
-<p>这一段其实挺让人迷惑的，明明 NSObject 就实现了键值编码协议方法使得所有继承自 NSObject 的对象就是符合键值编码的，还要怎么使对象符合键值编码。作为 iOS、MacOS 应用开发者来说就是保证自己创建的对象是继承自 NSObject 就足够了。</p>
-</blockquote>
-<h3 id="Swift-中的键值编码"><a href="#Swift-中的键值编码" class="headerlink" title="Swift 中的键值编码"></a>Swift 中的键值编码</h3><p>从 NSObject 或其子类继承的 Swift 对象默认对其属性遵循键值编码。而在 Objective-C 中，属性的访问器和实例变量必须遵循某些模式，而 Swift 中的标准属性声明会自动保证这一点。另一方面，该协议的许多功能要么不相关，要么可以使用 Objective-C 中不存在的原生 Swift 构造或技术更好地处理。例如，由于所有 Swift 属性都是对象，因此您永远不会使用默认实现对非对象属性的特殊处理。</p>
-<p>因此，虽然键值编码协议方法可以直接转换为 Swift，但本指南主要关注 Objective-C，您需要做更多工作来确保合规性，并且键值编码通常最有用。整个指南都指出了需要在 Swift 中采用明显不同方法的情况。</p>
-<p>如需了解更多关于如何将 Swift 与 Cocoa 技术结合使用的信息，请阅读《将 Swift 与 Cocoa 和 Objective-C 结合使用 (Swift 3)》。如需 Swift 的完整描述，请阅读《Swift 编程语言 (Swift 3)》。</p>
-<blockquote>
-<p>个人小结</p>
-<p>虽然 Swift 中的对象不必继承自 NSObject，但如果你想让你的 Swift 对象具备 KVC 能力那就记得继承 NSObject。</p>
-</blockquote>
-<h3 id="依赖键值编码的其他-Cocoa-技术"><a href="#依赖键值编码的其他-Cocoa-技术" class="headerlink" title="依赖键值编码的其他 Cocoa 技术"></a>依赖键值编码的其他 Cocoa 技术</h3><p>符合键值编码的对象可以参与依赖于这种访问方式的各种 Cocoa 技术，包括：</p>
-<ul>
-<li><strong>键值观察。</strong> 该机制使对象能够注册由另一个对象属性的变化驱动的异步通知，如《键值观察编程指南》中所述。</li>
-<li><strong>Cocoa 绑定。</strong> 这套技术完全实现了模型-视图-控制器范例，其中模型封装应用程序数据，视图显示和编辑该数据，控制器在两者之间进行调解。阅读 Cocoa Bindings 编程主题以了解有关 Cocoa Bindings 的更多信息。</li>
-<li><strong>Core Data。</strong> 该框架为与对象生命周期和对象图管理（包括持久化）相关的常见任务提供了通用且自动化的解决方案。您可以在《Core Data 编程指南》中阅读关于 Core Data 的内容。</li>
-<li><strong>AppleScript。</strong> 这种脚本语言可以直接控制可编写脚本的应用以及 macOS 的许多部分。Cocoa 的脚本支持利用键值编码来获取和设置可编写脚本的对象中的信息。NSScriptKeyValueCoding 非正式协议中的方法扩展了键值编码功能，包括通过索引在多值键中获取&#x2F;设置键值，以及将键值强制转换（或转换）为适当数据类型。《AppleScript概述》提供了对 AppleScript 及其相关技术的高层介绍。</li>
-</ul>
-<blockquote>
-<p>个人小结</p>
-<p>核心观点是，键值编码是基础中的基础，它是 KVO、Cocoa 绑定、Core Data、AppleScript 这些技术的基础，这些技术依赖键值编码。</p>
-</blockquote>
-<hr>
-<h1 id="键值编码基础知识"><a href="#键值编码基础知识" class="headerlink" title="键值编码基础知识"></a>键值编码基础知识</h1><h2 id="访问对象的属性"><a href="#访问对象的属性" class="headerlink" title="访问对象的属性"></a>访问对象的属性</h2><p>对象通常在其接口声明中定义属性，这些属性属于以下几个类别：</p>
-<ul>
-<li><strong>属性(Attributes)</strong> 这些是简单值，例如标量、字符串或布尔值。数值对象（例如 NSNumber）和其他不可变类型（例如 NSColor）也被视为属性。</li>
-<li><strong>一对一关系(To-one relationships)</strong> 这些是具有自身属性的可变对象。对象的属性可以在不改变对象本身的情况下发生变化。例如，银行账户对象可能具有 owner 属性，该属性是 Person 对象的一个实例，而 Person 对象本身具有 address 属性。账户所有人的地址可能会更改，但银行账户持有的所有者引用不会改变。银行账户的所有者没有改变，只是她的地址改变了。</li>
-<li><strong>一对多关系(To-many relationships)</strong> 这些是集合对象。通常使用 NSArray 或 NSSet 的实例来保存此类集合，尽管也可以使用自定义集合类。</li>
-</ul>
-<p>清单 2-1 中声明的 BankAccount 对象演示了每种类型的属性。</p>
-<p>清单 2-1 BankAccount 对象的属性</p>
-<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">BankAccount</span> : <span class="title">NSObject</span></span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>) <span class="built_in">NSNumber</span>* currentBalance;              <span class="comment">// 属性</span></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>) Person* owner;                         <span class="comment">// 一对一关系</span></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>) <span class="built_in">NSArray</span>&lt; Transaction* &gt;* transactions; <span class="comment">// 一对多关系</span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
-
-<p>为了保持封装性，对象通常会在其接口上提供属性的访问器方法。对象作者可以显式编写这些方法，也可以依赖编译器自动合成。无论哪种方式，使用这些访问器的代码作者都必须在编译前将属性名写入代码中。访问器方法的名称由此成为调用代码的静态组成部分。例如，给定清单 2-1 中声明的银行账户对象，编译器会合成一个可以为 myAccount 实例调用的 setter：</p>
-<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line">[myAccount setCurrentBalance:@(<span class="number">100.0</span>)];</span><br></pre></td></tr></table></figure>
-
-<p>这种方式虽然直接，但缺乏灵活性。相比之下，实现了键值编码协议的对象提供了一种更通用的机制 —— 通过字符串标识符来访问对象属性。</p>
-<blockquote>
-<p>个人小结</p>
-<p>这里关于属性的分类中，最抽象的就是 Attributes 和 To-one relationships。不过这其实不是 KVC 文档的重点，就不要太在意了。总之知道可以使用 KVC 方法获取对象的各种类型的属性就足够了。</p>
-</blockquote>
-<h3 id="使用键和键路径识别对象的属性"><a href="#使用键和键路径识别对象的属性" class="headerlink" title="使用键和键路径识别对象的属性"></a>使用键和键路径识别对象的属性</h3><p>键是标识特定属性的字符串。通常，按照惯例，表示属性的键是代码中的属性本身的名称。键必须使用 ASCII 编码，不得包含空格，并且通常以小写字母开头（尽管也有例外，例如许多类中的 URL 属性）。</p>
-<p>因为清单 2-1 中的 BankAccount 类是实现了键值编码协议的，所以它识别键 owner ，currentBalance 和 transactions，它们是它的属性的名称。您可以通过其键设置其值，而不是调用 setCurrentBalance: 方法。</p>
-<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line">[myAccount setValue:@(<span class="number">100.0</span>) forKey:<span class="string">@&quot;currentBalance&quot;</span>];</span><br></pre></td></tr></table></figure>
-
-<p>实际上，你可以使用同一个方法，通过传入不同的键参数来设置 myAccount 对象的所有属性。由于参数是字符串类型，它可以作为运行时动态操作的变量。</p>
-<p>键路径是由点分隔的键序列组成的字符串，用于指定需要连续访问的对象属性链。序列中首个键的属性相对于消息接收者而确定，后续每个键的值都基于前一个属性的值来获取。因此通过单次调用方法就能深入访问对象层级结构，这便是键路径的核心价值所在。</p>
-<p>例如，将键路径 <code>owner.address.street</code> 应用于银行账户实例时，其含义可解析为：</p>
-<ol>
-<li>首先获取银行账户持有者（owner，Person类实例）</li>
-<li>继而访问该持有者的地址（address，Address类实例）</li>
-<li>最终取得地址对象中的街道字符串值（street）</li>
+<h2 id="入门指南"><a href="#入门指南" class="headerlink" title="入门指南"></a>入门指南</h2><ol>
+<li><input checked="" disabled="" type="checkbox"> 关于键值编码</li>
 </ol>
-<blockquote>
-<p>在 Swift 中，您可以使用 #keyPath 表达式替代字符串来指定键或键路径。这种方法提供编译时检查的优势，正如《Swift与Cocoa、Objective-C互操作性指南（Swift 3版）》中”键与键路径”章节所述。</p>
-</blockquote>
-<h3 id="使用键获取属性的值"><a href="#使用键获取属性的值" class="headerlink" title="使用键获取属性的值"></a>使用键获取属性的值</h3><p>当对象遵循 NSKeyValueCoding 协议时，即视为支持键值编码。继承自 NSObject 的对象会自动遵循此协议（NSObject 已提供该协议核心方法的默认实现），并具备特定的默认行为。此类对象至少实现以下基于键的基本读取方法：</p>
-<ol>
-<li><p>valueForKey:</p>
-<ul>
-<li>返回由键参数指定的属性值。若根据<a href="#%E8%AE%BF%E9%97%AE%E5%99%A8%E6%90%9C%E7%B4%A2%E9%80%BB%E8%BE%91">访问器搜索逻辑</a>规则无法找到对应键的属性，对象会向自身发送 <code>valueForUndefinedKey:</code> 消息。</li>
-<li><code>valueForUndefinedKey:</code> 默认实现会抛出 NSUndefinedKeyException 异常，但子类可重写此方法以更优雅地处理该场景。</li>
-</ul>
-</li>
-<li><p>valueForKeyPath:</p>
-<ul>
-<li>返回相对于消息接收者的指定键路径值。若键路径序列中任意对象对特定键不兼容键值编码（即 <code>valueForKey:</code> 的默认实现无法找到访问器方法），该对象会收到 <code>valueForUndefinedKey:</code> 消息。</li>
-</ul>
-</li>
-<li><p>dictionaryWithValuesForKeys:</p>
-<ul>
-<li>返回与接收者相关的键数组对应值。该方法会遍历数组中的每个键并调用 <code>valueForKey:</code>。</li>
-<li>返回的 NSDictionary 包含数组中所有键的对应值。</li>
-</ul>
-</li>
+<h2 id="键值编码基础知识"><a href="#键值编码基础知识" class="headerlink" title="键值编码基础知识"></a>键值编码基础知识</h2><ol start="2">
+<li><input checked="" disabled="" type="checkbox"> 访问对象的属性</li>
+<li><input checked="" disabled="" type="checkbox"> 访问集合属性		</li>
+<li><input checked="" disabled="" type="checkbox"> 使用集合操作符</li>
+<li><input checked="" disabled="" type="checkbox"> 表示非对象值</li>
+<li><input disabled="" type="checkbox"> 验证属性</li>
+<li><input checked="" disabled="" type="checkbox"> 访问器搜索逻辑</li>
 </ol>
-<blockquote>
-<p>重要提示</p>
-<p>集合对象（如 NSArray&#x2F;NSSet&#x2F;NSDictionary）不可包含 nil 值，需用 NSNull 实例表示空值。<code>dictionaryWithValuesForKeys:</code> 及其相关方法 <code>setValuesForKeysWithDictionary:</code> 的默认实现会自动完成 NSNull（字典参数中）与 nil（存储属性中）的转换。</p>
-</blockquote>
-<p>使用键路径寻址属性时，如果键路径中除最后一个键外的任何键是对多关系（即，它引用集合），则返回值是一个集合，其中包含对多键右侧键的所有值。例如，请求键路径 <code>transactions.payee</code> 的值将返回一个数组，其中包含所有交易的 payee 对象。这也适用于键路径中的多个数组。键路径 <code>accounts.transactions.payee</code> 返回一个数组，其中包含所有账户中所有交易的所有收款人对象。</p>
-<h3 id="使用键设置属性的值"><a href="#使用键设置属性的值" class="headerlink" title="使用键设置属性的值"></a>使用键设置属性的值</h3><p>与 getter 一样，符合键值编码的对象还提供了一小组通用 setter，其默认行为基于 NSObject 中的 NSKeyValueCoding 协议的实现。</p>
-<ul>
-<li><p>setValue:forKey:</p>
-<ul>
-<li>为消息接收对象的指定键设置给定值。该方法默认实现会自动拆解表示标量和结构体的 NSNumber 与 NSValue 对象，并将其赋值给对应属性。非对象值的包装与解包语义详见<a href="#%E9%9D%9E%E5%AF%B9%E8%B1%A1%E5%B1%9E%E6%80%A7%E7%9A%84%E5%A4%84%E7%90%86">非对象属性的处理</a>。</li>
-<li>若指定键在接收对象中无对应属性，对象将向自身发送 <code>setValue:forUndefinedKey:</code> 消息。该消息默认实现会触发 NSUndefinedKeyException 异常，但子类可通过覆写此方法实现自定义处理逻辑。</li>
-</ul>
-</li>
-<li><p>setValue:forKeyPath:</p>
-<ul>
-<li>沿指定键路径为接收对象设置给定值。若键路径中任一节点对象不遵循键值编码规范，该节点将收到 <code>setValue:forUndefinedKey:</code> 消息。</li>
-</ul>
-</li>
-<li><p>setValuesForKeysWithDictionary:</p>
-<ul>
-<li>通过字典键名批量设置接收对象的属性值。默认实现将遍历字典键值对，为每个键调用 <code>setValue:forKey:</code> 方法，并根据需要将 NSNull 对象替换为 nil。</li>
-</ul>
-</li>
-</ul>
-<p>根据默认实现，当尝试为非对象属性设置 nil 值时，遵循键值编码规范的对象会向自身发送 <code>setNilValueForKey:</code> 消息。该消息默认实现将触发 NSInvalidArgumentException 异常，但开发者可通过覆写方法替换为默认值或标记值（详见《非对象值处理机制》）。</p>
-<h3 id="使用键简化对象访问"><a href="#使用键简化对象访问" class="headerlink" title="使用键简化对象访问"></a>使用键简化对象访问</h3><p>若要了解基于键的 getter 和 setter 如何简化代码，请考虑以下示例。在 macOS 中，NSTableView 和 NSOutlineView 对象将标识符字符串与其每列相关联。如果支持表的模型对象不符合键值编码，则表的数据源方法将被迫依次检查每个列标识符以找到要返回的正确属性，如示例 2-2 所示。此外，将来，当您向模型添加另一个属性（在本例中为 Person 对象）时，还必须重新访问数据源方法，添加另一个条件来测试新属性并返回相关值。</p>
-<p>示例 2-2 未采用键值编码的数据源方法的实现</p>
-<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line">- (<span class="type">id</span>)tableView:(<span class="built_in">NSTableView</span> *)tableview objectValueForTableColumn:(<span class="type">id</span>)column row:(<span class="built_in">NSInteger</span>)row</span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">id</span> result = <span class="literal">nil</span>;</span><br><span class="line">    Person *person = [<span class="keyword">self</span>.people objectAtIndex:row];</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">if</span> ([[column identifier] isEqualToString:<span class="string">@&quot;name&quot;</span>]) &#123;</span><br><span class="line">        result = [person name];</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> ([[column identifier] isEqualToString:<span class="string">@&quot;age&quot;</span>]) &#123;</span><br><span class="line">        result = @([person age]);  <span class="comment">// 将标量年龄值包装为NSNumber对象</span></span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> ([[column identifier] isEqualToString:<span class="string">@&quot;favoriteColor&quot;</span>]) &#123;</span><br><span class="line">        result = [person favoriteColor];</span><br><span class="line">    &#125; <span class="comment">// 其他属性判断...</span></span><br><span class="line"> </span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>相比之下，示例 2-3 显示了同一数据源方法的更简洁的实现，该方法利用了符合键值编码的 Person 对象。仅使用 <code>valueForKey:</code> 访问器，数据源方法使用列标识符作为键返回适当的值。除了更短之外，它还更通用，因为稍后添加新列时，只要列标识符始终与模型对象的属性名称匹配，它就会继续保持不变地工作。</p>
-<p>示例 2-3 使用键值编码实现数据源方法</p>
-<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line">- (<span class="type">id</span>)tableView:(<span class="built_in">NSTableView</span> *)tableview objectValueForTableColumn:(<span class="type">id</span>)column row:(<span class="built_in">NSInteger</span>)row</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// 直接通过列标识符作为键值获取对应属性</span></span><br><span class="line">    <span class="keyword">return</span> [[<span class="keyword">self</span>.people objectAtIndex:row] valueForKey:[column identifier]];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="访问集合属性"><a href="#访问集合属性" class="headerlink" title="访问集合属性"></a>访问集合属性</h2><p>遵循键值编码规范的对象以统一方式暴露其集合类型属性（To-Many）。与普通属性操作类似，开发者可使用 <code>valueForKey:</code> 与 <code>setValue:forKey:</code>（或其键路径变体）直接访问集合对象。但若需修改集合内容，采用协议定义的可变代理方法通常更高效。</p>
-<p>协议定义三类代理访问方法（均含键与键路径版本）：</p>
-<ul>
-<li><p>mutableArrayValueForKey: 和 mutableArrayValueForKeyPath:</p>
-<ul>
-<li>它们返回一个代理对象，其行为类似于 NSMutableArray 对象。</li>
-</ul>
-</li>
-<li><p>mutableSetValueForKey: and mutableSetValueForKeyPath:</p>
-<ul>
-<li>它们返回一个代理对象，其行为类似于 NSMutableSet 对象。</li>
-</ul>
-</li>
-<li><p>mutableOrderedSetValueForKey: and mutableOrderedSetValueForKeyPath:</p>
-<ul>
-<li>它们返回一个代理对象，其行为类似于 NSMutableOrderedSet 对象。</li>
-</ul>
-</li>
-</ul>
-<p>当您操作代理对象（添加&#x2F;移除&#x2F;替换元素）时，协议的默认实现会相应修改基础属性。这种方式比传统流程更高效 —— 即先用 <code>valueForKey:</code> 获取不可变集合副本，修改内容后通过 <code>setValue:forKey:</code> 回写。多数情况下，此方式甚至比直接操作可变属性更高效。这些方法还具有额外优势：能自动维护集合内对象的键值观察合规性（详见《键值观察编程指南》）。</p>
-<h2 id="使用集合操作符"><a href="#使用集合操作符" class="headerlink" title="使用集合操作符"></a>使用集合操作符</h2><p>当向实现了键值编码的对象发送 <code>valueForKeyPath:</code> 消息时，可在键路径中嵌入集合操作符。集合操作符是以 “at” 符号（@）为前缀的关键字，指示 getter 在返回数据前执行特定操作。NSObject 提供的 <code>valueForKeyPath:</code> 默认实现支持此功能。</p>
-<p>若键路径包含集合操作符，操作符前的部分（称为左路径）指明操作所针对的集合对象，该集合相对于消息接收者。当直接向集合对象（如 NSArray 实例）发送消息时，左路径可省略。</p>
-<p>操作符后的键路径部分（称为右路径）指定操作符处理的集合内属性。除 @count 外，所有集合操作符都需要右路径。图 4-1 展示了操作符键路径的格式。</p>
-<p>图 4-1 操作符键路径格式</p>
-<img src="/2025/07/29/KVC/keypath.jpg" class="">
-
-<p>集合操作符分为三种基本行为类型：</p>
-<ul>
-<li><p>聚合操作符</p>
-<ul>
-<li>对集合对象进行归约计算，返回与右路径属性数据类型匹配的单个对象。@count 是例外 —— 它不需要右路径，且始终返回 NSNumber 实例。</li>
-</ul>
-</li>
-<li><p>数组操作符</p>
-<ul>
-<li>返回 NSArray 实例，包含目标集合中的特定对象子集。</li>
-</ul>
-</li>
-<li><p>嵌套操作符</p>
-<ul>
-<li>处理包含其他集合的集合对象，根据操作符类型返回 NSArray 或 NSSet 实例，该结果集以特定方式合并嵌套集合内的对象。</li>
-</ul>
-</li>
-</ul>
-<h3 id="示例数据"><a href="#示例数据" class="headerlink" title="示例数据"></a>示例数据</h3><p>以下描述包含展示各操作符调用方式及结果的代码片段。示例基于代码清单 2-1 的 BankAccount 类，该类持有 Transaction 对象数组（如代码清单 4-1 所声明）。每个 Transaction 对象代表一条简易支票簿记录。</p>
-<p>清单 4-1 Transaction 对象的接口声明。</p>
-<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">Transaction</span> : <span class="title">NSObject</span></span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>) <span class="built_in">NSString</span>* payee;   <span class="comment">// To whom</span></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>) <span class="built_in">NSNumber</span>* amount;  <span class="comment">// How much</span></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>) <span class="built_in">NSDate</span>* date;      <span class="comment">// When</span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
-
-<p>为便于说明，假设您的 BankAccount 实例包含由表 4-1 数据构成的 transactions 数组，且所有示例调用均在 BankAccount 对象内部执行。</p>
-<p>表 4-1 Transactions 对象的示例数据</p>
-<table>
-<thead>
-<tr>
-<th>payee</th>
-<th>amount</th>
-<th>date</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>Green Power</td>
-<td>$120.00</td>
-<td>Dec 1, 2015</td>
-</tr>
-<tr>
-<td>Green Power</td>
-<td>$150.00</td>
-<td>Jan 1, 2016</td>
-</tr>
-<tr>
-<td>Green Power</td>
-<td>$170.00</td>
-<td>Feb 1, 2016</td>
-</tr>
-<tr>
-<td>Car Loan</td>
-<td>$250.00</td>
-<td>Jan 15, 2016</td>
-</tr>
-<tr>
-<td>Car Loan</td>
-<td>$250.00</td>
-<td>Feb 15, 2016</td>
-</tr>
-<tr>
-<td>Car Loan</td>
-<td>$250.00</td>
-<td>Mar 15, 2016</td>
-</tr>
-<tr>
-<td>General Cable</td>
-<td>$120.00</td>
-<td>Dec 1, 2015</td>
-</tr>
-<tr>
-<td>General Cable</td>
-<td>$155.00</td>
-<td>Jan 1, 2016</td>
-</tr>
-<tr>
-<td>General Cable</td>
-<td>$120.00</td>
-<td>Feb 1, 2016</td>
-</tr>
-<tr>
-<td>Mortgage</td>
-<td>$1,250.00</td>
-<td>Jan 15, 2016</td>
-</tr>
-<tr>
-<td>Mortgage</td>
-<td>$1,250.00</td>
-<td>Feb 15, 2016</td>
-</tr>
-<tr>
-<td>Mortgage</td>
-<td>$1,250.00</td>
-<td>Mar 15, 2016</td>
-</tr>
-<tr>
-<td>Animal Hospital</td>
-<td>$600.00</td>
-<td>Jul 15, 2016</td>
-</tr>
-</tbody></table>
-<h3 id="聚合操作符"><a href="#聚合操作符" class="headerlink" title="聚合操作符"></a>聚合操作符</h3><p>聚合操作符作用于 array 或 set 属性，生成反映该集合特定维度特征的单一结果值。</p>
-<h4 id="avg"><a href="#avg" class="headerlink" title="@avg"></a><strong>@avg</strong></h4><p>指定 @avg 操作符时，<code>valueForKeyPath:</code> 将读取集合中每个元素的正确键路径指定的属性，将其转换为 double（将 0 替换为 nil 值），并计算这些值的算术平均值。然后返回存储在 NSNumber 实例中的结果。</p>
-<p>要获取表 4-1 中示例数据的平均交易金额：</p>
-<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="built_in">NSNumber</span> *transactionAverage = [<span class="keyword">self</span>.transactions valueForKeyPath:<span class="string">@&quot;@avg.amount&quot;</span>];</span><br></pre></td></tr></table></figure>
-
-<p>返回的的结果是 456.54</p>
-<h4 id="count"><a href="#count" class="headerlink" title="@count"></a><strong>@count</strong></h4><p>指定 @count 操作符时，<code>valueForKeyPath:</code> 将返回集合的数量在一个 NSNumber 对象中。如果出现了右路径将会被忽略。</p>
-<p>获取 Transaction 中 transactions 个对象的数量：</p>
-<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="built_in">NSNumber</span> *numberOfTransactions = [<span class="keyword">self</span>.transactions valueForKeyPath:<span class="string">@&quot;@count&quot;</span>];</span><br></pre></td></tr></table></figure>
-
-<p>返回的结果是 13。</p>
-<h4 id="max"><a href="#max" class="headerlink" title="@max"></a><strong>@max</strong></h4><p>指定 @max 操作符时，<code>valueForKeyPath:</code> 方法将在右路径指向的集合元素中执行搜索，并返回最大值。该搜索通过调用 <code>compare:</code> 方法进行比较（此方法由许多 Foundation 类（如NSNumber）定义）。因此，右路径对应的属性必须包含能响应此方法的有效对象，搜索过程会自动忽略值为 nil 的集合元素。</p>
-<p>要获取表 4-1 中列出的交易中最大日期值，即最新交易的日期：</p>
-<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="built_in">NSDate</span> *latestDate = [<span class="keyword">self</span>.transactions valueForKeyPath:<span class="string">@&quot;@max.date&quot;</span>];</span><br></pre></td></tr></table></figure>
-
-<p>格式化的 latestDate 值为 2016 年 7 月 15 日。</p>
-<h4 id="min"><a href="#min" class="headerlink" title="@min"></a><strong>@min</strong></h4><p>指定 @min 操作符时，valueForKeyPath: 将在右路径命名的集合元素中搜索并返回最小的元素。搜索使用 compare: 方法进行比较，该方法由许多基础类（例如 NSNumber 类）定义。因此，右路径对应的属性必须包含能响应此方法的有效对象，搜索过程会自动忽略值为 nil 的集合元素。</p>
-<p>要获得表 4-1 中列出的交易中最早交易的最小日期值，即最早交易的日期：</p>
-<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="built_in">NSDate</span> *earliestDate = [<span class="keyword">self</span>.transactions valueForKeyPath:<span class="string">@&quot;@min.date&quot;</span>]; </span><br></pre></td></tr></table></figure>
-
-<p>格式化的 earliestDate 值为 2015 年 12 月 1 日。</p>
-<h4 id="sum"><a href="#sum" class="headerlink" title="@sum"></a><strong>@sum</strong></h4><p>指定 @sum 操作符时，<code>valueForKeyPath:</code> 会读取集合中每个元素的正确键路径指定的属性，将其转换为 double（用 0 替换 nil 值），并计算这些值的总和。然后返回存储在 NSNumber 实例中的结果。</p>
-<p>要获取表 4-1 中示例数据中交易金额的总和：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">NSNumber *amountSum = [self.transactions valueForKeyPath:@&quot;@sum.amount&quot;]; </span><br></pre></td></tr></table></figure>
-
-<p>返回的结果是 5,935.00</p>
-<h3 id="数组操作符"><a href="#数组操作符" class="headerlink" title="数组操作符"></a>数组操作符</h3><p>数组操作符导致 <code>valueForKeyPath:</code> 返回一个对象数组，该数组对应于右键路径指示的特定对象集。</p>
-<blockquote>
-<p>重要</p>
-<p>如果使用数组操作符时，如果任何叶对象为 nil，则 <code>valueForKeyPath:</code> 方法会引发异常。</p>
-</blockquote>
-<h4 id="distinctUnionOfObjects"><a href="#distinctUnionOfObjects" class="headerlink" title="@distinctUnionOfObjects"></a><strong>@distinctUnionOfObjects</strong></h4><p>指定 @distinctUnionOfObjects 操作符时，<code>valueForKeyPath:</code> 将创建并返回一个数组，其中包含与正确键路径指定的属性相对应的集合的不同对象。</p>
-<p>要获取 transactions 中交易的 payee 属性值集合，但省略重复值：</p>
-<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="built_in">NSArray</span> *distinctPayees = [<span class="keyword">self</span>.transactions valueForKeyPath:<span class="string">@&quot;@distinctUnionOfObjects.payee&quot;</span>]; </span><br></pre></td></tr></table></figure>
-
-<p>生成的 distinctPayees 数组包含以下字符串中的每个实例：Car Loan、General Cable、Animal Hospital、Green Power、Mortgage。</p>
-<h4 id="unionOfObjects"><a href="#unionOfObjects" class="headerlink" title="@unionOfObjects"></a><strong>@unionOfObjects</strong></h4><p>指定 @unionOfObjects 操作符时，<code>valueForKeyPath:</code> 将创建并返回一个数组，其中包含与正确键路径指定的属性相对应的集合的所有对象。与 @distinctUnionOfObjects 不同，重复的对象不会被删除。</p>
-<p>要获取 transactions 中交易的 payee 属性值的集合：。</p>
-<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="built_in">NSArray</span> *payees = [<span class="keyword">self</span>.transactions valueForKeyPath:<span class="string">@&quot;@unionOfObjects.payee&quot;</span>]; </span><br></pre></td></tr></table></figure>
-
-<p>生成的 payees 数组包含以下字符串：Green Power、Green Power、Green Power、Car Loan、Car Loan、Car Loan、General Cable、General Cable、General Cable、Mortgage、Mortgage、Mortgage、Animal Hospital。注意重复项</p>
-<h3 id="嵌套操作符"><a href="#嵌套操作符" class="headerlink" title="嵌套操作符"></a>嵌套操作符</h3><p>嵌套操作符作用于嵌套集合 —— 即集合中的每个条目本身又包含一个集合。</p>
-<blockquote>
-<p>重要提示</p>
-<p>当使用嵌套操作符时，若任何叶节点对象为 nil，valueForKeyPath: 方法将触发异常。</p>
-</blockquote>
-<p>下文描述基于名为 moreTransactions 的新数据数组（数据内容见表4-2），该数组与原始 transactions 数组（来自”样本数据”部分）共同构成嵌套数组：</p>
-<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="built_in">NSArray</span>* moreTransactions = @[&lt;<span class="meta"># transaction data #&gt;];</span></span><br><span class="line"><span class="built_in">NSArray</span>* arrayOfArrays = @[<span class="keyword">self</span>.transactions, moreTransactions];</span><br></pre></td></tr></table></figure>
-
-<p>表4-2 moreTransactions 阵列中假设的 Transaction 数据。</p>
-<table>
-<thead>
-<tr>
-<th>payee</th>
-<th>amount</th>
-<th>date</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>General Cable - Cottage</td>
-<td>$120.00</td>
-<td>Dec 18, 2015</td>
-</tr>
-<tr>
-<td>General Cable - Cottage</td>
-<td>$155.00</td>
-<td>Jan 9, 2016</td>
-</tr>
-<tr>
-<td>General Cable - Cottage</td>
-<td>$120.00</td>
-<td>Dec 1, 2016</td>
-</tr>
-<tr>
-<td>Second Mortgage</td>
-<td>$1,250.00</td>
-<td>Nov 15, 2016</td>
-</tr>
-<tr>
-<td>Second Mortgage</td>
-<td>$1,250.00</td>
-<td>Sep 20, 2016</td>
-</tr>
-<tr>
-<td>Second Mortgage</td>
-<td>$1,250.00</td>
-<td>Feb 12, 2016</td>
-</tr>
-<tr>
-<td>Hobby Shop</td>
-<td>$600.00</td>
-<td>Jun 14, 2016</td>
-</tr>
-</tbody></table>
-<h4 id="distinctUnionOfArrays"><a href="#distinctUnionOfArrays" class="headerlink" title="@distinctUnionOfArrays"></a><strong>@distinctUnionOfArrays</strong></h4><p>当指定 @distinctUnionOfArrays 操作符时，<code>valueForKeyPath:</code> 方法将创建并返回一个新数组，其中包含右路径指定属性对应的所有集合去重合并后的唯一对象。</p>
-<p>要获取数组集合 arrayOfArrays 中所有 payee 属性的去重值：</p>
-<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="built_in">NSArray</span> *collectedDistinctPayees = [arrayOfArrays valueForKeyPath:<span class="string">@&quot;@distinctUnionOfArrays.payee&quot;</span>]; </span><br></pre></td></tr></table></figure>
-
-<p>生成的 collectedDistinctPayees 数组将包含以下值：Hobby Shop, Mortgage, Animal Hospital, Second Mortgage, Car Loan, General Cable - Cottage, General Cable, Green Power。</p>
-<h4 id="unionOfArrays"><a href="#unionOfArrays" class="headerlink" title="@unionOfArrays"></a><strong>@unionOfArrays</strong></h4><p>指定 @unionOfArrays 操作符时，<code>valueForKeyPath:</code> 将创建并返回一个数组，其中包含与正确键路径指定的属性相对应的所有集合组合的所有对象，而不删除重复项。</p>
-<p>获取 arrayOfArrays 内所有数组中的 payee 属性的值：。</p>
-<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="built_in">NSArray</span> *collectedPayees = [arrayOfArrays valueForKeyPath:<span class="string">@&quot;@unionOfArrays.payee&quot;</span>];</span><br></pre></td></tr></table></figure>
-
-<p>生成的 collectedPayees 数组包含以下值：Green Power、Green Power、Green Power、Car Loan、Car Loan、Car Loan、General Cable、General Cable、General Cable、Mortgage、Mortgage、Mortgage、Mortgage、Animal Hospital、General Cable - Cottage、General Cable - Cottage、General Cable - Cottage、Second Mortgage、Second Mortgage、Second Mortgage、Hobby Shop。</p>
-<h4 id="distinctUnionOfSets"><a href="#distinctUnionOfSets" class="headerlink" title="@distinctUnionOfSets"></a><strong>@distinctUnionOfSets</strong></h4><p>指定 @distinctUnionOfSets 操作符时，<code>valueForKeyPath:</code> 将创建并返回一个 NSSet 对象，其中包含与右键路径指定的属性相对应的所有集合组合的不同对象。</p>
-<p>此操作符的行为与 @distinctUnionOfArrays 类似，不同之处在于它需要一个包含 NSSet 对象实例的 NSSet 实例，而不是 NSArray 实例的 NSArray 实例。此外，它还返回一个 NSSet 实例。假设示例数据存储在集合而不是数组中，则示例调用和结果与 @distinctUnionOfArrays 中显示的结果相同。</p>
-<blockquote>
-<p>个人小结</p>
-<p>关于集合操作符，这点估计是蛮多人的盲点，反正作者没看过这篇文档之前是不知道还能这么写的，所以实际用到的也不多。个人感觉意义其实不是很大，就是简化了一些操作，每个集合操作符都可以拆开为其他几句代码，使用它就相当于能少些几句代码。</p>
-</blockquote>
-<h2 id="非对象属性的处理"><a href="#非对象属性的处理" class="headerlink" title="非对象属性的处理"></a>非对象属性的处理</h2><p>NSObject 默认提供的键值编码协议方法实现，既能处理对象类型的属性，也能处理非对象类型（比如标量或结构体）的属性。它的默认实现会在对象类型的参数或返回值，与底层存储的非对象类型属性之间，自动进行封装和拆箱（boxing&#x2F;unboxing）。这样一来，无论属性实际是一个对象，还是一个整型、浮点数或结构体，键值访问方法（getter&#x2F;setter）的参数和返回值签名始终保持为对象类型，接口一致性得以保证。</p>
-<blockquote>
-<p>注意：</p>
-<p>由于 Swift 中的所有属性都是对象，因此本部分仅适用于 Objective-C 属性。</p>
-</blockquote>
-<p>当您调用协议中的某个获取器，例如 <code>valueForKey:</code> 时，默认实现会根据《访问器搜索逻辑》中描述的规则确定为指定键提供值的具体访问器方法或实例变量。如果返回值不是对象，获取器会使用该值初始化一个 NSNumber 对象（对于标量）或 NSValue 对象（对于结构），然后返回该对象。</p>
-<p>同样，默认情况下，像 <code>setValue:forKey:</code> 这样的 setter 会根据特定的键确定属性访问器或实例变量所需的数据类型。如果数据类型不是对象，setter 会先向传入的值对象发送一个适当的 <type>Value 消息来提取底层数据，并将该数据存储起来。</p>
-<blockquote>
-<p>注意：</p>
-<p>当您使用非对象属性的 nil 值调用键值编码协议的 setter 方法时，setter 方法没有明显的一般处理方式。因此，它会向接收 setter 调用的对象发送一个 <code>setNilValueForKey:</code> 消息。默认实现会抛出一个 NSInvalidArgumentException 异常，但子类可以覆盖此行为，例如设置一个标记值或提供一个有意义的默认值。</p>
-</blockquote>
-<h3 id="包装和解包标量类型"><a href="#包装和解包标量类型" class="headerlink" title="包装和解包标量类型"></a>包装和解包标量类型</h3><p>表 5-1 列出了默认键值编码实现使用 NSNumber 实例包装的标量类型。对于每种数据类型，表格显示了用于从底层属性值初始化 NSNumber 以提供 getter 返回值的创建方法。然后显示了在设置操作中从 setter 输入参数提取值的访问器方法。</p>
-<p>表 5-1 中的标量类型作为 NSNumber 对象的封装</p>
-<table>
-<thead>
-<tr>
-<th>Data type</th>
-<th>Creation method</th>
-<th>Accessor method</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>BOOL</td>
-<td>numberWithBool:</td>
-<td>boolValue(在 iOS 中)<br>charValue(在 macOS 中)</td>
-</tr>
-<tr>
-<td>char</td>
-<td>numberWithChar:</td>
-<td>charValue</td>
-</tr>
-<tr>
-<td>double</td>
-<td>numberWithDouble:</td>
-<td>doubleValue</td>
-</tr>
-<tr>
-<td>float</td>
-<td>numberWithFloat:</td>
-<td>floatValue</td>
-</tr>
-<tr>
-<td>int</td>
-<td>numberWithInt:</td>
-<td>intValue</td>
-</tr>
-<tr>
-<td>long</td>
-<td>numberWithLong:</td>
-<td>longValue</td>
-</tr>
-<tr>
-<td>long long</td>
-<td>numberWithLongLong:</td>
-<td>longLongValue</td>
-</tr>
-<tr>
-<td>short</td>
-<td>numberWithShort:</td>
-<td>shortValue</td>
-</tr>
-<tr>
-<td>unsigned char</td>
-<td>numberWithUnsignedChar:</td>
-<td>unsignedChar</td>
-</tr>
-<tr>
-<td>unsigned int</td>
-<td>numberWithUnsignedInt:</td>
-<td>unsignedInt</td>
-</tr>
-<tr>
-<td>unsigned long</td>
-<td>numberWithUnsignedLong:</td>
-<td>unsignedLong</td>
-</tr>
-<tr>
-<td>unsigned long long</td>
-<td>numberWithUnsignedLongLong:</td>
-<td>unsignedLongLong</td>
-</tr>
-<tr>
-<td>unsigned short</td>
-<td>numberWithUnsignedShort:</td>
-<td>unsignedShort</td>
-</tr>
-</tbody></table>
-<blockquote>
-<p>注意</p>
-<p>在 macOS 中，由于历史原因， BOOL 被定义为 signed char 类型，而 KVC 不区分这两种类型。因此，当你使用一个 BOOL 类型的键时，不应该传递字符串值如 @“true” 或 @“YES” 给 setValue:forKey: 。KVC 会尝试调用 charValue （因为 BOOL 本质上是 char 类型），但 NSString 并没有实现这个方法，这会导致运行时错误。相反，当你使用一个 BOOL 类型的键时，应该只传递一个 NSNumber 对象，如 @(1) 或 @(YES) 作为 setValue:forKey: 方法的值参数。这种限制在 iOS 中并不适用，因为在 iOS 中 BOOL 被定义为原生的布尔类型 bool ，KVC 会调用 boolValue ，它可以处理 NSNumber 对象或格式正确的 NSString 对象。</p>
-</blockquote>
-<h3 id="包装和解包结构类型"><a href="#包装和解包结构类型" class="headerlink" title="包装和解包结构类型"></a>包装和解包结构类型</h3><p>表 5-2 列出了默认访问器用于包装和解包常见的 NSPoint 、 NSRange 、 NSRect 和 NSSize 结构的创建和访问方法。</p>
-<p>表 5-2 中常见的 struct 类型是如何使用 NSValue 进行包装的。</p>
-<table>
-<thead>
-<tr>
-<th>Data type</th>
-<th>Creation method</th>
-<th>Accessor method</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>NSPoint</td>
-<td>valueWithPoint:</td>
-<td>pointValue</td>
-</tr>
-<tr>
-<td>NSRange</td>
-<td>valueWithRange::</td>
-<td>rangeValue</td>
-</tr>
-<tr>
-<td>NSRect</td>
-<td>valueWithRect: (仅限 macOS)</td>
-<td>rectValue</td>
-</tr>
-<tr>
-<td>NSSize</td>
-<td>valueWithSize:</td>
-<td>sizeValue</td>
-</tr>
-</tbody></table>
-<p>自动包装和解包不仅限于 NSPoint 、 NSRange 、 NSRect 和 NSSize 。结构类型（即其 Objective-C 类型编码字符串以 { 开头的类型）可以被包装成一个 NSValue 对象。例如，考虑在列表 5-1 中声明的结构和类接口。</p>
-<p>列表 5-1 一个使用自定义结构的示例类</p>
-<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> &#123;</span><br><span class="line">    <span class="type">float</span> x, y, z;</span><br><span class="line">&#125; ThreeFloats;</span><br><span class="line"> </span><br><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">MyClass</span></span></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>) ThreeFloats threeFloats;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
-
-<p>通过名为 myClass 的此类实例，您可以使用键值编码获取 threeFloats 的值</p>
-<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="built_in">NSValue</span>* result = [myClass valueForKey:<span class="string">@&quot;threeFloats&quot;</span>]; </span><br></pre></td></tr></table></figure>
-
-<p>默认实现的 <code>valueForKey:</code> 调用 threeFloats 的获取器方法，然后将结果包装在一个 NSValue 对象中返回。</p>
-<p>同样，你可以使用键值编码设置 threeFloats 的值</p>
-<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line">ThreeFloats floats = &#123;<span class="number">1.</span>, <span class="number">2.</span>, <span class="number">3.</span>&#125;;</span><br><span class="line"><span class="built_in">NSValue</span>* value = [<span class="built_in">NSValue</span> valueWithBytes:&amp;floats objCType:<span class="keyword">@encode</span>(ThreeFloats)];</span><br><span class="line">[myClass setValue:value forKey:<span class="string">@&quot;threeFloats&quot;</span>];</span><br></pre></td></tr></table></figure>
-
-<p>默认实现会通过 <code>getValue:</code> 消息解包值，然后使用结果结构调用 setThreeFloats: 。</p>
-<h2 id="验证属性"><a href="#验证属性" class="headerlink" title="验证属性"></a>验证属性</h2><p>键值编码协议定义了方法来支持属性验证。就像你使用基于键的访问器来读取和写入键值编码兼容对象的属性一样，你也可以通过键（或键路径）来验证属性。当你调用 <code>validateValue:forKey:error:</code> （或 <code>validateValue:forKeyPath:error:</code> ）方法时，协议的默认实现会在接收验证消息的对象（或键路径的终点对象）中搜索一个方法，该方法的名称符合 validate<Key>:error: 的模式。如果对象没有这样的方法，验证默认成功，并返回 YES 。当存在特定于属性的验证方法时，协议的默认实现会调用该方法并返回其结果。</p>
-<blockquote>
-<p>注意</p>
-<p>通常你只在 Objective-C 中使用这里描述的验证。在 Swift 中，属性验证通常通过依赖编译器对可选类型和强类型检查的支持来处理，同时使用内置的 willSet 和 didSet 属性观察者来测试任何运行时 API 合约，如《Swift 编程语言（Swift 3）》一书的属性观察者部分所述。</p>
-</blockquote>
-<p>因为属性特定的验证方法通过引用接收值和错误参数，验证可能有三种结果：</p>
-<ol>
-<li><p>验证方法认为值对象有效，并返回 YES ，而不修改值或错误。</p>
-</li>
-<li><p>验证方法认为值对象无效，但不对其进行修改。在这种情况下，该方法返回 NO ，并设置错误引用（如果由调用者提供）为一个表示失败原因的 NSError 对象。</p>
-</li>
-<li><p>验证方法认为值对象无效，但会创建一个新的有效对象作为替代。在这种情况下，方法返回 YES ，同时保留错误对象不变。在返回之前，方法会修改值引用，使其指向新的值对象。每当进行修改时，方法总是会创建一个新的对象，而不是修改旧的对象，即使该对象是可变的。</p>
-</li>
+<h2 id="采用键值编码协议"><a href="#采用键值编码协议" class="headerlink" title="采用键值编码协议"></a>采用键值编码协议</h2><ol start="8">
+<li><input disabled="" type="checkbox"> 实现基本键值编码合规性			</li>
+<li><input disabled="" type="checkbox"> 定义集合方法					</li>
+<li><input disabled="" type="checkbox"> 处理非对象值					</li>
+<li><input disabled="" type="checkbox"> 添加验证						</li>
+<li><input disabled="" type="checkbox"> 描述属性关系					</li>
+<li><input disabled="" type="checkbox"> 以性能为导向进行设计</li>
+<li><input disabled="" type="checkbox"> 合规性检查清单</li>
 </ol>
-<p>列表 6-1 展示了如何为名称字符串调用验证的示例。</p>
-<p>列表 6-1 名称属性的验证</p>
+<h1 id="常见疑惑及解答"><a href="#常见疑惑及解答" class="headerlink" title="常见疑惑及解答"></a>常见疑惑及解答</h1><p>以下是作者对这篇文档的一些疑问以及结合 AI 的回答。</p>
+<h2 id="属性验证是什么鬼？"><a href="#属性验证是什么鬼？" class="headerlink" title="属性验证是什么鬼？"></a>属性验证是什么鬼？</h2><p>Person 有一个 <code>NSString *name</code> 属性，如果需要给 name 添加验证则在内部添加以下代码</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line">- (<span class="type">BOOL</span>)validateName:(<span class="type">id</span> *)ioValue error:(<span class="built_in">NSError</span> * __autoreleasing *)outError&#123;</span><br><span class="line">    <span class="keyword">if</span> ((*ioValue == <span class="literal">nil</span>) || ([(<span class="built_in">NSString</span> *)*ioValue length] &lt; <span class="number">2</span>)) &#123;</span><br><span class="line">        <span class="keyword">if</span> (outError != <span class="literal">NULL</span>) &#123;</span><br><span class="line">            *outError = [<span class="built_in">NSError</span> errorWithDomain:PersonErrorDomain</span><br><span class="line">                                            code:PersonInvalidNameCode</span><br><span class="line">                                        userInfo:@&#123; <span class="built_in">NSLocalizedDescriptionKey</span></span><br><span class="line">                                                    : <span class="string">@&quot;Name too short&quot;</span> &#125;];</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">NO</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">YES</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在外部使用属性验证：</p>
 <figure class="highlight objc"><table><tr><td class="code"><pre><span class="line">Person* person = [[Person alloc] init];</span><br><span class="line"><span class="built_in">NSError</span>* error;</span><br><span class="line"><span class="built_in">NSString</span>* name = <span class="string">@&quot;John&quot;</span>;</span><br><span class="line"><span class="keyword">if</span> (![person validateValue:&amp;name forKey:<span class="string">@&quot;name&quot;</span> error:&amp;error]) &#123;</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@&quot;%@&quot;</span>,error);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<h3 id="自动验证"><a href="#自动验证" class="headerlink" title="自动验证"></a>自动验证</h3><p>通常，键值编码协议及其默认实现并未定义任何自动执行验证的机制。相反，您应在适当的情况下使用验证方法。</p>
-<p>某些其他 Cocoa 技术在某些情况下会自动进行验证。例如，Core Data 在保存管理对象上下文时会自动进行验证（参见 Core Data 编程指南）。此外，在 macOS 中，Cocoa 绑定允许您指定验证应自动进行（参见 Cocoa 绑定编程主题以获取更多信息）。</p>
-<blockquote>
-<p>个人总结</p>
-<p>这个验证属性功能，作者几乎没有使用过，也没怎么遇到过。。。</p>
-</blockquote>
-<h2 id="访问器搜索逻辑"><a href="#访问器搜索逻辑" class="headerlink" title="访问器搜索逻辑"></a>访问器搜索逻辑</h2><p>键值编码协议的默认实现由 <code>NSObject</code> 提供，通过一组明确定义的规则将基于键的访问器调用映射到对象的底层属性。这些协议方法使用一个键参数，在其自身对象实例中搜索访问器、实例变量以及遵循特定命名约定的相关方法。尽管你很少会修改这种默认搜索，但了解其工作原理对于追踪键值编码对象的行为以及使自己的对象符合要求都是很有帮助的。</p>
-<blockquote>
-<p>注意</p>
-<p>本节中的描述使用了 <code>&lt;key&gt;</code> 或 <code>&lt;Key&gt;</code> 作为占位符，代表出现在某个键值编码协议方法参数中的键字符串，该方法随后使用该字符串作为次要方法调用或变量名查找的一部分。映射的属性名称遵循占位符的大小写。例如，对于获取器 <code>&lt;key&gt;</code> 和 <code>is&lt;Key&gt;</code>，名为 hidden 的属性映射到 <code>hidden</code> 和 <code>isHidden</code>。</p>
-</blockquote>
-<h3 id="基本-getter-的搜索逻辑"><a href="#基本-getter-的搜索逻辑" class="headerlink" title="基本 getter 的搜索逻辑"></a>基本 getter 的搜索逻辑</h3><p>默认实现的 <code>valueForKey:</code> ，在接收到 <code>valueForKey:</code> 参数时，会在接收该调用的类实例内部执行以下过程。</p>
+<p>谁会用到这么奇葩的功能？直接在 setter 方法里面对入参进行验证就非常合理了啊。为什么还要这么脱了裤子放屁？</p>
+<p>上面的例子就是 KVC 的属性验证机制（validate<Key>:error:），很多人第一次看到的时候都会觉得：「这玩意儿不是多此一举吗？我直接在 setter 里校验不就好了？」</p>
+<h3 id="为什么会有-validate-error-这种“奇葩”设计？"><a href="#为什么会有-validate-error-这种“奇葩”设计？" class="headerlink" title="为什么会有 validate:error: 这种“奇葩”设计？"></a>为什么会有 validate<Key>:error: 这种“奇葩”设计？</h3><p>要理解它，就要从 KVC&#x2F;KVO 的历史定位来看：</p>
 <ol>
-<li><p>首先，在实例中查找第一个名为 get&lt;Key&gt; 、 &lt;key&gt; 、 is&lt;Key&gt; 或 _&lt;key&gt; 的访问器方法。如果找到该方法，则调用它，并将结果作为输入进行第 5 步。否则，继续下一步。</p>
+<li>KVC 不是给你写普通 app 的<ul>
+<li>它的目标是：让对象能被 跨语言、跨工具访问。</li>
+<li>AppleScript、Interface Builder、Core Data、Bindings（数据绑定）、甚至一些旧的 Cocoa 工具，全都依赖 KVC。</li>
+</ul>
 </li>
-<li><p>如果没有找到简单的访问器方法，则在实例中查找名称匹配 countOf&lt;Key&gt; 和 objectIn&lt;Key&gt;AtIndex: （对应于 NSArray 类定义的原始方法）以及 &lt;key&gt;AtIndexes: （对应于 NSArray 方法 objectsAtIndexes: ）的方法。</p>
-<p> 如果找到了第一个这些方法，并且至少找到了另外两个方法中的一个，则创建一个集合代理对象，该对象能够响应所有 NSArray 方法，并返回该对象。否则，继续下一步。</p>
-<p> 代理对象随后会将接收到的任何 NSArray 消息转换为对符合键值编码的对象的一些 countOf&lt;Key&gt; 、 objectIn&lt;Key&gt;AtIndex: 和 &lt;key&gt;AtIndexes: 消息。如果原始对象还实现了一个可选的方法，其名称类似于 get&lt;Key&gt;:range: ，代理对象在适当的情况下也会使用该方法。实际上，代理对象与符合键值编码的对象一起工作，使得底层属性的行为类似于 NSArray ，即使它不是。</p>
+<li>setter 校验 vs validate 校验<ul>
+<li>setter 校验：调用 setAge: 时能拦截无效值，没问题。</li>
+<li>KVC 校验：当外部用 <code>setValue:forKey:</code> 或者 UI 绑定框架（比如 Interface Builder 的 Cocoa Bindings）在更新属性前，就能调用 <code>validate&lt;Key&gt;:error:</code> 来判断输入值是否合法。</li>
+<li>好处是：UI 层可以在赋值前发现问题，不会直接 crash，也可以通过 <code>NSError</code> 把信息传回界面，弹个提示。</li>
+</ul>
 </li>
-<li><p>如果未找到简单的访问器方法或一组数组访问方法，则查找名为 countOf&lt;Key&gt; 、 enumeratorOf&lt;Key&gt; 和 memberOf&lt;Key&gt;: 的三组方法（对应于由 NSSet 类定义的基本方法）。</p>
-<p> 如果找到了这三个方法，创建一个集合代理对象，该对象能够响应所有 NSSet 消息，并返回该对象。否则，继续执行步骤 4。</p>
-<p> 代理对象随后会将接收到的任何 NSSet 消息转换为对创建它的对象的一些 countOf&lt;Key&gt; 、 enumeratorOf&lt;Key&gt; 和 memberOf&lt;Key&gt;: 消息。实际上，代理对象与符合键值编码的对象一起工作，使得底层属性的行为类似于 NSSet ，即使它不是。</p>
-</li>
-<li><p>如果未找到简单的访问器方法或集合访问器方法组，并且接收者的类方法 accessInstanceVariablesDirectly 返回 YES ，则按顺序查找名为 _&lt;key&gt; 、 _is&lt;Key&gt; 、 &lt;key&gt; 或 is&lt;Key&gt; 的实例变量。如果找到，直接获取实例变量的值并进行第 5 步。否则，进行第 6 步。</p>
-</li>
-<li><p>如果检索到的属性值是对象指针，则直接返回结果。</p>
-<p> 如果值是 NSNumber 支持的标量类型，则将其存储在 NSNumber 实例中并返回该实例。</p>
-<p> 如果结果是 NSValue 不支持的标量类型，则将其转换为 NSValue 对象并返回该对象。</p>
-</li>
-<li><p>如果其他方法都无效，可以调用 valueForUndefinedKey: 。默认情况下，这会抛出异常，但 NSObject 的子类可以提供特定于键的行为。</p>
+<li>实际用途：数据绑定 (Cocoa Bindings)<ul>
+<li>在 macOS AppKit 里，有个很冷门但很强大的特性：Bindings。</li>
+<li>比如一个文本框直接绑定到 <code>person.age</code>，当用户输入值时，AppKit 会在背后调用 <code>validateAge:error:</code> 来校验。</li>
+<li>如果校验失败，UI 可以自动显示错误提示，而不是你手动写代码去监听输入变化再验证。</li>
+</ul>
 </li>
 </ol>
-<h3 id="基本-setter-的搜索逻辑"><a href="#基本-setter-的搜索逻辑" class="headerlink" title="基本 setter 的搜索逻辑"></a>基本 setter 的搜索逻辑</h3><p>给定 key 和 value 参数， setValue:forKey: 的默认实现尝试在接收调用的对象中将名为 key 的属性设置为 value （或者，对于非对象属性，设置为其未包装的版本，如在非对象属性的处理中所述），使用以下步骤：</p>
+<h3 id="为什么感觉“没用”？"><a href="#为什么感觉“没用”？" class="headerlink" title="为什么感觉“没用”？"></a>为什么感觉“没用”？</h3><ul>
+<li>在 iOS 开发里，这套机制几乎没人用，因为 iOS 从来没有推行 Cocoa Bindings。</li>
+<li>在 macOS 桌面应用（特别是老一代 AppKit + Interface Builder）里，确实有人用过这套机制来省掉 UI 验证逻辑。</li>
+<li>Apple 后来也逐渐弱化了 Bindings，转向更现代的 SwiftUI 数据流模型，所以这个东西在新代码里几乎成了遗迹。</li>
+</ul>
+<h3 id="所以结论是："><a href="#所以结论是：" class="headerlink" title="所以结论是："></a>所以结论是：</h3><ul>
+<li><strong>✅ 现代 iOS&#x2F;Swift 开发者：完全不用管 <code>validate&lt;Key&gt;:error:</code>，直接在 setter 或者数据模型层自己写验证就好。</strong></li>
+<li>🌀 历史原因：它主要是给 KVC + Bindings 体系设计的，让 UI 能在赋值之前通过统一协议进行验证。</li>
+<li>📖 文档之所以写这么多：Apple 文档要保证完整性，告诉你 KVC 提供了这个 hook，但没告诉你“99% 的人不会用到”。</li>
+</ul>
+<p>其实你这句话非常有代表性：</p>
+<blockquote>
+<p>“直接在属性的 setter 方法里面对入参进行验证不比这脱了裤子放屁爽多了？”</p>
+</blockquote>
+<p>这也是为什么 绝大多数 iOS&#x2F;macOS 开发者对 <code>validate&lt;Key&gt;</code> 只停留在知道但不用的层面。</p>
+<h2 id="实现基本键值编码合规性要我做什么？"><a href="#实现基本键值编码合规性要我做什么？" class="headerlink" title="实现基本键值编码合规性要我做什么？"></a>实现基本键值编码合规性要我做什么？</h2><p>在大多数场景下，只要使用 @property 并让编译器自动生成 ivar 和访问器（accessor），就能自动满足 KVC（Key-Value Coding）要求，开发者无需手动实现绝大多数行为。只有在你的对象存在非对象属性的时候，必须重写 <code>setNilValueForKey:</code> 方法来避免可能的崩溃，实践中也建议在 <code>setNilValueForKey:</code> 内尽量使用 <code>setValue:forKey:</code>，以保证 KVO 通知等机制能正确触发，而不是直接设值或设置 ivar 。</p>
+<h2 id="什么时候需要定义集合方法？"><a href="#什么时候需要定义集合方法？" class="headerlink" title="什么时候需要定义集合方法？"></a>什么时候需要定义集合方法？</h2><p>这一节的内容我相信也是很多人十分不理解的一节。集合不是有专门的 <code>mutableXXXValueForKey:</code> 这样的集合获取方法吗？然后就可以通过这个方法返回的结果，对集合属性进行任何增删改操作啊，还支持 KVO 功能。集合属性只需要通过 <code>mutableXXXValueForKey:</code> 不需要看起来也没有必要实现任何其他 KVC 的那些集合方法啊?</p>
+<h3 id="1-mutableXXXValueForKey-的机制"><a href="#1-mutableXXXValueForKey-的机制" class="headerlink" title="1. mutableXXXValueForKey: 的机制"></a>1. <code>mutableXXXValueForKey:</code> 的机制</h3><ul>
+<li>调用 <code>mutableArrayValueForKey:@&quot;someProperty&quot;</code> 时，KVC runtime 会返回一个 <strong>特殊的代理对象</strong>（不是你原始的 NSMutableArray）。</li>
+<li>这个代理对象拦截 <code>addObject:</code> &#x2F; <code>removeObject:</code> 等操作，转发给你的对象。</li>
+<li>这样做的好处是：<ul>
+<li>自动触发 KVO 通知（观察者会知道集合变动了）。</li>
+<li>统一封装逻辑（外部调用者不用关心你集合的真实存储结构）。</li>
+</ul>
+</li>
+</ul>
+<p>所以，如果你只是自己在 Swift&#x2F;Objective-C 里操作集合，并且依赖 KVO，确实只需要用 <code>mutableArrayValueForKey:</code> 就够了。</p>
+<h3 id="2-Collection-Methods（countOf-等）的作用"><a href="#2-Collection-Methods（countOf-等）的作用" class="headerlink" title="2. Collection Methods（countOf&lt;Key&gt; 等）的作用"></a>2. Collection Methods（<code>countOf&lt;Key&gt;</code> 等）的作用</h3><ul>
+<li>这些方法并不是为了你写代码时方便，而是为了 KVC runtime 能够在不同语言&#x2F;上下文中自动把属性“当作集合”来使用。</li>
+<li>举例：<ul>
+<li>AppleScript 想访问 <code>myObj.items[0]</code>，它不会直接知道 items 是一个 NSMutableArray。</li>
+<li>KVC runtime 会尝试调用 <code>countOfItems</code>、<code>objectInItemsAtIndex:</code> 等方法，把你的对象包装成集合接口。</li>
+<li>这样就算你内部不是用 NSArray 存储，而是用数据库、懒加载列表、Core Data faulting，KVC 依然能“装配”成一个可以下标访问的集合。</li>
+</ul>
+</li>
+<li>换句话说：<ul>
+<li><code>mutableArrayValueForKey:</code> → 是给 <strong>你主动获取可变集合代理</strong> 时用的。</li>
+<li>Collection Methods → 是给 KVC runtime 在更通用&#x2F;语言无关场景下 自动装配集合访问的。</li>
+</ul>
+</li>
+</ul>
+<h3 id="3-什么时候用哪个？"><a href="#3-什么时候用哪个？" class="headerlink" title="3. 什么时候用哪个？"></a>3. 什么时候用哪个？</h3><ul>
+<li>一般应用开发者（写 iOS &#x2F; macOS app，用 ObjC&#x2F;Swift）<ul>
+<li>不需要自己去写 <code>countOf&lt;Key&gt; / objectIn&lt;Key&gt;AtIndex:</code> 这种 Collection Methods。</li>
+<li>只要集合属性真的是 <code>NSMutableArray/NSMutableSet/NSMutableDictionary</code>，再通过 <code>mutableArrayValueForKey: / mutableSetValueForKey: / mutableDictionaryValueForKey:</code> 拿代理，就能满足 增删改查 + 自动 KVO 的需求。</li>
+<li>这是绝大多数开发者的场景。</li>
+</ul>
+</li>
+<li>Apple 文档里强调的 Collection Methods<ul>
+<li>更偏向 框架作者 &#x2F; 跨语言交互 &#x2F; 特殊存储结构 的情况。</li>
+<li>比如：<ul>
+<li>你内部集合不是用 NSMutableArray 存，而是懒加载、数据库查询、Core Data faulting 等。</li>
+<li>或者你需要让 AppleScript &#x2F; JavaScriptCore &#x2F; KVC runtime 能把你的对象属性“包装成集合”。</li>
+</ul>
+</li>
+<li>这种情况下才需要你实现那一套方法，让 runtime 知道怎么装配出一个“集合语义”。</li>
+</ul>
+</li>
+</ul>
+<p>Apple 文档写得很“学术”，通篇把 KVC 的 accessor conventions 列出来，却没强调“普通开发者大多情况下用不到，直接用 <code>mutableXXXValueForKey:</code> 就行”。这也是 Apple 文档的一大毛病 —— 为了完整性，把所有机制罗列出来，但没有给读者一个“实用优先级”指引，让人误以为“是不是每个集合属性都要写一大堆方法”。</p>
+<h2 id="描述属性关系这一篇到底在讲什么东西？作为iOS应用开发者到底要干什么？"><a href="#描述属性关系这一篇到底在讲什么东西？作为iOS应用开发者到底要干什么？" class="headerlink" title="描述属性关系这一篇到底在讲什么东西？作为iOS应用开发者到底要干什么？"></a>描述属性关系这一篇到底在讲什么东西？作为iOS应用开发者到底要干什么？</h2><h3 id="1-这篇《描述属性关系》文档到底在讲什么？"><a href="#1-这篇《描述属性关系》文档到底在讲什么？" class="headerlink" title="1. 这篇《描述属性关系》文档到底在讲什么？"></a>1. 这篇《描述属性关系》文档到底在讲什么？</h3><p>它其实在讲：</p>
+<ul>
+<li>KVC 不仅仅能处理单纯的属性 (attribute)，还可以处理对象之间的“关系 (relationship)”。</li>
+<li>“关系”分为：<ul>
+<li>to-one：一对一，例如 <code>person.employer</code>。</li>
+<li>to-many：一对多，例如 <code>person.pets</code>。</li>
+<li>inverse：反向关系，例如 pet.owner 对应 person.pets。</li>
+</ul>
+</li>
+<li>Cocoa 里有一个类 <code>NSClassDescription</code>，它是用来描述这些“属性和关系”的元数据的。</li>
+<li>框架（如 Core Data、AppleScript）会用 <code>NSClassDescription</code> 来告诉 KVC：某个 key 是普通属性，某个 key 是 to-one 或 to-many 关系，这样 KVC 才能更聪明地处理数据。</li>
+</ul>
+<h3 id="2-作为-iOS-应用开发者要做什么？"><a href="#2-作为-iOS-应用开发者要做什么？" class="headerlink" title="2. 作为 iOS 应用开发者要做什么？"></a>2. 作为 iOS 应用开发者要做什么？</h3><p>👉 大部分情况下，你什么都不用做。</p>
+<p>因为：</p>
+<ul>
+<li>如果你在写 普通 App 业务代码，你根本不会直接用到 <code>NSClassDescription</code>。</li>
+<li>如果你在用 Core Data，Xcode 生成的模型文件已经帮你定义了关系（entity、attribute、to-one、to-many、inverse），Core Data 内部会用到 <code>NSClassDescription</code>，但你不需要管。</li>
+<li>如果你写 KVC&#x2F;KVO，你只要关心 <code>setValue:forKey:</code>、<code>valueForKey:</code>、<code>mutableArrayValueForKey:</code> 这些就够了。关系的逻辑由框架实现。</li>
+</ul>
+<h3 id="3-那文档为什么要写？"><a href="#3-那文档为什么要写？" class="headerlink" title="3. 那文档为什么要写？"></a>3. 那文档为什么要写？</h3><ul>
+<li>这是 Cocoa 框架的完整性设计文档，面向写框架的人（比如 Core Data、AppleScript 支持、ORM 框架开发者），而不是面向普通 App 开发者。</li>
+<li>Apple 为了完整性，会把最底层的“元数据机制”写清楚，但普通开发者 不会直接用。</li>
+</ul>
+<h3 id="4-你需要怎么理解？"><a href="#4-你需要怎么理解？" class="headerlink" title="4. 你需要怎么理解？"></a>4. 你需要怎么理解？</h3><ul>
+<li>知道背景：KVC 不止能操作值，还能理解关系。</li>
+<li>对日常开发的结论：<ul>
+<li>写普通 App：不用管，完全不会用到。</li>
+<li>写 Core Data：关系已经在模型里声明了，你直接用 NSManagedObject 就好。</li>
+<li>写底层框架&#x2F;ORM（极少数情况）：才可能接触 <code>NSClassDescription</code>。</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>Apple 在这篇文档里一丁点说明都没有，然后还将它归类在 Adopting Key-Value Coding 章节下，让很多开发者误认为需要做些什么才能符合KVC规范。。。</p>
+<p>这正是 Apple 文档里最“恶心”的地方：</p>
+<ul>
+<li>他们把 框架设计层面的说明（比如 <code>NSClassDescription</code>、关系描述、反向关系）和 应用开发者要用的 KVC 规范 混在一起写，</li>
+<li>还放在 Adopting Key-Value Coding 下面，看起来好像是“要想支持 KVC，就得自己实现这些关系方法”，但事实根本不是。</li>
+</ul>
+</blockquote>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>整个 Key-Value Coding Programming Guide 文档里太多这样的误导文章了，几乎就是一篇屎一样东拼西凑出来的文档。。。</p>
+<p>Apple 很多旧文档（尤其是 Programming Guide 系列）确实就是一坨拼凑物，问题集中在这几个方面：</p>
 <ol>
-<li><p>首先查找名为 set&lt;Key&gt;: 或 _set&lt;Key&gt;: 的第一个访问器。如果找到，使用输入值（或根据需要的未包装值）调用它并结束。</p>
+<li>写给框架作者和写给应用开发者混在一起<ul>
+<li>你只想知道“作为 iOS 开发者我要写啥代码”，结果文档里一堆 Core Data &#x2F; AppleScript 的底层背景介绍，根本没说明白哪些是你需要做的，哪些是框架自己搞的。</li>
+<li>就像你刚吐槽的 “描述属性关系” 一节，99% 开发者根本用不上。</li>
+</ul>
 </li>
-<li><p>如果未找到简单的访问器，并且类方法 accessInstanceVariablesDirectly 返回 YES ，则查找名为 _<key> 、 _is&lt;Key&gt; 、 &lt;key&gt; 或 is&lt;Key&gt; 的实例变量（按此顺序）。如果找到，则直接使用输入值（或未包装值）设置该变量并结束。</p>
+<li>没有明确上下文<ul>
+<li>文档一开头不说目标读者是谁，也不说“以下部分主要给框架作者看”，让人误以为“每一节都要掌握并实现”。</li>
+<li>结果你读完一堆接口名、方法签名，完全不清楚到底是不是要自己写。</li>
+</ul>
 </li>
-<li><p>若未找到访问器或实例变量，则调用 setValue:forUndefinedKey: 。默认情况下这将引发异常，但 NSObject 的子类可以提供特定键的行为。</p>
+<li>示例过时 &#x2F; 脱离实际<ul>
+<li>很多示例还是 Mac OS X + AppleScript 年代的残留，放在今天的 iOS 开发语境里完全没用。</li>
+<li>而且 Swift 生态里这些东西几乎都被替代了，但文档没更新，还是用 Objective-C 那套思路。</li>
+</ul>
+</li>
+<li>组织混乱，逻辑跳跃<ul>
+<li>有些地方本来应该按“日常用法 → 进阶用法 → 框架作者用法”来组织，但 Apple 文档常常是“先丢一堆 API，再扯点历史背景，再突然告诉你几个特殊方法”，让人越看越晕。</li>
+</ul>
 </li>
 </ol>
-<h3 id="可变数组的搜索逻辑"><a href="#可变数组的搜索逻辑" class="headerlink" title="可变数组的搜索逻辑"></a>可变数组的搜索逻辑</h3><p>给定一个 key 参数， mutableArrayValueForKey: 的默认实现返回一个代理数组，该数组用于接收访问器调用的对象中的名为 key 的属性，具体步骤如下：</p>
+<p>Apple 这类老文档最大的问题：</p>
 <ol>
-<li><p>寻找名为 insertObject:in&lt;Key&gt;AtIndex: 和 removeObjectFrom&lt;Key&gt;AtIndex: 的方法对（分别对应 NSMutableArray 原始方法 insertObject:atIndex: 和 removeObjectAtIndex: ），或者名为 insert&lt;Key&gt;:atIndexes: 和 remove&lt;Key&gt;AtIndexes: 的方法对（分别对应 NSMutableArray 、 insertObjects:atIndexes: 和 removeObjectsAtIndexes: 方法）。</p>
-<p> 如果对象至少有一个插入方法和至少一个移除方法，返回一个代理对象，该对象通过发送 insertObject:in&lt;Key&gt;AtIndex: 、 removeObjectFrom&lt;Key&gt;AtIndex: 、 insert&lt;Key&gt;:atIndexes: 和 remove&lt;Key&gt;AtIndexes: 方法的消息来响应 NSMutableArray 消息，这些消息是发送给 mutableArrayValueForKey: 的原始接收者的。</p>
-<p> 当对象接收 mutableArrayValueForKey: 消息时，如果该对象还实现了可选的替换对象方法，方法名为 replaceObjectIn&lt;Key&gt;AtIndex:withObject: 或 replace&lt;Key&gt;AtIndexes:with&lt;Key&gt;: ，则代理对象在适当的情况下也会利用这些方法以获得最佳性能。</p>
+<li><p>作为写给框架作者的文档，它也不合格</p>
+<ul>
+<li>它只是列了几个方法名（<code>toOneRelationshipKeys</code>、<code>inverseRelationshipKey:</code>…），告诉你有这么个类 <code>NSClassDescription</code>。</li>
+<li>但没有任何：<ul>
+<li>完整的调用时机说明（什么时候 KVC 会去问 <code>NSClassDescription</code>？）</li>
+<li>实际实现的示例（如何写一个子类？怎么注册？和 KVC 的调用链如何交互？）</li>
+<li>和其他子系统的关系（Core Data 是怎么利用它的？AppleScript 是怎么依赖它的？）</li>
+</ul>
 </li>
-<li><p>如果对象没有可变数组方法，而是寻找一个方法名符合 set&lt;Key&gt;: 模式的访问器方法。在这种情况下，返回一个代理对象，该对象通过向 mutableArrayValueForKey: 的原始接收者发送 set&lt;Key&gt;: 消息来响应 NSMutableArray 消息。</p>
-<blockquote>
-<p>注意</p>
-<p>本步骤描述的机制比上一步骤的效率要低得多，因为它可能会反复创建新的集合对象，而不是修改现有的对象。因此，在设计自己的符合键值编码的对象时，你应该尽量避免使用这种方法。</p>
-</blockquote>
+<li>所以 —— 它给你的信息 既不足以让应用开发者知道要不要用，也 不足以让框架作者真正能靠它写东西。这就是所谓的“既不接地气，也不深入”的尴尬状态。</li>
+</ul>
 </li>
-<li><p>如果既没有找到可变数组方法，也没有找到访问器，且接收者的类响应 YES 方法 accessInstanceVariablesDirectly ，则按顺序查找名为 _&lt;key&gt; 或 &lt;key&gt; 的实例变量。</p>
-<p> 如果找到了这样的实例变量，则返回一个代理对象，该对象将接收到的每个 NSMutableArray 消息转发给实例变量的值，通常该值是 NSMutableArray 的实例或其子类的实例。</p>
+<li><p>为什么会这样？</p>
+<ul>
+<li>历史遗留：<br>  这份 KVC Programming Guide 的主体是 OS X 10.1 ~ 10.3 时代写的，当时 AppleScript Bridge、Core Data 都刚起步。写文档的人更多是“描述愿景”，不是严谨的框架开发手册。</li>
+<li>不维护：<br>  后来 Swift 出来，KVC&#x2F;KVO 渐渐成为“旧时代的动态特性”，文档就再没认真更新过。Apple 内部甚至可能都没人愿意重写。</li>
+<li>定位模糊：<br>  它夹在“应用开发文档”和“框架设计文档”之间，结果两边都没讨好。</li>
+</ul>
 </li>
-<li><p>如果所有方法都失败了，则返回一个可变集合代理对象，该对象在接收到 NSMutableArray 消息时，向原始接收者 mutableArrayValueForKey: 消息的接收者发出 setValue:forUndefinedKey: 消息。</p>
-<p> 默认的 setValue:forUndefinedKey: 实现会抛出一个 NSUndefinedKeyException 错误，但子类可以覆盖这种行为。</p>
+<li><p>框架作者真正会看什么？<br> 如果你真要基于 KVC 搞个 ORM &#x2F; 数据绑定框架，你不会去看这篇文档，你会：</p>
+<ul>
+<li>看头文件：<code>NSKeyValueCoding.h</code>、<code>NSClassDescription.h</code>。</li>
+<li>看现成实现：<ul>
+<li>Core Data 怎么实现 NSClassDescription 的子类。</li>
+<li>AppleScript Bridge 怎么注册类描述。</li>
+</ul>
+</li>
+<li>逆向调试调用链：看看 <code>valueForKey:</code> 在处理关系属性时，到底什么时候查询 <code>NSClassDescription</code>。</li>
+</ul>
+<p> 换句话说：真正写框架的人靠源码&#x2F;调试，不靠这篇文档。</p>
+</li>
+<li><p>结论</p>
+<ul>
+<li>作为应用开发文档 → 太复杂、误导。</li>
+<li>作为框架开发文档 → 太皮毛、不够用。</li>
+</ul>
 </li>
 </ol>
-<h3 id="可变有序集合的搜索逻辑"><a href="#可变有序集合的搜索逻辑" class="headerlink" title="可变有序集合的搜索逻辑"></a>可变有序集合的搜索逻辑</h3><p>mutableOrderedSetValueForKey: 的默认实现与 valueForKey: 认识到相同的基本访问器方法和有序集合访问器方法（参见基本获取器的默认搜索逻辑），并且遵循相同的直接实例变量访问策略，但总是返回一个可变集合代理对象，而不是 valueForKey: 返回的不可变集合。此外，它还会执行以下操作：</p>
-<ol>
-<li><p>搜索名称类似于 insertObject:in&lt;Key&gt;AtIndex: 和 removeObjectFrom&lt;Key&gt;AtIndex: （对应于 NSMutableOrderedSet 类定义的两个最基本的方法）以及 insert&lt;Key&gt;:atIndexes: 和 remove&lt;Key&gt;AtIndexes: （对应于 insertObjects:atIndexes: 和 removeObjectsAtIndexes: ）的方法。</p>
-<p> 如果找到至少一个插入方法和至少一个移除方法，当代理对象接收到 NSMutableOrderedSet 消息时，它会向原始接收者发送 insertObject:in&lt;Key&gt;AtIndex: 、 removeObjectFrom&lt;Key&gt;AtIndex: 、 insert&lt;Key&gt;:atIndexes: 和 remove&lt;Key&gt;AtIndexes: 消息中的某些组合消息。</p>
-<p> 代理对象在原对象中存在类似 replaceObjectIn&lt;Key&gt;AtIndex:withObject: 或 replace&lt;Key&gt;AtIndexes:with&lt;Key&gt;: 的方法时也会使用这些方法。</p>
-</li>
-<li><p>如果未找到可变集合方法，则会搜索类似 set&lt;Key&gt;: 的访问器方法。在这种情况下，每次代理对象接收到 NSMutableOrderedSet 消息时，都会向原 mutableOrderedSetValueForKey: 接收者发送一个 set&lt;Key&gt;: 消息。</p>
-<blockquote>
-<p>注意：</p>
-<p>本步骤中描述的机制比上一步骤中的机制效率低得多，因为它可能会反复创建新的集合对象而不是修改现有的一个。因此，在设计您自己的符合键值编码的对象时，您应该尽量避免使用它。</p>
-</blockquote>
-</li>
-<li><p>如果既没有找到可变集合消息也没有找到访问器，并且接收者的 accessInstanceVariablesDirectly 类方法返回 YES ，则按顺序查找一个名为 _&lt;key&gt; 或 &lt;key&gt; 的实例变量。如果找到了这样的实例变量，返回的代理对象会将接收到的 NSMutableOrderedSet 消息转发给该实例变量的值，该值通常是 NSMutableOrderedSet 或其子类的一个实例。</p>
-</li>
-<li><p>如果所有方法都失败了，返回的代理对象会在接收到可变集合消息时，向原始接收者 mutableOrderedSetValueForKey: 发送一个 setValue:forUndefinedKey: 消息。</p>
-<p> setValue:forUndefinedKey: 的默认实现会抛出一个 NSUndefinedKeyException 异常，但对象可以覆盖此行为。</p>
-</li>
-</ol>
-<h3 id="可变集合的搜索逻辑"><a href="#可变集合的搜索逻辑" class="headerlink" title="可变集合的搜索逻辑"></a>可变集合的搜索逻辑</h3><p>mutableSetValueForKey: 的默认实现，给定一个 key 参数作为输入，返回一个指向接收访问器调用的对象内部名为 key 的数组属性的可变代理集合，采用以下步骤：</p>
-<ol>
-<li><p>搜索名称类似于 add&lt;Key&gt;Object: 和 remove&lt;Key&gt;Object: （分别对应于 NSMutableSet 原始方法 addObject: 和 removeObject: ）以及 add&lt;Key&gt;: 和 remove&lt;Key&gt;: （分别对应于 NSMutableSet 方法 unionSet: 和 minusSet: ）的方法。如果至少找到一个添加方法和一个移除方法，则返回一个代理对象，该对象在接收到 add&lt;Key&gt;Object: 消息时，将发送 remove&lt;Key&gt;Object: 、 add&lt;Key&gt;: 、 remove&lt;Key&gt;: 中的某些组合消息到原始接收者 mutableSetValueForKey: 。</p>
-</li>
-<li><p>如果 mutableSetValueForKey: 调用的接收者是一个受管理的对象，则搜索逻辑不会继续，就像对于非受管理的对象那样。有关更多信息，请参阅《Core Data 编程指南》中的受管理对象访问器方法。</p>
-</li>
-<li><p>如果找不到可变集合方法，并且对象不是管理对象，则搜索一个名为 set&lt;Key&gt;: 的访问器方法。如果找到这样的方法，返回的代理对象会将它接收到的每个 set&lt;Key&gt;: 消息转发给原始接收者 mutableSetValueForKey: 。</p>
-<blockquote>
-<p>注意</p>
-<p>本步骤中描述的机制比第一步的机制效率低得多，因为它可能会反复创建新的集合对象而不是修改现有的对象。因此，在设计自己的符合键值编码的对象时，您应该尽量避免使用它。</p>
-</blockquote>
-</li>
-<li><p>如果找不到可变集合方法和访问器方法，并且 accessInstanceVariablesDirectly 类方法返回 YES ，则按顺序搜索一个名为 _&lt;key&gt; 或 &lt;key&gt; 的实例变量。如果找到这样的实例变量，代理对象会将它接收到的每个 NSMutableSet 消息转发给实例变量的值，该值通常是 NSMutableSet 或其子类的一个实例。</p>
-</li>
-<li><p>如果所有其他方法都失败了，返回的代理对象会将接收到的 NSMutableSet 消息转发给原始接收者 mutableSetValueForKey: ，并发送一个 setValue:forUndefinedKey: 消息。</p>
-</li>
-</ol>
-<h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><p>访问器搜索逻辑这一小节应该算是 KVC 里面的重点了，面试的时候也有可能会问到。其实如果是直译过来的话应该叫访问器搜索模式，但是这样听起来就容易让人摸不着头脑。</p>
-<hr>
-<blockquote>
-<p>重要提示：</p>
-<p>作为 iOS，macOS，或 Apple 生态应用层开发者，只要你的类继承自 NSObject，就完全不必阅读和理解文档里的以下这一章 —— NSObject 已经帮你把所有默认的 KVC 行为（包括 to-many 集合代理）都做好了。之所以有以下</p>
-</blockquote>
-<h1 id="采用键值编码协议"><a href="#采用键值编码协议" class="headerlink" title="采用键值编码协议"></a>采用键值编码协议</h1><h2 id="实现基本键值编码合规性"><a href="#实现基本键值编码合规性" class="headerlink" title="实现基本键值编码合规性"></a>实现基本键值编码合规性</h2><h3 id="基础的获取器方法"><a href="#基础的获取器方法" class="headerlink" title="基础的获取器方法"></a>基础的获取器方法</h3><h3 id="基础的设置器方法"><a href="#基础的设置器方法" class="headerlink" title="基础的设置器方法"></a>基础的设置器方法</h3><h3 id="实例变量"><a href="#实例变量" class="headerlink" title="实例变量"></a>实例变量</h3><h2 id="定义集合方法"><a href="#定义集合方法" class="headerlink" title="定义集合方法"></a>定义集合方法</h2><h3 id="访问有序集合"><a href="#访问有序集合" class="headerlink" title="访问有序集合"></a>访问有序集合</h3><h4 id="有序集合的获取器方法"><a href="#有序集合的获取器方法" class="headerlink" title="有序集合的获取器方法"></a>有序集合的获取器方法</h4><h4 id="有序集合的修改方法"><a href="#有序集合的修改方法" class="headerlink" title="有序集合的修改方法"></a>有序集合的修改方法</h4><h3 id="访问无序集合"><a href="#访问无序集合" class="headerlink" title="访问无序集合"></a>访问无序集合</h3><h4 id="无序集合的获取器方法"><a href="#无序集合的获取器方法" class="headerlink" title="无序集合的获取器方法"></a>无序集合的获取器方法</h4><h4 id="无序集合的修改方法"><a href="#无序集合的修改方法" class="headerlink" title="无序集合的修改方法"></a>无序集合的修改方法</h4><h2 id="处理非对象值"><a href="#处理非对象值" class="headerlink" title="处理非对象值"></a>处理非对象值</h2><h2 id="添加验证"><a href="#添加验证" class="headerlink" title="添加验证"></a>添加验证</h2><h3 id="实现验证方法"><a href="#实现验证方法" class="headerlink" title="实现验证方法"></a>实现验证方法</h3><h3 id="验证基本数据类型的属性"><a href="#验证基本数据类型的属性" class="headerlink" title="验证基本数据类型的属性"></a>验证基本数据类型的属性</h3><h2 id="描述属性关系"><a href="#描述属性关系" class="headerlink" title="描述属性关系"></a>描述属性关系</h2><h3 id="类描述"><a href="#类描述" class="headerlink" title="类描述"></a>类描述</h3><h2 id="以性能为导向进行设计"><a href="#以性能为导向进行设计" class="headerlink" title="以性能为导向进行设计"></a>以性能为导向进行设计</h2><h3 id="覆写键值编码方法"><a href="#覆写键值编码方法" class="headerlink" title="覆写键值编码方法"></a>覆写键值编码方法</h3><h3 id="优化对多关系"><a href="#优化对多关系" class="headerlink" title="优化对多关系"></a>优化对多关系</h3><p>这个意思应该是尽可能集合类型的属性，要实现那些特定的集合存取器方法？不确定</p>
-<h2 id="合规性检查清单"><a href="#合规性检查清单" class="headerlink" title="合规性检查清单"></a>合规性检查清单</h2><h3 id="属性和一对一关系的合规性"><a href="#属性和一对一关系的合规性" class="headerlink" title="属性和一对一关系的合规性"></a>属性和一对一关系的合规性</h3><h3 id="有序的对多关系合规性"><a href="#有序的对多关系合规性" class="headerlink" title="有序的对多关系合规性"></a>有序的对多关系合规性</h3><h3 id="无序的对多关系合规性"><a href="#无序的对多关系合规性" class="headerlink" title="无序的对多关系合规性"></a>无序的对多关系合规性</h3><h3 id="属性验证"><a href="#属性验证" class="headerlink" title="属性验证"></a>属性验证</h3>]]></content>
+<p>所以它才会让人读了怒气值飙升 😅。本质就是一份“既不中用、又没写深”的垃圾拼凑物。</p>
+<h1 id="KVC-有关的面试题"><a href="#KVC-有关的面试题" class="headerlink" title="KVC 有关的面试题"></a>KVC 有关的面试题</h1><h2 id="通过-KVC-修改属性会触发-KVO-吗？"><a href="#通过-KVC-修改属性会触发-KVO-吗？" class="headerlink" title="通过 KVC 修改属性会触发 KVO 吗？"></a>通过 KVC 修改属性会触发 KVO 吗？</h2><p>会的。</p>
+<p>在绝大多数情况下，通过 KVC (<code>setValue:forKey:</code>) 修改对象的属性时，会触发 KVO 通知。原因是：</p>
+<p><code>setValue:forKey:</code> 等 KVC 设置方法的实现逻辑（文档的访问器搜索逻辑中写了）会去调用属性对应的 setter 方法，而对象在被观察之后它的 setter 会被重写，内部会触发 KVO 通知。</p>
+<p>特殊情况：手动关闭了自动 KVO。如果类中重写了 <code>+ (BOOL)automaticallyNotifiesObserversForKey:(NSString *)key</code> 并返回 NO，那么即使通过 KVC 修改，也不会触发 KVO，除非你手动调用：</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line">[<span class="keyword">self</span> willChangeValueForKey:<span class="string">@&quot;name&quot;</span>];</span><br><span class="line">_name = newValue;</span><br><span class="line">[<span class="keyword">self</span> didChangeValueForKey:<span class="string">@&quot;name&quot;</span>];</span><br></pre></td></tr></table></figure>
+
+<p>总结：通过 KVC 修改属性 → 一般会触发 KVO（因为内部会走 setter）。除非你显示添加代码手动关闭了 KVO 通知。</p>
+<h2 id="KVC-的赋值和取值过程是怎样的？原理是什么？"><a href="#KVC-的赋值和取值过程是怎样的？原理是什么？" class="headerlink" title="KVC 的赋值和取值过程是怎样的？原理是什么？"></a>KVC 的赋值和取值过程是怎样的？原理是什么？</h2><p>呃，答案就在文档访问器搜索逻辑里。简单概括来说就是：</p>
+<ul>
+<li>KVC 的赋值 <code>setValue:forKey:</code> 等方法底层先去找各种相关 setter 方法，存在就直接调用，如果不存在则再去找各种相关实例变量，找到了就赋值，否则就会调用 <code>setValue:forUndefinedKey:</code> 抛出异常。</li>
+<li>KVC 的取值 <code>valueForKey:</code> 等方法的底层先去找各种相关的 getter 方法，找到了就直接调用，如果不存在则再去找各种相关的实例变量，找到了就返回值，否则就调用 <code>valueForUndefinedKey:</code> 抛出异常。这只是概括，具体的取值逻辑中还有 NSArray 和 NSSet 的集合访问器逻辑。</li>
+</ul>
+]]></content>
       <categories>
         <category>iOS 底层原理</category>
       </categories>
@@ -4964,6 +4572,212 @@ commonModes并不是一个真正单独的模式
       </tags>
   </entry>
   <entry>
+    <title>多线程</title>
+    <url>/2025/05/23/%E5%A4%9A%E7%BA%BF%E7%A8%8B/</url>
+    <content><![CDATA[<h1 id="相关面试题"><a href="#相关面试题" class="headerlink" title="相关面试题"></a>相关面试题</h1><ul>
+<li>你理解的多线程？</li>
+<li>iOS 中的多线程方案有哪几种？你更倾向于哪一种？</li>
+<li>你在项目中用过 GCD 吗？</li>
+<li>GCD 的队列类型</li>
+<li>说一下 OperationQueue 和 GCD 的区别，以及各自的优势</li>
+<li>线程安全的处理手段有哪些？</li>
+<li>Objective-C 你了解的锁有哪些？在你回答基础上进行二次提问：<ul>
+<li>自旋锁和互斥锁对比？</li>
+<li>使用以上锁需要注意哪些？</li>
+<li>用 C&#x2F;C++&#x2F;Objective-C 任一语言实现自旋锁或互斥锁，口述即可</li>
+</ul>
+</li>
+</ul>
+<h1 id="iOS-中的多线程方案"><a href="#iOS-中的多线程方案" class="headerlink" title="iOS 中的多线程方案"></a>iOS 中的多线程方案</h1><table>
+<thead>
+<tr>
+<th>技术方案</th>
+<th>简介</th>
+<th>实现的语言</th>
+<th>线程生命周期</th>
+<th>使用频率</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>pthread</td>
+<td>· 一套通用的多线程 API<br>· 适用于 Unix、Linux、Windows 等系统<br>· 跨平台、可移植<br>· 使用难度大</td>
+<td>C</td>
+<td>程序员管理</td>
+<td>几乎不用</td>
+</tr>
+<tr>
+<td>NSThread</td>
+<td>· 提供面向对象的 API<br>· 简单易用，可直接操作线程对象</td>
+<td>Objective-C</td>
+<td>程序员管理</td>
+<td>偶尔使用</td>
+</tr>
+<tr>
+<td>GCD</td>
+<td>· 旨在替代 NSThread 等线程技术<br>· 充分利用设备的多核心</td>
+<td>C</td>
+<td>系统自动管理</td>
+<td>经常使用</td>
+</tr>
+<tr>
+<td>NSOperation</td>
+<td>* 提供面向对象的 API<br> * 基于 GCD 实现<br>* 比 GCD 多了一些更加简单实用的功能</td>
+<td>Objective-C</td>
+<td>系统自动管理</td>
+<td>经常使用</td>
+</tr>
+</tbody></table>
+<h1 id="GCD-基础知识"><a href="#GCD-基础知识" class="headerlink" title="GCD 基础知识"></a>GCD 基础知识</h1><p>什么是 GCD ？</p>
+<p>​​GCD（Grand Central Dispatch）​​ 是苹果公司为优化多核处理器性能而开发的并发编程技术，旨在简化并行任务的管理。</p>
+<ul>
+<li>GCD 中有 2 个用来执行任务的函数<ul>
+<li>用同步的方式执行任务  <figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="built_in">dispatch_sync</span>(<span class="built_in">dispatch_queue_t</span> queue, dispatch_block_t block);</span><br></pre></td></tr></table></figure></li>
+<li>用异步的方式执行任务  <figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="built_in">dispatch_async</span>(<span class="built_in">dispatch_queue_t</span> queue, dispatch_block_t block);</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ul>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="built_in">dispatch_queue_t</span> queue = dispatch_get_global_queue(<span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line"><span class="built_in">dispatch_async</span>(queue, ^&#123;</span><br><span class="line">	<span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务，线程：%@&quot;</span>, [<span class="built_in">NSThread</span> currentThread]);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>GCD 源码，居然在 Swift 项目下</p>
+<p>GCD 的队列有两种<br>    - 串行队列：跟烤串一样，任务就像是烤串上一块一块的羊肉，执行时一个接着一个。<br>    - 并发队列：不止一根烤串了，多根烤串同时执行任务。</p>
+<p>同步、异步、并发、串行的概念<br>    - 同步：不开启新线程<br>    - 异步：有能力开启新线程<br>    - 串行：一个任务接着一个任务执行<br>    - 并发：多个任务可以同一时间执行</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>并发队列</th>
+<th>手动创建的串行队列</th>
+<th>主队列</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>同步函数 sync</td>
+<td>* 不开新线程<br>* 任务串行</td>
+<td>* 不开新线程<br>* 任务串行</td>
+<td>* 不开新线程<br>* 任务串行</td>
+</tr>
+<tr>
+<td>异步函数 async</td>
+<td>* 开新线程<br>* 任务并发</td>
+<td>* 开新线程<br>* 任务串行</td>
+<td>* 不开新线程<br>* 任务串行</td>
+</tr>
+</tbody></table>
+<p>162：<br>死锁？<br>什么是死锁？<br>什么情况下产生死锁？</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="built_in">dispatch_queue_t</span> queue = dispatch_get_main_queue();</span><br><span class="line"><span class="built_in">dispatch_sync</span>(queue, ^&#123;</span><br><span class="line">	<span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务&quot;</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>以上代码如果是在主线程执行就产生了死锁。如果不在主线程执行不会产生死锁。</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="built_in">dispatch_queue_t</span> queue = dispatch_get_main_queue();</span><br><span class="line"><span class="built_in">dispatch_async</span>(queue, ^&#123;</span><br><span class="line">	<span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务&quot;</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>以上代码不会产生死锁，异步主队列是在主线程上执行任务。很经典的场景。</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务1&quot;</span>);</span><br><span class="line"><span class="built_in">dispatch_queue_t</span> queue = dispatch_queue_create(<span class="string">&quot;custom_queue&quot;</span>, DISPATCH_QUEUE_SERIAL);</span><br><span class="line"><span class="built_in">dispatch_async</span>(queue, ^&#123;</span><br><span class="line">	<span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务2&quot;</span>);</span><br><span class="line">	<span class="built_in">dispatch_sync</span>(queue, ^&#123;</span><br><span class="line">		<span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务3&quot;</span>);</span><br><span class="line">	&#125;);</span><br><span class="line">	<span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务4&quot;</span>);</span><br><span class="line">&#125;);</span><br><span class="line"><span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务5&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+<p>以上代码会产生死锁，两个block任务在同一个队列，又是同步函数</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务1&quot;</span>);</span><br><span class="line"><span class="built_in">dispatch_queue_t</span> queue1 = dispatch_queue_create(<span class="string">&quot;custom_queue1&quot;</span>, DISPATCH_QUEUE_SERIAL);</span><br><span class="line"><span class="built_in">dispatch_queue_t</span> queue2 = dispatch_queue_create(<span class="string">&quot;custom_queue2&quot;</span>, DISPATCH_QUEUE_CONCURRENT);</span><br><span class="line"><span class="built_in">dispatch_async</span>(queue1, ^&#123;</span><br><span class="line">	<span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务2&quot;</span>);</span><br><span class="line">	<span class="built_in">dispatch_sync</span>(queue2, ^&#123;</span><br><span class="line">		<span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务3&quot;</span>);</span><br><span class="line">	&#125;);</span><br><span class="line">	<span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务4&quot;</span>);</span><br><span class="line">&#125;);</span><br><span class="line"><span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务5&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+<p>以上代码不会产生死锁，</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务1&quot;</span>);</span><br><span class="line"><span class="built_in">dispatch_queue_t</span> queue1 = dispatch_queue_create(<span class="string">&quot;custom_queue1&quot;</span>, DISPATCH_QUEUE_SERIAL);</span><br><span class="line"><span class="built_in">dispatch_queue_t</span> queue2 = dispatch_queue_create(<span class="string">&quot;custom_queue2&quot;</span>, DISPATCH_QUEUE_SERIAL);</span><br><span class="line"><span class="built_in">dispatch_async</span>(queue1, ^&#123;</span><br><span class="line">	<span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务2&quot;</span>);</span><br><span class="line">	<span class="built_in">dispatch_sync</span>(queue2, ^&#123;</span><br><span class="line">		<span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务3&quot;</span>);</span><br><span class="line">	&#125;);</span><br><span class="line">	<span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务4&quot;</span>);</span><br><span class="line">&#125;);</span><br><span class="line"><span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务5&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+<p>以上代码也不会产生死锁。</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务1&quot;</span>);</span><br><span class="line"><span class="built_in">dispatch_queue_t</span> queue = dispatch_queue_create(<span class="string">&quot;custom_queue&quot;</span>, DISPATCH_QUEUE_CONCURRENT);</span><br><span class="line"><span class="built_in">dispatch_async</span>(queue, ^&#123;</span><br><span class="line">	<span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务2&quot;</span>);</span><br><span class="line">	<span class="built_in">dispatch_sync</span>(queue, ^&#123;</span><br><span class="line">		<span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务3&quot;</span>);</span><br><span class="line">	&#125;);</span><br><span class="line">	<span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务4&quot;</span>);</span><br><span class="line">&#125;);</span><br><span class="line"><span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务5&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+<p>以上代码也不会产生死锁，并发队列</p>
+<p><strong>使用同步函数 sync 往当前的串行队列再次添加任务就会产生死锁</strong></p>
+<p>165：<br>面试题<br>以下代码的打印结果是什么：</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line">- (<span class="type">void</span>)touchesBegan:(<span class="built_in">NSSet</span>&lt;<span class="built_in">UITouch</span> *&gt; *)touches withEvent:(<span class="built_in">UIEvent</span> *)event &#123;</span><br><span class="line">    <span class="built_in">dispatch_queue_t</span> queue = dispatch_get_global_queue(<span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line">    <span class="built_in">dispatch_async</span>(queue, ^&#123;</span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@&quot;1&quot;</span>);</span><br><span class="line">        [<span class="keyword">self</span> performSelector:<span class="keyword">@selector</span>(test) withObject:<span class="literal">nil</span> afterDelay:<span class="number">.0</span>];</span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@&quot;3&quot;</span>);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="type">void</span>)test &#123;</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@&quot;2&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>打印结果是 1，3。performSelector: withObject: afterDelay: 方法依赖 RunLoop，子线程的 RunLoop 默认不开启，导致 2 的打印并不会执行。</p>
+<p>166：<br>performSelector:withObject:afterDelay: 是在 CoreFoundation 库里面实现的<br>performSelector:withObject: 是在 objc4 库里面实现的</p>
+<p>GNUstep 将 Cocoa 的 Objective-C 库重写了一遍并开源了，所以可以参考学习。</p>
+<p>167：<br>面试题2<br>以下代码的打印结果是什么：</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line">- (<span class="type">void</span>)touchesBegan:(<span class="built_in">NSSet</span>&lt;<span class="built_in">UITouch</span> *&gt; *)touches withEvent:(<span class="built_in">UIEvent</span> *)event &#123;</span><br><span class="line">    <span class="built_in">NSThread</span> *thread = [[<span class="built_in">NSThread</span> alloc] initWithBlock:^&#123;</span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@&quot;1&quot;</span>);</span><br><span class="line">    &#125;];</span><br><span class="line">    [thread start];</span><br><span class="line">    </span><br><span class="line">    [<span class="keyword">self</span> performSelector:<span class="keyword">@selector</span>(test) onThread:thread withObject:<span class="literal">nil</span> waitUntilDone:<span class="literal">YES</span>];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="type">void</span>)test &#123;</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@&quot;2&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>打印结果是 1，然后程序崩溃，打印完 1 之后线程退出了，没办法执行 test 了，要保活子线程就得开启 RunLoop，强引用也解决不了。</p>
+<p>168：<br>调度组的使用<br>实现功能：发送多个网络请求，所有网络请求都完成的时候处理事情？<br>正是调度组的典型使用场景</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line">dispatch_group_t group = dispatch_group_create();</span><br><span class="line"><span class="built_in">dispatch_queue_t</span> queue = dispatch_queue_create(<span class="string">&quot;custom_queue&quot;</span>, DISPATCH_QUEUE_CONCURRENT);</span><br><span class="line">dispatch_group_async(group, queue, ^&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; i++) &#123;</span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@&quot;任务1，线程：%@&quot;</span>, [<span class="built_in">NSThread</span> currentThread]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br><span class="line">dispatch_group_async(group, queue, ^&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; i++) &#123;</span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@&quot;任务2，线程：%@&quot;</span>, [<span class="built_in">NSThread</span> currentThread]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br><span class="line">dispatch_group_notify(group, dispatch_get_main_queue(), ^&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; i++) &#123;</span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@&quot;任务3，线程：%@&quot;</span>, [<span class="built_in">NSThread</span> currentThread]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h1 id="线程同步方案"><a href="#线程同步方案" class="headerlink" title="线程同步方案"></a>线程同步方案</h1><p>169:<br>多线程存在的问题？同时做多件事情提高了效率，但是存在线程安全问题<br>资源共享问题：<br>    多个线程访问和使用同一个资源</p>
+<p>案例：<br>存钱取钱。<br>卖票案例。</p>
+<p>解决办法：<br>    线程同步技术：加锁</p>
+<p>170-173：<br>iOS 中的线程同步方案有：</p>
+<ul>
+<li>OSSpinLock</li>
+<li>os_unfair_lock</li>
+<li>pthread_mutex</li>
+<li>NSLock</li>
+<li>NSRecursiveLock</li>
+<li>NSCondition</li>
+<li>NSConditionLock</li>
+<li>@synchronized</li>
+<li>dispatch_semaphore</li>
+<li>dispatch_queue(DISPATCH_QUEUE_SERIAL)</li>
+</ul>
+<p>然后是介绍 OSSpinLock 的使用了。导入 libkern&#x2F;OSAtomic.h 头文件，OS_SPINLOCK_INIT 宏创建锁，OSSpinLockLock() 函数加锁  OSSpinLockUnlock() 函数解锁<br>OSSpinLock 叫自旋锁，等待锁的期间一直占用着 CPU，已经过时了，还有可能产生优先级问题。。。总是就是不要用了，那为什么还讲那么多七七八八的呢</p>
+<p>原来 172 里是对代码的结构进行了调整。。。结合了一些封装设计在里面。。。站在讲解多线程锁的角度来讲，完全没有必要讲这块内容！<br>但是我想想有没有必要学习下怎么写的？？？</p>
+<p>173：答疑</p>
+<p>174：os_unfair_lock<br>这是自旋锁还是互斥锁呢？好像没讲呢？根据汇编得知是互斥锁，调用syscall让CPU休眠了</p>
+<p>175：pthread_mutex<br>互斥锁，等待锁的线程会处于休眠状态。</p>
+<p>176：pthread_mutex 递归锁</p>
+<p>177：自旋锁，互斥锁的汇编实现<br>自旋锁底层是一个循环一直在执行。<br>互斥锁底层调用了syscall让CPU进入休眠</p>
+<p>178：pthread_mutex 条件<br>讲了个什么场景没太理解。。。<br>感觉讲的真不好，总是磕磕绊绊来来回回重复叙述<br>pthread_cond_wait()<br>pthread_cond_signal()<br>意思好像是始终能保证 A 在 B 之前执行？好像是 OperationQueue 里面的依赖关系的？可能就是依赖的底层实现？<br>生产者？消费者？模式，意思是生产者必须先生产产品出来才可以给消费者消费。</p>
+<p>179:<br>NSLock 是对 mutex 普通锁的封装<br>NSRecursiveLock 是对 mutex 递归锁的封装<br>NSCondition 是 mutex cond 的封装</p>
+<p>180：课后答疑</p>
+<p>181：<br>[self.confition signal] 解释<br>完全听不明白了，不知道在表达啥呢。。。<br>答疑 RunLoop，这不是前面讲过了，看看什么问题</p>
+<ol>
+<li>NSThread 的生命不是一个强引用就能保证的，它的 RunLoop 不执行，线程的入口函数执行完就释放了。</li>
+<li>线程的入口函数执行了一段代码，但是如果不实现循环，它就跟普通的命令行程序执行完入口函数就结束了。<br>其实还是对线程的理解不够深入。确实线程对象比普通的对象更抽象。</li>
+</ol>
+<p>182：NSConditionLock<br>NSConditionLock？不是有一个 NSCondition 吗，这个又是什么<br>原来 NSConditionLock 是对 NSCondition 的封装。提供了更多功能<br>条件锁，应用场景还是建立依赖。。。</p>
+<p>183：串行队列<br>是的，GCD 的串行队列也可以实现线程同步</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="built_in">dispatch_queue_t</span> moneyQueue = dispatch_queue_create(<span class="string">&quot;custom_queue1&quot;</span>, DISPATCH_QUEUE_SERIAL);</span><br><span class="line"><span class="built_in">dispatch_sync</span>(moneyQueue, ^&#123;</span><br><span class="line">	</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>这个好理解</p>
+<p>184-185：dispatch_semaphore<br>信号量，通过信号量控制线程最大并发数量为 1 的话同样可以实现线程同步。</p>
+<p>dispatch_semaphore_wait() 函数会让信号量减 1。如果信号量大于 0 会执行后续代码。如果信号量 &lt;&#x3D; 0 会进入休眠直到大于 0 才可以继续执行后续代码。<br>dispatch_semaphore_signal() 会让信号量加 1。</p>
+<p>186：@synchronized 编译器语法糖<br>是 pthread_mutex_t 的封装。最简单的同步方案。<br>源码是在 objc4 库的 objc-sync.h objc-sync.mm 文件中，objc_sync_entry() objc_sync_exit()。发现是对 pthread_mutex_t 递归锁的封装。</p>
+<p>187：<br>总结线程同步方案：<br>性能从高到底</p>
+<ol>
+<li>os_unfair_lock</li>
+<li>OSSpinLock</li>
+<li>dispatch_semaphore</li>
+<li>pthread_mutex</li>
+<li>dispatch_queue(DISPATCH_QUEUE_SERIAL)</li>
+<li>NSLock</li>
+<li>NSCondition</li>
+<li>pthread_mutex(recursive)</li>
+<li>NSRecursiveLock</li>
+<li>NSConditionLock</li>
+<li>@synchronized</li>
+</ol>
+<p>188：自旋锁，互斥锁对比</p>
+<ul>
+<li>什么情况使用自旋锁比较划算？<ul>
+<li>预计线程等待锁的时间很短</li>
+<li>加锁的代码（临界区）经常被调用，但竞争情况很少发生</li>
+<li>CPU 资源不紧张</li>
+<li>多核心处理器</li>
+</ul>
+</li>
+<li>什么情况使用互斥锁比较划算<ul>
+<li>预计线程等待锁的时间较长</li>
+<li>单核处理器</li>
+<li>加锁的代码有 IO 操作</li>
+<li>加锁的代码复杂，循环量大</li>
+<li>加锁的代码竞争频繁</li>
+</ul>
+</li>
+</ul>
+<p>189：atomic<br>属于属性的修饰符，但在 iOS 中只推荐使用 nonatomic。atomic 更多用于 macOS 中。atomic 的作用是使属性的 getter 和 setter 是原子的，意思是属性的 setter 方法和 getter 方法都进行了加锁。<br>源码在 objc4 中。objc-accessors.mm 中，可以看到 atomic 的情况下进行了加锁。<br>但是又说没有办法保证使用属性的线程是安全的？这是什么意思<br>这个还是需要 AI 再详细解读一下了<br>问清楚为什么在 iOS 中不推荐使用 atomic。</p>
+<p>190-192：读写安全<br>文件的读写安全的实现。</p>
+<ol>
+<li>信号量最大并发为1，可以实现，但是只能单读单写。如果要实现多读单写就不能使用信号量了。多个线程可以同时读取数据，但只有一个线程写入数据，读和写是不能同时进行（只能有一个线程写，且写的时候无法读，可以有多个线程读但读的时候无法写）</li>
+<li>pthread_rwlock 读写锁，等待锁的线程会进入休眠 <figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="meta">#import <span class="string">&lt;pthread.h&gt;</span></span></span><br><span class="line"></span><br><span class="line">pthread_rwlock_t lock;</span><br><span class="line">pthread_rwlock_init(&amp;lock, <span class="literal">NULL</span>);</span><br><span class="line"><span class="comment">// 读锁</span></span><br><span class="line">pthread_rwlock_rdlock(&amp;lock);</span><br><span class="line"><span class="comment">// ......</span></span><br><span class="line">pthread_rwlock_unlock(&amp;lock);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 写锁</span></span><br><span class="line">pthread_rwlock_wrlock(&amp;lock);</span><br><span class="line"><span class="comment">// ......</span></span><br><span class="line">pthread_rwlock_unlock(&amp;lock);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 释放锁</span></span><br><span class="line">pthread_rwlock_destroy(&amp;lock);</span><br></pre></td></tr></table></figure></li>
+<li>dispatch_barrier_async 异步栅栏函数 <figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 必须使用创建的并发队列，全局并发队列或串行队列都无效</span></span><br><span class="line"><span class="built_in">dispatch_queue_t</span> queue = dispatch_queue_create(<span class="string">&quot;rw_queue&quot;</span>, DISPATCH_QUEUE_CONCURRENT);</span><br><span class="line"><span class="built_in">dispatch_async</span>(queue, ^&#123;</span><br><span class="line">	<span class="comment">// 读操作...</span></span><br><span class="line">&#125;);</span><br><span class="line">dispatch_barrier_async(queue, ^&#123;</span><br><span class="line">	<span class="comment">// 写操作...</span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></li>
+</ol>
+]]></content>
+      <categories>
+        <category>iOS 底层原理</category>
+      </categories>
+  </entry>
+  <entry>
     <title>内存管理</title>
     <url>/2025/05/15/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/</url>
     <content><![CDATA[<h1 id="相关面试题"><a href="#相关面试题" class="headerlink" title="相关面试题"></a>相关面试题</h1><ul>
@@ -5474,212 +5288,6 @@ commonModes并不是一个真正单独的模式
       </categories>
   </entry>
   <entry>
-    <title>多线程</title>
-    <url>/2025/05/23/%E5%A4%9A%E7%BA%BF%E7%A8%8B/</url>
-    <content><![CDATA[<h1 id="相关面试题"><a href="#相关面试题" class="headerlink" title="相关面试题"></a>相关面试题</h1><ul>
-<li>你理解的多线程？</li>
-<li>iOS 中的多线程方案有哪几种？你更倾向于哪一种？</li>
-<li>你在项目中用过 GCD 吗？</li>
-<li>GCD 的队列类型</li>
-<li>说一下 OperationQueue 和 GCD 的区别，以及各自的优势</li>
-<li>线程安全的处理手段有哪些？</li>
-<li>Objective-C 你了解的锁有哪些？在你回答基础上进行二次提问：<ul>
-<li>自旋锁和互斥锁对比？</li>
-<li>使用以上锁需要注意哪些？</li>
-<li>用 C&#x2F;C++&#x2F;Objective-C 任一语言实现自旋锁或互斥锁，口述即可</li>
-</ul>
-</li>
-</ul>
-<h1 id="iOS-中的多线程方案"><a href="#iOS-中的多线程方案" class="headerlink" title="iOS 中的多线程方案"></a>iOS 中的多线程方案</h1><table>
-<thead>
-<tr>
-<th>技术方案</th>
-<th>简介</th>
-<th>实现的语言</th>
-<th>线程生命周期</th>
-<th>使用频率</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>pthread</td>
-<td>· 一套通用的多线程 API<br>· 适用于 Unix、Linux、Windows 等系统<br>· 跨平台、可移植<br>· 使用难度大</td>
-<td>C</td>
-<td>程序员管理</td>
-<td>几乎不用</td>
-</tr>
-<tr>
-<td>NSThread</td>
-<td>· 提供面向对象的 API<br>· 简单易用，可直接操作线程对象</td>
-<td>Objective-C</td>
-<td>程序员管理</td>
-<td>偶尔使用</td>
-</tr>
-<tr>
-<td>GCD</td>
-<td>· 旨在替代 NSThread 等线程技术<br>· 充分利用设备的多核心</td>
-<td>C</td>
-<td>系统自动管理</td>
-<td>经常使用</td>
-</tr>
-<tr>
-<td>NSOperation</td>
-<td>* 提供面向对象的 API<br> * 基于 GCD 实现<br>* 比 GCD 多了一些更加简单实用的功能</td>
-<td>Objective-C</td>
-<td>系统自动管理</td>
-<td>经常使用</td>
-</tr>
-</tbody></table>
-<h1 id="GCD-基础知识"><a href="#GCD-基础知识" class="headerlink" title="GCD 基础知识"></a>GCD 基础知识</h1><p>什么是 GCD ？</p>
-<p>​​GCD（Grand Central Dispatch）​​ 是苹果公司为优化多核处理器性能而开发的并发编程技术，旨在简化并行任务的管理。</p>
-<ul>
-<li>GCD 中有 2 个用来执行任务的函数<ul>
-<li>用同步的方式执行任务  <figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="built_in">dispatch_sync</span>(<span class="built_in">dispatch_queue_t</span> queue, dispatch_block_t block);</span><br></pre></td></tr></table></figure></li>
-<li>用异步的方式执行任务  <figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="built_in">dispatch_async</span>(<span class="built_in">dispatch_queue_t</span> queue, dispatch_block_t block);</span><br></pre></td></tr></table></figure></li>
-</ul>
-</li>
-</ul>
-<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="built_in">dispatch_queue_t</span> queue = dispatch_get_global_queue(<span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line"><span class="built_in">dispatch_async</span>(queue, ^&#123;</span><br><span class="line">	<span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务，线程：%@&quot;</span>, [<span class="built_in">NSThread</span> currentThread]);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-
-<p>GCD 源码，居然在 Swift 项目下</p>
-<p>GCD 的队列有两种<br>    - 串行队列：跟烤串一样，任务就像是烤串上一块一块的羊肉，执行时一个接着一个。<br>    - 并发队列：不止一根烤串了，多根烤串同时执行任务。</p>
-<p>同步、异步、并发、串行的概念<br>    - 同步：不开启新线程<br>    - 异步：有能力开启新线程<br>    - 串行：一个任务接着一个任务执行<br>    - 并发：多个任务可以同一时间执行</p>
-<table>
-<thead>
-<tr>
-<th></th>
-<th>并发队列</th>
-<th>手动创建的串行队列</th>
-<th>主队列</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>同步函数 sync</td>
-<td>* 不开新线程<br>* 任务串行</td>
-<td>* 不开新线程<br>* 任务串行</td>
-<td>* 不开新线程<br>* 任务串行</td>
-</tr>
-<tr>
-<td>异步函数 async</td>
-<td>* 开新线程<br>* 任务并发</td>
-<td>* 开新线程<br>* 任务串行</td>
-<td>* 不开新线程<br>* 任务串行</td>
-</tr>
-</tbody></table>
-<p>162：<br>死锁？<br>什么是死锁？<br>什么情况下产生死锁？</p>
-<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="built_in">dispatch_queue_t</span> queue = dispatch_get_main_queue();</span><br><span class="line"><span class="built_in">dispatch_sync</span>(queue, ^&#123;</span><br><span class="line">	<span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务&quot;</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-<p>以上代码如果是在主线程执行就产生了死锁。如果不在主线程执行不会产生死锁。</p>
-<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="built_in">dispatch_queue_t</span> queue = dispatch_get_main_queue();</span><br><span class="line"><span class="built_in">dispatch_async</span>(queue, ^&#123;</span><br><span class="line">	<span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务&quot;</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-
-<p>以上代码不会产生死锁，异步主队列是在主线程上执行任务。很经典的场景。</p>
-<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务1&quot;</span>);</span><br><span class="line"><span class="built_in">dispatch_queue_t</span> queue = dispatch_queue_create(<span class="string">&quot;custom_queue&quot;</span>, DISPATCH_QUEUE_SERIAL);</span><br><span class="line"><span class="built_in">dispatch_async</span>(queue, ^&#123;</span><br><span class="line">	<span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务2&quot;</span>);</span><br><span class="line">	<span class="built_in">dispatch_sync</span>(queue, ^&#123;</span><br><span class="line">		<span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务3&quot;</span>);</span><br><span class="line">	&#125;);</span><br><span class="line">	<span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务4&quot;</span>);</span><br><span class="line">&#125;);</span><br><span class="line"><span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务5&quot;</span>);</span><br></pre></td></tr></table></figure>
-
-<p>以上代码会产生死锁，两个block任务在同一个队列，又是同步函数</p>
-<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务1&quot;</span>);</span><br><span class="line"><span class="built_in">dispatch_queue_t</span> queue1 = dispatch_queue_create(<span class="string">&quot;custom_queue1&quot;</span>, DISPATCH_QUEUE_SERIAL);</span><br><span class="line"><span class="built_in">dispatch_queue_t</span> queue2 = dispatch_queue_create(<span class="string">&quot;custom_queue2&quot;</span>, DISPATCH_QUEUE_CONCURRENT);</span><br><span class="line"><span class="built_in">dispatch_async</span>(queue1, ^&#123;</span><br><span class="line">	<span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务2&quot;</span>);</span><br><span class="line">	<span class="built_in">dispatch_sync</span>(queue2, ^&#123;</span><br><span class="line">		<span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务3&quot;</span>);</span><br><span class="line">	&#125;);</span><br><span class="line">	<span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务4&quot;</span>);</span><br><span class="line">&#125;);</span><br><span class="line"><span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务5&quot;</span>);</span><br></pre></td></tr></table></figure>
-
-<p>以上代码不会产生死锁，</p>
-<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务1&quot;</span>);</span><br><span class="line"><span class="built_in">dispatch_queue_t</span> queue1 = dispatch_queue_create(<span class="string">&quot;custom_queue1&quot;</span>, DISPATCH_QUEUE_SERIAL);</span><br><span class="line"><span class="built_in">dispatch_queue_t</span> queue2 = dispatch_queue_create(<span class="string">&quot;custom_queue2&quot;</span>, DISPATCH_QUEUE_SERIAL);</span><br><span class="line"><span class="built_in">dispatch_async</span>(queue1, ^&#123;</span><br><span class="line">	<span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务2&quot;</span>);</span><br><span class="line">	<span class="built_in">dispatch_sync</span>(queue2, ^&#123;</span><br><span class="line">		<span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务3&quot;</span>);</span><br><span class="line">	&#125;);</span><br><span class="line">	<span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务4&quot;</span>);</span><br><span class="line">&#125;);</span><br><span class="line"><span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务5&quot;</span>);</span><br></pre></td></tr></table></figure>
-
-<p>以上代码也不会产生死锁。</p>
-<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务1&quot;</span>);</span><br><span class="line"><span class="built_in">dispatch_queue_t</span> queue = dispatch_queue_create(<span class="string">&quot;custom_queue&quot;</span>, DISPATCH_QUEUE_CONCURRENT);</span><br><span class="line"><span class="built_in">dispatch_async</span>(queue, ^&#123;</span><br><span class="line">	<span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务2&quot;</span>);</span><br><span class="line">	<span class="built_in">dispatch_sync</span>(queue, ^&#123;</span><br><span class="line">		<span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务3&quot;</span>);</span><br><span class="line">	&#125;);</span><br><span class="line">	<span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务4&quot;</span>);</span><br><span class="line">&#125;);</span><br><span class="line"><span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务5&quot;</span>);</span><br></pre></td></tr></table></figure>
-
-<p>以上代码也不会产生死锁，并发队列</p>
-<p><strong>使用同步函数 sync 往当前的串行队列再次添加任务就会产生死锁</strong></p>
-<p>165：<br>面试题<br>以下代码的打印结果是什么：</p>
-<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line">- (<span class="type">void</span>)touchesBegan:(<span class="built_in">NSSet</span>&lt;<span class="built_in">UITouch</span> *&gt; *)touches withEvent:(<span class="built_in">UIEvent</span> *)event &#123;</span><br><span class="line">    <span class="built_in">dispatch_queue_t</span> queue = dispatch_get_global_queue(<span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line">    <span class="built_in">dispatch_async</span>(queue, ^&#123;</span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@&quot;1&quot;</span>);</span><br><span class="line">        [<span class="keyword">self</span> performSelector:<span class="keyword">@selector</span>(test) withObject:<span class="literal">nil</span> afterDelay:<span class="number">.0</span>];</span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@&quot;3&quot;</span>);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="type">void</span>)test &#123;</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@&quot;2&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>打印结果是 1，3。performSelector: withObject: afterDelay: 方法依赖 RunLoop，子线程的 RunLoop 默认不开启，导致 2 的打印并不会执行。</p>
-<p>166：<br>performSelector:withObject:afterDelay: 是在 CoreFoundation 库里面实现的<br>performSelector:withObject: 是在 objc4 库里面实现的</p>
-<p>GNUstep 将 Cocoa 的 Objective-C 库重写了一遍并开源了，所以可以参考学习。</p>
-<p>167：<br>面试题2<br>以下代码的打印结果是什么：</p>
-<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line">- (<span class="type">void</span>)touchesBegan:(<span class="built_in">NSSet</span>&lt;<span class="built_in">UITouch</span> *&gt; *)touches withEvent:(<span class="built_in">UIEvent</span> *)event &#123;</span><br><span class="line">    <span class="built_in">NSThread</span> *thread = [[<span class="built_in">NSThread</span> alloc] initWithBlock:^&#123;</span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@&quot;1&quot;</span>);</span><br><span class="line">    &#125;];</span><br><span class="line">    [thread start];</span><br><span class="line">    </span><br><span class="line">    [<span class="keyword">self</span> performSelector:<span class="keyword">@selector</span>(test) onThread:thread withObject:<span class="literal">nil</span> waitUntilDone:<span class="literal">YES</span>];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="type">void</span>)test &#123;</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@&quot;2&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>打印结果是 1，然后程序崩溃，打印完 1 之后线程退出了，没办法执行 test 了，要保活子线程就得开启 RunLoop，强引用也解决不了。</p>
-<p>168：<br>调度组的使用<br>实现功能：发送多个网络请求，所有网络请求都完成的时候处理事情？<br>正是调度组的典型使用场景</p>
-<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line">dispatch_group_t group = dispatch_group_create();</span><br><span class="line"><span class="built_in">dispatch_queue_t</span> queue = dispatch_queue_create(<span class="string">&quot;custom_queue&quot;</span>, DISPATCH_QUEUE_CONCURRENT);</span><br><span class="line">dispatch_group_async(group, queue, ^&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; i++) &#123;</span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@&quot;任务1，线程：%@&quot;</span>, [<span class="built_in">NSThread</span> currentThread]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br><span class="line">dispatch_group_async(group, queue, ^&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; i++) &#123;</span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@&quot;任务2，线程：%@&quot;</span>, [<span class="built_in">NSThread</span> currentThread]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br><span class="line">dispatch_group_notify(group, dispatch_get_main_queue(), ^&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; i++) &#123;</span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@&quot;任务3，线程：%@&quot;</span>, [<span class="built_in">NSThread</span> currentThread]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-
-<h1 id="线程同步方案"><a href="#线程同步方案" class="headerlink" title="线程同步方案"></a>线程同步方案</h1><p>169:<br>多线程存在的问题？同时做多件事情提高了效率，但是存在线程安全问题<br>资源共享问题：<br>    多个线程访问和使用同一个资源</p>
-<p>案例：<br>存钱取钱。<br>卖票案例。</p>
-<p>解决办法：<br>    线程同步技术：加锁</p>
-<p>170-173：<br>iOS 中的线程同步方案有：</p>
-<ul>
-<li>OSSpinLock</li>
-<li>os_unfair_lock</li>
-<li>pthread_mutex</li>
-<li>NSLock</li>
-<li>NSRecursiveLock</li>
-<li>NSCondition</li>
-<li>NSConditionLock</li>
-<li>@synchronized</li>
-<li>dispatch_semaphore</li>
-<li>dispatch_queue(DISPATCH_QUEUE_SERIAL)</li>
-</ul>
-<p>然后是介绍 OSSpinLock 的使用了。导入 libkern&#x2F;OSAtomic.h 头文件，OS_SPINLOCK_INIT 宏创建锁，OSSpinLockLock() 函数加锁  OSSpinLockUnlock() 函数解锁<br>OSSpinLock 叫自旋锁，等待锁的期间一直占用着 CPU，已经过时了，还有可能产生优先级问题。。。总是就是不要用了，那为什么还讲那么多七七八八的呢</p>
-<p>原来 172 里是对代码的结构进行了调整。。。结合了一些封装设计在里面。。。站在讲解多线程锁的角度来讲，完全没有必要讲这块内容！<br>但是我想想有没有必要学习下怎么写的？？？</p>
-<p>173：答疑</p>
-<p>174：os_unfair_lock<br>这是自旋锁还是互斥锁呢？好像没讲呢？根据汇编得知是互斥锁，调用syscall让CPU休眠了</p>
-<p>175：pthread_mutex<br>互斥锁，等待锁的线程会处于休眠状态。</p>
-<p>176：pthread_mutex 递归锁</p>
-<p>177：自旋锁，互斥锁的汇编实现<br>自旋锁底层是一个循环一直在执行。<br>互斥锁底层调用了syscall让CPU进入休眠</p>
-<p>178：pthread_mutex 条件<br>讲了个什么场景没太理解。。。<br>感觉讲的真不好，总是磕磕绊绊来来回回重复叙述<br>pthread_cond_wait()<br>pthread_cond_signal()<br>意思好像是始终能保证 A 在 B 之前执行？好像是 OperationQueue 里面的依赖关系的？可能就是依赖的底层实现？<br>生产者？消费者？模式，意思是生产者必须先生产产品出来才可以给消费者消费。</p>
-<p>179:<br>NSLock 是对 mutex 普通锁的封装<br>NSRecursiveLock 是对 mutex 递归锁的封装<br>NSCondition 是 mutex cond 的封装</p>
-<p>180：课后答疑</p>
-<p>181：<br>[self.confition signal] 解释<br>完全听不明白了，不知道在表达啥呢。。。<br>答疑 RunLoop，这不是前面讲过了，看看什么问题</p>
-<ol>
-<li>NSThread 的生命不是一个强引用就能保证的，它的 RunLoop 不执行，线程的入口函数执行完就释放了。</li>
-<li>线程的入口函数执行了一段代码，但是如果不实现循环，它就跟普通的命令行程序执行完入口函数就结束了。<br>其实还是对线程的理解不够深入。确实线程对象比普通的对象更抽象。</li>
-</ol>
-<p>182：NSConditionLock<br>NSConditionLock？不是有一个 NSCondition 吗，这个又是什么<br>原来 NSConditionLock 是对 NSCondition 的封装。提供了更多功能<br>条件锁，应用场景还是建立依赖。。。</p>
-<p>183：串行队列<br>是的，GCD 的串行队列也可以实现线程同步</p>
-<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="built_in">dispatch_queue_t</span> moneyQueue = dispatch_queue_create(<span class="string">&quot;custom_queue1&quot;</span>, DISPATCH_QUEUE_SERIAL);</span><br><span class="line"><span class="built_in">dispatch_sync</span>(moneyQueue, ^&#123;</span><br><span class="line">	</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-<p>这个好理解</p>
-<p>184-185：dispatch_semaphore<br>信号量，通过信号量控制线程最大并发数量为 1 的话同样可以实现线程同步。</p>
-<p>dispatch_semaphore_wait() 函数会让信号量减 1。如果信号量大于 0 会执行后续代码。如果信号量 &lt;&#x3D; 0 会进入休眠直到大于 0 才可以继续执行后续代码。<br>dispatch_semaphore_signal() 会让信号量加 1。</p>
-<p>186：@synchronized 编译器语法糖<br>是 pthread_mutex_t 的封装。最简单的同步方案。<br>源码是在 objc4 库的 objc-sync.h objc-sync.mm 文件中，objc_sync_entry() objc_sync_exit()。发现是对 pthread_mutex_t 递归锁的封装。</p>
-<p>187：<br>总结线程同步方案：<br>性能从高到底</p>
-<ol>
-<li>os_unfair_lock</li>
-<li>OSSpinLock</li>
-<li>dispatch_semaphore</li>
-<li>pthread_mutex</li>
-<li>dispatch_queue(DISPATCH_QUEUE_SERIAL)</li>
-<li>NSLock</li>
-<li>NSCondition</li>
-<li>pthread_mutex(recursive)</li>
-<li>NSRecursiveLock</li>
-<li>NSConditionLock</li>
-<li>@synchronized</li>
-</ol>
-<p>188：自旋锁，互斥锁对比</p>
-<ul>
-<li>什么情况使用自旋锁比较划算？<ul>
-<li>预计线程等待锁的时间很短</li>
-<li>加锁的代码（临界区）经常被调用，但竞争情况很少发生</li>
-<li>CPU 资源不紧张</li>
-<li>多核心处理器</li>
-</ul>
-</li>
-<li>什么情况使用互斥锁比较划算<ul>
-<li>预计线程等待锁的时间较长</li>
-<li>单核处理器</li>
-<li>加锁的代码有 IO 操作</li>
-<li>加锁的代码复杂，循环量大</li>
-<li>加锁的代码竞争频繁</li>
-</ul>
-</li>
-</ul>
-<p>189：atomic<br>属于属性的修饰符，但在 iOS 中只推荐使用 nonatomic。atomic 更多用于 macOS 中。atomic 的作用是使属性的 getter 和 setter 是原子的，意思是属性的 setter 方法和 getter 方法都进行了加锁。<br>源码在 objc4 中。objc-accessors.mm 中，可以看到 atomic 的情况下进行了加锁。<br>但是又说没有办法保证使用属性的线程是安全的？这是什么意思<br>这个还是需要 AI 再详细解读一下了<br>问清楚为什么在 iOS 中不推荐使用 atomic。</p>
-<p>190-192：读写安全<br>文件的读写安全的实现。</p>
-<ol>
-<li>信号量最大并发为1，可以实现，但是只能单读单写。如果要实现多读单写就不能使用信号量了。多个线程可以同时读取数据，但只有一个线程写入数据，读和写是不能同时进行（只能有一个线程写，且写的时候无法读，可以有多个线程读但读的时候无法写）</li>
-<li>pthread_rwlock 读写锁，等待锁的线程会进入休眠 <figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="meta">#import <span class="string">&lt;pthread.h&gt;</span></span></span><br><span class="line"></span><br><span class="line">pthread_rwlock_t lock;</span><br><span class="line">pthread_rwlock_init(&amp;lock, <span class="literal">NULL</span>);</span><br><span class="line"><span class="comment">// 读锁</span></span><br><span class="line">pthread_rwlock_rdlock(&amp;lock);</span><br><span class="line"><span class="comment">// ......</span></span><br><span class="line">pthread_rwlock_unlock(&amp;lock);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 写锁</span></span><br><span class="line">pthread_rwlock_wrlock(&amp;lock);</span><br><span class="line"><span class="comment">// ......</span></span><br><span class="line">pthread_rwlock_unlock(&amp;lock);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 释放锁</span></span><br><span class="line">pthread_rwlock_destroy(&amp;lock);</span><br></pre></td></tr></table></figure></li>
-<li>dispatch_barrier_async 异步栅栏函数 <figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 必须使用创建的并发队列，全局并发队列或串行队列都无效</span></span><br><span class="line"><span class="built_in">dispatch_queue_t</span> queue = dispatch_queue_create(<span class="string">&quot;rw_queue&quot;</span>, DISPATCH_QUEUE_CONCURRENT);</span><br><span class="line"><span class="built_in">dispatch_async</span>(queue, ^&#123;</span><br><span class="line">	<span class="comment">// 读操作...</span></span><br><span class="line">&#125;);</span><br><span class="line">dispatch_barrier_async(queue, ^&#123;</span><br><span class="line">	<span class="comment">// 写操作...</span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></li>
-</ol>
-]]></content>
-      <categories>
-        <category>iOS 底层原理</category>
-      </categories>
-  </entry>
-  <entry>
     <title>密码学概述</title>
     <url>/2021/06/10/%E5%AF%86%E7%A0%81%E5%AD%A6%E6%A6%82%E8%BF%B0/</url>
     <content><![CDATA[<p>密码学（来自希腊语kryptos，意思是隐藏）一词的核心是指使数据无法被窥探者读取的技术。当然，密码学也可以用于其他目的。密码学包括一系列技术，如验证数据的真实性（检测是否修改）、确定个人或其他实体的身份、确定谁发送了特定消息或创建了特定数据片段、通过网络安全地发送数据、用密码或口令安全地锁定文件等等。</p>
@@ -5859,6 +5467,88 @@ m<sup>k * φ(n) + 1</sup> mod n = m
         <tag>RSA</tag>
         <tag>DES</tag>
         <tag>AES</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>揭开神秘的iOS布局</title>
+    <url>/2018/03/26/%E6%8F%AD%E7%A7%98iOS%E5%B8%83%E5%B1%80/</url>
+    <content><![CDATA[<p>翻译自: <a href="http://tech.gc.com/demystifying-ios-layout/">Demystifying iOS Layout</a></p>
+<p>在你刚开始开发iOS应用时,最难避免或者说最难调试的是处理视图的布局和内容;通常这些事情的发生是因为对 <strong>视图更新</strong> 真实发生存在误解;了解 <strong>视图更新</strong> 的方式和时间需要更深入地了解iOS应用程序的主运行循环,以及它如何与<code>UIView</code>提供的某些方法关联;这篇博文将解释这些互动,希望澄清如何使用<code>UIView</code>的方法来获得你想要的行为;</p>
+<h2 id="iOS应用程序的主运行循环"><a href="#iOS应用程序的主运行循环" class="headerlink" title="iOS应用程序的主运行循环"></a>iOS应用程序的主运行循环</h2><p>iOS应用程序的主运行循环用来处理所有用户输入事件并在您的应用程序中触发适当的响应;任何与应用程序的用户交互都会被添加到事件队列中;应用程序对象(如下图所示)将事件队列中的事件取出,并将它们分派给应用程序中的其他对象;<strong>它本质上是通过解释来自用户的输入事件并在应用程序的核心对象中为该输入调用相应的处理程序来执行运行循环</strong>;这些处理程序调用应用程序开发人员编写的代码;一旦这些方法调用返回,控制回到主运行循环并且开始更新周期;更新周期负责布局和重绘视图(在下一节中介绍);下面是应用程序如何与设备进行通信并处理用户输入的插图</p>
+<p>538</p>
+<p><em><a href="https://developer.apple.com/library/content/documentation/General/Conceptual/Devpedia-CocoaApp/MainEventLoop.html">https://developer.apple.com/library/content/documentation/General/Conceptual/Devpedia-CocoaApp/MainEventLoop.html</a></em></p>
+<h2 id="更新周期-Update-Cycle"><a href="#更新周期-Update-Cycle" class="headerlink" title="更新周期(Update Cycle)"></a>更新周期(Update Cycle)</h2><p>更新周期是应用程序完成运行所有事件处理代码后,控制权返回到主运行循环的点;就是在这个点,系统开始更新布局,显示和约束;如果您要求改变视图而它正在执行事件处理程序,系统会将此视图标记为需要重绘;在下一次更新周期,系统将执行这些视图上所有的变化;用户交互和布局更新之间的时间间隔对用户来说应该是感觉不到的;iOS应用程序通常以60fps动画,这意味着一个刷新周期只需要1&#x2F;60秒;由于这种情况发生的速度很快,用户不会注意到她与设备上的应用程序进行交互和看到内容和布局更新之间的UI的滞后;但是,由于事件被执行的时间和相应视图的重绘时间之间存在时间间隔,所以在运行循环过程中,视图可能不会按照您希望的方式更新;如果您有任何计算依赖视图最新的内容或布局,您有可能操作的是该视图的旧的内容或布局而不是最新的;了解运行循环,更新周期和某些的<code>UIView</code>方法能够帮助避免或者调试这类问题;</p>
+<p>您可以在下图中看到更新周期在运行循环结束时如何发生<br>1185</p>
+<h2 id="布局"><a href="#布局" class="headerlink" title="布局"></a>布局</h2><p>视图的布局指的是它在屏幕上的大小和位置;每一个视图都有一个<code>frame</code>属性来描述它在父视图坐标系统中的位置以及它的大小;<code>UIView</code>提供了一些方法,可以让你通知系统一个视图的布局已经改变,同时为你提供了可以重写的方法,以便在重新计算视图的布局后定义要执行的操作</p>
+<h3 id="layoutSubviews"><a href="#layoutSubviews" class="headerlink" title="layoutSubviews()"></a>layoutSubviews()</h3><p>这个<code>UIView</code>方法调整视图及其所有子视图的大小和位置;它给出当前视图和每个子视图的位置和大小;此方法很昂贵,因为它对视图的所有子视图起作用并调用其相应的<code>layoutSubviews</code>方法;系统会在任何需要重新计算视图的 frame 属性时调用此方法,因此当您想要设置 frame 属性指定视图位置和大小的时候您应该重写此方法;但是,当您的视图层次结构需要布局刷新时,您绝不应该显示的调用它;相反,在运行循环期间,您可以使用多种机制在不同点触发<code>layoutSubviews</code>调用,这比直接调用<code>layoutSubviews</code>方法要便宜的多;</p>
+<p>当<code>layoutSubviews</code>方法完成时,将在拥有该视图的视图控制器中触发对<code>viewDidLayoutSubviews</code>的调用;<strong>由于<code>layoutSubviews</code>是更新视图布局后可靠调用的唯一方法,因此应该将任何取决于布局和大小的逻辑代码方法<code>viewDidLayoutSubviews</code>中,而不是放在<code>viewDidLoad</code>或<code>viewDidAppear</code>中</strong>;这是避免使用过时的布局或者位置变量的唯一方法。</p>
+<h2 id="自动刷新触发器"><a href="#自动刷新触发器" class="headerlink" title="自动刷新触发器"></a>自动刷新触发器</h2><p>有多个事件会自动地将视图标记为布局已经改变,所以该视图的<code>layoutSubviews</code>方法将在下一次更新周期时被系统调用,不需要开发人员手动执行这个方法;</p>
+<p>这些自动将视图标记为布局已经改变的方式有以下几种:</p>
+<ul>
+<li>改变视图的大小</li>
+<li>添加子视图</li>
+<li>用户滚动<code>UIScrollView</code>(<code>layoutSubviews</code>方法会被<code>UIScrollView</code>以及它的父视图调用)</li>
+<li>用户旋转设备</li>
+<li>更新视图的约束</li>
+</ul>
+<p>以上这些方式都告诉系统,视图的位置需要重新计算并且会自动导致最终的<code>layoutSubviews</code>方法的调用;当然,也有直接触发<code>layoutSubviews</code>方法调用的办法;</p>
+<h3 id="setNeedsLayout"><a href="#setNeedsLayout" class="headerlink" title="setNeedsLayout()"></a>setNeedsLayout()</h3><p>触发<code>layoutSubviews</code>调用最省资源的方式就是在您的视图上调用<code>setNeedsLayout</code>方法;这将指示系统这个视图的布局需要重新计算;<code>setNeedsLayout</code>执行并立即返回,并且在返回之前并不实际更新视图;相反,视图将会在下一个更新周期(系统调用这些视图以及后续所有子视图的<code>layoutSubviews</code>方法)实际更新视图的布局;即使从<code>setNeedsLayout</code>返回后到视图被重新绘制布局之间有一段任意的时间间隔,但是这个延迟不会对用户造成影响,因为永远不会长到对界面造成卡顿;</p>
+<h3 id="layoutIfNeeded"><a href="#layoutIfNeeded" class="headerlink" title="layoutIfNeeded()"></a>layoutIfNeeded()</h3><p><code>layoutIfNeeded</code>是<code>UIView</code>的另一个将会在不久后触发<code>layoutSubviews</code>调用的方法;与<code>setNeedsLayout</code>会让视图在下一个周期调用<code>layoutSubviews</code>更新视图不同,<code>layoutIfNeeded</code>会立即触发<code>layoutSubviews</code>方法调用,如果视图需要布局更新的话;如果你在调用<code>setNeedsLayout</code>方法或者触发上面描述的自动刷新触发器之后调用了<code>layoutIfNeeded</code>方法,<code>layoutSubviews</code>将会在视图上被调用;然而,如果你调用<code>layoutIfNeeded</code>之后没有动作指示系统视图需要重新刷新视图,那么<code>layoutSubviews</code>方法将不会被调用;<br>在一次运行循环中,两次调用视图的<code>layoutIfNeeded</code>方法之间,视图的布局并没有变化的话,那么第二次调用将不会触发<code>layoutSubviews</code>的调用;</p>
+<p>与<code>setNeedsLayout</code>方法不同,使用<code>layoutIfNeeded</code>方法,布局和重绘会在函数返回之前立即发生改变(除非有正在运行中的动画);这个方法在你需要依赖新的布局而又无法等待视图的下次更新周期到来的时候特别有用;然而,除了这种情况外,你还是应该调用<code>setNeedsLayout</code>然后等待下次更新周期的到来,这样在每次运行循环中都只会更新一次布局;</p>
+<p>动画更改约束时,此方法特别有用;您应该在动画的 block 开始之前调用一次<code>layoutIfNeeded</code>,以确保在动画开始之前通知所有的布局更新;配置新的约束,然后在动画 block 内,再次调用<code>layoutIfNeeded</code>以动画到最新的状态;</p>
+<h2 id="显示"><a href="#显示" class="headerlink" title="显示"></a>显示</h2><p>视图的显示包含颜色,文本,图片和Core Graphics绘制等视图属性,但不包含它和它的子视图的大小和位置;和布局的方法类似,显示也有触发更新的方法,它们由系统在检测到更新时被自动调用,或者我们可以手动调用直接触发更新;</p>
+<h3 id="draw"><a href="#draw" class="headerlink" title="draw(_:)"></a>draw(_:)</h3><p><code>UIView</code>的<code>draw</code>方法(Objective-C中的<code>drawRect</code>)对视图的显示内容的作用	就像 <code>layoutSubviews</code>方法对视图的位置和尺寸的作用;同<code>layoutSubviews</code>一样,你不应该在代码中直接调用<code>draw</code>方法,而应该在运行循环的不同点调用能触发<code>draw</code>方法调用的方法;然而,与<code>layoutSubviews</code>方法不同的是,<code>draw</code>方法不会触发后续子视图的调用;</p>
+<h3 id="setNeedsDisplay"><a href="#setNeedsDisplay" class="headerlink" title="setNeedsDisplay()"></a>setNeedsDisplay()</h3><p>这个方法类似布局中的<code>setNeedsLayout</code>;它会给有显示内容更新的视图设置一个内部的标记之后返回,并不会真正的视图重绘;而是在接下来的更新周期中,系统会遍历所有已被标记的视图,调用它们的<code>draw</code>方法;如果你只想在下次更新时重绘部分的视图,你可以调用<code>setNeedsDisplay(_:)</code>(Objective-C中的<code>setNeedsDisplayInRect:</code>)方法,并把希望重绘的矩形部分传入参数;</p>
+<p>大部分时候,在视图中更新任何 UI 组件都会通过自动设置内部的”显示内容更新”标记将视图标记为”dirty”的;导致在下一次更新周期中视图的内容就会重绘而不需要直接显示调用<code>setNeedsDisplay</code>;然而如果你有一个属性没有绑定到UI控件,但需要在属性值每次更新重绘视图,那么你可以实现该属性的<code>didSet</code>方法,并在里面调用<code>setNeedsDisplay</code>方法来触发视图的更新;</p>
+<p>有时设置一个属性要求自定义绘制,这种情况下你需要重写<code>draw</code>方法;在下面的例子中,设置<code>numberOfPoints</code>会触发系统根据具体点数绘制不同的视图;在这个例子中,你需要在<code>draw</code>方法中实现自定义绘制,并在<code>numberOfPoints</code>的property observer里调用<code>setNeedsDisplay</code>;</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Class MyView: UIView &#123;</span><br><span class="line">	var numberOfPoints = 0 &#123;</span><br><span class="line">		didSet &#123;</span><br><span class="line">			setNeedsDisplay()</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	override func draw(_ rect: CGRect) &#123;</span><br><span class="line">		switch numberOfPoints &#123;</span><br><span class="line">		case 0: </span><br><span class="line">			return</span><br><span class="line">		case 1: </span><br><span class="line">			drawPoint(rect)</span><br><span class="line">		case 2:</span><br><span class="line">			drawLine(rect)</span><br><span class="line">		case 3: </span><br><span class="line">			drawTriangle(rect)</span><br><span class="line">		case 4:</span><br><span class="line">			drawRectangle(rect)</span><br><span class="line">		case 5: </span><br><span class="line">			drawPentagon(rect)</span><br><span class="line">		default:</span><br><span class="line">			drawEllipse(rect)</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>视图的显示方法里没有类似布局中的<code>layoutIfNeeded</code>这样可以触发立即更新的方法;通常情况下等到下一个更新周期再重新绘制视图也无所谓;</p>
+<h2 id="约束"><a href="#约束" class="headerlink" title="约束"></a>约束</h2><p>在自动布局技术中布局和重绘视图有三个步骤;第一步是更新约束,系统计算并设置视图上所有必需的约束条件;第二步是布局阶段,布局引擎计算视图和子视图的 frame 并且将它们布局;最后一步完成这一循环的是显示阶段;第三步完成此次循环的是显示阶段,如果有必要,那么通过调用视图的<code>draw</code>方法重绘视图的内容;</p>
+<h3 id="updateConstraints"><a href="#updateConstraints" class="headerlink" title="updateConstraints()"></a>updateConstraints()</h3><p>这个方法用在自动布局中动态的改变视图的约束;和布局中的<code>layoutSubviews</code>方法和显示内容中的<code>draw</code>方法类似,<code>updateConstraints</code>只应该被重写,而不应该在你的代码中直接调用;一般来说,您应该在<code>updateConstraints</code>方法中仅仅实现必须要更新的约束;静态的约束应该设置在interface builder,视图的初始化方法(initializer)或者控制器的<code>viewDidLoad</code>中;</p>
+<p>通常情况下,开启或者关闭约束,更改约束的优先级或者常量值,或者从视图层级中移除一个视图时都会设置一个内部的标记,这个标记将会在下一次更新周期触发<code>updateConstraints</code>方法调用;当然啦,也有手动的给视图打上需要更新约束的标记的方法,如下:</p>
+<h3 id="setNeedsUpdateConstraints"><a href="#setNeedsUpdateConstraints" class="headerlink" title="setNeedsUpdateConstraints()"></a>setNeedsUpdateConstraints()</h3><p>调用<code>setNeedsUpdateConstraints</code>会保证在下一次的更新周期中更新约束;它通过标记视图的约束已更新来触发<code>updateConstraints</code>调用;这个方法和<code>setNeedsDisplay</code>,<code>setNeedsLayout</code>方法的工作机制类似;</p>
+<h3 id="updateConstraintsIfNeeded"><a href="#updateConstraintsIfNeeded" class="headerlink" title="updateConstraintsIfNeeded()"></a>updateConstraintsIfNeeded()</h3><p>这个方法就等同于使用了自动布局的视图中的<code>layoutIfNeeded</code>方法;它会检查视图约束是否更新的标记(能够被自动设置,或者通过<code>setNeedsUpdateConstraints</code>设置,或者通过<code>invalidateInstrinsicContentSize</code>设置),如果它表明约束需要更新,它将立刻触发<code>updateConstraints</code>方法的调用而不需要等到运行循环的结束;</p>
+<h3 id="invalidateIntrinsicContentSize"><a href="#invalidateIntrinsicContentSize" class="headerlink" title="invalidateIntrinsicContentSize()"></a>invalidateIntrinsicContentSize()</h3><p>一些使用自动布局的视图中会有一个<code>intrinsicContentSize</code>的属性,这是视图根据它的内容得到的自然尺寸;一个视图的<code>intrinsicContentSize</code>属性通常由所包含的元素的约束来决定,但是也可以通过重写来提供自定义的行为;调用<code>invalidateIntrinsicContentSize</code>会设置一个标记表示这个视图的<code>intrinsicContentSize</code>已经过期,需要在下一个布局阶段重新计算;</p>
+<h2 id="它们是如何连接的"><a href="#它们是如何连接的" class="headerlink" title="它们是如何连接的"></a>它们是如何连接的</h2><p>视图的布局,显示以及约束都遵循着相似的模式,例如它们更新的方式以及如何在运行循环的不同点上强制更新;任意组件都有一个实际去更新的方法(<code>layoutSubviews</code>,<code>draw</code>,以及<code>updateConstraints</code>),你可以重写来手动操作视图,但是任何情况下都不要在你的代码中直接调用;这些方法仅仅在视图有标记,告诉系统视图的某些组件需要更新了,在主运行循环的后面被调用;有些操作会自动设置这个标志,也有一些方法能够让您手动的设置它;对于布局和约束的更新,如果您无法等到更新周期的到来(因为有些操作依赖最新的布局),有这么一些方法可以让你立即更新,并保证布局需要更新标记被正确标记;下面的表格列出了任意组件会怎样更新及其对应方法;</p>
+<table>
+<thead>
+<tr>
+<th>Method purposes</th>
+<th>Layout</th>
+<th>Display</th>
+<th>Constraints</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Implement updates(override,don’t call explicitly)</td>
+<td><code>layoutSubviews</code></td>
+<td><code>draw</code></td>
+<td><code>updateConstraints</code></td>
+</tr>
+<tr>
+<td>Explicitly mark view as needing update on next update cycle</td>
+<td><code>setNeedsLayout</code></td>
+<td><code>setNeedsDisplay</code></td>
+<td><code>setNeedsUpdateConstraints</code> <code>invalidateIntrinsicContentSize</code></td>
+</tr>
+<tr>
+<td>Update iimmediately if view is marked as ‘dirty’</td>
+<td><code>layoutIfNeeded</code></td>
+<td></td>
+<td><code>updateConstraintsIfNeeded</code></td>
+</tr>
+<tr>
+<td>Actions that implicitly cause views to be updated</td>
+<td><code>addSubview</code><br> Resizing视图,通过<code>setFrame</code>改变视图的<code>bounds</code>(不只是translation)<br>用户滑动UIScrollView<br>用户旋转设备</td>
+<td>改变视图的<code>bounds</code></td>
+<td>激活&#x2F;禁用约束<br>更改约束的值或者优先级<br>从视图层次结构中移除视图</td>
+</tr>
+</tbody></table>
+<p>下面的流程图总结了<strong>更新周期</strong>和<strong>事件循环</strong>之间的交互,并指出了上文提到的方法在<strong>运行循环</strong>期间的位置;你可以在运行循环中的任意一点直接的调用<code>layoutIfNeeded</code>或者<code>updateConstraintsIfNeeded</code>,需要记住,这开销会很大;在循环的主运行循环的后面是更新周期,如果视图被设置特定的”需要更新约束”,”需要更新布局”或者”需要更新显示”的标记,在这个节点会进行更新约束,更新布局以及更新显示内容;一旦这些更新结束,主运行循环会重新开始;</p>
+<p>8831<em><a href="https://i.stack.imgur.com/i9YuN.png">https://i.stack.imgur.com/i9YuN.png</a></em></p>
+]]></content>
+      <tags>
+        <tag>iOS</tag>
       </tags>
   </entry>
   <entry>
@@ -6287,88 +5977,6 @@ m<sup>k * φ(n) + 1</sup> mod n = m
         <tag>逆向</tag>
         <tag>微信</tag>
         <tag>插件</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>揭开神秘的iOS布局</title>
-    <url>/2018/03/26/%E6%8F%AD%E7%A7%98iOS%E5%B8%83%E5%B1%80/</url>
-    <content><![CDATA[<p>翻译自: <a href="http://tech.gc.com/demystifying-ios-layout/">Demystifying iOS Layout</a></p>
-<p>在你刚开始开发iOS应用时,最难避免或者说最难调试的是处理视图的布局和内容;通常这些事情的发生是因为对 <strong>视图更新</strong> 真实发生存在误解;了解 <strong>视图更新</strong> 的方式和时间需要更深入地了解iOS应用程序的主运行循环,以及它如何与<code>UIView</code>提供的某些方法关联;这篇博文将解释这些互动,希望澄清如何使用<code>UIView</code>的方法来获得你想要的行为;</p>
-<h2 id="iOS应用程序的主运行循环"><a href="#iOS应用程序的主运行循环" class="headerlink" title="iOS应用程序的主运行循环"></a>iOS应用程序的主运行循环</h2><p>iOS应用程序的主运行循环用来处理所有用户输入事件并在您的应用程序中触发适当的响应;任何与应用程序的用户交互都会被添加到事件队列中;应用程序对象(如下图所示)将事件队列中的事件取出,并将它们分派给应用程序中的其他对象;<strong>它本质上是通过解释来自用户的输入事件并在应用程序的核心对象中为该输入调用相应的处理程序来执行运行循环</strong>;这些处理程序调用应用程序开发人员编写的代码;一旦这些方法调用返回,控制回到主运行循环并且开始更新周期;更新周期负责布局和重绘视图(在下一节中介绍);下面是应用程序如何与设备进行通信并处理用户输入的插图</p>
-<p>538</p>
-<p><em><a href="https://developer.apple.com/library/content/documentation/General/Conceptual/Devpedia-CocoaApp/MainEventLoop.html">https://developer.apple.com/library/content/documentation/General/Conceptual/Devpedia-CocoaApp/MainEventLoop.html</a></em></p>
-<h2 id="更新周期-Update-Cycle"><a href="#更新周期-Update-Cycle" class="headerlink" title="更新周期(Update Cycle)"></a>更新周期(Update Cycle)</h2><p>更新周期是应用程序完成运行所有事件处理代码后,控制权返回到主运行循环的点;就是在这个点,系统开始更新布局,显示和约束;如果您要求改变视图而它正在执行事件处理程序,系统会将此视图标记为需要重绘;在下一次更新周期,系统将执行这些视图上所有的变化;用户交互和布局更新之间的时间间隔对用户来说应该是感觉不到的;iOS应用程序通常以60fps动画,这意味着一个刷新周期只需要1&#x2F;60秒;由于这种情况发生的速度很快,用户不会注意到她与设备上的应用程序进行交互和看到内容和布局更新之间的UI的滞后;但是,由于事件被执行的时间和相应视图的重绘时间之间存在时间间隔,所以在运行循环过程中,视图可能不会按照您希望的方式更新;如果您有任何计算依赖视图最新的内容或布局,您有可能操作的是该视图的旧的内容或布局而不是最新的;了解运行循环,更新周期和某些的<code>UIView</code>方法能够帮助避免或者调试这类问题;</p>
-<p>您可以在下图中看到更新周期在运行循环结束时如何发生<br>1185</p>
-<h2 id="布局"><a href="#布局" class="headerlink" title="布局"></a>布局</h2><p>视图的布局指的是它在屏幕上的大小和位置;每一个视图都有一个<code>frame</code>属性来描述它在父视图坐标系统中的位置以及它的大小;<code>UIView</code>提供了一些方法,可以让你通知系统一个视图的布局已经改变,同时为你提供了可以重写的方法,以便在重新计算视图的布局后定义要执行的操作</p>
-<h3 id="layoutSubviews"><a href="#layoutSubviews" class="headerlink" title="layoutSubviews()"></a>layoutSubviews()</h3><p>这个<code>UIView</code>方法调整视图及其所有子视图的大小和位置;它给出当前视图和每个子视图的位置和大小;此方法很昂贵,因为它对视图的所有子视图起作用并调用其相应的<code>layoutSubviews</code>方法;系统会在任何需要重新计算视图的 frame 属性时调用此方法,因此当您想要设置 frame 属性指定视图位置和大小的时候您应该重写此方法;但是,当您的视图层次结构需要布局刷新时,您绝不应该显示的调用它;相反,在运行循环期间,您可以使用多种机制在不同点触发<code>layoutSubviews</code>调用,这比直接调用<code>layoutSubviews</code>方法要便宜的多;</p>
-<p>当<code>layoutSubviews</code>方法完成时,将在拥有该视图的视图控制器中触发对<code>viewDidLayoutSubviews</code>的调用;<strong>由于<code>layoutSubviews</code>是更新视图布局后可靠调用的唯一方法,因此应该将任何取决于布局和大小的逻辑代码方法<code>viewDidLayoutSubviews</code>中,而不是放在<code>viewDidLoad</code>或<code>viewDidAppear</code>中</strong>;这是避免使用过时的布局或者位置变量的唯一方法。</p>
-<h2 id="自动刷新触发器"><a href="#自动刷新触发器" class="headerlink" title="自动刷新触发器"></a>自动刷新触发器</h2><p>有多个事件会自动地将视图标记为布局已经改变,所以该视图的<code>layoutSubviews</code>方法将在下一次更新周期时被系统调用,不需要开发人员手动执行这个方法;</p>
-<p>这些自动将视图标记为布局已经改变的方式有以下几种:</p>
-<ul>
-<li>改变视图的大小</li>
-<li>添加子视图</li>
-<li>用户滚动<code>UIScrollView</code>(<code>layoutSubviews</code>方法会被<code>UIScrollView</code>以及它的父视图调用)</li>
-<li>用户旋转设备</li>
-<li>更新视图的约束</li>
-</ul>
-<p>以上这些方式都告诉系统,视图的位置需要重新计算并且会自动导致最终的<code>layoutSubviews</code>方法的调用;当然,也有直接触发<code>layoutSubviews</code>方法调用的办法;</p>
-<h3 id="setNeedsLayout"><a href="#setNeedsLayout" class="headerlink" title="setNeedsLayout()"></a>setNeedsLayout()</h3><p>触发<code>layoutSubviews</code>调用最省资源的方式就是在您的视图上调用<code>setNeedsLayout</code>方法;这将指示系统这个视图的布局需要重新计算;<code>setNeedsLayout</code>执行并立即返回,并且在返回之前并不实际更新视图;相反,视图将会在下一个更新周期(系统调用这些视图以及后续所有子视图的<code>layoutSubviews</code>方法)实际更新视图的布局;即使从<code>setNeedsLayout</code>返回后到视图被重新绘制布局之间有一段任意的时间间隔,但是这个延迟不会对用户造成影响,因为永远不会长到对界面造成卡顿;</p>
-<h3 id="layoutIfNeeded"><a href="#layoutIfNeeded" class="headerlink" title="layoutIfNeeded()"></a>layoutIfNeeded()</h3><p><code>layoutIfNeeded</code>是<code>UIView</code>的另一个将会在不久后触发<code>layoutSubviews</code>调用的方法;与<code>setNeedsLayout</code>会让视图在下一个周期调用<code>layoutSubviews</code>更新视图不同,<code>layoutIfNeeded</code>会立即触发<code>layoutSubviews</code>方法调用,如果视图需要布局更新的话;如果你在调用<code>setNeedsLayout</code>方法或者触发上面描述的自动刷新触发器之后调用了<code>layoutIfNeeded</code>方法,<code>layoutSubviews</code>将会在视图上被调用;然而,如果你调用<code>layoutIfNeeded</code>之后没有动作指示系统视图需要重新刷新视图,那么<code>layoutSubviews</code>方法将不会被调用;<br>在一次运行循环中,两次调用视图的<code>layoutIfNeeded</code>方法之间,视图的布局并没有变化的话,那么第二次调用将不会触发<code>layoutSubviews</code>的调用;</p>
-<p>与<code>setNeedsLayout</code>方法不同,使用<code>layoutIfNeeded</code>方法,布局和重绘会在函数返回之前立即发生改变(除非有正在运行中的动画);这个方法在你需要依赖新的布局而又无法等待视图的下次更新周期到来的时候特别有用;然而,除了这种情况外,你还是应该调用<code>setNeedsLayout</code>然后等待下次更新周期的到来,这样在每次运行循环中都只会更新一次布局;</p>
-<p>动画更改约束时,此方法特别有用;您应该在动画的 block 开始之前调用一次<code>layoutIfNeeded</code>,以确保在动画开始之前通知所有的布局更新;配置新的约束,然后在动画 block 内,再次调用<code>layoutIfNeeded</code>以动画到最新的状态;</p>
-<h2 id="显示"><a href="#显示" class="headerlink" title="显示"></a>显示</h2><p>视图的显示包含颜色,文本,图片和Core Graphics绘制等视图属性,但不包含它和它的子视图的大小和位置;和布局的方法类似,显示也有触发更新的方法,它们由系统在检测到更新时被自动调用,或者我们可以手动调用直接触发更新;</p>
-<h3 id="draw"><a href="#draw" class="headerlink" title="draw(_:)"></a>draw(_:)</h3><p><code>UIView</code>的<code>draw</code>方法(Objective-C中的<code>drawRect</code>)对视图的显示内容的作用	就像 <code>layoutSubviews</code>方法对视图的位置和尺寸的作用;同<code>layoutSubviews</code>一样,你不应该在代码中直接调用<code>draw</code>方法,而应该在运行循环的不同点调用能触发<code>draw</code>方法调用的方法;然而,与<code>layoutSubviews</code>方法不同的是,<code>draw</code>方法不会触发后续子视图的调用;</p>
-<h3 id="setNeedsDisplay"><a href="#setNeedsDisplay" class="headerlink" title="setNeedsDisplay()"></a>setNeedsDisplay()</h3><p>这个方法类似布局中的<code>setNeedsLayout</code>;它会给有显示内容更新的视图设置一个内部的标记之后返回,并不会真正的视图重绘;而是在接下来的更新周期中,系统会遍历所有已被标记的视图,调用它们的<code>draw</code>方法;如果你只想在下次更新时重绘部分的视图,你可以调用<code>setNeedsDisplay(_:)</code>(Objective-C中的<code>setNeedsDisplayInRect:</code>)方法,并把希望重绘的矩形部分传入参数;</p>
-<p>大部分时候,在视图中更新任何 UI 组件都会通过自动设置内部的”显示内容更新”标记将视图标记为”dirty”的;导致在下一次更新周期中视图的内容就会重绘而不需要直接显示调用<code>setNeedsDisplay</code>;然而如果你有一个属性没有绑定到UI控件,但需要在属性值每次更新重绘视图,那么你可以实现该属性的<code>didSet</code>方法,并在里面调用<code>setNeedsDisplay</code>方法来触发视图的更新;</p>
-<p>有时设置一个属性要求自定义绘制,这种情况下你需要重写<code>draw</code>方法;在下面的例子中,设置<code>numberOfPoints</code>会触发系统根据具体点数绘制不同的视图;在这个例子中,你需要在<code>draw</code>方法中实现自定义绘制,并在<code>numberOfPoints</code>的property observer里调用<code>setNeedsDisplay</code>;</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Class MyView: UIView &#123;</span><br><span class="line">	var numberOfPoints = 0 &#123;</span><br><span class="line">		didSet &#123;</span><br><span class="line">			setNeedsDisplay()</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	override func draw(_ rect: CGRect) &#123;</span><br><span class="line">		switch numberOfPoints &#123;</span><br><span class="line">		case 0: </span><br><span class="line">			return</span><br><span class="line">		case 1: </span><br><span class="line">			drawPoint(rect)</span><br><span class="line">		case 2:</span><br><span class="line">			drawLine(rect)</span><br><span class="line">		case 3: </span><br><span class="line">			drawTriangle(rect)</span><br><span class="line">		case 4:</span><br><span class="line">			drawRectangle(rect)</span><br><span class="line">		case 5: </span><br><span class="line">			drawPentagon(rect)</span><br><span class="line">		default:</span><br><span class="line">			drawEllipse(rect)</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>视图的显示方法里没有类似布局中的<code>layoutIfNeeded</code>这样可以触发立即更新的方法;通常情况下等到下一个更新周期再重新绘制视图也无所谓;</p>
-<h2 id="约束"><a href="#约束" class="headerlink" title="约束"></a>约束</h2><p>在自动布局技术中布局和重绘视图有三个步骤;第一步是更新约束,系统计算并设置视图上所有必需的约束条件;第二步是布局阶段,布局引擎计算视图和子视图的 frame 并且将它们布局;最后一步完成这一循环的是显示阶段;第三步完成此次循环的是显示阶段,如果有必要,那么通过调用视图的<code>draw</code>方法重绘视图的内容;</p>
-<h3 id="updateConstraints"><a href="#updateConstraints" class="headerlink" title="updateConstraints()"></a>updateConstraints()</h3><p>这个方法用在自动布局中动态的改变视图的约束;和布局中的<code>layoutSubviews</code>方法和显示内容中的<code>draw</code>方法类似,<code>updateConstraints</code>只应该被重写,而不应该在你的代码中直接调用;一般来说,您应该在<code>updateConstraints</code>方法中仅仅实现必须要更新的约束;静态的约束应该设置在interface builder,视图的初始化方法(initializer)或者控制器的<code>viewDidLoad</code>中;</p>
-<p>通常情况下,开启或者关闭约束,更改约束的优先级或者常量值,或者从视图层级中移除一个视图时都会设置一个内部的标记,这个标记将会在下一次更新周期触发<code>updateConstraints</code>方法调用;当然啦,也有手动的给视图打上需要更新约束的标记的方法,如下:</p>
-<h3 id="setNeedsUpdateConstraints"><a href="#setNeedsUpdateConstraints" class="headerlink" title="setNeedsUpdateConstraints()"></a>setNeedsUpdateConstraints()</h3><p>调用<code>setNeedsUpdateConstraints</code>会保证在下一次的更新周期中更新约束;它通过标记视图的约束已更新来触发<code>updateConstraints</code>调用;这个方法和<code>setNeedsDisplay</code>,<code>setNeedsLayout</code>方法的工作机制类似;</p>
-<h3 id="updateConstraintsIfNeeded"><a href="#updateConstraintsIfNeeded" class="headerlink" title="updateConstraintsIfNeeded()"></a>updateConstraintsIfNeeded()</h3><p>这个方法就等同于使用了自动布局的视图中的<code>layoutIfNeeded</code>方法;它会检查视图约束是否更新的标记(能够被自动设置,或者通过<code>setNeedsUpdateConstraints</code>设置,或者通过<code>invalidateInstrinsicContentSize</code>设置),如果它表明约束需要更新,它将立刻触发<code>updateConstraints</code>方法的调用而不需要等到运行循环的结束;</p>
-<h3 id="invalidateIntrinsicContentSize"><a href="#invalidateIntrinsicContentSize" class="headerlink" title="invalidateIntrinsicContentSize()"></a>invalidateIntrinsicContentSize()</h3><p>一些使用自动布局的视图中会有一个<code>intrinsicContentSize</code>的属性,这是视图根据它的内容得到的自然尺寸;一个视图的<code>intrinsicContentSize</code>属性通常由所包含的元素的约束来决定,但是也可以通过重写来提供自定义的行为;调用<code>invalidateIntrinsicContentSize</code>会设置一个标记表示这个视图的<code>intrinsicContentSize</code>已经过期,需要在下一个布局阶段重新计算;</p>
-<h2 id="它们是如何连接的"><a href="#它们是如何连接的" class="headerlink" title="它们是如何连接的"></a>它们是如何连接的</h2><p>视图的布局,显示以及约束都遵循着相似的模式,例如它们更新的方式以及如何在运行循环的不同点上强制更新;任意组件都有一个实际去更新的方法(<code>layoutSubviews</code>,<code>draw</code>,以及<code>updateConstraints</code>),你可以重写来手动操作视图,但是任何情况下都不要在你的代码中直接调用;这些方法仅仅在视图有标记,告诉系统视图的某些组件需要更新了,在主运行循环的后面被调用;有些操作会自动设置这个标志,也有一些方法能够让您手动的设置它;对于布局和约束的更新,如果您无法等到更新周期的到来(因为有些操作依赖最新的布局),有这么一些方法可以让你立即更新,并保证布局需要更新标记被正确标记;下面的表格列出了任意组件会怎样更新及其对应方法;</p>
-<table>
-<thead>
-<tr>
-<th>Method purposes</th>
-<th>Layout</th>
-<th>Display</th>
-<th>Constraints</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>Implement updates(override,don’t call explicitly)</td>
-<td><code>layoutSubviews</code></td>
-<td><code>draw</code></td>
-<td><code>updateConstraints</code></td>
-</tr>
-<tr>
-<td>Explicitly mark view as needing update on next update cycle</td>
-<td><code>setNeedsLayout</code></td>
-<td><code>setNeedsDisplay</code></td>
-<td><code>setNeedsUpdateConstraints</code> <code>invalidateIntrinsicContentSize</code></td>
-</tr>
-<tr>
-<td>Update iimmediately if view is marked as ‘dirty’</td>
-<td><code>layoutIfNeeded</code></td>
-<td></td>
-<td><code>updateConstraintsIfNeeded</code></td>
-</tr>
-<tr>
-<td>Actions that implicitly cause views to be updated</td>
-<td><code>addSubview</code><br> Resizing视图,通过<code>setFrame</code>改变视图的<code>bounds</code>(不只是translation)<br>用户滑动UIScrollView<br>用户旋转设备</td>
-<td>改变视图的<code>bounds</code></td>
-<td>激活&#x2F;禁用约束<br>更改约束的值或者优先级<br>从视图层次结构中移除视图</td>
-</tr>
-</tbody></table>
-<p>下面的流程图总结了<strong>更新周期</strong>和<strong>事件循环</strong>之间的交互,并指出了上文提到的方法在<strong>运行循环</strong>期间的位置;你可以在运行循环中的任意一点直接的调用<code>layoutIfNeeded</code>或者<code>updateConstraintsIfNeeded</code>,需要记住,这开销会很大;在循环的主运行循环的后面是更新周期,如果视图被设置特定的”需要更新约束”,”需要更新布局”或者”需要更新显示”的标记,在这个节点会进行更新约束,更新布局以及更新显示内容;一旦这些更新结束,主运行循环会重新开始;</p>
-<p>8831<em><a href="https://i.stack.imgur.com/i9YuN.png">https://i.stack.imgur.com/i9YuN.png</a></em></p>
-]]></content>
-      <tags>
-        <tag>iOS</tag>
       </tags>
   </entry>
   <entry>
