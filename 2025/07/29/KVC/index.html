@@ -7,7 +7,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://masterking.github.io/images/iOS_low-level_principles.webp">
 <meta property="article:published_time" content="2025-07-29T06:21:57.000Z">
-<meta property="article:modified_time" content="2025-08-23T11:51:31.474Z">
+<meta property="article:modified_time" content="2025-08-23T12:05:33.545Z">
 <meta property="article:author" content="masterKing">
 <meta property="article:tag" content="KVC">
 <meta name="twitter:card" content="summary">
@@ -18,7 +18,7 @@
   "url": "https://masterking.github.io/2025/07/29/KVC/",
   "image": "https://masterking.github.io/images/iOS_low-level_principles.webp",
   "datePublished": "2025-07-29T06:21:57.000Z",
-  "dateModified": "2025-08-23T11:51:31.474Z",
+  "dateModified": "2025-08-23T12:05:33.545Z",
   "author": [
     {
       "@type": "Person",
@@ -169,7 +169,7 @@ btf.addGlobalFn('pjaxComplete', () => {
   isHighlightShrink: undefined,
   isToc: true,
   pageType: 'post'
-}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg" style="background: linear-gradient( 135deg, #2c241f, #968282);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/images/WechatIMG1.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">47</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">31</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">6</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/sileorepo/"><i class="fa-fw fas fa-shop"></i><span> sileo 源</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/images/iOS_low-level_principles.webp);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">masterKing 的博客</span></a><a class="nav-page-title" href="/"><span class="site-name">KVC</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/sileorepo/"><i class="fa-fw fas fa-shop"></i><span> sileo 源</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">KVC</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-07-29T06:21:57.000Z" title="发表于 2025-07-29 14:21:57">2025-07-29</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-08-23T11:51:31.474Z" title="更新于 2025-08-23 19:51:31">2025-08-23</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/iOS-%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86/">iOS 底层原理</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">总字数:</span><span class="word-count">4.2k</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span><span class="post-meta-separator">|</span><span class="post-meta-commentcount"><i class="far fa-comments fa-fw post-meta-icon"></i><span class="post-meta-label">评论数:</span><a href="/2025/07/29/KVC/#post-comment" itemprop="discussionUrl"><span class="valine-comment-count" data-xid="/2025/07/29/KVC/" itemprop="commentCount"><i class="fa-solid fa-spinner fa-spin"></i></span></a></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><div id="post-outdate-notice" data="{&quot;limitDay&quot;:365,&quot;messagePrev&quot;:&quot;距离上次更新已有&quot;,&quot;messageNext&quot;:&quot;天，文章某些内容可能已过时。&quot;,&quot;postUpdate&quot;:&quot;2025-08-23 19:51:31&quot;}" hidden></div><p>我不知道有多少人像本人一样，n 年来查看过不知道多少次这个 <a target="_blank" rel="noopener" href="https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/KeyValueCoding/index.html#//apple_ref/doc/uid/10000107-SW1">KVC 文档</a>，但是每次通篇读下来总是会遇到读不懂的地方，总是莫名其妙的出现一个章节完全不知道在讲什么东西，不论是用传统的 Google 翻译或者目前主流的 AI 翻译翻译了，也还是会遇到读起来狗屁不通的情况。</p>
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg" style="background: linear-gradient( 135deg, #2c241f, #968282);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/images/WechatIMG1.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">47</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">31</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">6</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/sileorepo/"><i class="fa-fw fas fa-shop"></i><span> sileo 源</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/images/iOS_low-level_principles.webp);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">masterKing 的博客</span></a><a class="nav-page-title" href="/"><span class="site-name">KVC</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/sileorepo/"><i class="fa-fw fas fa-shop"></i><span> sileo 源</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">KVC</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-07-29T06:21:57.000Z" title="发表于 2025-07-29 14:21:57">2025-07-29</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-08-23T12:05:33.545Z" title="更新于 2025-08-23 20:05:33">2025-08-23</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/iOS-%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86/">iOS 底层原理</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">总字数:</span><span class="word-count">4.2k</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span><span class="post-meta-separator">|</span><span class="post-meta-commentcount"><i class="far fa-comments fa-fw post-meta-icon"></i><span class="post-meta-label">评论数:</span><a href="/2025/07/29/KVC/#post-comment" itemprop="discussionUrl"><span class="valine-comment-count" data-xid="/2025/07/29/KVC/" itemprop="commentCount"><i class="fa-solid fa-spinner fa-spin"></i></span></a></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><div id="post-outdate-notice" data="{&quot;limitDay&quot;:365,&quot;messagePrev&quot;:&quot;距离上次更新已有&quot;,&quot;messageNext&quot;:&quot;天，文章某些内容可能已过时。&quot;,&quot;postUpdate&quot;:&quot;2025-08-23 20:05:33&quot;}" hidden></div><p>我不知道有多少人像本人一样，n 年来查看过不知道多少次这个 <a target="_blank" rel="noopener" href="https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/KeyValueCoding/index.html#//apple_ref/doc/uid/10000107-SW1">KVC 文档</a>，但是每次通篇读下来总是会遇到读不懂的地方，总是莫名其妙的出现一个章节完全不知道在讲什么东西，不论是用传统的 Google 翻译或者目前主流的 AI 翻译翻译了，也还是会遇到读起来狗屁不通的情况。</p>
 <ul>
 <li>其实根本原因是原始文档就有问题，东拼西凑的一坨屎，有歧义，导致不论你是直译还是意译都是让人摸不着头脑的翻译，只能根据上下文的理解才能正确翻译。为此作者将这份文档结合AI和个人理解做了全篇翻译，有需要的可以自行<a href="./book.zip">下载</a>。</li>
 <li>还有原始文档很多地方只写了要怎么做，但是没有告诉你为什么要这么做，就会让人觉得莫名其妙。</li>
@@ -177,29 +177,26 @@ btf.addGlobalFn('pjaxComplete', () => {
 </ul>
 <p>这次作者决定结合 AI 和个人的理解将 KVC 文档彻底弄清楚，即使不能完全弄明白也要留下一个深刻的印象，方便后续遇到文章中的场景时能够回想起来。</p>
 <hr>
-<h1 id="章节概览"><a href="#章节概览" class="headerlink" title="章节概览"></a>章节概览</h1><ul>
-<li><input checked="" disabled="" type="checkbox"> 建议阅读 </li>
-<li><input disabled="" type="checkbox"> 不建议阅读</li>
-</ul>
+<h1 id="章节概览"><a href="#章节概览" class="headerlink" title="章节概览"></a>章节概览</h1><p>✅ 建议阅读<br>❌ 不建议阅读</p>
 <h2 id="入门指南"><a href="#入门指南" class="headerlink" title="入门指南"></a>入门指南</h2><ol>
-<li><input checked="" disabled="" type="checkbox"> 关于键值编码</li>
+<li>✅ 关于键值编码</li>
 </ol>
 <h2 id="键值编码基础知识"><a href="#键值编码基础知识" class="headerlink" title="键值编码基础知识"></a>键值编码基础知识</h2><ol start="2">
-<li><input checked="" disabled="" type="checkbox"> 访问对象的属性</li>
-<li><input checked="" disabled="" type="checkbox"> 访问集合属性		</li>
-<li><input checked="" disabled="" type="checkbox"> 使用集合操作符</li>
-<li><input checked="" disabled="" type="checkbox"> 表示非对象值</li>
-<li><input disabled="" type="checkbox"> 验证属性</li>
-<li><input checked="" disabled="" type="checkbox"> 访问器搜索逻辑</li>
+<li>✅ 访问对象的属性</li>
+<li>✅ 访问集合属性		</li>
+<li>✅ 使用集合操作符</li>
+<li>✅ 表示非对象值</li>
+<li>❌ 验证属性</li>
+<li>✅ 访问器搜索逻辑</li>
 </ol>
 <h2 id="采用键值编码协议"><a href="#采用键值编码协议" class="headerlink" title="采用键值编码协议"></a>采用键值编码协议</h2><ol start="8">
-<li><input disabled="" type="checkbox"> 实现基本键值编码合规性			</li>
-<li><input disabled="" type="checkbox"> 定义集合方法					</li>
-<li><input disabled="" type="checkbox"> 处理非对象值					</li>
-<li><input disabled="" type="checkbox"> 添加验证						</li>
-<li><input disabled="" type="checkbox"> 描述属性关系					</li>
-<li><input disabled="" type="checkbox"> 以性能为导向进行设计</li>
-<li><input disabled="" type="checkbox"> 合规性检查清单</li>
+<li>❌ 实现基本键值编码合规性			</li>
+<li>❌ 定义集合方法					</li>
+<li>❌ 处理非对象值					</li>
+<li>❌ 添加验证						</li>
+<li>❌ 描述属性关系					</li>
+<li>❌ 以性能为导向进行设计</li>
+<li>❌ 合规性检查清单</li>
 </ol>
 <h1 id="常见疑惑及解答"><a href="#常见疑惑及解答" class="headerlink" title="常见疑惑及解答"></a>常见疑惑及解答</h1><p>以下是作者对这篇文档的一些疑问以及结合 AI 的回答。</p>
 <h2 id="属性验证是什么鬼？"><a href="#属性验证是什么鬼？" class="headerlink" title="属性验证是什么鬼？"></a>属性验证是什么鬼？</h2><p>Person 有一个 <code>NSString *name</code> 属性，如果需要给 name 添加验证则在内部添加以下代码</p>

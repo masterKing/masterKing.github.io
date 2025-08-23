@@ -85,64 +85,6 @@
 ]]></content>
   </entry>
   <entry>
-    <title>MBProgressHUD源码解析</title>
-    <url>/2020/06/24/2020-06-24-MBProgressHUD%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/</url>
-    <content><![CDATA[<h1 id="MBProgressHUD"><a href="#MBProgressHUD" class="headerlink" title="MBProgressHUD"></a>MBProgressHUD</h1><p>从入行以来,就经常听说,学习编程进步最快的方式,就是阅读优秀作品的源码…</p>
-<p>那么,今天我来阅读一下MBProgressHUD这个库的源码…</p>
-<p>查看一下文件,非常简单的俩个MBProgressHUD.h和MBProgressHUD.m文件</p>
-<p>没什么说的,从MBProgressHUD.h文件开始看吧;</p>
-<p>头文件首先声明了一个自定义的类 <code>MBBackgroundView</code> 和 一个协议 <code>MBProgressHUDDelegate</code>,自定义类放在这里声明一下,应该是因为<code>MBProgressHUD</code>里面使用到了<code>MBBackgroundView</code>类,且<code>MBProgressHUD</code>的声明与实现都放在了<code>MBBackgroundView</code>的前面,将<code>MBBackgroundView</code>的位置挪到比<code>MBProgressHUD</code>靠前的地方就不需要提前声明了,这个很简单,不需要多说了吧;而代理协议<code>MBProgressHUDDelegate</code>,对于做过iOS的开发人来说,应该说是再熟悉不过了…</p>
-<p>接下来声明了一个供外部使用的变量<code>extern CGFloat const MBProgressMaxOffset;</code>,使用<code>extern</code>修饰了的变量能够在其他文件也可以访问到;往下查看头文件的时候,发现是为了给属性<code>offset</code>使用的,注释里面写到可以使用CGPointMake(0.f, MBProgressMaxOffset)来使HUD的位置处于底部边缘的中心位置</p>
-<p>然后是4个自定义类型,<code>MBProgressHUDMode``MBProgressHUDAnimation``MBProgressHUDBackgroundStyle``MBProgressHUDCompletionBlock</code>;这四个类型也都比较简单,见名字大概就知道是什么意思了,简单提一下;<br><code>MBProgressHUDMode</code>mode翻译过来叫(设备的)模式,方式,风格,样式…在这里取风格或者样式应该更加恰当;它有6种不同的样式:</p>
-<ul>
-<li><code>MBProgressHUDModeIndeterminate </code>	&#x2F;&#x2F;iOS系统原生的UIActivityIndicatorView</li>
-<li><code>MBProgressHUDModeDeterminate </code>	&#x2F;&#x2F;一个圆形的饼状进度视图样式</li>
-<li><code>MBProgressHUDModeDeterminateHorizontalBar </code>	&#x2F;&#x2F;一个水平的条状进度视图样式</li>
-<li><code>MBProgressHUDModeAnnularDeterminate </code>	&#x2F;&#x2F;圆环形的进度视图样式</li>
-<li><code>MBProgressHUDModeCustomView </code>	&#x2F;&#x2F;自定义视图样式</li>
-<li><code>MBProgressHUDModeText </code> &#x2F;&#x2F;纯文字样式</li>
-</ul>
-<p><code>MBProgressHUDAnimation</code>动画类型</p>
-<ul>
-<li><code>MBProgressHUDAnimationFade</code> &#x2F;&#x2F;淡入淡出</li>
-<li><code>MBProgressHUDAnimationZoom</code> &#x2F;&#x2F;出现时放大,消失时缩小</li>
-<li><code>MBProgressHUDAnimationZoomOut</code> &#x2F;&#x2F;缩小</li>
-<li><code>MBProgressHUDAnimationZoomIn</code> &#x2F;&#x2F;放大</li>
-</ul>
-<p><code>MBProgressHUDBackgroundStyle</code>背景风格</p>
-<ul>
-<li><code>MBProgressHUDBackgroundStyleSolidColor</code> &#x2F;&#x2F;纯色</li>
-<li><code>MBProgressHUDBackgroundStyleBlur</code> &#x2F;&#x2F;模糊,毛玻璃效果</li>
-</ul>
-<p><code>MBProgressHUDCompletionBlock</code>是一个无返回值无参数的block</p>
-<p>接来下是<code>MBProgressHUD</code>的正式声明了<br>首先是7个方法声明</p>
-<p>前三个为类方法:</p>
-<p><code>+ (instancetype)showHUDAddedTo:(UIView *)view animated:(BOOL)animated;</code></p>
-<p><code>+ (BOOL)hideHUDForView:(UIView *)view animated:(BOOL)animated;</code></p>
-<p><code>+ (nullable MBProgressHUD *)HUDForView:(UIView *)view;</code></p>
-<p>后面为对象方法:</p>
-<p><code>- (instancetype)initWithView:(UIView *)view;</code></p>
-<p><code>- (void)showAnimated:(BOOL)animated;</code></p>
-<p><code>- (void)hideAnimated:(BOOL)animated;</code></p>
-<p><code>- (void)hideAnimated:(BOOL)animated afterDelay:(NSTimeInterval)delay;</code></p>
-<p>每个方法的注释都很详细,不需要多介绍什么的,接下来看看属性</p>
-<p><code>@property (weak, nonatomic) id&lt;MBProgressHUDDelegate&gt; delegate;</code><br><code>@property (copy, nullable) MBProgressHUDCompletionBlock completionBlock;</code><br>这两个属性都是用来回传HUD消失事件的,代理协议里面也只有一个HUD已经隐藏的方法</p>
-<p><code>@property (assign, nonatomic) NSTimeInterval graceTime;</code>这个属性很有意思,一开始我理解成下面那个属性<code>minShowTime</code>了,往下看到<code>minShowTime</code>之后,我才发现理解错了;这个属性的意思是:如果有graceTime,那么HUD在graceTime之后才显示.作用就是不让时间非常短的任务显示HUD(嗯,用处好像不是很大,我看了下我们项目,没有一个地方使用…)举个例子:我们一般会在网络请求发起之前显示HUD,在网络请求返回时隐藏HUD,在不考虑下面<code>minShowTime</code>属性的情况下,如果这个时间间隔非常短,就会出现显示了HUD瞬间就消失了的尴尬情况,那么这个时候,设置一个graceTime,对于那些时间非常短的异步任务就根本不会显示也没有必要显示HUD了</p>
-<p><code>@property (assign, nonatomic) NSTimeInterval minShowTime;</code>这个属性的作用就容易理解多了,最小显示时间;同样也是为了解决时间间隔很短的异步任务问题,你还察觉不到就结束了,那么这个HUD压根就看不见…所以加上这么一个时间</p>
-<p><code>@property (assign, nonatomic) BOOL removeFromSuperViewOnHide;</code>这个也是非常好理解,隐藏的时候是否从父视图移除</p>
-<h6 id="下面的属性时跟外观-Appearance-相关的"><a href="#下面的属性时跟外观-Appearance-相关的" class="headerlink" title="下面的属性时跟外观(Appearance)相关的"></a>下面的属性时跟外观(Appearance)相关的</h6><p><code>@property (assign, nonatomic) MBProgressHUDMode mode;</code> 样式<br><code>@property (strong, nonatomic, nullable) UIColor *contentColor</code> 内容颜色<br><code>@property (assign, nonatomic) MBProgressHUDAnimation animationType</code> 显示或隐藏时的动画类型<br><code>@property (assign, nonatomic) CGPoint offset</code> 相对于视图中心的边框偏移量<br><code>@property (assign, nonatomic) CGFloat margin</code> HUD边缘和HUD元素之间的间距<br><code>@property (assign, nonatomic) CGSize minSize</code> HUD边框的最小尺寸<br><code>@property (assign, nonatomic, getter = isSquare) BOOL square</code> 如果可能的话，强制HUD尺寸相等。<br><code>@property (assign, nonatomic, getter=areDefaultMotionEffectsEnabled) BOOL defaultMotionEffectsEnabled</code> 当启用时，bezel center会受到设备加速计数据的轻微影响</p>
-<h6 id="进度相关属性-Progress"><a href="#进度相关属性-Progress" class="headerlink" title="进度相关属性(Progress)"></a>进度相关属性(Progress)</h6><p><code>@property (assign, nonatomic) float progress;</code> 进度指示器的进度,取值0.0~1.0,默认为0.0</p>
-<h6 id="进度对象相关属性-ProgressObject"><a href="#进度对象相关属性-ProgressObject" class="headerlink" title="进度对象相关属性(ProgressObject)"></a>进度对象相关属性(ProgressObject)</h6><p><code>@property (strong, nonatomic, nullable) NSProgress *progressObject;</code> 不是太明白干什么的</p>
-<h6 id="视图相关属性-Views"><a href="#视图相关属性-Views" class="headerlink" title="视图相关属性(Views)"></a>视图相关属性(Views)</h6><p><code>@property (strong, nonatomic, readonly) MBBackgroundView *bezelView;</code> 包含文本标签和指示器(或者自定义视图)的边框视图<br><code>@property (strong, nonatomic, readonly) MBBackgroundView *backgroundView;</code> 覆盖整个HUD区域，放置在bezelView后面的视图<br><code>@property (strong, nonatomic, nullable) UIView *customView;</code> 当HUD样式为MBProgressHUDModeCustomView的时候,显示的视图;视图应该实现intrinsicContentSize方法已显示正确的大小,为了得到最好的效果,建议使用37x37像素<br><code>@property (strong, nonatomic, readonly) UILabel *label;</code> 显示在活动指示器下方的文本标签,HUD会自动调整大小以适应整个文本<br><code>@property (strong, nonatomic, readonly) UILabel *detailsLabel;</code> 一个标签，其中包含一个可选的详细信息消息，显示在labelText消息下面。细节文本可以跨越多行。<br><code>@property (strong, nonatomic, readonly) UIButton *button;</code> 放在标签下面的按钮。只有在添加target和action后才可见。</p>
-<p>好了,MBProgressHUD的方法属性就这些了…<br>接下来看看MBProgressHUD头文件里,其他的类的声明;</p>
-<p>首先是<code>MBRoundProgressView</code>这个应该是饼图样式时使用到的视图,只有4个属性<br><code>@property (nonatomic, assign) float progress;</code> 进度<br><code>@property (nonatomic, strong) UIColor *progressTintColor;</code> 指示器进度的颜色<br><code>@property (nonatomic, strong) UIColor *backgroundTintColor;</code> 指示器背景色<br><code>@property (nonatomic, assign, getter = isAnnular) BOOL annular;</code> 是否环形,不是很清楚什么效果…</p>
-<p>然后是<code>MBBarProgressView</code>,这个应该是一个扁平的进度条视图<br><code>@property (nonatomic, assign) float progress;</code> 进度<br><code>@property (nonatomic, strong) UIColor *lineColor;</code> 条状边框线颜色<br><code>@property (nonatomic, strong) UIColor *progressRemainingColor;</code> 条状背景色<br><code>@property (nonatomic, strong) UIColor *progressColor;</code> 条状进度颜色</p>
-<p>最后是<code>MBBackgroundView</code>,这个是背景视图<br><code>@property (nonatomic) MBProgressHUDBackgroundStyle style;</code> 背景样式,毛玻璃或者纯色,iOS7和它之后都是毛玻璃效果,之前是纯色<br><code>@property (nonatomic) UIBlurEffectStyle blurEffectStyle;</code> 模糊效果样式<br><code>@property (nonatomic, strong) UIColor *color;</code> 背景色</p>
-<p>以上就是MBProgressHUD.h文件的全部内容了,其实还有一部分,是遗弃的旧版本的代码就不看了</p>
-<p>下面,我来看看.m文件源码,这才是重点啊</p>
-]]></content>
-  </entry>
-  <entry>
     <title>2023年10月了黑苹果还香吗？性价比超高黑苹果台式机搭配&amp;黑苹果安装教程</title>
     <url>/2023/10/19/2023-10-19-2023%E5%B9%B410%E6%9C%88%E4%BA%86%E9%BB%91%E8%8B%B9%E6%9E%9C%E8%BF%98%E9%A6%99%E5%90%97%EF%BC%9F%E6%80%A7%E4%BB%B7%E6%AF%94%E8%B6%85%E9%AB%98%E9%BB%91%E8%8B%B9%E6%9E%9C%E5%8F%B0%E5%BC%8F%E6%9C%BA%E6%90%AD%E9%85%8D-%E9%BB%91%E8%8B%B9%E6%9E%9C%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B/</url>
     <content><![CDATA[<h1 id="缘由"><a href="#缘由" class="headerlink" title="缘由"></a>缘由</h1><p>最近一段时间对 iOS 逆向开发进行了一定的研究，之前也更新过一段时间的相关文章（后续由于搬家，不幸感染病毒🦠等一些原因断更了个把月），在学习和探索过程中，非常明显的感受到逆向分析对电脑的性能要求很高尤其是 CPU，在使用逆向分析工具 ghidra，hopper 等程序对 MachO 文件进行分析的时候，常常一分析就要等上大几个小时，而且我使用了 n 年的 MacBook Pro 在分析过程中 CPU 温度总是会飙升到 90 度以上，同时 CPU 散热风扇转速也高达 4500 转以上，甚至经常满转速 6000 转运行，噪音可想而知。等待的时间，加上风扇的噪音真的会让人失去耐性，忍无可忍之下决定购买一台性能强劲的，性价比超高的 Mac 电脑。</p>
@@ -339,6 +281,171 @@
       </tags>
   </entry>
   <entry>
+    <title>MBProgressHUD源码解析</title>
+    <url>/2020/06/24/2020-06-24-MBProgressHUD%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/</url>
+    <content><![CDATA[<h1 id="MBProgressHUD"><a href="#MBProgressHUD" class="headerlink" title="MBProgressHUD"></a>MBProgressHUD</h1><p>从入行以来,就经常听说,学习编程进步最快的方式,就是阅读优秀作品的源码…</p>
+<p>那么,今天我来阅读一下MBProgressHUD这个库的源码…</p>
+<p>查看一下文件,非常简单的俩个MBProgressHUD.h和MBProgressHUD.m文件</p>
+<p>没什么说的,从MBProgressHUD.h文件开始看吧;</p>
+<p>头文件首先声明了一个自定义的类 <code>MBBackgroundView</code> 和 一个协议 <code>MBProgressHUDDelegate</code>,自定义类放在这里声明一下,应该是因为<code>MBProgressHUD</code>里面使用到了<code>MBBackgroundView</code>类,且<code>MBProgressHUD</code>的声明与实现都放在了<code>MBBackgroundView</code>的前面,将<code>MBBackgroundView</code>的位置挪到比<code>MBProgressHUD</code>靠前的地方就不需要提前声明了,这个很简单,不需要多说了吧;而代理协议<code>MBProgressHUDDelegate</code>,对于做过iOS的开发人来说,应该说是再熟悉不过了…</p>
+<p>接下来声明了一个供外部使用的变量<code>extern CGFloat const MBProgressMaxOffset;</code>,使用<code>extern</code>修饰了的变量能够在其他文件也可以访问到;往下查看头文件的时候,发现是为了给属性<code>offset</code>使用的,注释里面写到可以使用CGPointMake(0.f, MBProgressMaxOffset)来使HUD的位置处于底部边缘的中心位置</p>
+<p>然后是4个自定义类型,<code>MBProgressHUDMode``MBProgressHUDAnimation``MBProgressHUDBackgroundStyle``MBProgressHUDCompletionBlock</code>;这四个类型也都比较简单,见名字大概就知道是什么意思了,简单提一下;<br><code>MBProgressHUDMode</code>mode翻译过来叫(设备的)模式,方式,风格,样式…在这里取风格或者样式应该更加恰当;它有6种不同的样式:</p>
+<ul>
+<li><code>MBProgressHUDModeIndeterminate </code>	&#x2F;&#x2F;iOS系统原生的UIActivityIndicatorView</li>
+<li><code>MBProgressHUDModeDeterminate </code>	&#x2F;&#x2F;一个圆形的饼状进度视图样式</li>
+<li><code>MBProgressHUDModeDeterminateHorizontalBar </code>	&#x2F;&#x2F;一个水平的条状进度视图样式</li>
+<li><code>MBProgressHUDModeAnnularDeterminate </code>	&#x2F;&#x2F;圆环形的进度视图样式</li>
+<li><code>MBProgressHUDModeCustomView </code>	&#x2F;&#x2F;自定义视图样式</li>
+<li><code>MBProgressHUDModeText </code> &#x2F;&#x2F;纯文字样式</li>
+</ul>
+<p><code>MBProgressHUDAnimation</code>动画类型</p>
+<ul>
+<li><code>MBProgressHUDAnimationFade</code> &#x2F;&#x2F;淡入淡出</li>
+<li><code>MBProgressHUDAnimationZoom</code> &#x2F;&#x2F;出现时放大,消失时缩小</li>
+<li><code>MBProgressHUDAnimationZoomOut</code> &#x2F;&#x2F;缩小</li>
+<li><code>MBProgressHUDAnimationZoomIn</code> &#x2F;&#x2F;放大</li>
+</ul>
+<p><code>MBProgressHUDBackgroundStyle</code>背景风格</p>
+<ul>
+<li><code>MBProgressHUDBackgroundStyleSolidColor</code> &#x2F;&#x2F;纯色</li>
+<li><code>MBProgressHUDBackgroundStyleBlur</code> &#x2F;&#x2F;模糊,毛玻璃效果</li>
+</ul>
+<p><code>MBProgressHUDCompletionBlock</code>是一个无返回值无参数的block</p>
+<p>接来下是<code>MBProgressHUD</code>的正式声明了<br>首先是7个方法声明</p>
+<p>前三个为类方法:</p>
+<p><code>+ (instancetype)showHUDAddedTo:(UIView *)view animated:(BOOL)animated;</code></p>
+<p><code>+ (BOOL)hideHUDForView:(UIView *)view animated:(BOOL)animated;</code></p>
+<p><code>+ (nullable MBProgressHUD *)HUDForView:(UIView *)view;</code></p>
+<p>后面为对象方法:</p>
+<p><code>- (instancetype)initWithView:(UIView *)view;</code></p>
+<p><code>- (void)showAnimated:(BOOL)animated;</code></p>
+<p><code>- (void)hideAnimated:(BOOL)animated;</code></p>
+<p><code>- (void)hideAnimated:(BOOL)animated afterDelay:(NSTimeInterval)delay;</code></p>
+<p>每个方法的注释都很详细,不需要多介绍什么的,接下来看看属性</p>
+<p><code>@property (weak, nonatomic) id&lt;MBProgressHUDDelegate&gt; delegate;</code><br><code>@property (copy, nullable) MBProgressHUDCompletionBlock completionBlock;</code><br>这两个属性都是用来回传HUD消失事件的,代理协议里面也只有一个HUD已经隐藏的方法</p>
+<p><code>@property (assign, nonatomic) NSTimeInterval graceTime;</code>这个属性很有意思,一开始我理解成下面那个属性<code>minShowTime</code>了,往下看到<code>minShowTime</code>之后,我才发现理解错了;这个属性的意思是:如果有graceTime,那么HUD在graceTime之后才显示.作用就是不让时间非常短的任务显示HUD(嗯,用处好像不是很大,我看了下我们项目,没有一个地方使用…)举个例子:我们一般会在网络请求发起之前显示HUD,在网络请求返回时隐藏HUD,在不考虑下面<code>minShowTime</code>属性的情况下,如果这个时间间隔非常短,就会出现显示了HUD瞬间就消失了的尴尬情况,那么这个时候,设置一个graceTime,对于那些时间非常短的异步任务就根本不会显示也没有必要显示HUD了</p>
+<p><code>@property (assign, nonatomic) NSTimeInterval minShowTime;</code>这个属性的作用就容易理解多了,最小显示时间;同样也是为了解决时间间隔很短的异步任务问题,你还察觉不到就结束了,那么这个HUD压根就看不见…所以加上这么一个时间</p>
+<p><code>@property (assign, nonatomic) BOOL removeFromSuperViewOnHide;</code>这个也是非常好理解,隐藏的时候是否从父视图移除</p>
+<h6 id="下面的属性时跟外观-Appearance-相关的"><a href="#下面的属性时跟外观-Appearance-相关的" class="headerlink" title="下面的属性时跟外观(Appearance)相关的"></a>下面的属性时跟外观(Appearance)相关的</h6><p><code>@property (assign, nonatomic) MBProgressHUDMode mode;</code> 样式<br><code>@property (strong, nonatomic, nullable) UIColor *contentColor</code> 内容颜色<br><code>@property (assign, nonatomic) MBProgressHUDAnimation animationType</code> 显示或隐藏时的动画类型<br><code>@property (assign, nonatomic) CGPoint offset</code> 相对于视图中心的边框偏移量<br><code>@property (assign, nonatomic) CGFloat margin</code> HUD边缘和HUD元素之间的间距<br><code>@property (assign, nonatomic) CGSize minSize</code> HUD边框的最小尺寸<br><code>@property (assign, nonatomic, getter = isSquare) BOOL square</code> 如果可能的话，强制HUD尺寸相等。<br><code>@property (assign, nonatomic, getter=areDefaultMotionEffectsEnabled) BOOL defaultMotionEffectsEnabled</code> 当启用时，bezel center会受到设备加速计数据的轻微影响</p>
+<h6 id="进度相关属性-Progress"><a href="#进度相关属性-Progress" class="headerlink" title="进度相关属性(Progress)"></a>进度相关属性(Progress)</h6><p><code>@property (assign, nonatomic) float progress;</code> 进度指示器的进度,取值0.0~1.0,默认为0.0</p>
+<h6 id="进度对象相关属性-ProgressObject"><a href="#进度对象相关属性-ProgressObject" class="headerlink" title="进度对象相关属性(ProgressObject)"></a>进度对象相关属性(ProgressObject)</h6><p><code>@property (strong, nonatomic, nullable) NSProgress *progressObject;</code> 不是太明白干什么的</p>
+<h6 id="视图相关属性-Views"><a href="#视图相关属性-Views" class="headerlink" title="视图相关属性(Views)"></a>视图相关属性(Views)</h6><p><code>@property (strong, nonatomic, readonly) MBBackgroundView *bezelView;</code> 包含文本标签和指示器(或者自定义视图)的边框视图<br><code>@property (strong, nonatomic, readonly) MBBackgroundView *backgroundView;</code> 覆盖整个HUD区域，放置在bezelView后面的视图<br><code>@property (strong, nonatomic, nullable) UIView *customView;</code> 当HUD样式为MBProgressHUDModeCustomView的时候,显示的视图;视图应该实现intrinsicContentSize方法已显示正确的大小,为了得到最好的效果,建议使用37x37像素<br><code>@property (strong, nonatomic, readonly) UILabel *label;</code> 显示在活动指示器下方的文本标签,HUD会自动调整大小以适应整个文本<br><code>@property (strong, nonatomic, readonly) UILabel *detailsLabel;</code> 一个标签，其中包含一个可选的详细信息消息，显示在labelText消息下面。细节文本可以跨越多行。<br><code>@property (strong, nonatomic, readonly) UIButton *button;</code> 放在标签下面的按钮。只有在添加target和action后才可见。</p>
+<p>好了,MBProgressHUD的方法属性就这些了…<br>接下来看看MBProgressHUD头文件里,其他的类的声明;</p>
+<p>首先是<code>MBRoundProgressView</code>这个应该是饼图样式时使用到的视图,只有4个属性<br><code>@property (nonatomic, assign) float progress;</code> 进度<br><code>@property (nonatomic, strong) UIColor *progressTintColor;</code> 指示器进度的颜色<br><code>@property (nonatomic, strong) UIColor *backgroundTintColor;</code> 指示器背景色<br><code>@property (nonatomic, assign, getter = isAnnular) BOOL annular;</code> 是否环形,不是很清楚什么效果…</p>
+<p>然后是<code>MBBarProgressView</code>,这个应该是一个扁平的进度条视图<br><code>@property (nonatomic, assign) float progress;</code> 进度<br><code>@property (nonatomic, strong) UIColor *lineColor;</code> 条状边框线颜色<br><code>@property (nonatomic, strong) UIColor *progressRemainingColor;</code> 条状背景色<br><code>@property (nonatomic, strong) UIColor *progressColor;</code> 条状进度颜色</p>
+<p>最后是<code>MBBackgroundView</code>,这个是背景视图<br><code>@property (nonatomic) MBProgressHUDBackgroundStyle style;</code> 背景样式,毛玻璃或者纯色,iOS7和它之后都是毛玻璃效果,之前是纯色<br><code>@property (nonatomic) UIBlurEffectStyle blurEffectStyle;</code> 模糊效果样式<br><code>@property (nonatomic, strong) UIColor *color;</code> 背景色</p>
+<p>以上就是MBProgressHUD.h文件的全部内容了,其实还有一部分,是遗弃的旧版本的代码就不看了</p>
+<p>下面,我来看看.m文件源码,这才是重点啊</p>
+]]></content>
+  </entry>
+  <entry>
+    <title>8天让iOS开发者上手Flutter之七</title>
+    <url>/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/</url>
+    <content><![CDATA[<p>上一篇文章我们已经完成首页聊天页面的导航条和列表展示，今天的任务是完成搜索 cell 的展示和点击之后的搜索页面的功能。</p>
+<h1 id="自定义-SearchCell"><a href="#自定义-SearchCell" class="headerlink" title="自定义 SearchCell"></a>自定义 SearchCell</h1><h2 id="新建-search-cell-dart-文件"><a href="#新建-search-cell-dart-文件" class="headerlink" title="新建 search_cell.dart 文件"></a>新建 search_cell.dart 文件</h2><img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/1dbd72608e914624a9d4585ad1097307~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<h2 id="实现-SearchCell-代码"><a href="#实现-SearchCell-代码" class="headerlink" title="实现 SearchCell 代码"></a>实现 SearchCell 代码</h2><p>SearchCell 的话，因为仅仅只是展示，点击之后就进入搜索页了，应该来说是不需要状态的，所以用一个 StatelessWidget 就够了。然后布局的方式使用一个 Container 包含一个 Row，Row 里面包一个图片和文本就可以了。布局的方式其实多种多样，能实现就好了。完整代码如下：</p>
+<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/d0128b2c771c49c59ef63ecd63e85895~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>一个有意思的地方是，flutter 里面的 Image 居然可以设置颜色，而且颜色是设置给图片的。比如我的放大镜图片原本是黑色的，设置红色之后，居然真的变红色了！！！</p>
+<div align=center>
+<img src="8天让iOS开发者上手Flutter之七/7c322f9a1989444792c8be1a83af7e8e~tplv-k3u1fbpfcp-watermark.png"/>
+</div>
+
+<h2 id="使用-SearchCell"><a href="#使用-SearchCell" class="headerlink" title="使用 SearchCell"></a>使用 SearchCell</h2><p>SearchCell 的展示就算写完了，然后在 ChatPage.dart 中使用，我们把 ListView 的 itemBuilder 方法抽取出来，然后因为我们多加了一个 SearchCell，所以 itemCount 需要加 1，然后取 _chatList 数据的时候也要处理一下下标。</p>
+<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/17291ce793da406ba1a0877a2350c65e~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<h1 id="自定义-SearchPage"><a href="#自定义-SearchPage" class="headerlink" title="自定义 SearchPage"></a>自定义 SearchPage</h1><h2 id="新建-search-page-dart-文件"><a href="#新建-search-page-dart-文件" class="headerlink" title="新建 search_page.dart 文件"></a>新建 search_page.dart 文件</h2><img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/0699384aaddf495185d41f9dfbfb4d63~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<h2 id="简单实现-SearchPage"><a href="#简单实现-SearchPage" class="headerlink" title="简单实现 SearchPage"></a>简单实现 SearchPage</h2><p>SearchPage 作为一个页面，使用 StatelessWidget 肯定是无法胜任的，所以使用一个 StatefulWidget。而由于 AppBar 的样式和我们需要显示的效果图还是有差别的，所以这里我们不使用 Scaffold 提供的 AppBar 了。我们自定义一个 SearchBar，配合一个 ListView 来搭建基本的布局。这里面基本没有新鲜的东西，就简单贴一下代码：</p>
+<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/2a65878c91ef4795a80cde4b9100e7ac~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>SearchBar 由于是在 SearchPage 中使用的，所以就直接定义在 SearchPage 中了，代码也是先简单定义如下：</p>
+<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/e6ae11c406504b5f8f1e8386d60fc9ad~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<h2 id="点击跳转到-SearchPage"><a href="#点击跳转到-SearchPage" class="headerlink" title="点击跳转到 SearchPage"></a>点击跳转到 SearchPage</h2><img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/f9239dbba4a8422a88b545ade852133e~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>在搜索 cell 里面实现点击方法，然后跳转到 SearchPage，显示效果如图：</p>
+<div align=center>
+<img src = '8天让iOS开发者上手Flutter之七/e5054ecb6ba147d7a3adc6f76e71bc47~tplv-k3u1fbpfcp-watermark.png'>
+</div>
+
+<h1 id="实现-SearchBar"><a href="#实现-SearchBar" class="headerlink" title="实现 SearchBar"></a>实现 SearchBar</h1><h2 id="SearchBar-的布局"><a href="#SearchBar-的布局" class="headerlink" title="SearchBar 的布局"></a>SearchBar 的布局</h2><p>SearchBar 的布局，最外层分为上下两个部分，上面的部分是系统状态栏的高度。下面的部分就是显示搜索条的高度。而搜索条的布局，使用 Row 分隔为左右两个部分，左侧包含放大镜，文本输入框和删除图片。右侧就是一个返回上级页面的取消。这里主要提一下 flutter 中的文本框，跟 iOS 中 UITextField 真的很不一样，UITextField 中左侧的图标，右侧的删除，都是封装在内部的。而在 flutter 中，文本框 TextField 真的就只有文本框，没有其他的东西，都需要自己添加。完整代码如下：</p>
+<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/0dbc3f3f2239405ca84199dc0fda9801~tplv-k3u1fbpfcp-watermark.png" class="" alt="Snip20210818_60.png">
+
+<h2 id="SearchBar-事件处理"><a href="#SearchBar-事件处理" class="headerlink" title="SearchBar 事件处理"></a>SearchBar 事件处理</h2><h3 id="取消的处理"><a href="#取消的处理" class="headerlink" title="取消的处理"></a>取消的处理</h3><p>点击取消需要 pop 到上一个界面，给取消加一个 <code>GestureDetector</code> 实现 <code>onTap</code> 就好了。代码如下：</p>
+<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/386cd9fc654946959405e1090597a1ee~tplv-k3u1fbpfcp-watermark.png" class="" alt="Snip20210818_61.png">
+
+<h3 id="清除按钮功能实现"><a href="#清除按钮功能实现" class="headerlink" title="清除按钮功能实现"></a>清除按钮功能实现</h3><p>未输入文本的时候，不显示清除按钮。有输入文本的时候，显示清除按钮。点击清除按钮，清空文本内容并隐藏清除按钮。</p>
+<p>使用一个bool值 <code>_showClear</code> 控制清除按钮的显示隐藏。代码如下：</p>
+<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/9a5423cd5b0146b19169fbb6bbf12236~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>在文本变化的时候，修改 <code>_showClear</code> 值并刷新状态。文本的变化在TextField的 <code>onChanged</code> 属性就可以监听到。代码如下：</p>
+<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/053efa2bbde9460f976cfe5e7ba63d83~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>最后就是清除按钮的点击功能，由于需要清空 TextField 的文本内容，需要使用到 <code>TextEditingController</code>,给 TextField 的 <code>controller</code> 属性赋值，然后通过 <code>TextEditingController</code> 对象清除文本内容。文本清除之后并不会自动调用系统的 <code>onChanged</code> 方法，自己手动调用一下就好了。代码如下：</p>
+<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/b08d5ad674544fd3b52cb4cd86366783~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<h3 id="SearchBar-回调文本框的内容"><a href="#SearchBar-回调文本框的内容" class="headerlink" title="SearchBar 回调文本框的内容"></a>SearchBar 回调文本框的内容</h3><p>文本框的内容变化的时候，需要回调给 SearchBar 外部，这样我们才能在 SearchPage 页面进行搜索内容。使用一个回调作为参数就可以实现了。代码如下：</p>
+<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/762fd4c2b23444caa7f44d23dc3641d9~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p><code>onChanged</code> 是一个闭包属性，在初始化 SearchBar 的时候传入，在 TextField 的文本变化的时候调用闭包，并将文本作为参数回传给 SearchBar 外部。因为将 <code>onChanged</code> 作为了必传参数，所以编译器自然会在用到了 SearchBar 的地方报错。很容易找到报错的地方，加个参数就好了。</p>
+<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/6481817bd4544a138bbeaf10b3c80c54~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>SearchBar 相关的代码就算差不多完成了，其实可以将 SearchBar 单独作为一个文件独立出来。接下来就是处理 SearchPage 了</p>
+<h1 id="实现-SearchPage"><a href="#实现-SearchPage" class="headerlink" title="实现 SearchPage"></a>实现 SearchPage</h1><p>搜索页面的搜索功能，往细了说，可以搜索很多内容，我们这里只是简单的搜索名字，只要名字包含输入的内容，就将搜索结果展示出来。由于这里对中文名进行搜索的时候，能匹配到的数据比较少，所以这里已经将网络请求返回的名字由中文改为英文名字了。前面展示中文名字的截图就不做修改了。</p>
+<h2 id="SearchPage-的搜索功能"><a href="#SearchPage-的搜索功能" class="headerlink" title="SearchPage 的搜索功能"></a>SearchPage 的搜索功能</h2><h3 id="添加-datas-数据源"><a href="#添加-datas-数据源" class="headerlink" title="添加 datas 数据源"></a>添加 <code>datas</code> 数据源</h3><p>要实现 SearchPage 的搜索功能，那么它首先必须要有数据源，很明显它的数据源是从首页来的。先定义一个 <code>datas</code>,作为必传参数，然后通过外部层层传递过来。</p>
+<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/700b1121913846efb7e15edd66ee4613~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p><code>datas</code> 定义好了以后，报红色错误的地方，就是需要传参数的地方，很方便，都不用我们自己去翻哪里需要加参数了。发现 SearchCell 里面需要传入数据源，同样的方式，在 SearchCell 里面定义 <code>datas</code>,然后在报错的地方处理。</p>
+<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/15a0335618d648deb35dfa08cff589b9~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>就这样子顺藤摸瓜，直到来到 chat_page 将数据源传入就完成了</p>
+<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/9dd3a5666ded4f8393fed63621b903d1~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<h3 id="SearchPage-自己的数据源"><a href="#SearchPage-自己的数据源" class="headerlink" title="SearchPage 自己的数据源"></a>SearchPage 自己的数据源</h3><p>SearchPage 需要展示搜索之后的结果，所以自己定义一个数组用来存放搜索的结果。并且暂时先使用 Text 做一个最简单的展示。代码如下：</p>
+<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/8e81c3d13e6547c4bc7bb8a5d021bac5~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<h3 id="实现搜索功能并展示数据"><a href="#实现搜索功能并展示数据" class="headerlink" title="实现搜索功能并展示数据"></a>实现搜索功能并展示数据</h3><p>搜索的功能实现很简单，就是判断数据源里面的名字是否包含输入的文本，如果包含就全部添加并展示。<br>代码如下：</p>
+<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/9bd07dfcbf5247609d3b28d3780fec6c~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>APP 上如图，我输入 son，显示结果：</p>
+<div align=center>
+<img src='8天让iOS开发者上手Flutter之七/3332ccab3c12452fb12016e1508f6d5a~tplv-k3u1fbpfcp-watermark.png'>
+</div>
+
+<h2 id="SearchPage-的搜索结果列表展示"><a href="#SearchPage-的搜索结果列表展示" class="headerlink" title="SearchPage 的搜索结果列表展示"></a>SearchPage 的搜索结果列表展示</h2><p>SearchPage 的搜索结果列表展示的数据样式，应该和首页是类似的。所以可以直接使用首页的布局。代码如下：</p>
+<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/3118496d7dd94eae9cb516dd92e86ef0~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<h2 id="SearchPage-高亮显示搜到的结果"><a href="#SearchPage-高亮显示搜到的结果" class="headerlink" title="SearchPage 高亮显示搜到的结果"></a>SearchPage 高亮显示搜到的结果</h2><p>这里的思路是，高亮显示搜到的结果，那么普通的文本肯定是不行了，必须是富文本。如何找到搜索的关键字在文本中的位置呢，这个不用我们考虑了。flutter 中对字符串有一个分隔方法 <code>split</code>,这个方法跟 iOS 中的字符串的 <code>componentsSeparatedByString:</code> 方法类似，根据传入的参数来分隔字符串。这里贴一下 iOS 的代码：</p>
+<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/c991926b90ac4a6490d95ad1bc0889e2~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>（还是Xcode看着顺眼啊）我们将字符串 <code>abcaa</code> 以字符 <code>a</code> 分组，再将分组的结果拼接回原来的字符串。为什么要这么操作？因为重新拼接新字符串的时候，我们就可以处理富文本字符串了。现在回到 flutter 中来，flutter 中拼接的富文本的方式太方便了，RichText 花样拼接 TextSpan 这个我们在前面也讲过了。</p>
+<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/7bd6ae46acf344e48435c1dfa80dc50f~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p><code>_searchKey</code> 就是我们输入的文本，在 SearchPage 中声明属性，在 SearchBar 的回调中赋值就好了。</p>
+<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/be6eb80c9ad24db5897308c568863416~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/6723d425c75249d488bc3b8d31f9e345~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>现在测试一下，输入 son，APP 显示如图：</p>
+<div align=center>
+<img src='8天让iOS开发者上手Flutter之七/20dad78f11364579aae756585e776407~tplv-k3u1fbpfcp-watermark.png'>
+</div>
+
+<h2 id="滚动列表叫回键盘"><a href="#滚动列表叫回键盘" class="headerlink" title="滚动列表叫回键盘"></a>滚动列表叫回键盘</h2><p>ListView 的滚动，我们在前面已经说过一次，需要将 ListView 包在 <code>NotificationListener</code> 里面。然后叫回键盘的代码 <code>FocusScope.of(context).requestFocus(FocusNode());</code> 这个记住就好了，代码如下：</p>
+<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/d33048a50ec0451983defba0221a6547~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>到这里我们的 flutter 仿微信 Demo 功能就差不多完了，还剩最后一篇就是介绍 flutter 和原生混合开发的一些东西。这个也是实际项目中应该经常会遇到的情况。其实写到这里会发现很多东西和原生都是相通的或者类似的。除了新的语言 Dart 不是很熟悉之外，其他很多地方比如很多属性的名字，颜色，闭包，都能够看到原生的影子。flutter 创造者们也不会闭门造车，都会去借鉴原生里面的东西。</p>
+]]></content>
+      <categories>
+        <category>flutter</category>
+      </categories>
+      <tags>
+        <tag>flutter</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>8天让iOS开发者上手Flutter之一：快速入门Flutter</title>
     <url>/2021/07/10/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%80%EF%BC%9A%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8Flutter/</url>
     <content><![CDATA[<p>flutter 现在是越来越火了，现在作为一个 iOS 开发，如果你不会 flutter 都好像不算个正常人似的？而且现在的 flutter 情况，有点像 2012 年那会儿刚刚兴起的 iOS，Android 开发一样，会点皮毛 UI 就可以提升不少身价…这些年过来，有无数的前端跨平台框架兴起。却只有 flutter 一家独秀，说明它还是有两把刷子的。今天这篇文章内容是基于 Mac 和 Android Studio 基础来开发 flutter 的，如果你还没有配置好开发环境，可以在网上搜索，或者直接到官网安装。这篇文章主要用来记录我学习 flutter 的过程，如果你也对 flutter 感兴趣可以跟着一起练习。</p>
@@ -521,113 +628,6 @@
 </div>
 
 <h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>今天介绍了 Flutter 里面的许多的基础 Widget，有用于布局的 Center，Row，Column…有用于显示文本的 Text，RichText，TextSpan…有列表展示 ListView，有基础架构 Scaffold，MaterialApp 类，虽然东西有点多，但基本还没有什么难以理解的内容</p>
-]]></content>
-      <categories>
-        <category>flutter</category>
-      </categories>
-      <tags>
-        <tag>flutter</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>8天让iOS开发者上手Flutter之七</title>
-    <url>/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/</url>
-    <content><![CDATA[<p>上一篇文章我们已经完成首页聊天页面的导航条和列表展示，今天的任务是完成搜索 cell 的展示和点击之后的搜索页面的功能。</p>
-<h1 id="自定义-SearchCell"><a href="#自定义-SearchCell" class="headerlink" title="自定义 SearchCell"></a>自定义 SearchCell</h1><h2 id="新建-search-cell-dart-文件"><a href="#新建-search-cell-dart-文件" class="headerlink" title="新建 search_cell.dart 文件"></a>新建 search_cell.dart 文件</h2><img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/1dbd72608e914624a9d4585ad1097307~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<h2 id="实现-SearchCell-代码"><a href="#实现-SearchCell-代码" class="headerlink" title="实现 SearchCell 代码"></a>实现 SearchCell 代码</h2><p>SearchCell 的话，因为仅仅只是展示，点击之后就进入搜索页了，应该来说是不需要状态的，所以用一个 StatelessWidget 就够了。然后布局的方式使用一个 Container 包含一个 Row，Row 里面包一个图片和文本就可以了。布局的方式其实多种多样，能实现就好了。完整代码如下：</p>
-<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/d0128b2c771c49c59ef63ecd63e85895~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>一个有意思的地方是，flutter 里面的 Image 居然可以设置颜色，而且颜色是设置给图片的。比如我的放大镜图片原本是黑色的，设置红色之后，居然真的变红色了！！！</p>
-<div align=center>
-<img src="8天让iOS开发者上手Flutter之七/7c322f9a1989444792c8be1a83af7e8e~tplv-k3u1fbpfcp-watermark.png"/>
-</div>
-
-<h2 id="使用-SearchCell"><a href="#使用-SearchCell" class="headerlink" title="使用 SearchCell"></a>使用 SearchCell</h2><p>SearchCell 的展示就算写完了，然后在 ChatPage.dart 中使用，我们把 ListView 的 itemBuilder 方法抽取出来，然后因为我们多加了一个 SearchCell，所以 itemCount 需要加 1，然后取 _chatList 数据的时候也要处理一下下标。</p>
-<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/17291ce793da406ba1a0877a2350c65e~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<h1 id="自定义-SearchPage"><a href="#自定义-SearchPage" class="headerlink" title="自定义 SearchPage"></a>自定义 SearchPage</h1><h2 id="新建-search-page-dart-文件"><a href="#新建-search-page-dart-文件" class="headerlink" title="新建 search_page.dart 文件"></a>新建 search_page.dart 文件</h2><img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/0699384aaddf495185d41f9dfbfb4d63~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<h2 id="简单实现-SearchPage"><a href="#简单实现-SearchPage" class="headerlink" title="简单实现 SearchPage"></a>简单实现 SearchPage</h2><p>SearchPage 作为一个页面，使用 StatelessWidget 肯定是无法胜任的，所以使用一个 StatefulWidget。而由于 AppBar 的样式和我们需要显示的效果图还是有差别的，所以这里我们不使用 Scaffold 提供的 AppBar 了。我们自定义一个 SearchBar，配合一个 ListView 来搭建基本的布局。这里面基本没有新鲜的东西，就简单贴一下代码：</p>
-<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/2a65878c91ef4795a80cde4b9100e7ac~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>SearchBar 由于是在 SearchPage 中使用的，所以就直接定义在 SearchPage 中了，代码也是先简单定义如下：</p>
-<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/e6ae11c406504b5f8f1e8386d60fc9ad~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<h2 id="点击跳转到-SearchPage"><a href="#点击跳转到-SearchPage" class="headerlink" title="点击跳转到 SearchPage"></a>点击跳转到 SearchPage</h2><img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/f9239dbba4a8422a88b545ade852133e~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>在搜索 cell 里面实现点击方法，然后跳转到 SearchPage，显示效果如图：</p>
-<div align=center>
-<img src = '8天让iOS开发者上手Flutter之七/e5054ecb6ba147d7a3adc6f76e71bc47~tplv-k3u1fbpfcp-watermark.png'>
-</div>
-
-<h1 id="实现-SearchBar"><a href="#实现-SearchBar" class="headerlink" title="实现 SearchBar"></a>实现 SearchBar</h1><h2 id="SearchBar-的布局"><a href="#SearchBar-的布局" class="headerlink" title="SearchBar 的布局"></a>SearchBar 的布局</h2><p>SearchBar 的布局，最外层分为上下两个部分，上面的部分是系统状态栏的高度。下面的部分就是显示搜索条的高度。而搜索条的布局，使用 Row 分隔为左右两个部分，左侧包含放大镜，文本输入框和删除图片。右侧就是一个返回上级页面的取消。这里主要提一下 flutter 中的文本框，跟 iOS 中 UITextField 真的很不一样，UITextField 中左侧的图标，右侧的删除，都是封装在内部的。而在 flutter 中，文本框 TextField 真的就只有文本框，没有其他的东西，都需要自己添加。完整代码如下：</p>
-<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/0dbc3f3f2239405ca84199dc0fda9801~tplv-k3u1fbpfcp-watermark.png" class="" alt="Snip20210818_60.png">
-
-<h2 id="SearchBar-事件处理"><a href="#SearchBar-事件处理" class="headerlink" title="SearchBar 事件处理"></a>SearchBar 事件处理</h2><h3 id="取消的处理"><a href="#取消的处理" class="headerlink" title="取消的处理"></a>取消的处理</h3><p>点击取消需要 pop 到上一个界面，给取消加一个 <code>GestureDetector</code> 实现 <code>onTap</code> 就好了。代码如下：</p>
-<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/386cd9fc654946959405e1090597a1ee~tplv-k3u1fbpfcp-watermark.png" class="" alt="Snip20210818_61.png">
-
-<h3 id="清除按钮功能实现"><a href="#清除按钮功能实现" class="headerlink" title="清除按钮功能实现"></a>清除按钮功能实现</h3><p>未输入文本的时候，不显示清除按钮。有输入文本的时候，显示清除按钮。点击清除按钮，清空文本内容并隐藏清除按钮。</p>
-<p>使用一个bool值 <code>_showClear</code> 控制清除按钮的显示隐藏。代码如下：</p>
-<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/9a5423cd5b0146b19169fbb6bbf12236~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>在文本变化的时候，修改 <code>_showClear</code> 值并刷新状态。文本的变化在TextField的 <code>onChanged</code> 属性就可以监听到。代码如下：</p>
-<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/053efa2bbde9460f976cfe5e7ba63d83~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>最后就是清除按钮的点击功能，由于需要清空 TextField 的文本内容，需要使用到 <code>TextEditingController</code>,给 TextField 的 <code>controller</code> 属性赋值，然后通过 <code>TextEditingController</code> 对象清除文本内容。文本清除之后并不会自动调用系统的 <code>onChanged</code> 方法，自己手动调用一下就好了。代码如下：</p>
-<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/b08d5ad674544fd3b52cb4cd86366783~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<h3 id="SearchBar-回调文本框的内容"><a href="#SearchBar-回调文本框的内容" class="headerlink" title="SearchBar 回调文本框的内容"></a>SearchBar 回调文本框的内容</h3><p>文本框的内容变化的时候，需要回调给 SearchBar 外部，这样我们才能在 SearchPage 页面进行搜索内容。使用一个回调作为参数就可以实现了。代码如下：</p>
-<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/762fd4c2b23444caa7f44d23dc3641d9~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p><code>onChanged</code> 是一个闭包属性，在初始化 SearchBar 的时候传入，在 TextField 的文本变化的时候调用闭包，并将文本作为参数回传给 SearchBar 外部。因为将 <code>onChanged</code> 作为了必传参数，所以编译器自然会在用到了 SearchBar 的地方报错。很容易找到报错的地方，加个参数就好了。</p>
-<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/6481817bd4544a138bbeaf10b3c80c54~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>SearchBar 相关的代码就算差不多完成了，其实可以将 SearchBar 单独作为一个文件独立出来。接下来就是处理 SearchPage 了</p>
-<h1 id="实现-SearchPage"><a href="#实现-SearchPage" class="headerlink" title="实现 SearchPage"></a>实现 SearchPage</h1><p>搜索页面的搜索功能，往细了说，可以搜索很多内容，我们这里只是简单的搜索名字，只要名字包含输入的内容，就将搜索结果展示出来。由于这里对中文名进行搜索的时候，能匹配到的数据比较少，所以这里已经将网络请求返回的名字由中文改为英文名字了。前面展示中文名字的截图就不做修改了。</p>
-<h2 id="SearchPage-的搜索功能"><a href="#SearchPage-的搜索功能" class="headerlink" title="SearchPage 的搜索功能"></a>SearchPage 的搜索功能</h2><h3 id="添加-datas-数据源"><a href="#添加-datas-数据源" class="headerlink" title="添加 datas 数据源"></a>添加 <code>datas</code> 数据源</h3><p>要实现 SearchPage 的搜索功能，那么它首先必须要有数据源，很明显它的数据源是从首页来的。先定义一个 <code>datas</code>,作为必传参数，然后通过外部层层传递过来。</p>
-<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/700b1121913846efb7e15edd66ee4613~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p><code>datas</code> 定义好了以后，报红色错误的地方，就是需要传参数的地方，很方便，都不用我们自己去翻哪里需要加参数了。发现 SearchCell 里面需要传入数据源，同样的方式，在 SearchCell 里面定义 <code>datas</code>,然后在报错的地方处理。</p>
-<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/15a0335618d648deb35dfa08cff589b9~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>就这样子顺藤摸瓜，直到来到 chat_page 将数据源传入就完成了</p>
-<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/9dd3a5666ded4f8393fed63621b903d1~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<h3 id="SearchPage-自己的数据源"><a href="#SearchPage-自己的数据源" class="headerlink" title="SearchPage 自己的数据源"></a>SearchPage 自己的数据源</h3><p>SearchPage 需要展示搜索之后的结果，所以自己定义一个数组用来存放搜索的结果。并且暂时先使用 Text 做一个最简单的展示。代码如下：</p>
-<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/8e81c3d13e6547c4bc7bb8a5d021bac5~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<h3 id="实现搜索功能并展示数据"><a href="#实现搜索功能并展示数据" class="headerlink" title="实现搜索功能并展示数据"></a>实现搜索功能并展示数据</h3><p>搜索的功能实现很简单，就是判断数据源里面的名字是否包含输入的文本，如果包含就全部添加并展示。<br>代码如下：</p>
-<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/9bd07dfcbf5247609d3b28d3780fec6c~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>APP 上如图，我输入 son，显示结果：</p>
-<div align=center>
-<img src='8天让iOS开发者上手Flutter之七/3332ccab3c12452fb12016e1508f6d5a~tplv-k3u1fbpfcp-watermark.png'>
-</div>
-
-<h2 id="SearchPage-的搜索结果列表展示"><a href="#SearchPage-的搜索结果列表展示" class="headerlink" title="SearchPage 的搜索结果列表展示"></a>SearchPage 的搜索结果列表展示</h2><p>SearchPage 的搜索结果列表展示的数据样式，应该和首页是类似的。所以可以直接使用首页的布局。代码如下：</p>
-<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/3118496d7dd94eae9cb516dd92e86ef0~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<h2 id="SearchPage-高亮显示搜到的结果"><a href="#SearchPage-高亮显示搜到的结果" class="headerlink" title="SearchPage 高亮显示搜到的结果"></a>SearchPage 高亮显示搜到的结果</h2><p>这里的思路是，高亮显示搜到的结果，那么普通的文本肯定是不行了，必须是富文本。如何找到搜索的关键字在文本中的位置呢，这个不用我们考虑了。flutter 中对字符串有一个分隔方法 <code>split</code>,这个方法跟 iOS 中的字符串的 <code>componentsSeparatedByString:</code> 方法类似，根据传入的参数来分隔字符串。这里贴一下 iOS 的代码：</p>
-<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/c991926b90ac4a6490d95ad1bc0889e2~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>（还是Xcode看着顺眼啊）我们将字符串 <code>abcaa</code> 以字符 <code>a</code> 分组，再将分组的结果拼接回原来的字符串。为什么要这么操作？因为重新拼接新字符串的时候，我们就可以处理富文本字符串了。现在回到 flutter 中来，flutter 中拼接的富文本的方式太方便了，RichText 花样拼接 TextSpan 这个我们在前面也讲过了。</p>
-<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/7bd6ae46acf344e48435c1dfa80dc50f~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p><code>_searchKey</code> 就是我们输入的文本，在 SearchPage 中声明属性，在 SearchBar 的回调中赋值就好了。</p>
-<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/be6eb80c9ad24db5897308c568863416~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/6723d425c75249d488bc3b8d31f9e345~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>现在测试一下，输入 son，APP 显示如图：</p>
-<div align=center>
-<img src='8天让iOS开发者上手Flutter之七/20dad78f11364579aae756585e776407~tplv-k3u1fbpfcp-watermark.png'>
-</div>
-
-<h2 id="滚动列表叫回键盘"><a href="#滚动列表叫回键盘" class="headerlink" title="滚动列表叫回键盘"></a>滚动列表叫回键盘</h2><p>ListView 的滚动，我们在前面已经说过一次，需要将 ListView 包在 <code>NotificationListener</code> 里面。然后叫回键盘的代码 <code>FocusScope.of(context).requestFocus(FocusNode());</code> 这个记住就好了，代码如下：</p>
-<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/d33048a50ec0451983defba0221a6547~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>到这里我们的 flutter 仿微信 Demo 功能就差不多完了，还剩最后一篇就是介绍 flutter 和原生混合开发的一些东西。这个也是实际项目中应该经常会遇到的情况。其实写到这里会发现很多东西和原生都是相通的或者类似的。除了新的语言 Dart 不是很熟悉之外，其他很多地方比如很多属性的名字，颜色，闭包，都能够看到原生的影子。flutter 创造者们也不会闭门造车，都会去借鉴原生里面的东西。</p>
 ]]></content>
       <categories>
         <category>flutter</category>
@@ -2038,78 +2038,6 @@ Block 的 hook ？应用场景？埋点
       </tags>
   </entry>
   <entry>
-    <title>Category</title>
-    <url>/2025/06/08/Category/</url>
-    <content><![CDATA[<h1 id="分类诞生的历史"><a href="#分类诞生的历史" class="headerlink" title="分类诞生的历史"></a>分类诞生的历史</h1><p>Objective-C 的分类（Category）语法并非随语言初始版本一同出现，而是随着语言发展逐步引入的重要特性。以下是关键时间线和技术背景分析：</p>
-<p>Objective-C 由 Brad Cox 和 Tom Love 在 1980 年代初基于 C 语言开发，旨在添加 Smalltalk 风格的面向对象特性。初始版本（1981年）​​ 仅包含核心的面向对象机制（如类、继承、消息传递），​​未包含分类语法​​。此时语言的核心是“软件组件”（Software-IC）概念，聚焦于通过类封装数据和操作。</p>
-<p>​​Objective-C 的类别（Category）语法是在 1990 年代初加入到 Objective-C 语言中的，具体时间是随着 NeXTSTEP 操作系统的发布而引入的。NeXTSTEP 是苹果公司前首席执行官史蒂夫·乔布斯创办的 NeXT 公司开发的操作系统，它使用了 Objective-C 作为主要编程语言，并引入了类别这一特性。﻿<br>​​<br>​​<strong>设计动机</strong>​​：解决无法修改原始类（如系统框架类）时扩展功能的需求。例如，为 NSString 添加绘图方法而无需继承或修改原始实现。这是最核心的应用场景。早期 Objective-C 依赖继承和组合实现扩展，分类则提供了更轻量、灵活的替代方案，直接为类添加方法。</p>
-<h1 id="核心语法：声明与实现"><a href="#核心语法：声明与实现" class="headerlink" title="核心语法：声明与实现"></a>核心语法：声明与实现</h1><p>分类，分类，顾名思义就知道，它是对类的拆分，所以需要一个明确的类，然后是分类的名称。</p>
-<ul>
-<li>分类的声明：  <figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">ClassName</span> (<span class="title">CategoryName</span>)</span></span><br><span class="line"><span class="comment">// 分类需要的属性。。。</span></span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure></li>
-<li>分类的实现：  <figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">ClassName</span> (<span class="title">CategoryName</span>)</span></span><br><span class="line"><span class="comment">// 方法的实现</span></span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure></li>
-</ul>
-<h1 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h1><p>按照实际使用频率排序：</p>
-<h2 id="🛠️-一、扩展系统或第三方框架类"><a href="#🛠️-一、扩展系统或第三方框架类" class="headerlink" title="🛠️ 一、扩展系统或第三方框架类"></a>🛠️ 一、扩展系统或第三方框架类</h2><p>场景：为 NSString、NSArray 等系统类或者第三方框架提供的类添加项目所需的特定方法。<br>示例：为 NSString 添加邮箱格式验证方法。</p>
-<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="comment">// NSString+Validation.h</span></span><br><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">NSString</span> (<span class="title">Validation</span>)</span></span><br><span class="line">- (<span class="type">BOOL</span>)isValidEmail;</span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// NSString+Validation.m</span></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">NSString</span> (<span class="title">Validation</span>)</span></span><br><span class="line">- (<span class="type">BOOL</span>)isValidEmail &#123;</span><br><span class="line">    <span class="comment">// 正则验证逻辑</span></span><br><span class="line">    <span class="keyword">return</span> [emailTest evaluateWithObject:<span class="keyword">self</span>];</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
-
-<p>优势：</p>
-<ul>
-<li>不修改 NSString 源码，避免破坏系统类的封装性；</li>
-<li>方法对所有 NSString 实例及子类（如 NSMutableString）生效。</li>
-</ul>
-<h2 id="⚙️-二、面向切面编程（AOP）支持"><a href="#⚙️-二、面向切面编程（AOP）支持" class="headerlink" title="⚙️ 二、面向切面编程（AOP）支持"></a>⚙️ 二、面向切面编程（AOP）支持</h2><p>场景​​：无侵入添加横切关注点（如日志、埋点）。<br>示例​​：通过分类实现方法交换（Method Swizzling）：</p>
-<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">ViewController</span> (<span class="title">log</span>)</span></span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">ViewController</span> (<span class="title">log</span>)</span></span><br><span class="line">+ (<span class="type">void</span>)load &#123;</span><br><span class="line">    <span class="keyword">static</span> <span class="built_in">dispatch_once_t</span> onceToken;</span><br><span class="line">    <span class="built_in">dispatch_once</span>(&amp;onceToken, ^&#123;</span><br><span class="line">        Method original = class_getInstanceMethod(<span class="keyword">self</span>, <span class="keyword">@selector</span>(viewDidAppear:));</span><br><span class="line">        Method swizzled = class_getInstanceMethod(<span class="keyword">self</span>, <span class="keyword">@selector</span>(swizzled_viewDidAppear:));</span><br><span class="line">        method_exchangeImplementations(original, swizzled);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br><span class="line">- (<span class="type">void</span>)swizzled_viewDidAppear:(<span class="type">BOOL</span>)animated &#123;</span><br><span class="line">    <span class="comment">// 调用原始方法实现</span></span><br><span class="line">    [<span class="keyword">self</span> swizzled_viewDidAppear:animated];</span><br><span class="line">    <span class="comment">// 实现需求</span></span><br><span class="line">    [Analytics logEvent:<span class="string">@&quot;ScreenAppeared&quot;</span> forView:<span class="keyword">self</span>];</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
-
-<p>​​优势​​：</p>
-<ul>
-<li>统一埋点逻辑，避免污染业务代码；</li>
-<li>适用于调试、性能监控等全局行为。</li>
-</ul>
-<h2 id="🧩-三、代码模块化与可读性提升"><a href="#🧩-三、代码模块化与可读性提升" class="headerlink" title="🧩 三、代码模块化与可读性提升"></a>🧩 三、代码模块化与可读性提升</h2><p>场景​​：将大型类的功能拆分到多个分类中，按逻辑分组管理。<br>示例​​：自定义 UIView 时分离布局、动画、样式代码；或者 NSApplication.h，UIApplication.h 头文件的实现方式</p>
-<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="comment">// UIView+Layout.h  (布局相关)</span></span><br><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">UIView</span> (<span class="title">Layout</span>)</span></span><br><span class="line">- (<span class="type">void</span>)autoCenterInSuperview;</span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// UIView+Animation.h  (动画相关)</span></span><br><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">UIView</span> (<span class="title">Animation</span>)</span></span><br><span class="line">- (<span class="type">void</span>)fadeInWithDuration:(<span class="built_in">NSTimeInterval</span>)duration;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
-
-
-
-<h1 id="底层实现原理"><a href="#底层实现原理" class="headerlink" title="底层实现原理"></a>底层实现原理</h1><p>分类中的方法都会合并到类对象的方法列表中。具体来说，分类中的实例方法会被合并到类对象的方法列表中，分类中的类方法会被合并到元类对象的方法列表。</p>
-<p>那么这个合并的动作发生在什么时刻？是程序启动的时候？还是编译源码的时候？</p>
-<p>根据分类的能力来说，分类可以给系统的类和第三方的类添加方法，那么可以推理出一定不是在编译时进行合并的，因为在编译时根本无法获取到系统的类和第三方的类对象啊，只能在运行时加载系统的类和第三方类的时候将分类中的方法添加到类中。其实实际上也确实这样的，我们可以从 Objective-C 的运行时库源码和编译后的产物中得到验证。</p>
-<h2 id="1-编译时的处理"><a href="#1-编译时的处理" class="headerlink" title="1. 编译时的处理"></a>1. 编译时的处理</h2><p>分类的底层结构，即编译器是如何处理我们编写的分类的。</p>
-<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">NSDate</span> (<span class="title">custom</span>)</span></span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">NSDate</span> (<span class="title">custom</span>)</span></span><br><span class="line">- (<span class="type">void</span>)hello &#123;</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@&quot;%s&quot;</span>, __func__);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
-
-<p>我们在源码中创建了多少个分类，在编译时就会产生多少个分类的结构体变量。如：你给 NSObject 创建了 2 个分类，那么在编译时就生成了 2 个分类结构体变量。分类的名字就是变量名的最后部分。通过查看编译后的分类结构也能验证，并不是在编译时就合并到类中了。编译时仅仅是将分类的信息保存了下来。</p>
-<h2 id="2-运行时的合并"><a href="#2-运行时的合并" class="headerlink" title="2. 运行时的合并"></a>2. 运行时的合并</h2><p>那运行时到底是如何合并分类信息到类中的呢？那就是 objc4 的源码分析了</p>
-<p><code>_objc_init -&gt; map_images -&gt; map_images_nolock() -&gt; _read_images()</code></p>
-<p>在 <code>_read_images()</code> 函数里面。核心方法 <code>remethodizeClass()</code> 里面有一个 <code>attachCategories()</code> 方法。最后是 class 的 rw 的 attachLists 方法的实现。</p>
-<p>首先将方法数组扩容，然后将原始的方法列表移动到数组的末尾，再将所有分类的方法列表复制到前面。这样就导致了分类的方法列表会在原始的方法列表前面，造成了类似覆盖的效果。就是说分类中如果存在和原始类中同名的方法，那么就会导致原始类中的方法不会被调用，而是调用分类中的方法。而如多个分类中存在同名的方法，则会按照编译的顺序优先调用，最后编译的分类中的方法会放在数组前面导致的。</p>
-<p>分类涉及的相关知识还是挺深的。。。个人认为，想要掌握 Category 的底层原理，必须先掌握，Objective-C 对象模型，运行时库初始化，等等底层知识。</p>
-<h1 id="使用注意点"><a href="#使用注意点" class="headerlink" title="使用注意点"></a>使用注意点</h1><p>理解了分类的底层原理之后，自然而然的就会考虑到不恰当使用分类可能会导致的问题：</p>
-<h2 id="不能添加实例变量"><a href="#不能添加实例变量" class="headerlink" title="不能添加实例变量"></a>不能添加实例变量</h2><p>这一点需要结合分类的设计初衷来讲，虽然从技术上来说，分类可以做到给类添加实例变量，但是会带来巨大的不稳定性和性能开销以及破坏类的封装性，从多方面考虑让分类支持添加实例变量都不是一个合适的选择。所以实际上也并没有让分类支持添加实例变量的能力，而是提供了关联对象技术达到类似实例变量的效果。</p>
-<h2 id="命名冲突风险"><a href="#命名冲突风险" class="headerlink" title="命名冲突风险"></a>命名冲突风险</h2><p>这是一个非常有可能会遇到的问题，多个分类中如果存在同名的方法，那么运行时到底会执行哪一个方法这是有答案的。取决于最后编译的是哪个分类，从前面的底层原理中得知，最后面的编译的分类会被添加到类的方法列表的前面。但是实际运用分类过程中是极不推荐在分类中使用同名方法的，应该尽量避免，解决办法就是给每个分类的方法添加一个前缀，这样大大降低了同名的可能。</p>
-<h2 id="不可覆盖原生方法"><a href="#不可覆盖原生方法" class="headerlink" title="不可覆盖原生方法"></a>不可覆盖原生方法</h2><p>覆盖系统方法可能导致框架行为异常。这也是非常有可能出现的问题，而且危险性较高，建议分类仅用来添加新功能，而不是修改原有的逻辑。</p>
-<blockquote>
-<p>分类的核心价值在于 ​​“无侵入式扩展”​​，任何可能破坏类封装性或导致运行时冲突的方案（如方法覆盖），都应优先考虑替代设计。</p>
-</blockquote>
-<h1 id="相关面试题"><a href="#相关面试题" class="headerlink" title="相关面试题"></a>相关面试题</h1><ul>
-<li>Category 的使用场景是什么</li>
-<li>Category 的实现原理</li>
-<li>Category 和 Extension 的区别是什么</li>
-<li>Category 有 load 方法吗？load 方法在什么时候被调用？load 方法能继承吗？<ul>
-<li>分类有没有 load 方法？这个问题十分奇怪？分类哪里来的 load 方法？你在分类里写了 load 方法就肯定有，没写就肯定没有啊。。。</li>
-<li>这回是 load_images 方法的源码分析了。先调用类的 load 方法，再调用分类的 load 方法。</li>
-<li>objc 运行时在初始化的时候，会直接调用类的 load 方法，而不是通过消息发送的形式调用 load 方法。</li>
-<li>我觉得，你得先搞懂 Objective-C 语言提供 load 方法的目的是什么？</li>
-<li>load，initialize 方法在 NSObject.h 文件中声明，并没有实现。那么 Objective-C 语言在 NSObject.h 文件中声明 load 和 initialize 又不实现的目的是什么呢？</li>
-</ul>
-</li>
-<li>load、initialize 方法的区别是什么？它们在 category 中的时候被调用的顺序是什么？出现继承时它们之间的被调用过程是怎样的？</li>
-<li>category 能否添加成员变量？如果可以，如何添加，如果不可以，解释为什么不可以？</li>
-</ul>
-]]></content>
-      <categories>
-        <category>iOS 底层原理</category>
-      </categories>
-  </entry>
-  <entry>
     <title>Cycript</title>
     <url>/2023/08/23/Cycript/</url>
     <content><![CDATA[<h1 id="什么是-Cycript"><a href="#什么是-Cycript" class="headerlink" title="什么是 Cycript"></a>什么是 Cycript</h1><p>Cycript 是一种用于 iOS 操作系统的脚本语言，同时也是该语言的解释器（一般来说不需要编译的脚本语言都会提供它对应的解释器，比如 Python、JavaScript、Ruby、PHP 等），Cycript 是 JavaScript，Objective-C++ 等语言的混合物这意味着它能理解 JavaScript，Objective-C++ 甚至是 Objective-C 语法，但是需要注意的是 Cycript 主要支持 JavaScript 的语法，对前端开发人员比较友好，而由于 Swift 吸收了 JavaScript 等其他各种语言的优点，所以 Cycript 中也能看到 Swift 的影子，Cycript 对 Objective-C 语法并不是完全支持，比如 Objective-C 创建一个 UIView 的代码是</p>
@@ -2286,6 +2214,78 @@ Block 的 hook ？应用场景？埋点
       </categories>
   </entry>
   <entry>
+    <title>Category</title>
+    <url>/2025/06/08/Category/</url>
+    <content><![CDATA[<h1 id="分类诞生的历史"><a href="#分类诞生的历史" class="headerlink" title="分类诞生的历史"></a>分类诞生的历史</h1><p>Objective-C 的分类（Category）语法并非随语言初始版本一同出现，而是随着语言发展逐步引入的重要特性。以下是关键时间线和技术背景分析：</p>
+<p>Objective-C 由 Brad Cox 和 Tom Love 在 1980 年代初基于 C 语言开发，旨在添加 Smalltalk 风格的面向对象特性。初始版本（1981年）​​ 仅包含核心的面向对象机制（如类、继承、消息传递），​​未包含分类语法​​。此时语言的核心是“软件组件”（Software-IC）概念，聚焦于通过类封装数据和操作。</p>
+<p>​​Objective-C 的类别（Category）语法是在 1990 年代初加入到 Objective-C 语言中的，具体时间是随着 NeXTSTEP 操作系统的发布而引入的。NeXTSTEP 是苹果公司前首席执行官史蒂夫·乔布斯创办的 NeXT 公司开发的操作系统，它使用了 Objective-C 作为主要编程语言，并引入了类别这一特性。﻿<br>​​<br>​​<strong>设计动机</strong>​​：解决无法修改原始类（如系统框架类）时扩展功能的需求。例如，为 NSString 添加绘图方法而无需继承或修改原始实现。这是最核心的应用场景。早期 Objective-C 依赖继承和组合实现扩展，分类则提供了更轻量、灵活的替代方案，直接为类添加方法。</p>
+<h1 id="核心语法：声明与实现"><a href="#核心语法：声明与实现" class="headerlink" title="核心语法：声明与实现"></a>核心语法：声明与实现</h1><p>分类，分类，顾名思义就知道，它是对类的拆分，所以需要一个明确的类，然后是分类的名称。</p>
+<ul>
+<li>分类的声明：  <figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">ClassName</span> (<span class="title">CategoryName</span>)</span></span><br><span class="line"><span class="comment">// 分类需要的属性。。。</span></span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure></li>
+<li>分类的实现：  <figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">ClassName</span> (<span class="title">CategoryName</span>)</span></span><br><span class="line"><span class="comment">// 方法的实现</span></span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+<h1 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h1><p>按照实际使用频率排序：</p>
+<h2 id="🛠️-一、扩展系统或第三方框架类"><a href="#🛠️-一、扩展系统或第三方框架类" class="headerlink" title="🛠️ 一、扩展系统或第三方框架类"></a>🛠️ 一、扩展系统或第三方框架类</h2><p>场景：为 NSString、NSArray 等系统类或者第三方框架提供的类添加项目所需的特定方法。<br>示例：为 NSString 添加邮箱格式验证方法。</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="comment">// NSString+Validation.h</span></span><br><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">NSString</span> (<span class="title">Validation</span>)</span></span><br><span class="line">- (<span class="type">BOOL</span>)isValidEmail;</span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// NSString+Validation.m</span></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">NSString</span> (<span class="title">Validation</span>)</span></span><br><span class="line">- (<span class="type">BOOL</span>)isValidEmail &#123;</span><br><span class="line">    <span class="comment">// 正则验证逻辑</span></span><br><span class="line">    <span class="keyword">return</span> [emailTest evaluateWithObject:<span class="keyword">self</span>];</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+
+<p>优势：</p>
+<ul>
+<li>不修改 NSString 源码，避免破坏系统类的封装性；</li>
+<li>方法对所有 NSString 实例及子类（如 NSMutableString）生效。</li>
+</ul>
+<h2 id="⚙️-二、面向切面编程（AOP）支持"><a href="#⚙️-二、面向切面编程（AOP）支持" class="headerlink" title="⚙️ 二、面向切面编程（AOP）支持"></a>⚙️ 二、面向切面编程（AOP）支持</h2><p>场景​​：无侵入添加横切关注点（如日志、埋点）。<br>示例​​：通过分类实现方法交换（Method Swizzling）：</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">ViewController</span> (<span class="title">log</span>)</span></span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">ViewController</span> (<span class="title">log</span>)</span></span><br><span class="line">+ (<span class="type">void</span>)load &#123;</span><br><span class="line">    <span class="keyword">static</span> <span class="built_in">dispatch_once_t</span> onceToken;</span><br><span class="line">    <span class="built_in">dispatch_once</span>(&amp;onceToken, ^&#123;</span><br><span class="line">        Method original = class_getInstanceMethod(<span class="keyword">self</span>, <span class="keyword">@selector</span>(viewDidAppear:));</span><br><span class="line">        Method swizzled = class_getInstanceMethod(<span class="keyword">self</span>, <span class="keyword">@selector</span>(swizzled_viewDidAppear:));</span><br><span class="line">        method_exchangeImplementations(original, swizzled);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br><span class="line">- (<span class="type">void</span>)swizzled_viewDidAppear:(<span class="type">BOOL</span>)animated &#123;</span><br><span class="line">    <span class="comment">// 调用原始方法实现</span></span><br><span class="line">    [<span class="keyword">self</span> swizzled_viewDidAppear:animated];</span><br><span class="line">    <span class="comment">// 实现需求</span></span><br><span class="line">    [Analytics logEvent:<span class="string">@&quot;ScreenAppeared&quot;</span> forView:<span class="keyword">self</span>];</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+
+<p>​​优势​​：</p>
+<ul>
+<li>统一埋点逻辑，避免污染业务代码；</li>
+<li>适用于调试、性能监控等全局行为。</li>
+</ul>
+<h2 id="🧩-三、代码模块化与可读性提升"><a href="#🧩-三、代码模块化与可读性提升" class="headerlink" title="🧩 三、代码模块化与可读性提升"></a>🧩 三、代码模块化与可读性提升</h2><p>场景​​：将大型类的功能拆分到多个分类中，按逻辑分组管理。<br>示例​​：自定义 UIView 时分离布局、动画、样式代码；或者 NSApplication.h，UIApplication.h 头文件的实现方式</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="comment">// UIView+Layout.h  (布局相关)</span></span><br><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">UIView</span> (<span class="title">Layout</span>)</span></span><br><span class="line">- (<span class="type">void</span>)autoCenterInSuperview;</span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// UIView+Animation.h  (动画相关)</span></span><br><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">UIView</span> (<span class="title">Animation</span>)</span></span><br><span class="line">- (<span class="type">void</span>)fadeInWithDuration:(<span class="built_in">NSTimeInterval</span>)duration;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h1 id="底层实现原理"><a href="#底层实现原理" class="headerlink" title="底层实现原理"></a>底层实现原理</h1><p>分类中的方法都会合并到类对象的方法列表中。具体来说，分类中的实例方法会被合并到类对象的方法列表中，分类中的类方法会被合并到元类对象的方法列表。</p>
+<p>那么这个合并的动作发生在什么时刻？是程序启动的时候？还是编译源码的时候？</p>
+<p>根据分类的能力来说，分类可以给系统的类和第三方的类添加方法，那么可以推理出一定不是在编译时进行合并的，因为在编译时根本无法获取到系统的类和第三方的类对象啊，只能在运行时加载系统的类和第三方类的时候将分类中的方法添加到类中。其实实际上也确实这样的，我们可以从 Objective-C 的运行时库源码和编译后的产物中得到验证。</p>
+<h2 id="1-编译时的处理"><a href="#1-编译时的处理" class="headerlink" title="1. 编译时的处理"></a>1. 编译时的处理</h2><p>分类的底层结构，即编译器是如何处理我们编写的分类的。</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">NSDate</span> (<span class="title">custom</span>)</span></span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">NSDate</span> (<span class="title">custom</span>)</span></span><br><span class="line">- (<span class="type">void</span>)hello &#123;</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@&quot;%s&quot;</span>, __func__);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+
+<p>我们在源码中创建了多少个分类，在编译时就会产生多少个分类的结构体变量。如：你给 NSObject 创建了 2 个分类，那么在编译时就生成了 2 个分类结构体变量。分类的名字就是变量名的最后部分。通过查看编译后的分类结构也能验证，并不是在编译时就合并到类中了。编译时仅仅是将分类的信息保存了下来。</p>
+<h2 id="2-运行时的合并"><a href="#2-运行时的合并" class="headerlink" title="2. 运行时的合并"></a>2. 运行时的合并</h2><p>那运行时到底是如何合并分类信息到类中的呢？那就是 objc4 的源码分析了</p>
+<p><code>_objc_init -&gt; map_images -&gt; map_images_nolock() -&gt; _read_images()</code></p>
+<p>在 <code>_read_images()</code> 函数里面。核心方法 <code>remethodizeClass()</code> 里面有一个 <code>attachCategories()</code> 方法。最后是 class 的 rw 的 attachLists 方法的实现。</p>
+<p>首先将方法数组扩容，然后将原始的方法列表移动到数组的末尾，再将所有分类的方法列表复制到前面。这样就导致了分类的方法列表会在原始的方法列表前面，造成了类似覆盖的效果。就是说分类中如果存在和原始类中同名的方法，那么就会导致原始类中的方法不会被调用，而是调用分类中的方法。而如多个分类中存在同名的方法，则会按照编译的顺序优先调用，最后编译的分类中的方法会放在数组前面导致的。</p>
+<p>分类涉及的相关知识还是挺深的。。。个人认为，想要掌握 Category 的底层原理，必须先掌握，Objective-C 对象模型，运行时库初始化，等等底层知识。</p>
+<h1 id="使用注意点"><a href="#使用注意点" class="headerlink" title="使用注意点"></a>使用注意点</h1><p>理解了分类的底层原理之后，自然而然的就会考虑到不恰当使用分类可能会导致的问题：</p>
+<h2 id="不能添加实例变量"><a href="#不能添加实例变量" class="headerlink" title="不能添加实例变量"></a>不能添加实例变量</h2><p>这一点需要结合分类的设计初衷来讲，虽然从技术上来说，分类可以做到给类添加实例变量，但是会带来巨大的不稳定性和性能开销以及破坏类的封装性，从多方面考虑让分类支持添加实例变量都不是一个合适的选择。所以实际上也并没有让分类支持添加实例变量的能力，而是提供了关联对象技术达到类似实例变量的效果。</p>
+<h2 id="命名冲突风险"><a href="#命名冲突风险" class="headerlink" title="命名冲突风险"></a>命名冲突风险</h2><p>这是一个非常有可能会遇到的问题，多个分类中如果存在同名的方法，那么运行时到底会执行哪一个方法这是有答案的。取决于最后编译的是哪个分类，从前面的底层原理中得知，最后面的编译的分类会被添加到类的方法列表的前面。但是实际运用分类过程中是极不推荐在分类中使用同名方法的，应该尽量避免，解决办法就是给每个分类的方法添加一个前缀，这样大大降低了同名的可能。</p>
+<h2 id="不可覆盖原生方法"><a href="#不可覆盖原生方法" class="headerlink" title="不可覆盖原生方法"></a>不可覆盖原生方法</h2><p>覆盖系统方法可能导致框架行为异常。这也是非常有可能出现的问题，而且危险性较高，建议分类仅用来添加新功能，而不是修改原有的逻辑。</p>
+<blockquote>
+<p>分类的核心价值在于 ​​“无侵入式扩展”​​，任何可能破坏类封装性或导致运行时冲突的方案（如方法覆盖），都应优先考虑替代设计。</p>
+</blockquote>
+<h1 id="相关面试题"><a href="#相关面试题" class="headerlink" title="相关面试题"></a>相关面试题</h1><ul>
+<li>Category 的使用场景是什么</li>
+<li>Category 的实现原理</li>
+<li>Category 和 Extension 的区别是什么</li>
+<li>Category 有 load 方法吗？load 方法在什么时候被调用？load 方法能继承吗？<ul>
+<li>分类有没有 load 方法？这个问题十分奇怪？分类哪里来的 load 方法？你在分类里写了 load 方法就肯定有，没写就肯定没有啊。。。</li>
+<li>这回是 load_images 方法的源码分析了。先调用类的 load 方法，再调用分类的 load 方法。</li>
+<li>objc 运行时在初始化的时候，会直接调用类的 load 方法，而不是通过消息发送的形式调用 load 方法。</li>
+<li>我觉得，你得先搞懂 Objective-C 语言提供 load 方法的目的是什么？</li>
+<li>load，initialize 方法在 NSObject.h 文件中声明，并没有实现。那么 Objective-C 语言在 NSObject.h 文件中声明 load 和 initialize 又不实现的目的是什么呢？</li>
+</ul>
+</li>
+<li>load、initialize 方法的区别是什么？它们在 category 中的时候被调用的顺序是什么？出现继承时它们之间的被调用过程是怎样的？</li>
+<li>category 能否添加成员变量？如果可以，如何添加，如果不可以，解释为什么不可以？</li>
+</ul>
+]]></content>
+      <categories>
+        <category>iOS 底层原理</category>
+      </categories>
+  </entry>
+  <entry>
     <title>Error Domain=NSURLErrorDomain Code=-999 已取消</title>
     <url>/2018/04/03/Error-Domain-NSURLErrorDomain-Code-999-%E5%B7%B2%E5%8F%96%E6%B6%88/</url>
     <content><![CDATA[<p>今天遇到这么一个问题,在使用 SDWebimage 设置 UIImageView 的图片的时候,发现这个图片<br><code>http://img4.imgtn.bdimg.com/it/u=132600321,3123081067&amp;fm=27&amp;gp=0.jpg</code>怎么也设置不成功,后来调试一看发现</p>
@@ -2322,29 +2322,26 @@ Block 的 hook ？应用场景？埋点
 </ul>
 <p>这次作者决定结合 AI 和个人的理解将 KVC 文档彻底弄清楚，即使不能完全弄明白也要留下一个深刻的印象，方便后续遇到文章中的场景时能够回想起来。</p>
 <hr>
-<h1 id="章节概览"><a href="#章节概览" class="headerlink" title="章节概览"></a>章节概览</h1><ul>
-<li><input checked="" disabled="" type="checkbox"> 建议阅读 </li>
-<li><input disabled="" type="checkbox"> 不建议阅读</li>
-</ul>
+<h1 id="章节概览"><a href="#章节概览" class="headerlink" title="章节概览"></a>章节概览</h1><p>✅ 建议阅读<br>❌ 不建议阅读</p>
 <h2 id="入门指南"><a href="#入门指南" class="headerlink" title="入门指南"></a>入门指南</h2><ol>
-<li><input checked="" disabled="" type="checkbox"> 关于键值编码</li>
+<li>✅ 关于键值编码</li>
 </ol>
 <h2 id="键值编码基础知识"><a href="#键值编码基础知识" class="headerlink" title="键值编码基础知识"></a>键值编码基础知识</h2><ol start="2">
-<li><input checked="" disabled="" type="checkbox"> 访问对象的属性</li>
-<li><input checked="" disabled="" type="checkbox"> 访问集合属性		</li>
-<li><input checked="" disabled="" type="checkbox"> 使用集合操作符</li>
-<li><input checked="" disabled="" type="checkbox"> 表示非对象值</li>
-<li><input disabled="" type="checkbox"> 验证属性</li>
-<li><input checked="" disabled="" type="checkbox"> 访问器搜索逻辑</li>
+<li>✅ 访问对象的属性</li>
+<li>✅ 访问集合属性		</li>
+<li>✅ 使用集合操作符</li>
+<li>✅ 表示非对象值</li>
+<li>❌ 验证属性</li>
+<li>✅ 访问器搜索逻辑</li>
 </ol>
 <h2 id="采用键值编码协议"><a href="#采用键值编码协议" class="headerlink" title="采用键值编码协议"></a>采用键值编码协议</h2><ol start="8">
-<li><input disabled="" type="checkbox"> 实现基本键值编码合规性			</li>
-<li><input disabled="" type="checkbox"> 定义集合方法					</li>
-<li><input disabled="" type="checkbox"> 处理非对象值					</li>
-<li><input disabled="" type="checkbox"> 添加验证						</li>
-<li><input disabled="" type="checkbox"> 描述属性关系					</li>
-<li><input disabled="" type="checkbox"> 以性能为导向进行设计</li>
-<li><input disabled="" type="checkbox"> 合规性检查清单</li>
+<li>❌ 实现基本键值编码合规性			</li>
+<li>❌ 定义集合方法					</li>
+<li>❌ 处理非对象值					</li>
+<li>❌ 添加验证						</li>
+<li>❌ 描述属性关系					</li>
+<li>❌ 以性能为导向进行设计</li>
+<li>❌ 合规性检查清单</li>
 </ol>
 <h1 id="常见疑惑及解答"><a href="#常见疑惑及解答" class="headerlink" title="常见疑惑及解答"></a>常见疑惑及解答</h1><p>以下是作者对这篇文档的一些疑问以及结合 AI 的回答。</p>
 <h2 id="属性验证是什么鬼？"><a href="#属性验证是什么鬼？" class="headerlink" title="属性验证是什么鬼？"></a>属性验证是什么鬼？</h2><p>Person 有一个 <code>NSString *name</code> 属性，如果需要给 name 添加验证则在内部添加以下代码</p>
@@ -3733,6 +3730,47 @@ commonModes并不是一个真正单独的模式
       </categories>
   </entry>
   <entry>
+    <title>iOS 底层原理导图</title>
+    <url>/2025/04/25/iOS-%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86%E5%AF%BC%E5%9B%BE/</url>
+    <content><![CDATA[<h1 id="iOS-底层原理导图"><a href="#iOS-底层原理导图" class="headerlink" title="iOS 底层原理导图"></a>iOS 底层原理导图</h1><ul>
+<li><p>iOS 底层知识入门</p>
+</li>
+<li><p>KVC </p>
+</li>
+<li><p>KVO </p>
+</li>
+<li><p>Category</p>
+</li>
+<li><p>关联对象</p>
+</li>
+<li><p>Block</p>
+</li>
+<li><p>Runtime</p>
+<ul>
+<li>深入理解iOS对象模型（一）：实例对象的内存探秘</li>
+<li>Objective-C 类对象</li>
+</ul>
+</li>
+<li><p>Runloop</p>
+</li>
+<li><p>多线程</p>
+<ul>
+<li>线程同步方案（锁、串行队列）</li>
+</ul>
+</li>
+<li><p>内存管理</p>
+</li>
+<li><p>性能优化</p>
+</li>
+<li><p>架构设计</p>
+</li>
+</ul>
+]]></content>
+      <categories>
+        <category>iOS 底层原理</category>
+      </categories>
+  </entry>
+  <entry>
     <title>iOS 应用重签名</title>
     <url>/2021/06/20/iOS-%E5%BA%94%E7%94%A8%E9%87%8D%E7%AD%BE%E5%90%8D/</url>
     <content><![CDATA[<p>上一篇文章作者讲解了 iOS 应用签名的原理。理解了签名的流程之后，我们知道签名保证的是自签名之后原始数据没有被其他人篡改，我们的 App 在调试过程中每次安装到设备上都会签名，假设我们使用自己的配置文件和证书对他人的 App 进行签名，是不是就能冒充是我们自己开发的 APP 了？</p>
@@ -3845,47 +3883,6 @@ commonModes并不是一个真正单独的模式
 ]]></content>
       <categories>
         <category>iOS 逆向与安全</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>iOS 底层原理导图</title>
-    <url>/2025/04/25/iOS-%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86%E5%AF%BC%E5%9B%BE/</url>
-    <content><![CDATA[<h1 id="iOS-底层原理导图"><a href="#iOS-底层原理导图" class="headerlink" title="iOS 底层原理导图"></a>iOS 底层原理导图</h1><ul>
-<li><p>iOS 底层知识入门</p>
-</li>
-<li><p>KVC </p>
-</li>
-<li><p>KVO </p>
-</li>
-<li><p>Category</p>
-</li>
-<li><p>关联对象</p>
-</li>
-<li><p>Block</p>
-</li>
-<li><p>Runtime</p>
-<ul>
-<li>深入理解iOS对象模型（一）：实例对象的内存探秘</li>
-<li>Objective-C 类对象</li>
-</ul>
-</li>
-<li><p>Runloop</p>
-</li>
-<li><p>多线程</p>
-<ul>
-<li>线程同步方案（锁、串行队列）</li>
-</ul>
-</li>
-<li><p>内存管理</p>
-</li>
-<li><p>性能优化</p>
-</li>
-<li><p>架构设计</p>
-</li>
-</ul>
-]]></content>
-      <categories>
-        <category>iOS 底层原理</category>
       </categories>
   </entry>
   <entry>
@@ -4572,212 +4569,6 @@ commonModes并不是一个真正单独的模式
       </tags>
   </entry>
   <entry>
-    <title>多线程</title>
-    <url>/2025/05/23/%E5%A4%9A%E7%BA%BF%E7%A8%8B/</url>
-    <content><![CDATA[<h1 id="相关面试题"><a href="#相关面试题" class="headerlink" title="相关面试题"></a>相关面试题</h1><ul>
-<li>你理解的多线程？</li>
-<li>iOS 中的多线程方案有哪几种？你更倾向于哪一种？</li>
-<li>你在项目中用过 GCD 吗？</li>
-<li>GCD 的队列类型</li>
-<li>说一下 OperationQueue 和 GCD 的区别，以及各自的优势</li>
-<li>线程安全的处理手段有哪些？</li>
-<li>Objective-C 你了解的锁有哪些？在你回答基础上进行二次提问：<ul>
-<li>自旋锁和互斥锁对比？</li>
-<li>使用以上锁需要注意哪些？</li>
-<li>用 C&#x2F;C++&#x2F;Objective-C 任一语言实现自旋锁或互斥锁，口述即可</li>
-</ul>
-</li>
-</ul>
-<h1 id="iOS-中的多线程方案"><a href="#iOS-中的多线程方案" class="headerlink" title="iOS 中的多线程方案"></a>iOS 中的多线程方案</h1><table>
-<thead>
-<tr>
-<th>技术方案</th>
-<th>简介</th>
-<th>实现的语言</th>
-<th>线程生命周期</th>
-<th>使用频率</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>pthread</td>
-<td>· 一套通用的多线程 API<br>· 适用于 Unix、Linux、Windows 等系统<br>· 跨平台、可移植<br>· 使用难度大</td>
-<td>C</td>
-<td>程序员管理</td>
-<td>几乎不用</td>
-</tr>
-<tr>
-<td>NSThread</td>
-<td>· 提供面向对象的 API<br>· 简单易用，可直接操作线程对象</td>
-<td>Objective-C</td>
-<td>程序员管理</td>
-<td>偶尔使用</td>
-</tr>
-<tr>
-<td>GCD</td>
-<td>· 旨在替代 NSThread 等线程技术<br>· 充分利用设备的多核心</td>
-<td>C</td>
-<td>系统自动管理</td>
-<td>经常使用</td>
-</tr>
-<tr>
-<td>NSOperation</td>
-<td>* 提供面向对象的 API<br> * 基于 GCD 实现<br>* 比 GCD 多了一些更加简单实用的功能</td>
-<td>Objective-C</td>
-<td>系统自动管理</td>
-<td>经常使用</td>
-</tr>
-</tbody></table>
-<h1 id="GCD-基础知识"><a href="#GCD-基础知识" class="headerlink" title="GCD 基础知识"></a>GCD 基础知识</h1><p>什么是 GCD ？</p>
-<p>​​GCD（Grand Central Dispatch）​​ 是苹果公司为优化多核处理器性能而开发的并发编程技术，旨在简化并行任务的管理。</p>
-<ul>
-<li>GCD 中有 2 个用来执行任务的函数<ul>
-<li>用同步的方式执行任务  <figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="built_in">dispatch_sync</span>(<span class="built_in">dispatch_queue_t</span> queue, dispatch_block_t block);</span><br></pre></td></tr></table></figure></li>
-<li>用异步的方式执行任务  <figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="built_in">dispatch_async</span>(<span class="built_in">dispatch_queue_t</span> queue, dispatch_block_t block);</span><br></pre></td></tr></table></figure></li>
-</ul>
-</li>
-</ul>
-<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="built_in">dispatch_queue_t</span> queue = dispatch_get_global_queue(<span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line"><span class="built_in">dispatch_async</span>(queue, ^&#123;</span><br><span class="line">	<span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务，线程：%@&quot;</span>, [<span class="built_in">NSThread</span> currentThread]);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-
-<p>GCD 源码，居然在 Swift 项目下</p>
-<p>GCD 的队列有两种<br>    - 串行队列：跟烤串一样，任务就像是烤串上一块一块的羊肉，执行时一个接着一个。<br>    - 并发队列：不止一根烤串了，多根烤串同时执行任务。</p>
-<p>同步、异步、并发、串行的概念<br>    - 同步：不开启新线程<br>    - 异步：有能力开启新线程<br>    - 串行：一个任务接着一个任务执行<br>    - 并发：多个任务可以同一时间执行</p>
-<table>
-<thead>
-<tr>
-<th></th>
-<th>并发队列</th>
-<th>手动创建的串行队列</th>
-<th>主队列</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>同步函数 sync</td>
-<td>* 不开新线程<br>* 任务串行</td>
-<td>* 不开新线程<br>* 任务串行</td>
-<td>* 不开新线程<br>* 任务串行</td>
-</tr>
-<tr>
-<td>异步函数 async</td>
-<td>* 开新线程<br>* 任务并发</td>
-<td>* 开新线程<br>* 任务串行</td>
-<td>* 不开新线程<br>* 任务串行</td>
-</tr>
-</tbody></table>
-<p>162：<br>死锁？<br>什么是死锁？<br>什么情况下产生死锁？</p>
-<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="built_in">dispatch_queue_t</span> queue = dispatch_get_main_queue();</span><br><span class="line"><span class="built_in">dispatch_sync</span>(queue, ^&#123;</span><br><span class="line">	<span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务&quot;</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-<p>以上代码如果是在主线程执行就产生了死锁。如果不在主线程执行不会产生死锁。</p>
-<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="built_in">dispatch_queue_t</span> queue = dispatch_get_main_queue();</span><br><span class="line"><span class="built_in">dispatch_async</span>(queue, ^&#123;</span><br><span class="line">	<span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务&quot;</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-
-<p>以上代码不会产生死锁，异步主队列是在主线程上执行任务。很经典的场景。</p>
-<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务1&quot;</span>);</span><br><span class="line"><span class="built_in">dispatch_queue_t</span> queue = dispatch_queue_create(<span class="string">&quot;custom_queue&quot;</span>, DISPATCH_QUEUE_SERIAL);</span><br><span class="line"><span class="built_in">dispatch_async</span>(queue, ^&#123;</span><br><span class="line">	<span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务2&quot;</span>);</span><br><span class="line">	<span class="built_in">dispatch_sync</span>(queue, ^&#123;</span><br><span class="line">		<span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务3&quot;</span>);</span><br><span class="line">	&#125;);</span><br><span class="line">	<span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务4&quot;</span>);</span><br><span class="line">&#125;);</span><br><span class="line"><span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务5&quot;</span>);</span><br></pre></td></tr></table></figure>
-
-<p>以上代码会产生死锁，两个block任务在同一个队列，又是同步函数</p>
-<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务1&quot;</span>);</span><br><span class="line"><span class="built_in">dispatch_queue_t</span> queue1 = dispatch_queue_create(<span class="string">&quot;custom_queue1&quot;</span>, DISPATCH_QUEUE_SERIAL);</span><br><span class="line"><span class="built_in">dispatch_queue_t</span> queue2 = dispatch_queue_create(<span class="string">&quot;custom_queue2&quot;</span>, DISPATCH_QUEUE_CONCURRENT);</span><br><span class="line"><span class="built_in">dispatch_async</span>(queue1, ^&#123;</span><br><span class="line">	<span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务2&quot;</span>);</span><br><span class="line">	<span class="built_in">dispatch_sync</span>(queue2, ^&#123;</span><br><span class="line">		<span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务3&quot;</span>);</span><br><span class="line">	&#125;);</span><br><span class="line">	<span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务4&quot;</span>);</span><br><span class="line">&#125;);</span><br><span class="line"><span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务5&quot;</span>);</span><br></pre></td></tr></table></figure>
-
-<p>以上代码不会产生死锁，</p>
-<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务1&quot;</span>);</span><br><span class="line"><span class="built_in">dispatch_queue_t</span> queue1 = dispatch_queue_create(<span class="string">&quot;custom_queue1&quot;</span>, DISPATCH_QUEUE_SERIAL);</span><br><span class="line"><span class="built_in">dispatch_queue_t</span> queue2 = dispatch_queue_create(<span class="string">&quot;custom_queue2&quot;</span>, DISPATCH_QUEUE_SERIAL);</span><br><span class="line"><span class="built_in">dispatch_async</span>(queue1, ^&#123;</span><br><span class="line">	<span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务2&quot;</span>);</span><br><span class="line">	<span class="built_in">dispatch_sync</span>(queue2, ^&#123;</span><br><span class="line">		<span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务3&quot;</span>);</span><br><span class="line">	&#125;);</span><br><span class="line">	<span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务4&quot;</span>);</span><br><span class="line">&#125;);</span><br><span class="line"><span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务5&quot;</span>);</span><br></pre></td></tr></table></figure>
-
-<p>以上代码也不会产生死锁。</p>
-<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务1&quot;</span>);</span><br><span class="line"><span class="built_in">dispatch_queue_t</span> queue = dispatch_queue_create(<span class="string">&quot;custom_queue&quot;</span>, DISPATCH_QUEUE_CONCURRENT);</span><br><span class="line"><span class="built_in">dispatch_async</span>(queue, ^&#123;</span><br><span class="line">	<span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务2&quot;</span>);</span><br><span class="line">	<span class="built_in">dispatch_sync</span>(queue, ^&#123;</span><br><span class="line">		<span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务3&quot;</span>);</span><br><span class="line">	&#125;);</span><br><span class="line">	<span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务4&quot;</span>);</span><br><span class="line">&#125;);</span><br><span class="line"><span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务5&quot;</span>);</span><br></pre></td></tr></table></figure>
-
-<p>以上代码也不会产生死锁，并发队列</p>
-<p><strong>使用同步函数 sync 往当前的串行队列再次添加任务就会产生死锁</strong></p>
-<p>165：<br>面试题<br>以下代码的打印结果是什么：</p>
-<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line">- (<span class="type">void</span>)touchesBegan:(<span class="built_in">NSSet</span>&lt;<span class="built_in">UITouch</span> *&gt; *)touches withEvent:(<span class="built_in">UIEvent</span> *)event &#123;</span><br><span class="line">    <span class="built_in">dispatch_queue_t</span> queue = dispatch_get_global_queue(<span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line">    <span class="built_in">dispatch_async</span>(queue, ^&#123;</span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@&quot;1&quot;</span>);</span><br><span class="line">        [<span class="keyword">self</span> performSelector:<span class="keyword">@selector</span>(test) withObject:<span class="literal">nil</span> afterDelay:<span class="number">.0</span>];</span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@&quot;3&quot;</span>);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="type">void</span>)test &#123;</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@&quot;2&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>打印结果是 1，3。performSelector: withObject: afterDelay: 方法依赖 RunLoop，子线程的 RunLoop 默认不开启，导致 2 的打印并不会执行。</p>
-<p>166：<br>performSelector:withObject:afterDelay: 是在 CoreFoundation 库里面实现的<br>performSelector:withObject: 是在 objc4 库里面实现的</p>
-<p>GNUstep 将 Cocoa 的 Objective-C 库重写了一遍并开源了，所以可以参考学习。</p>
-<p>167：<br>面试题2<br>以下代码的打印结果是什么：</p>
-<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line">- (<span class="type">void</span>)touchesBegan:(<span class="built_in">NSSet</span>&lt;<span class="built_in">UITouch</span> *&gt; *)touches withEvent:(<span class="built_in">UIEvent</span> *)event &#123;</span><br><span class="line">    <span class="built_in">NSThread</span> *thread = [[<span class="built_in">NSThread</span> alloc] initWithBlock:^&#123;</span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@&quot;1&quot;</span>);</span><br><span class="line">    &#125;];</span><br><span class="line">    [thread start];</span><br><span class="line">    </span><br><span class="line">    [<span class="keyword">self</span> performSelector:<span class="keyword">@selector</span>(test) onThread:thread withObject:<span class="literal">nil</span> waitUntilDone:<span class="literal">YES</span>];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="type">void</span>)test &#123;</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@&quot;2&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>打印结果是 1，然后程序崩溃，打印完 1 之后线程退出了，没办法执行 test 了，要保活子线程就得开启 RunLoop，强引用也解决不了。</p>
-<p>168：<br>调度组的使用<br>实现功能：发送多个网络请求，所有网络请求都完成的时候处理事情？<br>正是调度组的典型使用场景</p>
-<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line">dispatch_group_t group = dispatch_group_create();</span><br><span class="line"><span class="built_in">dispatch_queue_t</span> queue = dispatch_queue_create(<span class="string">&quot;custom_queue&quot;</span>, DISPATCH_QUEUE_CONCURRENT);</span><br><span class="line">dispatch_group_async(group, queue, ^&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; i++) &#123;</span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@&quot;任务1，线程：%@&quot;</span>, [<span class="built_in">NSThread</span> currentThread]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br><span class="line">dispatch_group_async(group, queue, ^&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; i++) &#123;</span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@&quot;任务2，线程：%@&quot;</span>, [<span class="built_in">NSThread</span> currentThread]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br><span class="line">dispatch_group_notify(group, dispatch_get_main_queue(), ^&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; i++) &#123;</span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@&quot;任务3，线程：%@&quot;</span>, [<span class="built_in">NSThread</span> currentThread]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-
-<h1 id="线程同步方案"><a href="#线程同步方案" class="headerlink" title="线程同步方案"></a>线程同步方案</h1><p>169:<br>多线程存在的问题？同时做多件事情提高了效率，但是存在线程安全问题<br>资源共享问题：<br>    多个线程访问和使用同一个资源</p>
-<p>案例：<br>存钱取钱。<br>卖票案例。</p>
-<p>解决办法：<br>    线程同步技术：加锁</p>
-<p>170-173：<br>iOS 中的线程同步方案有：</p>
-<ul>
-<li>OSSpinLock</li>
-<li>os_unfair_lock</li>
-<li>pthread_mutex</li>
-<li>NSLock</li>
-<li>NSRecursiveLock</li>
-<li>NSCondition</li>
-<li>NSConditionLock</li>
-<li>@synchronized</li>
-<li>dispatch_semaphore</li>
-<li>dispatch_queue(DISPATCH_QUEUE_SERIAL)</li>
-</ul>
-<p>然后是介绍 OSSpinLock 的使用了。导入 libkern&#x2F;OSAtomic.h 头文件，OS_SPINLOCK_INIT 宏创建锁，OSSpinLockLock() 函数加锁  OSSpinLockUnlock() 函数解锁<br>OSSpinLock 叫自旋锁，等待锁的期间一直占用着 CPU，已经过时了，还有可能产生优先级问题。。。总是就是不要用了，那为什么还讲那么多七七八八的呢</p>
-<p>原来 172 里是对代码的结构进行了调整。。。结合了一些封装设计在里面。。。站在讲解多线程锁的角度来讲，完全没有必要讲这块内容！<br>但是我想想有没有必要学习下怎么写的？？？</p>
-<p>173：答疑</p>
-<p>174：os_unfair_lock<br>这是自旋锁还是互斥锁呢？好像没讲呢？根据汇编得知是互斥锁，调用syscall让CPU休眠了</p>
-<p>175：pthread_mutex<br>互斥锁，等待锁的线程会处于休眠状态。</p>
-<p>176：pthread_mutex 递归锁</p>
-<p>177：自旋锁，互斥锁的汇编实现<br>自旋锁底层是一个循环一直在执行。<br>互斥锁底层调用了syscall让CPU进入休眠</p>
-<p>178：pthread_mutex 条件<br>讲了个什么场景没太理解。。。<br>感觉讲的真不好，总是磕磕绊绊来来回回重复叙述<br>pthread_cond_wait()<br>pthread_cond_signal()<br>意思好像是始终能保证 A 在 B 之前执行？好像是 OperationQueue 里面的依赖关系的？可能就是依赖的底层实现？<br>生产者？消费者？模式，意思是生产者必须先生产产品出来才可以给消费者消费。</p>
-<p>179:<br>NSLock 是对 mutex 普通锁的封装<br>NSRecursiveLock 是对 mutex 递归锁的封装<br>NSCondition 是 mutex cond 的封装</p>
-<p>180：课后答疑</p>
-<p>181：<br>[self.confition signal] 解释<br>完全听不明白了，不知道在表达啥呢。。。<br>答疑 RunLoop，这不是前面讲过了，看看什么问题</p>
-<ol>
-<li>NSThread 的生命不是一个强引用就能保证的，它的 RunLoop 不执行，线程的入口函数执行完就释放了。</li>
-<li>线程的入口函数执行了一段代码，但是如果不实现循环，它就跟普通的命令行程序执行完入口函数就结束了。<br>其实还是对线程的理解不够深入。确实线程对象比普通的对象更抽象。</li>
-</ol>
-<p>182：NSConditionLock<br>NSConditionLock？不是有一个 NSCondition 吗，这个又是什么<br>原来 NSConditionLock 是对 NSCondition 的封装。提供了更多功能<br>条件锁，应用场景还是建立依赖。。。</p>
-<p>183：串行队列<br>是的，GCD 的串行队列也可以实现线程同步</p>
-<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="built_in">dispatch_queue_t</span> moneyQueue = dispatch_queue_create(<span class="string">&quot;custom_queue1&quot;</span>, DISPATCH_QUEUE_SERIAL);</span><br><span class="line"><span class="built_in">dispatch_sync</span>(moneyQueue, ^&#123;</span><br><span class="line">	</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-<p>这个好理解</p>
-<p>184-185：dispatch_semaphore<br>信号量，通过信号量控制线程最大并发数量为 1 的话同样可以实现线程同步。</p>
-<p>dispatch_semaphore_wait() 函数会让信号量减 1。如果信号量大于 0 会执行后续代码。如果信号量 &lt;&#x3D; 0 会进入休眠直到大于 0 才可以继续执行后续代码。<br>dispatch_semaphore_signal() 会让信号量加 1。</p>
-<p>186：@synchronized 编译器语法糖<br>是 pthread_mutex_t 的封装。最简单的同步方案。<br>源码是在 objc4 库的 objc-sync.h objc-sync.mm 文件中，objc_sync_entry() objc_sync_exit()。发现是对 pthread_mutex_t 递归锁的封装。</p>
-<p>187：<br>总结线程同步方案：<br>性能从高到底</p>
-<ol>
-<li>os_unfair_lock</li>
-<li>OSSpinLock</li>
-<li>dispatch_semaphore</li>
-<li>pthread_mutex</li>
-<li>dispatch_queue(DISPATCH_QUEUE_SERIAL)</li>
-<li>NSLock</li>
-<li>NSCondition</li>
-<li>pthread_mutex(recursive)</li>
-<li>NSRecursiveLock</li>
-<li>NSConditionLock</li>
-<li>@synchronized</li>
-</ol>
-<p>188：自旋锁，互斥锁对比</p>
-<ul>
-<li>什么情况使用自旋锁比较划算？<ul>
-<li>预计线程等待锁的时间很短</li>
-<li>加锁的代码（临界区）经常被调用，但竞争情况很少发生</li>
-<li>CPU 资源不紧张</li>
-<li>多核心处理器</li>
-</ul>
-</li>
-<li>什么情况使用互斥锁比较划算<ul>
-<li>预计线程等待锁的时间较长</li>
-<li>单核处理器</li>
-<li>加锁的代码有 IO 操作</li>
-<li>加锁的代码复杂，循环量大</li>
-<li>加锁的代码竞争频繁</li>
-</ul>
-</li>
-</ul>
-<p>189：atomic<br>属于属性的修饰符，但在 iOS 中只推荐使用 nonatomic。atomic 更多用于 macOS 中。atomic 的作用是使属性的 getter 和 setter 是原子的，意思是属性的 setter 方法和 getter 方法都进行了加锁。<br>源码在 objc4 中。objc-accessors.mm 中，可以看到 atomic 的情况下进行了加锁。<br>但是又说没有办法保证使用属性的线程是安全的？这是什么意思<br>这个还是需要 AI 再详细解读一下了<br>问清楚为什么在 iOS 中不推荐使用 atomic。</p>
-<p>190-192：读写安全<br>文件的读写安全的实现。</p>
-<ol>
-<li>信号量最大并发为1，可以实现，但是只能单读单写。如果要实现多读单写就不能使用信号量了。多个线程可以同时读取数据，但只有一个线程写入数据，读和写是不能同时进行（只能有一个线程写，且写的时候无法读，可以有多个线程读但读的时候无法写）</li>
-<li>pthread_rwlock 读写锁，等待锁的线程会进入休眠 <figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="meta">#import <span class="string">&lt;pthread.h&gt;</span></span></span><br><span class="line"></span><br><span class="line">pthread_rwlock_t lock;</span><br><span class="line">pthread_rwlock_init(&amp;lock, <span class="literal">NULL</span>);</span><br><span class="line"><span class="comment">// 读锁</span></span><br><span class="line">pthread_rwlock_rdlock(&amp;lock);</span><br><span class="line"><span class="comment">// ......</span></span><br><span class="line">pthread_rwlock_unlock(&amp;lock);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 写锁</span></span><br><span class="line">pthread_rwlock_wrlock(&amp;lock);</span><br><span class="line"><span class="comment">// ......</span></span><br><span class="line">pthread_rwlock_unlock(&amp;lock);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 释放锁</span></span><br><span class="line">pthread_rwlock_destroy(&amp;lock);</span><br></pre></td></tr></table></figure></li>
-<li>dispatch_barrier_async 异步栅栏函数 <figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 必须使用创建的并发队列，全局并发队列或串行队列都无效</span></span><br><span class="line"><span class="built_in">dispatch_queue_t</span> queue = dispatch_queue_create(<span class="string">&quot;rw_queue&quot;</span>, DISPATCH_QUEUE_CONCURRENT);</span><br><span class="line"><span class="built_in">dispatch_async</span>(queue, ^&#123;</span><br><span class="line">	<span class="comment">// 读操作...</span></span><br><span class="line">&#125;);</span><br><span class="line">dispatch_barrier_async(queue, ^&#123;</span><br><span class="line">	<span class="comment">// 写操作...</span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></li>
-</ol>
-]]></content>
-      <categories>
-        <category>iOS 底层原理</category>
-      </categories>
-  </entry>
-  <entry>
     <title>内存管理</title>
     <url>/2025/05/15/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/</url>
     <content><![CDATA[<h1 id="相关面试题"><a href="#相关面试题" class="headerlink" title="相关面试题"></a>相关面试题</h1><ul>
@@ -5288,6 +5079,212 @@ commonModes并不是一个真正单独的模式
       </categories>
   </entry>
   <entry>
+    <title>多线程</title>
+    <url>/2025/05/23/%E5%A4%9A%E7%BA%BF%E7%A8%8B/</url>
+    <content><![CDATA[<h1 id="相关面试题"><a href="#相关面试题" class="headerlink" title="相关面试题"></a>相关面试题</h1><ul>
+<li>你理解的多线程？</li>
+<li>iOS 中的多线程方案有哪几种？你更倾向于哪一种？</li>
+<li>你在项目中用过 GCD 吗？</li>
+<li>GCD 的队列类型</li>
+<li>说一下 OperationQueue 和 GCD 的区别，以及各自的优势</li>
+<li>线程安全的处理手段有哪些？</li>
+<li>Objective-C 你了解的锁有哪些？在你回答基础上进行二次提问：<ul>
+<li>自旋锁和互斥锁对比？</li>
+<li>使用以上锁需要注意哪些？</li>
+<li>用 C&#x2F;C++&#x2F;Objective-C 任一语言实现自旋锁或互斥锁，口述即可</li>
+</ul>
+</li>
+</ul>
+<h1 id="iOS-中的多线程方案"><a href="#iOS-中的多线程方案" class="headerlink" title="iOS 中的多线程方案"></a>iOS 中的多线程方案</h1><table>
+<thead>
+<tr>
+<th>技术方案</th>
+<th>简介</th>
+<th>实现的语言</th>
+<th>线程生命周期</th>
+<th>使用频率</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>pthread</td>
+<td>· 一套通用的多线程 API<br>· 适用于 Unix、Linux、Windows 等系统<br>· 跨平台、可移植<br>· 使用难度大</td>
+<td>C</td>
+<td>程序员管理</td>
+<td>几乎不用</td>
+</tr>
+<tr>
+<td>NSThread</td>
+<td>· 提供面向对象的 API<br>· 简单易用，可直接操作线程对象</td>
+<td>Objective-C</td>
+<td>程序员管理</td>
+<td>偶尔使用</td>
+</tr>
+<tr>
+<td>GCD</td>
+<td>· 旨在替代 NSThread 等线程技术<br>· 充分利用设备的多核心</td>
+<td>C</td>
+<td>系统自动管理</td>
+<td>经常使用</td>
+</tr>
+<tr>
+<td>NSOperation</td>
+<td>* 提供面向对象的 API<br> * 基于 GCD 实现<br>* 比 GCD 多了一些更加简单实用的功能</td>
+<td>Objective-C</td>
+<td>系统自动管理</td>
+<td>经常使用</td>
+</tr>
+</tbody></table>
+<h1 id="GCD-基础知识"><a href="#GCD-基础知识" class="headerlink" title="GCD 基础知识"></a>GCD 基础知识</h1><p>什么是 GCD ？</p>
+<p>​​GCD（Grand Central Dispatch）​​ 是苹果公司为优化多核处理器性能而开发的并发编程技术，旨在简化并行任务的管理。</p>
+<ul>
+<li>GCD 中有 2 个用来执行任务的函数<ul>
+<li>用同步的方式执行任务  <figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="built_in">dispatch_sync</span>(<span class="built_in">dispatch_queue_t</span> queue, dispatch_block_t block);</span><br></pre></td></tr></table></figure></li>
+<li>用异步的方式执行任务  <figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="built_in">dispatch_async</span>(<span class="built_in">dispatch_queue_t</span> queue, dispatch_block_t block);</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ul>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="built_in">dispatch_queue_t</span> queue = dispatch_get_global_queue(<span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line"><span class="built_in">dispatch_async</span>(queue, ^&#123;</span><br><span class="line">	<span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务，线程：%@&quot;</span>, [<span class="built_in">NSThread</span> currentThread]);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>GCD 源码，居然在 Swift 项目下</p>
+<p>GCD 的队列有两种<br>    - 串行队列：跟烤串一样，任务就像是烤串上一块一块的羊肉，执行时一个接着一个。<br>    - 并发队列：不止一根烤串了，多根烤串同时执行任务。</p>
+<p>同步、异步、并发、串行的概念<br>    - 同步：不开启新线程<br>    - 异步：有能力开启新线程<br>    - 串行：一个任务接着一个任务执行<br>    - 并发：多个任务可以同一时间执行</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>并发队列</th>
+<th>手动创建的串行队列</th>
+<th>主队列</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>同步函数 sync</td>
+<td>* 不开新线程<br>* 任务串行</td>
+<td>* 不开新线程<br>* 任务串行</td>
+<td>* 不开新线程<br>* 任务串行</td>
+</tr>
+<tr>
+<td>异步函数 async</td>
+<td>* 开新线程<br>* 任务并发</td>
+<td>* 开新线程<br>* 任务串行</td>
+<td>* 不开新线程<br>* 任务串行</td>
+</tr>
+</tbody></table>
+<p>162：<br>死锁？<br>什么是死锁？<br>什么情况下产生死锁？</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="built_in">dispatch_queue_t</span> queue = dispatch_get_main_queue();</span><br><span class="line"><span class="built_in">dispatch_sync</span>(queue, ^&#123;</span><br><span class="line">	<span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务&quot;</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>以上代码如果是在主线程执行就产生了死锁。如果不在主线程执行不会产生死锁。</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="built_in">dispatch_queue_t</span> queue = dispatch_get_main_queue();</span><br><span class="line"><span class="built_in">dispatch_async</span>(queue, ^&#123;</span><br><span class="line">	<span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务&quot;</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>以上代码不会产生死锁，异步主队列是在主线程上执行任务。很经典的场景。</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务1&quot;</span>);</span><br><span class="line"><span class="built_in">dispatch_queue_t</span> queue = dispatch_queue_create(<span class="string">&quot;custom_queue&quot;</span>, DISPATCH_QUEUE_SERIAL);</span><br><span class="line"><span class="built_in">dispatch_async</span>(queue, ^&#123;</span><br><span class="line">	<span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务2&quot;</span>);</span><br><span class="line">	<span class="built_in">dispatch_sync</span>(queue, ^&#123;</span><br><span class="line">		<span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务3&quot;</span>);</span><br><span class="line">	&#125;);</span><br><span class="line">	<span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务4&quot;</span>);</span><br><span class="line">&#125;);</span><br><span class="line"><span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务5&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+<p>以上代码会产生死锁，两个block任务在同一个队列，又是同步函数</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务1&quot;</span>);</span><br><span class="line"><span class="built_in">dispatch_queue_t</span> queue1 = dispatch_queue_create(<span class="string">&quot;custom_queue1&quot;</span>, DISPATCH_QUEUE_SERIAL);</span><br><span class="line"><span class="built_in">dispatch_queue_t</span> queue2 = dispatch_queue_create(<span class="string">&quot;custom_queue2&quot;</span>, DISPATCH_QUEUE_CONCURRENT);</span><br><span class="line"><span class="built_in">dispatch_async</span>(queue1, ^&#123;</span><br><span class="line">	<span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务2&quot;</span>);</span><br><span class="line">	<span class="built_in">dispatch_sync</span>(queue2, ^&#123;</span><br><span class="line">		<span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务3&quot;</span>);</span><br><span class="line">	&#125;);</span><br><span class="line">	<span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务4&quot;</span>);</span><br><span class="line">&#125;);</span><br><span class="line"><span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务5&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+<p>以上代码不会产生死锁，</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务1&quot;</span>);</span><br><span class="line"><span class="built_in">dispatch_queue_t</span> queue1 = dispatch_queue_create(<span class="string">&quot;custom_queue1&quot;</span>, DISPATCH_QUEUE_SERIAL);</span><br><span class="line"><span class="built_in">dispatch_queue_t</span> queue2 = dispatch_queue_create(<span class="string">&quot;custom_queue2&quot;</span>, DISPATCH_QUEUE_SERIAL);</span><br><span class="line"><span class="built_in">dispatch_async</span>(queue1, ^&#123;</span><br><span class="line">	<span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务2&quot;</span>);</span><br><span class="line">	<span class="built_in">dispatch_sync</span>(queue2, ^&#123;</span><br><span class="line">		<span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务3&quot;</span>);</span><br><span class="line">	&#125;);</span><br><span class="line">	<span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务4&quot;</span>);</span><br><span class="line">&#125;);</span><br><span class="line"><span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务5&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+<p>以上代码也不会产生死锁。</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务1&quot;</span>);</span><br><span class="line"><span class="built_in">dispatch_queue_t</span> queue = dispatch_queue_create(<span class="string">&quot;custom_queue&quot;</span>, DISPATCH_QUEUE_CONCURRENT);</span><br><span class="line"><span class="built_in">dispatch_async</span>(queue, ^&#123;</span><br><span class="line">	<span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务2&quot;</span>);</span><br><span class="line">	<span class="built_in">dispatch_sync</span>(queue, ^&#123;</span><br><span class="line">		<span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务3&quot;</span>);</span><br><span class="line">	&#125;);</span><br><span class="line">	<span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务4&quot;</span>);</span><br><span class="line">&#125;);</span><br><span class="line"><span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务5&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+<p>以上代码也不会产生死锁，并发队列</p>
+<p><strong>使用同步函数 sync 往当前的串行队列再次添加任务就会产生死锁</strong></p>
+<p>165：<br>面试题<br>以下代码的打印结果是什么：</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line">- (<span class="type">void</span>)touchesBegan:(<span class="built_in">NSSet</span>&lt;<span class="built_in">UITouch</span> *&gt; *)touches withEvent:(<span class="built_in">UIEvent</span> *)event &#123;</span><br><span class="line">    <span class="built_in">dispatch_queue_t</span> queue = dispatch_get_global_queue(<span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line">    <span class="built_in">dispatch_async</span>(queue, ^&#123;</span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@&quot;1&quot;</span>);</span><br><span class="line">        [<span class="keyword">self</span> performSelector:<span class="keyword">@selector</span>(test) withObject:<span class="literal">nil</span> afterDelay:<span class="number">.0</span>];</span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@&quot;3&quot;</span>);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="type">void</span>)test &#123;</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@&quot;2&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>打印结果是 1，3。performSelector: withObject: afterDelay: 方法依赖 RunLoop，子线程的 RunLoop 默认不开启，导致 2 的打印并不会执行。</p>
+<p>166：<br>performSelector:withObject:afterDelay: 是在 CoreFoundation 库里面实现的<br>performSelector:withObject: 是在 objc4 库里面实现的</p>
+<p>GNUstep 将 Cocoa 的 Objective-C 库重写了一遍并开源了，所以可以参考学习。</p>
+<p>167：<br>面试题2<br>以下代码的打印结果是什么：</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line">- (<span class="type">void</span>)touchesBegan:(<span class="built_in">NSSet</span>&lt;<span class="built_in">UITouch</span> *&gt; *)touches withEvent:(<span class="built_in">UIEvent</span> *)event &#123;</span><br><span class="line">    <span class="built_in">NSThread</span> *thread = [[<span class="built_in">NSThread</span> alloc] initWithBlock:^&#123;</span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@&quot;1&quot;</span>);</span><br><span class="line">    &#125;];</span><br><span class="line">    [thread start];</span><br><span class="line">    </span><br><span class="line">    [<span class="keyword">self</span> performSelector:<span class="keyword">@selector</span>(test) onThread:thread withObject:<span class="literal">nil</span> waitUntilDone:<span class="literal">YES</span>];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="type">void</span>)test &#123;</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@&quot;2&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>打印结果是 1，然后程序崩溃，打印完 1 之后线程退出了，没办法执行 test 了，要保活子线程就得开启 RunLoop，强引用也解决不了。</p>
+<p>168：<br>调度组的使用<br>实现功能：发送多个网络请求，所有网络请求都完成的时候处理事情？<br>正是调度组的典型使用场景</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line">dispatch_group_t group = dispatch_group_create();</span><br><span class="line"><span class="built_in">dispatch_queue_t</span> queue = dispatch_queue_create(<span class="string">&quot;custom_queue&quot;</span>, DISPATCH_QUEUE_CONCURRENT);</span><br><span class="line">dispatch_group_async(group, queue, ^&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; i++) &#123;</span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@&quot;任务1，线程：%@&quot;</span>, [<span class="built_in">NSThread</span> currentThread]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br><span class="line">dispatch_group_async(group, queue, ^&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; i++) &#123;</span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@&quot;任务2，线程：%@&quot;</span>, [<span class="built_in">NSThread</span> currentThread]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br><span class="line">dispatch_group_notify(group, dispatch_get_main_queue(), ^&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; i++) &#123;</span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@&quot;任务3，线程：%@&quot;</span>, [<span class="built_in">NSThread</span> currentThread]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h1 id="线程同步方案"><a href="#线程同步方案" class="headerlink" title="线程同步方案"></a>线程同步方案</h1><p>169:<br>多线程存在的问题？同时做多件事情提高了效率，但是存在线程安全问题<br>资源共享问题：<br>    多个线程访问和使用同一个资源</p>
+<p>案例：<br>存钱取钱。<br>卖票案例。</p>
+<p>解决办法：<br>    线程同步技术：加锁</p>
+<p>170-173：<br>iOS 中的线程同步方案有：</p>
+<ul>
+<li>OSSpinLock</li>
+<li>os_unfair_lock</li>
+<li>pthread_mutex</li>
+<li>NSLock</li>
+<li>NSRecursiveLock</li>
+<li>NSCondition</li>
+<li>NSConditionLock</li>
+<li>@synchronized</li>
+<li>dispatch_semaphore</li>
+<li>dispatch_queue(DISPATCH_QUEUE_SERIAL)</li>
+</ul>
+<p>然后是介绍 OSSpinLock 的使用了。导入 libkern&#x2F;OSAtomic.h 头文件，OS_SPINLOCK_INIT 宏创建锁，OSSpinLockLock() 函数加锁  OSSpinLockUnlock() 函数解锁<br>OSSpinLock 叫自旋锁，等待锁的期间一直占用着 CPU，已经过时了，还有可能产生优先级问题。。。总是就是不要用了，那为什么还讲那么多七七八八的呢</p>
+<p>原来 172 里是对代码的结构进行了调整。。。结合了一些封装设计在里面。。。站在讲解多线程锁的角度来讲，完全没有必要讲这块内容！<br>但是我想想有没有必要学习下怎么写的？？？</p>
+<p>173：答疑</p>
+<p>174：os_unfair_lock<br>这是自旋锁还是互斥锁呢？好像没讲呢？根据汇编得知是互斥锁，调用syscall让CPU休眠了</p>
+<p>175：pthread_mutex<br>互斥锁，等待锁的线程会处于休眠状态。</p>
+<p>176：pthread_mutex 递归锁</p>
+<p>177：自旋锁，互斥锁的汇编实现<br>自旋锁底层是一个循环一直在执行。<br>互斥锁底层调用了syscall让CPU进入休眠</p>
+<p>178：pthread_mutex 条件<br>讲了个什么场景没太理解。。。<br>感觉讲的真不好，总是磕磕绊绊来来回回重复叙述<br>pthread_cond_wait()<br>pthread_cond_signal()<br>意思好像是始终能保证 A 在 B 之前执行？好像是 OperationQueue 里面的依赖关系的？可能就是依赖的底层实现？<br>生产者？消费者？模式，意思是生产者必须先生产产品出来才可以给消费者消费。</p>
+<p>179:<br>NSLock 是对 mutex 普通锁的封装<br>NSRecursiveLock 是对 mutex 递归锁的封装<br>NSCondition 是 mutex cond 的封装</p>
+<p>180：课后答疑</p>
+<p>181：<br>[self.confition signal] 解释<br>完全听不明白了，不知道在表达啥呢。。。<br>答疑 RunLoop，这不是前面讲过了，看看什么问题</p>
+<ol>
+<li>NSThread 的生命不是一个强引用就能保证的，它的 RunLoop 不执行，线程的入口函数执行完就释放了。</li>
+<li>线程的入口函数执行了一段代码，但是如果不实现循环，它就跟普通的命令行程序执行完入口函数就结束了。<br>其实还是对线程的理解不够深入。确实线程对象比普通的对象更抽象。</li>
+</ol>
+<p>182：NSConditionLock<br>NSConditionLock？不是有一个 NSCondition 吗，这个又是什么<br>原来 NSConditionLock 是对 NSCondition 的封装。提供了更多功能<br>条件锁，应用场景还是建立依赖。。。</p>
+<p>183：串行队列<br>是的，GCD 的串行队列也可以实现线程同步</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="built_in">dispatch_queue_t</span> moneyQueue = dispatch_queue_create(<span class="string">&quot;custom_queue1&quot;</span>, DISPATCH_QUEUE_SERIAL);</span><br><span class="line"><span class="built_in">dispatch_sync</span>(moneyQueue, ^&#123;</span><br><span class="line">	</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>这个好理解</p>
+<p>184-185：dispatch_semaphore<br>信号量，通过信号量控制线程最大并发数量为 1 的话同样可以实现线程同步。</p>
+<p>dispatch_semaphore_wait() 函数会让信号量减 1。如果信号量大于 0 会执行后续代码。如果信号量 &lt;&#x3D; 0 会进入休眠直到大于 0 才可以继续执行后续代码。<br>dispatch_semaphore_signal() 会让信号量加 1。</p>
+<p>186：@synchronized 编译器语法糖<br>是 pthread_mutex_t 的封装。最简单的同步方案。<br>源码是在 objc4 库的 objc-sync.h objc-sync.mm 文件中，objc_sync_entry() objc_sync_exit()。发现是对 pthread_mutex_t 递归锁的封装。</p>
+<p>187：<br>总结线程同步方案：<br>性能从高到底</p>
+<ol>
+<li>os_unfair_lock</li>
+<li>OSSpinLock</li>
+<li>dispatch_semaphore</li>
+<li>pthread_mutex</li>
+<li>dispatch_queue(DISPATCH_QUEUE_SERIAL)</li>
+<li>NSLock</li>
+<li>NSCondition</li>
+<li>pthread_mutex(recursive)</li>
+<li>NSRecursiveLock</li>
+<li>NSConditionLock</li>
+<li>@synchronized</li>
+</ol>
+<p>188：自旋锁，互斥锁对比</p>
+<ul>
+<li>什么情况使用自旋锁比较划算？<ul>
+<li>预计线程等待锁的时间很短</li>
+<li>加锁的代码（临界区）经常被调用，但竞争情况很少发生</li>
+<li>CPU 资源不紧张</li>
+<li>多核心处理器</li>
+</ul>
+</li>
+<li>什么情况使用互斥锁比较划算<ul>
+<li>预计线程等待锁的时间较长</li>
+<li>单核处理器</li>
+<li>加锁的代码有 IO 操作</li>
+<li>加锁的代码复杂，循环量大</li>
+<li>加锁的代码竞争频繁</li>
+</ul>
+</li>
+</ul>
+<p>189：atomic<br>属于属性的修饰符，但在 iOS 中只推荐使用 nonatomic。atomic 更多用于 macOS 中。atomic 的作用是使属性的 getter 和 setter 是原子的，意思是属性的 setter 方法和 getter 方法都进行了加锁。<br>源码在 objc4 中。objc-accessors.mm 中，可以看到 atomic 的情况下进行了加锁。<br>但是又说没有办法保证使用属性的线程是安全的？这是什么意思<br>这个还是需要 AI 再详细解读一下了<br>问清楚为什么在 iOS 中不推荐使用 atomic。</p>
+<p>190-192：读写安全<br>文件的读写安全的实现。</p>
+<ol>
+<li>信号量最大并发为1，可以实现，但是只能单读单写。如果要实现多读单写就不能使用信号量了。多个线程可以同时读取数据，但只有一个线程写入数据，读和写是不能同时进行（只能有一个线程写，且写的时候无法读，可以有多个线程读但读的时候无法写）</li>
+<li>pthread_rwlock 读写锁，等待锁的线程会进入休眠 <figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="meta">#import <span class="string">&lt;pthread.h&gt;</span></span></span><br><span class="line"></span><br><span class="line">pthread_rwlock_t lock;</span><br><span class="line">pthread_rwlock_init(&amp;lock, <span class="literal">NULL</span>);</span><br><span class="line"><span class="comment">// 读锁</span></span><br><span class="line">pthread_rwlock_rdlock(&amp;lock);</span><br><span class="line"><span class="comment">// ......</span></span><br><span class="line">pthread_rwlock_unlock(&amp;lock);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 写锁</span></span><br><span class="line">pthread_rwlock_wrlock(&amp;lock);</span><br><span class="line"><span class="comment">// ......</span></span><br><span class="line">pthread_rwlock_unlock(&amp;lock);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 释放锁</span></span><br><span class="line">pthread_rwlock_destroy(&amp;lock);</span><br></pre></td></tr></table></figure></li>
+<li>dispatch_barrier_async 异步栅栏函数 <figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 必须使用创建的并发队列，全局并发队列或串行队列都无效</span></span><br><span class="line"><span class="built_in">dispatch_queue_t</span> queue = dispatch_queue_create(<span class="string">&quot;rw_queue&quot;</span>, DISPATCH_QUEUE_CONCURRENT);</span><br><span class="line"><span class="built_in">dispatch_async</span>(queue, ^&#123;</span><br><span class="line">	<span class="comment">// 读操作...</span></span><br><span class="line">&#125;);</span><br><span class="line">dispatch_barrier_async(queue, ^&#123;</span><br><span class="line">	<span class="comment">// 写操作...</span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></li>
+</ol>
+]]></content>
+      <categories>
+        <category>iOS 底层原理</category>
+      </categories>
+  </entry>
+  <entry>
     <title>密码学概述</title>
     <url>/2021/06/10/%E5%AF%86%E7%A0%81%E5%AD%A6%E6%A6%82%E8%BF%B0/</url>
     <content><![CDATA[<p>密码学（来自希腊语kryptos，意思是隐藏）一词的核心是指使数据无法被窥探者读取的技术。当然，密码学也可以用于其他目的。密码学包括一系列技术，如验证数据的真实性（检测是否修改）、确定个人或其他实体的身份、确定谁发送了特定消息或创建了特定数据片段、通过网络安全地发送数据、用密码或口令安全地锁定文件等等。</p>
@@ -5550,6 +5547,62 @@ m<sup>k * φ(n) + 1</sup> mod n = m
       <tags>
         <tag>iOS</tag>
       </tags>
+  </entry>
+  <entry>
+    <title>架构模式</title>
+    <url>/2025/06/05/%E6%9E%B6%E6%9E%84%E6%A8%A1%E5%BC%8F/</url>
+    <content><![CDATA[<h1 id="面试题"><a href="#面试题" class="headerlink" title="面试题"></a>面试题</h1><ul>
+<li>讲解 MVC、MVVM、MVP 以及你在项目里具体是怎么写的？</li>
+<li>你自己用过哪些设计模式？</li>
+<li>一般开始做一个项目，你的架构是如何思考的？</li>
+</ul>
+<h1 id="什么是架构？"><a href="#什么是架构？" class="headerlink" title="什么是架构？"></a>什么是架构？</h1><p>感觉MJ这块讲的不是很好，可能这个确实还是比较抽象，建议多结合ai总结吧。</p>
+<p>常见的架构有</p>
+<ul>
+<li>MVC</li>
+<li>MVP</li>
+<li>MVVM</li>
+<li>VIPER</li>
+<li>CDD</li>
+</ul>
+<h1 id="MVC"><a href="#MVC" class="headerlink" title="MVC"></a>MVC</h1><p>Apple 官方的 MVC 指的是 Model、View、Controller。Controller 持有 View 和 Model，内部处理协调 View 和 Model 的逻辑。UIKit 框架中的视图框架如 UITableView，UICollectionView 等视图都是典型的 MVC 架构中的 View 层，这些视图不持有任何模型数据。而是在控制器中给视图提供数据。这样的做法让 UIKit 的视图得到了充分的复用。但是这种情况下，Controller 里面的代码会随着业务的增加导致越来越臃肿。因为所有的代码都写在 Controller 里面了。</p>
+<h2 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h2><ul>
+<li>View 和 Model 的可重用性高。</li>
+</ul>
+<h2 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h2><ul>
+<li>Controller 内的代码会必然越来越多。</li>
+</ul>
+<h1 id="MVC-变种"><a href="#MVC-变种" class="headerlink" title="MVC-变种"></a>MVC-变种</h1><p>呃，就是 View 持有了 Model，但是 Controller 依旧持有 Model。例子就是一个非常简单的组合视图，APP 图标和底部的名字。新建一个继承自 UIView 的 AppView，让它拥有一个 App 的 Model 属性。。。感觉好鸡肋。意思是按照 Apple 的 MVC 做法，AppView 是不持有 Model 的，但是将其视图暴露给外部。而这种做法就是 AppView 不暴露视图给外部，但是提供一个模型属性暴露给外部。外部给模型赋值就行了。</p>
+<h1 id="MVP"><a href="#MVP" class="headerlink" title="MVP"></a>MVP</h1><ul>
+<li>Model 模型</li>
+<li>View 视图</li>
+<li>Presenter 主持者，主持人</li>
+</ul>
+<p>这里应该贴代码了。。。控制器持有 Presenter。Presenter 也持有控制器，但是是弱引用的。</p>
+<p>感觉就是把控制器的一些逻辑移动到 Presenter 里面去了啊。相当于是 Controller 持有 Presenter，而 Presenter 代替 Controller 成为了 View 和 Model 的交流中心。</p>
+<h1 id="MVVM"><a href="#MVVM" class="headerlink" title="MVVM"></a>MVVM</h1><p>看着跟 MVP 一样啊。Presenter 换了个名字而已。。。ViewModel。MJ 说什么双向绑定。。。属性监听？</p>
+<p>AppView 持有 ViewModel，ViewModel 然后。。。看不懂</p>
+<p>什么 RAC 太重了？又是 KVO 怎么麻烦了？结果直接使用 FBKVOController？</p>
+<p>在 AppView 的 ViewModel setter 方法里面，监听 ViewModel 的属性，但是 ViewModel 属性发送变化时，更新 AppView 的视图。</p>
+<p>感觉讲的真的还是很勉强。。。最后说什么 VIPER、CDD 都是前面的变种。。。</p>
+<h1 id="分层架构"><a href="#分层架构" class="headerlink" title="分层架构"></a>分层架构</h1><ul>
+<li>界面层</li>
+<li>业务层</li>
+<li>数据层</li>
+</ul>
+<p>这个讲的更抽象。。。呃，感觉是为了赶紧结课，匆匆了事</p>
+<p>NewsService 类提供一个 API 加载数据，内部实现是使用 DBTool 加载本地数据，如果没有本地数据，使用 HPPTTool 加载网络数据。。。这个逻辑也太简单了，到处都是漏洞，首先如果没有本地数据就加载网络数据，那么如果一直没有本地数据就永远加载网络数据去了，这一点可能你会说加载网络数据之后就保存到本地啊，但是保存到本地之后，下次及以后就永远都是使用本地数据不去走网络请求了啊。。。搞不明白，搞这么多层是想干什么</p>
+<h1 id="设计模式"><a href="#设计模式" class="headerlink" title="设计模式"></a>设计模式</h1><p>这个就是面向对象语言的设计模式了，跟架构模式不相干。。。十分简单的介绍了一下，并没有讲到位。完全没有必要放在这里，而且面向对象语言的设计模式完全可以单开一门课程的。<br>面向对象语言的设计模式，其实是一些特定问题的经过验证的解决方案，经验总结：<br>可以分为三大类</p>
+<ul>
+<li>创建型模式：</li>
+<li>结构型模式：</li>
+<li>行为型模式：</li>
+</ul>
+<p>三分钟讲完面向对象编程语言的设计模式了，还有谁，建议看相关书籍了。。。</p>
+]]></content>
+      <categories>
+        <category>iOS 底层原理</category>
+      </categories>
   </entry>
   <entry>
     <title>微信抢红包插件</title>
@@ -5978,62 +6031,6 @@ m<sup>k * φ(n) + 1</sup> mod n = m
         <tag>微信</tag>
         <tag>插件</tag>
       </tags>
-  </entry>
-  <entry>
-    <title>架构模式</title>
-    <url>/2025/06/05/%E6%9E%B6%E6%9E%84%E6%A8%A1%E5%BC%8F/</url>
-    <content><![CDATA[<h1 id="面试题"><a href="#面试题" class="headerlink" title="面试题"></a>面试题</h1><ul>
-<li>讲解 MVC、MVVM、MVP 以及你在项目里具体是怎么写的？</li>
-<li>你自己用过哪些设计模式？</li>
-<li>一般开始做一个项目，你的架构是如何思考的？</li>
-</ul>
-<h1 id="什么是架构？"><a href="#什么是架构？" class="headerlink" title="什么是架构？"></a>什么是架构？</h1><p>感觉MJ这块讲的不是很好，可能这个确实还是比较抽象，建议多结合ai总结吧。</p>
-<p>常见的架构有</p>
-<ul>
-<li>MVC</li>
-<li>MVP</li>
-<li>MVVM</li>
-<li>VIPER</li>
-<li>CDD</li>
-</ul>
-<h1 id="MVC"><a href="#MVC" class="headerlink" title="MVC"></a>MVC</h1><p>Apple 官方的 MVC 指的是 Model、View、Controller。Controller 持有 View 和 Model，内部处理协调 View 和 Model 的逻辑。UIKit 框架中的视图框架如 UITableView，UICollectionView 等视图都是典型的 MVC 架构中的 View 层，这些视图不持有任何模型数据。而是在控制器中给视图提供数据。这样的做法让 UIKit 的视图得到了充分的复用。但是这种情况下，Controller 里面的代码会随着业务的增加导致越来越臃肿。因为所有的代码都写在 Controller 里面了。</p>
-<h2 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h2><ul>
-<li>View 和 Model 的可重用性高。</li>
-</ul>
-<h2 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h2><ul>
-<li>Controller 内的代码会必然越来越多。</li>
-</ul>
-<h1 id="MVC-变种"><a href="#MVC-变种" class="headerlink" title="MVC-变种"></a>MVC-变种</h1><p>呃，就是 View 持有了 Model，但是 Controller 依旧持有 Model。例子就是一个非常简单的组合视图，APP 图标和底部的名字。新建一个继承自 UIView 的 AppView，让它拥有一个 App 的 Model 属性。。。感觉好鸡肋。意思是按照 Apple 的 MVC 做法，AppView 是不持有 Model 的，但是将其视图暴露给外部。而这种做法就是 AppView 不暴露视图给外部，但是提供一个模型属性暴露给外部。外部给模型赋值就行了。</p>
-<h1 id="MVP"><a href="#MVP" class="headerlink" title="MVP"></a>MVP</h1><ul>
-<li>Model 模型</li>
-<li>View 视图</li>
-<li>Presenter 主持者，主持人</li>
-</ul>
-<p>这里应该贴代码了。。。控制器持有 Presenter。Presenter 也持有控制器，但是是弱引用的。</p>
-<p>感觉就是把控制器的一些逻辑移动到 Presenter 里面去了啊。相当于是 Controller 持有 Presenter，而 Presenter 代替 Controller 成为了 View 和 Model 的交流中心。</p>
-<h1 id="MVVM"><a href="#MVVM" class="headerlink" title="MVVM"></a>MVVM</h1><p>看着跟 MVP 一样啊。Presenter 换了个名字而已。。。ViewModel。MJ 说什么双向绑定。。。属性监听？</p>
-<p>AppView 持有 ViewModel，ViewModel 然后。。。看不懂</p>
-<p>什么 RAC 太重了？又是 KVO 怎么麻烦了？结果直接使用 FBKVOController？</p>
-<p>在 AppView 的 ViewModel setter 方法里面，监听 ViewModel 的属性，但是 ViewModel 属性发送变化时，更新 AppView 的视图。</p>
-<p>感觉讲的真的还是很勉强。。。最后说什么 VIPER、CDD 都是前面的变种。。。</p>
-<h1 id="分层架构"><a href="#分层架构" class="headerlink" title="分层架构"></a>分层架构</h1><ul>
-<li>界面层</li>
-<li>业务层</li>
-<li>数据层</li>
-</ul>
-<p>这个讲的更抽象。。。呃，感觉是为了赶紧结课，匆匆了事</p>
-<p>NewsService 类提供一个 API 加载数据，内部实现是使用 DBTool 加载本地数据，如果没有本地数据，使用 HPPTTool 加载网络数据。。。这个逻辑也太简单了，到处都是漏洞，首先如果没有本地数据就加载网络数据，那么如果一直没有本地数据就永远加载网络数据去了，这一点可能你会说加载网络数据之后就保存到本地啊，但是保存到本地之后，下次及以后就永远都是使用本地数据不去走网络请求了啊。。。搞不明白，搞这么多层是想干什么</p>
-<h1 id="设计模式"><a href="#设计模式" class="headerlink" title="设计模式"></a>设计模式</h1><p>这个就是面向对象语言的设计模式了，跟架构模式不相干。。。十分简单的介绍了一下，并没有讲到位。完全没有必要放在这里，而且面向对象语言的设计模式完全可以单开一门课程的。<br>面向对象语言的设计模式，其实是一些特定问题的经过验证的解决方案，经验总结：<br>可以分为三大类</p>
-<ul>
-<li>创建型模式：</li>
-<li>结构型模式：</li>
-<li>行为型模式：</li>
-</ul>
-<p>三分钟讲完面向对象编程语言的设计模式了，还有谁，建议看相关书籍了。。。</p>
-]]></content>
-      <categories>
-        <category>iOS 底层原理</category>
-      </categories>
   </entry>
   <entry>
     <title>深入理解 iOS 对象模型</title>
