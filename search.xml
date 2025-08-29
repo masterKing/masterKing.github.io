@@ -85,6 +85,64 @@
 ]]></content>
   </entry>
   <entry>
+    <title>MBProgressHUD源码解析</title>
+    <url>/2020/06/24/2020-06-24-MBProgressHUD%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/</url>
+    <content><![CDATA[<h1 id="MBProgressHUD"><a href="#MBProgressHUD" class="headerlink" title="MBProgressHUD"></a>MBProgressHUD</h1><p>从入行以来,就经常听说,学习编程进步最快的方式,就是阅读优秀作品的源码…</p>
+<p>那么,今天我来阅读一下MBProgressHUD这个库的源码…</p>
+<p>查看一下文件,非常简单的俩个MBProgressHUD.h和MBProgressHUD.m文件</p>
+<p>没什么说的,从MBProgressHUD.h文件开始看吧;</p>
+<p>头文件首先声明了一个自定义的类 <code>MBBackgroundView</code> 和 一个协议 <code>MBProgressHUDDelegate</code>,自定义类放在这里声明一下,应该是因为<code>MBProgressHUD</code>里面使用到了<code>MBBackgroundView</code>类,且<code>MBProgressHUD</code>的声明与实现都放在了<code>MBBackgroundView</code>的前面,将<code>MBBackgroundView</code>的位置挪到比<code>MBProgressHUD</code>靠前的地方就不需要提前声明了,这个很简单,不需要多说了吧;而代理协议<code>MBProgressHUDDelegate</code>,对于做过iOS的开发人来说,应该说是再熟悉不过了…</p>
+<p>接下来声明了一个供外部使用的变量<code>extern CGFloat const MBProgressMaxOffset;</code>,使用<code>extern</code>修饰了的变量能够在其他文件也可以访问到;往下查看头文件的时候,发现是为了给属性<code>offset</code>使用的,注释里面写到可以使用CGPointMake(0.f, MBProgressMaxOffset)来使HUD的位置处于底部边缘的中心位置</p>
+<p>然后是4个自定义类型,<code>MBProgressHUDMode``MBProgressHUDAnimation``MBProgressHUDBackgroundStyle``MBProgressHUDCompletionBlock</code>;这四个类型也都比较简单,见名字大概就知道是什么意思了,简单提一下;<br><code>MBProgressHUDMode</code>mode翻译过来叫(设备的)模式,方式,风格,样式…在这里取风格或者样式应该更加恰当;它有6种不同的样式:</p>
+<ul>
+<li><code>MBProgressHUDModeIndeterminate </code>	&#x2F;&#x2F;iOS系统原生的UIActivityIndicatorView</li>
+<li><code>MBProgressHUDModeDeterminate </code>	&#x2F;&#x2F;一个圆形的饼状进度视图样式</li>
+<li><code>MBProgressHUDModeDeterminateHorizontalBar </code>	&#x2F;&#x2F;一个水平的条状进度视图样式</li>
+<li><code>MBProgressHUDModeAnnularDeterminate </code>	&#x2F;&#x2F;圆环形的进度视图样式</li>
+<li><code>MBProgressHUDModeCustomView </code>	&#x2F;&#x2F;自定义视图样式</li>
+<li><code>MBProgressHUDModeText </code> &#x2F;&#x2F;纯文字样式</li>
+</ul>
+<p><code>MBProgressHUDAnimation</code>动画类型</p>
+<ul>
+<li><code>MBProgressHUDAnimationFade</code> &#x2F;&#x2F;淡入淡出</li>
+<li><code>MBProgressHUDAnimationZoom</code> &#x2F;&#x2F;出现时放大,消失时缩小</li>
+<li><code>MBProgressHUDAnimationZoomOut</code> &#x2F;&#x2F;缩小</li>
+<li><code>MBProgressHUDAnimationZoomIn</code> &#x2F;&#x2F;放大</li>
+</ul>
+<p><code>MBProgressHUDBackgroundStyle</code>背景风格</p>
+<ul>
+<li><code>MBProgressHUDBackgroundStyleSolidColor</code> &#x2F;&#x2F;纯色</li>
+<li><code>MBProgressHUDBackgroundStyleBlur</code> &#x2F;&#x2F;模糊,毛玻璃效果</li>
+</ul>
+<p><code>MBProgressHUDCompletionBlock</code>是一个无返回值无参数的block</p>
+<p>接来下是<code>MBProgressHUD</code>的正式声明了<br>首先是7个方法声明</p>
+<p>前三个为类方法:</p>
+<p><code>+ (instancetype)showHUDAddedTo:(UIView *)view animated:(BOOL)animated;</code></p>
+<p><code>+ (BOOL)hideHUDForView:(UIView *)view animated:(BOOL)animated;</code></p>
+<p><code>+ (nullable MBProgressHUD *)HUDForView:(UIView *)view;</code></p>
+<p>后面为对象方法:</p>
+<p><code>- (instancetype)initWithView:(UIView *)view;</code></p>
+<p><code>- (void)showAnimated:(BOOL)animated;</code></p>
+<p><code>- (void)hideAnimated:(BOOL)animated;</code></p>
+<p><code>- (void)hideAnimated:(BOOL)animated afterDelay:(NSTimeInterval)delay;</code></p>
+<p>每个方法的注释都很详细,不需要多介绍什么的,接下来看看属性</p>
+<p><code>@property (weak, nonatomic) id&lt;MBProgressHUDDelegate&gt; delegate;</code><br><code>@property (copy, nullable) MBProgressHUDCompletionBlock completionBlock;</code><br>这两个属性都是用来回传HUD消失事件的,代理协议里面也只有一个HUD已经隐藏的方法</p>
+<p><code>@property (assign, nonatomic) NSTimeInterval graceTime;</code>这个属性很有意思,一开始我理解成下面那个属性<code>minShowTime</code>了,往下看到<code>minShowTime</code>之后,我才发现理解错了;这个属性的意思是:如果有graceTime,那么HUD在graceTime之后才显示.作用就是不让时间非常短的任务显示HUD(嗯,用处好像不是很大,我看了下我们项目,没有一个地方使用…)举个例子:我们一般会在网络请求发起之前显示HUD,在网络请求返回时隐藏HUD,在不考虑下面<code>minShowTime</code>属性的情况下,如果这个时间间隔非常短,就会出现显示了HUD瞬间就消失了的尴尬情况,那么这个时候,设置一个graceTime,对于那些时间非常短的异步任务就根本不会显示也没有必要显示HUD了</p>
+<p><code>@property (assign, nonatomic) NSTimeInterval minShowTime;</code>这个属性的作用就容易理解多了,最小显示时间;同样也是为了解决时间间隔很短的异步任务问题,你还察觉不到就结束了,那么这个HUD压根就看不见…所以加上这么一个时间</p>
+<p><code>@property (assign, nonatomic) BOOL removeFromSuperViewOnHide;</code>这个也是非常好理解,隐藏的时候是否从父视图移除</p>
+<h6 id="下面的属性时跟外观-Appearance-相关的"><a href="#下面的属性时跟外观-Appearance-相关的" class="headerlink" title="下面的属性时跟外观(Appearance)相关的"></a>下面的属性时跟外观(Appearance)相关的</h6><p><code>@property (assign, nonatomic) MBProgressHUDMode mode;</code> 样式<br><code>@property (strong, nonatomic, nullable) UIColor *contentColor</code> 内容颜色<br><code>@property (assign, nonatomic) MBProgressHUDAnimation animationType</code> 显示或隐藏时的动画类型<br><code>@property (assign, nonatomic) CGPoint offset</code> 相对于视图中心的边框偏移量<br><code>@property (assign, nonatomic) CGFloat margin</code> HUD边缘和HUD元素之间的间距<br><code>@property (assign, nonatomic) CGSize minSize</code> HUD边框的最小尺寸<br><code>@property (assign, nonatomic, getter = isSquare) BOOL square</code> 如果可能的话，强制HUD尺寸相等。<br><code>@property (assign, nonatomic, getter=areDefaultMotionEffectsEnabled) BOOL defaultMotionEffectsEnabled</code> 当启用时，bezel center会受到设备加速计数据的轻微影响</p>
+<h6 id="进度相关属性-Progress"><a href="#进度相关属性-Progress" class="headerlink" title="进度相关属性(Progress)"></a>进度相关属性(Progress)</h6><p><code>@property (assign, nonatomic) float progress;</code> 进度指示器的进度,取值0.0~1.0,默认为0.0</p>
+<h6 id="进度对象相关属性-ProgressObject"><a href="#进度对象相关属性-ProgressObject" class="headerlink" title="进度对象相关属性(ProgressObject)"></a>进度对象相关属性(ProgressObject)</h6><p><code>@property (strong, nonatomic, nullable) NSProgress *progressObject;</code> 不是太明白干什么的</p>
+<h6 id="视图相关属性-Views"><a href="#视图相关属性-Views" class="headerlink" title="视图相关属性(Views)"></a>视图相关属性(Views)</h6><p><code>@property (strong, nonatomic, readonly) MBBackgroundView *bezelView;</code> 包含文本标签和指示器(或者自定义视图)的边框视图<br><code>@property (strong, nonatomic, readonly) MBBackgroundView *backgroundView;</code> 覆盖整个HUD区域，放置在bezelView后面的视图<br><code>@property (strong, nonatomic, nullable) UIView *customView;</code> 当HUD样式为MBProgressHUDModeCustomView的时候,显示的视图;视图应该实现intrinsicContentSize方法已显示正确的大小,为了得到最好的效果,建议使用37x37像素<br><code>@property (strong, nonatomic, readonly) UILabel *label;</code> 显示在活动指示器下方的文本标签,HUD会自动调整大小以适应整个文本<br><code>@property (strong, nonatomic, readonly) UILabel *detailsLabel;</code> 一个标签，其中包含一个可选的详细信息消息，显示在labelText消息下面。细节文本可以跨越多行。<br><code>@property (strong, nonatomic, readonly) UIButton *button;</code> 放在标签下面的按钮。只有在添加target和action后才可见。</p>
+<p>好了,MBProgressHUD的方法属性就这些了…<br>接下来看看MBProgressHUD头文件里,其他的类的声明;</p>
+<p>首先是<code>MBRoundProgressView</code>这个应该是饼图样式时使用到的视图,只有4个属性<br><code>@property (nonatomic, assign) float progress;</code> 进度<br><code>@property (nonatomic, strong) UIColor *progressTintColor;</code> 指示器进度的颜色<br><code>@property (nonatomic, strong) UIColor *backgroundTintColor;</code> 指示器背景色<br><code>@property (nonatomic, assign, getter = isAnnular) BOOL annular;</code> 是否环形,不是很清楚什么效果…</p>
+<p>然后是<code>MBBarProgressView</code>,这个应该是一个扁平的进度条视图<br><code>@property (nonatomic, assign) float progress;</code> 进度<br><code>@property (nonatomic, strong) UIColor *lineColor;</code> 条状边框线颜色<br><code>@property (nonatomic, strong) UIColor *progressRemainingColor;</code> 条状背景色<br><code>@property (nonatomic, strong) UIColor *progressColor;</code> 条状进度颜色</p>
+<p>最后是<code>MBBackgroundView</code>,这个是背景视图<br><code>@property (nonatomic) MBProgressHUDBackgroundStyle style;</code> 背景样式,毛玻璃或者纯色,iOS7和它之后都是毛玻璃效果,之前是纯色<br><code>@property (nonatomic) UIBlurEffectStyle blurEffectStyle;</code> 模糊效果样式<br><code>@property (nonatomic, strong) UIColor *color;</code> 背景色</p>
+<p>以上就是MBProgressHUD.h文件的全部内容了,其实还有一部分,是遗弃的旧版本的代码就不看了</p>
+<p>下面,我来看看.m文件源码,这才是重点啊</p>
+]]></content>
+  </entry>
+  <entry>
     <title>2023年10月了黑苹果还香吗？性价比超高黑苹果台式机搭配&amp;黑苹果安装教程</title>
     <url>/2023/10/19/2023-10-19-2023%E5%B9%B410%E6%9C%88%E4%BA%86%E9%BB%91%E8%8B%B9%E6%9E%9C%E8%BF%98%E9%A6%99%E5%90%97%EF%BC%9F%E6%80%A7%E4%BB%B7%E6%AF%94%E8%B6%85%E9%AB%98%E9%BB%91%E8%8B%B9%E6%9E%9C%E5%8F%B0%E5%BC%8F%E6%9C%BA%E6%90%AD%E9%85%8D-%E9%BB%91%E8%8B%B9%E6%9E%9C%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B/</url>
     <content><![CDATA[<h1 id="缘由"><a href="#缘由" class="headerlink" title="缘由"></a>缘由</h1><p>最近一段时间对 iOS 逆向开发进行了一定的研究，之前也更新过一段时间的相关文章（后续由于搬家，不幸感染病毒🦠等一些原因断更了个把月），在学习和探索过程中，非常明显的感受到逆向分析对电脑的性能要求很高尤其是 CPU，在使用逆向分析工具 ghidra，hopper 等程序对 MachO 文件进行分析的时候，常常一分析就要等上大几个小时，而且我使用了 n 年的 MacBook Pro 在分析过程中 CPU 温度总是会飙升到 90 度以上，同时 CPU 散热风扇转速也高达 4500 转以上，甚至经常满转速 6000 转运行，噪音可想而知。等待的时间，加上风扇的噪音真的会让人失去耐性，忍无可忍之下决定购买一台性能强劲的，性价比超高的 Mac 电脑。</p>
@@ -281,171 +339,6 @@
       </tags>
   </entry>
   <entry>
-    <title>MBProgressHUD源码解析</title>
-    <url>/2020/06/24/2020-06-24-MBProgressHUD%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/</url>
-    <content><![CDATA[<h1 id="MBProgressHUD"><a href="#MBProgressHUD" class="headerlink" title="MBProgressHUD"></a>MBProgressHUD</h1><p>从入行以来,就经常听说,学习编程进步最快的方式,就是阅读优秀作品的源码…</p>
-<p>那么,今天我来阅读一下MBProgressHUD这个库的源码…</p>
-<p>查看一下文件,非常简单的俩个MBProgressHUD.h和MBProgressHUD.m文件</p>
-<p>没什么说的,从MBProgressHUD.h文件开始看吧;</p>
-<p>头文件首先声明了一个自定义的类 <code>MBBackgroundView</code> 和 一个协议 <code>MBProgressHUDDelegate</code>,自定义类放在这里声明一下,应该是因为<code>MBProgressHUD</code>里面使用到了<code>MBBackgroundView</code>类,且<code>MBProgressHUD</code>的声明与实现都放在了<code>MBBackgroundView</code>的前面,将<code>MBBackgroundView</code>的位置挪到比<code>MBProgressHUD</code>靠前的地方就不需要提前声明了,这个很简单,不需要多说了吧;而代理协议<code>MBProgressHUDDelegate</code>,对于做过iOS的开发人来说,应该说是再熟悉不过了…</p>
-<p>接下来声明了一个供外部使用的变量<code>extern CGFloat const MBProgressMaxOffset;</code>,使用<code>extern</code>修饰了的变量能够在其他文件也可以访问到;往下查看头文件的时候,发现是为了给属性<code>offset</code>使用的,注释里面写到可以使用CGPointMake(0.f, MBProgressMaxOffset)来使HUD的位置处于底部边缘的中心位置</p>
-<p>然后是4个自定义类型,<code>MBProgressHUDMode``MBProgressHUDAnimation``MBProgressHUDBackgroundStyle``MBProgressHUDCompletionBlock</code>;这四个类型也都比较简单,见名字大概就知道是什么意思了,简单提一下;<br><code>MBProgressHUDMode</code>mode翻译过来叫(设备的)模式,方式,风格,样式…在这里取风格或者样式应该更加恰当;它有6种不同的样式:</p>
-<ul>
-<li><code>MBProgressHUDModeIndeterminate </code>	&#x2F;&#x2F;iOS系统原生的UIActivityIndicatorView</li>
-<li><code>MBProgressHUDModeDeterminate </code>	&#x2F;&#x2F;一个圆形的饼状进度视图样式</li>
-<li><code>MBProgressHUDModeDeterminateHorizontalBar </code>	&#x2F;&#x2F;一个水平的条状进度视图样式</li>
-<li><code>MBProgressHUDModeAnnularDeterminate </code>	&#x2F;&#x2F;圆环形的进度视图样式</li>
-<li><code>MBProgressHUDModeCustomView </code>	&#x2F;&#x2F;自定义视图样式</li>
-<li><code>MBProgressHUDModeText </code> &#x2F;&#x2F;纯文字样式</li>
-</ul>
-<p><code>MBProgressHUDAnimation</code>动画类型</p>
-<ul>
-<li><code>MBProgressHUDAnimationFade</code> &#x2F;&#x2F;淡入淡出</li>
-<li><code>MBProgressHUDAnimationZoom</code> &#x2F;&#x2F;出现时放大,消失时缩小</li>
-<li><code>MBProgressHUDAnimationZoomOut</code> &#x2F;&#x2F;缩小</li>
-<li><code>MBProgressHUDAnimationZoomIn</code> &#x2F;&#x2F;放大</li>
-</ul>
-<p><code>MBProgressHUDBackgroundStyle</code>背景风格</p>
-<ul>
-<li><code>MBProgressHUDBackgroundStyleSolidColor</code> &#x2F;&#x2F;纯色</li>
-<li><code>MBProgressHUDBackgroundStyleBlur</code> &#x2F;&#x2F;模糊,毛玻璃效果</li>
-</ul>
-<p><code>MBProgressHUDCompletionBlock</code>是一个无返回值无参数的block</p>
-<p>接来下是<code>MBProgressHUD</code>的正式声明了<br>首先是7个方法声明</p>
-<p>前三个为类方法:</p>
-<p><code>+ (instancetype)showHUDAddedTo:(UIView *)view animated:(BOOL)animated;</code></p>
-<p><code>+ (BOOL)hideHUDForView:(UIView *)view animated:(BOOL)animated;</code></p>
-<p><code>+ (nullable MBProgressHUD *)HUDForView:(UIView *)view;</code></p>
-<p>后面为对象方法:</p>
-<p><code>- (instancetype)initWithView:(UIView *)view;</code></p>
-<p><code>- (void)showAnimated:(BOOL)animated;</code></p>
-<p><code>- (void)hideAnimated:(BOOL)animated;</code></p>
-<p><code>- (void)hideAnimated:(BOOL)animated afterDelay:(NSTimeInterval)delay;</code></p>
-<p>每个方法的注释都很详细,不需要多介绍什么的,接下来看看属性</p>
-<p><code>@property (weak, nonatomic) id&lt;MBProgressHUDDelegate&gt; delegate;</code><br><code>@property (copy, nullable) MBProgressHUDCompletionBlock completionBlock;</code><br>这两个属性都是用来回传HUD消失事件的,代理协议里面也只有一个HUD已经隐藏的方法</p>
-<p><code>@property (assign, nonatomic) NSTimeInterval graceTime;</code>这个属性很有意思,一开始我理解成下面那个属性<code>minShowTime</code>了,往下看到<code>minShowTime</code>之后,我才发现理解错了;这个属性的意思是:如果有graceTime,那么HUD在graceTime之后才显示.作用就是不让时间非常短的任务显示HUD(嗯,用处好像不是很大,我看了下我们项目,没有一个地方使用…)举个例子:我们一般会在网络请求发起之前显示HUD,在网络请求返回时隐藏HUD,在不考虑下面<code>minShowTime</code>属性的情况下,如果这个时间间隔非常短,就会出现显示了HUD瞬间就消失了的尴尬情况,那么这个时候,设置一个graceTime,对于那些时间非常短的异步任务就根本不会显示也没有必要显示HUD了</p>
-<p><code>@property (assign, nonatomic) NSTimeInterval minShowTime;</code>这个属性的作用就容易理解多了,最小显示时间;同样也是为了解决时间间隔很短的异步任务问题,你还察觉不到就结束了,那么这个HUD压根就看不见…所以加上这么一个时间</p>
-<p><code>@property (assign, nonatomic) BOOL removeFromSuperViewOnHide;</code>这个也是非常好理解,隐藏的时候是否从父视图移除</p>
-<h6 id="下面的属性时跟外观-Appearance-相关的"><a href="#下面的属性时跟外观-Appearance-相关的" class="headerlink" title="下面的属性时跟外观(Appearance)相关的"></a>下面的属性时跟外观(Appearance)相关的</h6><p><code>@property (assign, nonatomic) MBProgressHUDMode mode;</code> 样式<br><code>@property (strong, nonatomic, nullable) UIColor *contentColor</code> 内容颜色<br><code>@property (assign, nonatomic) MBProgressHUDAnimation animationType</code> 显示或隐藏时的动画类型<br><code>@property (assign, nonatomic) CGPoint offset</code> 相对于视图中心的边框偏移量<br><code>@property (assign, nonatomic) CGFloat margin</code> HUD边缘和HUD元素之间的间距<br><code>@property (assign, nonatomic) CGSize minSize</code> HUD边框的最小尺寸<br><code>@property (assign, nonatomic, getter = isSquare) BOOL square</code> 如果可能的话，强制HUD尺寸相等。<br><code>@property (assign, nonatomic, getter=areDefaultMotionEffectsEnabled) BOOL defaultMotionEffectsEnabled</code> 当启用时，bezel center会受到设备加速计数据的轻微影响</p>
-<h6 id="进度相关属性-Progress"><a href="#进度相关属性-Progress" class="headerlink" title="进度相关属性(Progress)"></a>进度相关属性(Progress)</h6><p><code>@property (assign, nonatomic) float progress;</code> 进度指示器的进度,取值0.0~1.0,默认为0.0</p>
-<h6 id="进度对象相关属性-ProgressObject"><a href="#进度对象相关属性-ProgressObject" class="headerlink" title="进度对象相关属性(ProgressObject)"></a>进度对象相关属性(ProgressObject)</h6><p><code>@property (strong, nonatomic, nullable) NSProgress *progressObject;</code> 不是太明白干什么的</p>
-<h6 id="视图相关属性-Views"><a href="#视图相关属性-Views" class="headerlink" title="视图相关属性(Views)"></a>视图相关属性(Views)</h6><p><code>@property (strong, nonatomic, readonly) MBBackgroundView *bezelView;</code> 包含文本标签和指示器(或者自定义视图)的边框视图<br><code>@property (strong, nonatomic, readonly) MBBackgroundView *backgroundView;</code> 覆盖整个HUD区域，放置在bezelView后面的视图<br><code>@property (strong, nonatomic, nullable) UIView *customView;</code> 当HUD样式为MBProgressHUDModeCustomView的时候,显示的视图;视图应该实现intrinsicContentSize方法已显示正确的大小,为了得到最好的效果,建议使用37x37像素<br><code>@property (strong, nonatomic, readonly) UILabel *label;</code> 显示在活动指示器下方的文本标签,HUD会自动调整大小以适应整个文本<br><code>@property (strong, nonatomic, readonly) UILabel *detailsLabel;</code> 一个标签，其中包含一个可选的详细信息消息，显示在labelText消息下面。细节文本可以跨越多行。<br><code>@property (strong, nonatomic, readonly) UIButton *button;</code> 放在标签下面的按钮。只有在添加target和action后才可见。</p>
-<p>好了,MBProgressHUD的方法属性就这些了…<br>接下来看看MBProgressHUD头文件里,其他的类的声明;</p>
-<p>首先是<code>MBRoundProgressView</code>这个应该是饼图样式时使用到的视图,只有4个属性<br><code>@property (nonatomic, assign) float progress;</code> 进度<br><code>@property (nonatomic, strong) UIColor *progressTintColor;</code> 指示器进度的颜色<br><code>@property (nonatomic, strong) UIColor *backgroundTintColor;</code> 指示器背景色<br><code>@property (nonatomic, assign, getter = isAnnular) BOOL annular;</code> 是否环形,不是很清楚什么效果…</p>
-<p>然后是<code>MBBarProgressView</code>,这个应该是一个扁平的进度条视图<br><code>@property (nonatomic, assign) float progress;</code> 进度<br><code>@property (nonatomic, strong) UIColor *lineColor;</code> 条状边框线颜色<br><code>@property (nonatomic, strong) UIColor *progressRemainingColor;</code> 条状背景色<br><code>@property (nonatomic, strong) UIColor *progressColor;</code> 条状进度颜色</p>
-<p>最后是<code>MBBackgroundView</code>,这个是背景视图<br><code>@property (nonatomic) MBProgressHUDBackgroundStyle style;</code> 背景样式,毛玻璃或者纯色,iOS7和它之后都是毛玻璃效果,之前是纯色<br><code>@property (nonatomic) UIBlurEffectStyle blurEffectStyle;</code> 模糊效果样式<br><code>@property (nonatomic, strong) UIColor *color;</code> 背景色</p>
-<p>以上就是MBProgressHUD.h文件的全部内容了,其实还有一部分,是遗弃的旧版本的代码就不看了</p>
-<p>下面,我来看看.m文件源码,这才是重点啊</p>
-]]></content>
-  </entry>
-  <entry>
-    <title>8天让iOS开发者上手Flutter之七</title>
-    <url>/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/</url>
-    <content><![CDATA[<p>上一篇文章我们已经完成首页聊天页面的导航条和列表展示，今天的任务是完成搜索 cell 的展示和点击之后的搜索页面的功能。</p>
-<h1 id="自定义-SearchCell"><a href="#自定义-SearchCell" class="headerlink" title="自定义 SearchCell"></a>自定义 SearchCell</h1><h2 id="新建-search-cell-dart-文件"><a href="#新建-search-cell-dart-文件" class="headerlink" title="新建 search_cell.dart 文件"></a>新建 search_cell.dart 文件</h2><img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/1dbd72608e914624a9d4585ad1097307~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<h2 id="实现-SearchCell-代码"><a href="#实现-SearchCell-代码" class="headerlink" title="实现 SearchCell 代码"></a>实现 SearchCell 代码</h2><p>SearchCell 的话，因为仅仅只是展示，点击之后就进入搜索页了，应该来说是不需要状态的，所以用一个 StatelessWidget 就够了。然后布局的方式使用一个 Container 包含一个 Row，Row 里面包一个图片和文本就可以了。布局的方式其实多种多样，能实现就好了。完整代码如下：</p>
-<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/d0128b2c771c49c59ef63ecd63e85895~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>一个有意思的地方是，flutter 里面的 Image 居然可以设置颜色，而且颜色是设置给图片的。比如我的放大镜图片原本是黑色的，设置红色之后，居然真的变红色了！！！</p>
-<div align=center>
-<img src="8天让iOS开发者上手Flutter之七/7c322f9a1989444792c8be1a83af7e8e~tplv-k3u1fbpfcp-watermark.png"/>
-</div>
-
-<h2 id="使用-SearchCell"><a href="#使用-SearchCell" class="headerlink" title="使用 SearchCell"></a>使用 SearchCell</h2><p>SearchCell 的展示就算写完了，然后在 ChatPage.dart 中使用，我们把 ListView 的 itemBuilder 方法抽取出来，然后因为我们多加了一个 SearchCell，所以 itemCount 需要加 1，然后取 _chatList 数据的时候也要处理一下下标。</p>
-<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/17291ce793da406ba1a0877a2350c65e~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<h1 id="自定义-SearchPage"><a href="#自定义-SearchPage" class="headerlink" title="自定义 SearchPage"></a>自定义 SearchPage</h1><h2 id="新建-search-page-dart-文件"><a href="#新建-search-page-dart-文件" class="headerlink" title="新建 search_page.dart 文件"></a>新建 search_page.dart 文件</h2><img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/0699384aaddf495185d41f9dfbfb4d63~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<h2 id="简单实现-SearchPage"><a href="#简单实现-SearchPage" class="headerlink" title="简单实现 SearchPage"></a>简单实现 SearchPage</h2><p>SearchPage 作为一个页面，使用 StatelessWidget 肯定是无法胜任的，所以使用一个 StatefulWidget。而由于 AppBar 的样式和我们需要显示的效果图还是有差别的，所以这里我们不使用 Scaffold 提供的 AppBar 了。我们自定义一个 SearchBar，配合一个 ListView 来搭建基本的布局。这里面基本没有新鲜的东西，就简单贴一下代码：</p>
-<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/2a65878c91ef4795a80cde4b9100e7ac~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>SearchBar 由于是在 SearchPage 中使用的，所以就直接定义在 SearchPage 中了，代码也是先简单定义如下：</p>
-<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/e6ae11c406504b5f8f1e8386d60fc9ad~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<h2 id="点击跳转到-SearchPage"><a href="#点击跳转到-SearchPage" class="headerlink" title="点击跳转到 SearchPage"></a>点击跳转到 SearchPage</h2><img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/f9239dbba4a8422a88b545ade852133e~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>在搜索 cell 里面实现点击方法，然后跳转到 SearchPage，显示效果如图：</p>
-<div align=center>
-<img src = '8天让iOS开发者上手Flutter之七/e5054ecb6ba147d7a3adc6f76e71bc47~tplv-k3u1fbpfcp-watermark.png'>
-</div>
-
-<h1 id="实现-SearchBar"><a href="#实现-SearchBar" class="headerlink" title="实现 SearchBar"></a>实现 SearchBar</h1><h2 id="SearchBar-的布局"><a href="#SearchBar-的布局" class="headerlink" title="SearchBar 的布局"></a>SearchBar 的布局</h2><p>SearchBar 的布局，最外层分为上下两个部分，上面的部分是系统状态栏的高度。下面的部分就是显示搜索条的高度。而搜索条的布局，使用 Row 分隔为左右两个部分，左侧包含放大镜，文本输入框和删除图片。右侧就是一个返回上级页面的取消。这里主要提一下 flutter 中的文本框，跟 iOS 中 UITextField 真的很不一样，UITextField 中左侧的图标，右侧的删除，都是封装在内部的。而在 flutter 中，文本框 TextField 真的就只有文本框，没有其他的东西，都需要自己添加。完整代码如下：</p>
-<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/0dbc3f3f2239405ca84199dc0fda9801~tplv-k3u1fbpfcp-watermark.png" class="" alt="Snip20210818_60.png">
-
-<h2 id="SearchBar-事件处理"><a href="#SearchBar-事件处理" class="headerlink" title="SearchBar 事件处理"></a>SearchBar 事件处理</h2><h3 id="取消的处理"><a href="#取消的处理" class="headerlink" title="取消的处理"></a>取消的处理</h3><p>点击取消需要 pop 到上一个界面，给取消加一个 <code>GestureDetector</code> 实现 <code>onTap</code> 就好了。代码如下：</p>
-<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/386cd9fc654946959405e1090597a1ee~tplv-k3u1fbpfcp-watermark.png" class="" alt="Snip20210818_61.png">
-
-<h3 id="清除按钮功能实现"><a href="#清除按钮功能实现" class="headerlink" title="清除按钮功能实现"></a>清除按钮功能实现</h3><p>未输入文本的时候，不显示清除按钮。有输入文本的时候，显示清除按钮。点击清除按钮，清空文本内容并隐藏清除按钮。</p>
-<p>使用一个bool值 <code>_showClear</code> 控制清除按钮的显示隐藏。代码如下：</p>
-<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/9a5423cd5b0146b19169fbb6bbf12236~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>在文本变化的时候，修改 <code>_showClear</code> 值并刷新状态。文本的变化在TextField的 <code>onChanged</code> 属性就可以监听到。代码如下：</p>
-<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/053efa2bbde9460f976cfe5e7ba63d83~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>最后就是清除按钮的点击功能，由于需要清空 TextField 的文本内容，需要使用到 <code>TextEditingController</code>,给 TextField 的 <code>controller</code> 属性赋值，然后通过 <code>TextEditingController</code> 对象清除文本内容。文本清除之后并不会自动调用系统的 <code>onChanged</code> 方法，自己手动调用一下就好了。代码如下：</p>
-<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/b08d5ad674544fd3b52cb4cd86366783~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<h3 id="SearchBar-回调文本框的内容"><a href="#SearchBar-回调文本框的内容" class="headerlink" title="SearchBar 回调文本框的内容"></a>SearchBar 回调文本框的内容</h3><p>文本框的内容变化的时候，需要回调给 SearchBar 外部，这样我们才能在 SearchPage 页面进行搜索内容。使用一个回调作为参数就可以实现了。代码如下：</p>
-<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/762fd4c2b23444caa7f44d23dc3641d9~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p><code>onChanged</code> 是一个闭包属性，在初始化 SearchBar 的时候传入，在 TextField 的文本变化的时候调用闭包，并将文本作为参数回传给 SearchBar 外部。因为将 <code>onChanged</code> 作为了必传参数，所以编译器自然会在用到了 SearchBar 的地方报错。很容易找到报错的地方，加个参数就好了。</p>
-<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/6481817bd4544a138bbeaf10b3c80c54~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>SearchBar 相关的代码就算差不多完成了，其实可以将 SearchBar 单独作为一个文件独立出来。接下来就是处理 SearchPage 了</p>
-<h1 id="实现-SearchPage"><a href="#实现-SearchPage" class="headerlink" title="实现 SearchPage"></a>实现 SearchPage</h1><p>搜索页面的搜索功能，往细了说，可以搜索很多内容，我们这里只是简单的搜索名字，只要名字包含输入的内容，就将搜索结果展示出来。由于这里对中文名进行搜索的时候，能匹配到的数据比较少，所以这里已经将网络请求返回的名字由中文改为英文名字了。前面展示中文名字的截图就不做修改了。</p>
-<h2 id="SearchPage-的搜索功能"><a href="#SearchPage-的搜索功能" class="headerlink" title="SearchPage 的搜索功能"></a>SearchPage 的搜索功能</h2><h3 id="添加-datas-数据源"><a href="#添加-datas-数据源" class="headerlink" title="添加 datas 数据源"></a>添加 <code>datas</code> 数据源</h3><p>要实现 SearchPage 的搜索功能，那么它首先必须要有数据源，很明显它的数据源是从首页来的。先定义一个 <code>datas</code>,作为必传参数，然后通过外部层层传递过来。</p>
-<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/700b1121913846efb7e15edd66ee4613~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p><code>datas</code> 定义好了以后，报红色错误的地方，就是需要传参数的地方，很方便，都不用我们自己去翻哪里需要加参数了。发现 SearchCell 里面需要传入数据源，同样的方式，在 SearchCell 里面定义 <code>datas</code>,然后在报错的地方处理。</p>
-<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/15a0335618d648deb35dfa08cff589b9~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>就这样子顺藤摸瓜，直到来到 chat_page 将数据源传入就完成了</p>
-<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/9dd3a5666ded4f8393fed63621b903d1~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<h3 id="SearchPage-自己的数据源"><a href="#SearchPage-自己的数据源" class="headerlink" title="SearchPage 自己的数据源"></a>SearchPage 自己的数据源</h3><p>SearchPage 需要展示搜索之后的结果，所以自己定义一个数组用来存放搜索的结果。并且暂时先使用 Text 做一个最简单的展示。代码如下：</p>
-<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/8e81c3d13e6547c4bc7bb8a5d021bac5~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<h3 id="实现搜索功能并展示数据"><a href="#实现搜索功能并展示数据" class="headerlink" title="实现搜索功能并展示数据"></a>实现搜索功能并展示数据</h3><p>搜索的功能实现很简单，就是判断数据源里面的名字是否包含输入的文本，如果包含就全部添加并展示。<br>代码如下：</p>
-<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/9bd07dfcbf5247609d3b28d3780fec6c~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>APP 上如图，我输入 son，显示结果：</p>
-<div align=center>
-<img src='8天让iOS开发者上手Flutter之七/3332ccab3c12452fb12016e1508f6d5a~tplv-k3u1fbpfcp-watermark.png'>
-</div>
-
-<h2 id="SearchPage-的搜索结果列表展示"><a href="#SearchPage-的搜索结果列表展示" class="headerlink" title="SearchPage 的搜索结果列表展示"></a>SearchPage 的搜索结果列表展示</h2><p>SearchPage 的搜索结果列表展示的数据样式，应该和首页是类似的。所以可以直接使用首页的布局。代码如下：</p>
-<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/3118496d7dd94eae9cb516dd92e86ef0~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<h2 id="SearchPage-高亮显示搜到的结果"><a href="#SearchPage-高亮显示搜到的结果" class="headerlink" title="SearchPage 高亮显示搜到的结果"></a>SearchPage 高亮显示搜到的结果</h2><p>这里的思路是，高亮显示搜到的结果，那么普通的文本肯定是不行了，必须是富文本。如何找到搜索的关键字在文本中的位置呢，这个不用我们考虑了。flutter 中对字符串有一个分隔方法 <code>split</code>,这个方法跟 iOS 中的字符串的 <code>componentsSeparatedByString:</code> 方法类似，根据传入的参数来分隔字符串。这里贴一下 iOS 的代码：</p>
-<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/c991926b90ac4a6490d95ad1bc0889e2~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>（还是Xcode看着顺眼啊）我们将字符串 <code>abcaa</code> 以字符 <code>a</code> 分组，再将分组的结果拼接回原来的字符串。为什么要这么操作？因为重新拼接新字符串的时候，我们就可以处理富文本字符串了。现在回到 flutter 中来，flutter 中拼接的富文本的方式太方便了，RichText 花样拼接 TextSpan 这个我们在前面也讲过了。</p>
-<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/7bd6ae46acf344e48435c1dfa80dc50f~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p><code>_searchKey</code> 就是我们输入的文本，在 SearchPage 中声明属性，在 SearchBar 的回调中赋值就好了。</p>
-<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/be6eb80c9ad24db5897308c568863416~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/6723d425c75249d488bc3b8d31f9e345~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>现在测试一下，输入 son，APP 显示如图：</p>
-<div align=center>
-<img src='8天让iOS开发者上手Flutter之七/20dad78f11364579aae756585e776407~tplv-k3u1fbpfcp-watermark.png'>
-</div>
-
-<h2 id="滚动列表叫回键盘"><a href="#滚动列表叫回键盘" class="headerlink" title="滚动列表叫回键盘"></a>滚动列表叫回键盘</h2><p>ListView 的滚动，我们在前面已经说过一次，需要将 ListView 包在 <code>NotificationListener</code> 里面。然后叫回键盘的代码 <code>FocusScope.of(context).requestFocus(FocusNode());</code> 这个记住就好了，代码如下：</p>
-<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/d33048a50ec0451983defba0221a6547~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>到这里我们的 flutter 仿微信 Demo 功能就差不多完了，还剩最后一篇就是介绍 flutter 和原生混合开发的一些东西。这个也是实际项目中应该经常会遇到的情况。其实写到这里会发现很多东西和原生都是相通的或者类似的。除了新的语言 Dart 不是很熟悉之外，其他很多地方比如很多属性的名字，颜色，闭包，都能够看到原生的影子。flutter 创造者们也不会闭门造车，都会去借鉴原生里面的东西。</p>
-]]></content>
-      <categories>
-        <category>flutter</category>
-      </categories>
-      <tags>
-        <tag>flutter</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>8天让iOS开发者上手Flutter之一：快速入门Flutter</title>
     <url>/2021/07/10/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%80%EF%BC%9A%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8Flutter/</url>
     <content><![CDATA[<p>flutter 现在是越来越火了，现在作为一个 iOS 开发，如果你不会 flutter 都好像不算个正常人似的？而且现在的 flutter 情况，有点像 2012 年那会儿刚刚兴起的 iOS，Android 开发一样，会点皮毛 UI 就可以提升不少身价…这些年过来，有无数的前端跨平台框架兴起。却只有 flutter 一家独秀，说明它还是有两把刷子的。今天这篇文章内容是基于 Mac 和 Android Studio 基础来开发 flutter 的，如果你还没有配置好开发环境，可以在网上搜索，或者直接到官网安装。这篇文章主要用来记录我学习 flutter 的过程，如果你也对 flutter 感兴趣可以跟着一起练习。</p>
@@ -628,6 +521,113 @@
 </div>
 
 <h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>今天介绍了 Flutter 里面的许多的基础 Widget，有用于布局的 Center，Row，Column…有用于显示文本的 Text，RichText，TextSpan…有列表展示 ListView，有基础架构 Scaffold，MaterialApp 类，虽然东西有点多，但基本还没有什么难以理解的内容</p>
+]]></content>
+      <categories>
+        <category>flutter</category>
+      </categories>
+      <tags>
+        <tag>flutter</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>8天让iOS开发者上手Flutter之七</title>
+    <url>/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/</url>
+    <content><![CDATA[<p>上一篇文章我们已经完成首页聊天页面的导航条和列表展示，今天的任务是完成搜索 cell 的展示和点击之后的搜索页面的功能。</p>
+<h1 id="自定义-SearchCell"><a href="#自定义-SearchCell" class="headerlink" title="自定义 SearchCell"></a>自定义 SearchCell</h1><h2 id="新建-search-cell-dart-文件"><a href="#新建-search-cell-dart-文件" class="headerlink" title="新建 search_cell.dart 文件"></a>新建 search_cell.dart 文件</h2><img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/1dbd72608e914624a9d4585ad1097307~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<h2 id="实现-SearchCell-代码"><a href="#实现-SearchCell-代码" class="headerlink" title="实现 SearchCell 代码"></a>实现 SearchCell 代码</h2><p>SearchCell 的话，因为仅仅只是展示，点击之后就进入搜索页了，应该来说是不需要状态的，所以用一个 StatelessWidget 就够了。然后布局的方式使用一个 Container 包含一个 Row，Row 里面包一个图片和文本就可以了。布局的方式其实多种多样，能实现就好了。完整代码如下：</p>
+<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/d0128b2c771c49c59ef63ecd63e85895~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>一个有意思的地方是，flutter 里面的 Image 居然可以设置颜色，而且颜色是设置给图片的。比如我的放大镜图片原本是黑色的，设置红色之后，居然真的变红色了！！！</p>
+<div align=center>
+<img src="8天让iOS开发者上手Flutter之七/7c322f9a1989444792c8be1a83af7e8e~tplv-k3u1fbpfcp-watermark.png"/>
+</div>
+
+<h2 id="使用-SearchCell"><a href="#使用-SearchCell" class="headerlink" title="使用 SearchCell"></a>使用 SearchCell</h2><p>SearchCell 的展示就算写完了，然后在 ChatPage.dart 中使用，我们把 ListView 的 itemBuilder 方法抽取出来，然后因为我们多加了一个 SearchCell，所以 itemCount 需要加 1，然后取 _chatList 数据的时候也要处理一下下标。</p>
+<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/17291ce793da406ba1a0877a2350c65e~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<h1 id="自定义-SearchPage"><a href="#自定义-SearchPage" class="headerlink" title="自定义 SearchPage"></a>自定义 SearchPage</h1><h2 id="新建-search-page-dart-文件"><a href="#新建-search-page-dart-文件" class="headerlink" title="新建 search_page.dart 文件"></a>新建 search_page.dart 文件</h2><img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/0699384aaddf495185d41f9dfbfb4d63~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<h2 id="简单实现-SearchPage"><a href="#简单实现-SearchPage" class="headerlink" title="简单实现 SearchPage"></a>简单实现 SearchPage</h2><p>SearchPage 作为一个页面，使用 StatelessWidget 肯定是无法胜任的，所以使用一个 StatefulWidget。而由于 AppBar 的样式和我们需要显示的效果图还是有差别的，所以这里我们不使用 Scaffold 提供的 AppBar 了。我们自定义一个 SearchBar，配合一个 ListView 来搭建基本的布局。这里面基本没有新鲜的东西，就简单贴一下代码：</p>
+<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/2a65878c91ef4795a80cde4b9100e7ac~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>SearchBar 由于是在 SearchPage 中使用的，所以就直接定义在 SearchPage 中了，代码也是先简单定义如下：</p>
+<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/e6ae11c406504b5f8f1e8386d60fc9ad~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<h2 id="点击跳转到-SearchPage"><a href="#点击跳转到-SearchPage" class="headerlink" title="点击跳转到 SearchPage"></a>点击跳转到 SearchPage</h2><img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/f9239dbba4a8422a88b545ade852133e~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>在搜索 cell 里面实现点击方法，然后跳转到 SearchPage，显示效果如图：</p>
+<div align=center>
+<img src = '8天让iOS开发者上手Flutter之七/e5054ecb6ba147d7a3adc6f76e71bc47~tplv-k3u1fbpfcp-watermark.png'>
+</div>
+
+<h1 id="实现-SearchBar"><a href="#实现-SearchBar" class="headerlink" title="实现 SearchBar"></a>实现 SearchBar</h1><h2 id="SearchBar-的布局"><a href="#SearchBar-的布局" class="headerlink" title="SearchBar 的布局"></a>SearchBar 的布局</h2><p>SearchBar 的布局，最外层分为上下两个部分，上面的部分是系统状态栏的高度。下面的部分就是显示搜索条的高度。而搜索条的布局，使用 Row 分隔为左右两个部分，左侧包含放大镜，文本输入框和删除图片。右侧就是一个返回上级页面的取消。这里主要提一下 flutter 中的文本框，跟 iOS 中 UITextField 真的很不一样，UITextField 中左侧的图标，右侧的删除，都是封装在内部的。而在 flutter 中，文本框 TextField 真的就只有文本框，没有其他的东西，都需要自己添加。完整代码如下：</p>
+<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/0dbc3f3f2239405ca84199dc0fda9801~tplv-k3u1fbpfcp-watermark.png" class="" alt="Snip20210818_60.png">
+
+<h2 id="SearchBar-事件处理"><a href="#SearchBar-事件处理" class="headerlink" title="SearchBar 事件处理"></a>SearchBar 事件处理</h2><h3 id="取消的处理"><a href="#取消的处理" class="headerlink" title="取消的处理"></a>取消的处理</h3><p>点击取消需要 pop 到上一个界面，给取消加一个 <code>GestureDetector</code> 实现 <code>onTap</code> 就好了。代码如下：</p>
+<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/386cd9fc654946959405e1090597a1ee~tplv-k3u1fbpfcp-watermark.png" class="" alt="Snip20210818_61.png">
+
+<h3 id="清除按钮功能实现"><a href="#清除按钮功能实现" class="headerlink" title="清除按钮功能实现"></a>清除按钮功能实现</h3><p>未输入文本的时候，不显示清除按钮。有输入文本的时候，显示清除按钮。点击清除按钮，清空文本内容并隐藏清除按钮。</p>
+<p>使用一个bool值 <code>_showClear</code> 控制清除按钮的显示隐藏。代码如下：</p>
+<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/9a5423cd5b0146b19169fbb6bbf12236~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>在文本变化的时候，修改 <code>_showClear</code> 值并刷新状态。文本的变化在TextField的 <code>onChanged</code> 属性就可以监听到。代码如下：</p>
+<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/053efa2bbde9460f976cfe5e7ba63d83~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>最后就是清除按钮的点击功能，由于需要清空 TextField 的文本内容，需要使用到 <code>TextEditingController</code>,给 TextField 的 <code>controller</code> 属性赋值，然后通过 <code>TextEditingController</code> 对象清除文本内容。文本清除之后并不会自动调用系统的 <code>onChanged</code> 方法，自己手动调用一下就好了。代码如下：</p>
+<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/b08d5ad674544fd3b52cb4cd86366783~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<h3 id="SearchBar-回调文本框的内容"><a href="#SearchBar-回调文本框的内容" class="headerlink" title="SearchBar 回调文本框的内容"></a>SearchBar 回调文本框的内容</h3><p>文本框的内容变化的时候，需要回调给 SearchBar 外部，这样我们才能在 SearchPage 页面进行搜索内容。使用一个回调作为参数就可以实现了。代码如下：</p>
+<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/762fd4c2b23444caa7f44d23dc3641d9~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p><code>onChanged</code> 是一个闭包属性，在初始化 SearchBar 的时候传入，在 TextField 的文本变化的时候调用闭包，并将文本作为参数回传给 SearchBar 外部。因为将 <code>onChanged</code> 作为了必传参数，所以编译器自然会在用到了 SearchBar 的地方报错。很容易找到报错的地方，加个参数就好了。</p>
+<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/6481817bd4544a138bbeaf10b3c80c54~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>SearchBar 相关的代码就算差不多完成了，其实可以将 SearchBar 单独作为一个文件独立出来。接下来就是处理 SearchPage 了</p>
+<h1 id="实现-SearchPage"><a href="#实现-SearchPage" class="headerlink" title="实现 SearchPage"></a>实现 SearchPage</h1><p>搜索页面的搜索功能，往细了说，可以搜索很多内容，我们这里只是简单的搜索名字，只要名字包含输入的内容，就将搜索结果展示出来。由于这里对中文名进行搜索的时候，能匹配到的数据比较少，所以这里已经将网络请求返回的名字由中文改为英文名字了。前面展示中文名字的截图就不做修改了。</p>
+<h2 id="SearchPage-的搜索功能"><a href="#SearchPage-的搜索功能" class="headerlink" title="SearchPage 的搜索功能"></a>SearchPage 的搜索功能</h2><h3 id="添加-datas-数据源"><a href="#添加-datas-数据源" class="headerlink" title="添加 datas 数据源"></a>添加 <code>datas</code> 数据源</h3><p>要实现 SearchPage 的搜索功能，那么它首先必须要有数据源，很明显它的数据源是从首页来的。先定义一个 <code>datas</code>,作为必传参数，然后通过外部层层传递过来。</p>
+<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/700b1121913846efb7e15edd66ee4613~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p><code>datas</code> 定义好了以后，报红色错误的地方，就是需要传参数的地方，很方便，都不用我们自己去翻哪里需要加参数了。发现 SearchCell 里面需要传入数据源，同样的方式，在 SearchCell 里面定义 <code>datas</code>,然后在报错的地方处理。</p>
+<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/15a0335618d648deb35dfa08cff589b9~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>就这样子顺藤摸瓜，直到来到 chat_page 将数据源传入就完成了</p>
+<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/9dd3a5666ded4f8393fed63621b903d1~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<h3 id="SearchPage-自己的数据源"><a href="#SearchPage-自己的数据源" class="headerlink" title="SearchPage 自己的数据源"></a>SearchPage 自己的数据源</h3><p>SearchPage 需要展示搜索之后的结果，所以自己定义一个数组用来存放搜索的结果。并且暂时先使用 Text 做一个最简单的展示。代码如下：</p>
+<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/8e81c3d13e6547c4bc7bb8a5d021bac5~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<h3 id="实现搜索功能并展示数据"><a href="#实现搜索功能并展示数据" class="headerlink" title="实现搜索功能并展示数据"></a>实现搜索功能并展示数据</h3><p>搜索的功能实现很简单，就是判断数据源里面的名字是否包含输入的文本，如果包含就全部添加并展示。<br>代码如下：</p>
+<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/9bd07dfcbf5247609d3b28d3780fec6c~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>APP 上如图，我输入 son，显示结果：</p>
+<div align=center>
+<img src='8天让iOS开发者上手Flutter之七/3332ccab3c12452fb12016e1508f6d5a~tplv-k3u1fbpfcp-watermark.png'>
+</div>
+
+<h2 id="SearchPage-的搜索结果列表展示"><a href="#SearchPage-的搜索结果列表展示" class="headerlink" title="SearchPage 的搜索结果列表展示"></a>SearchPage 的搜索结果列表展示</h2><p>SearchPage 的搜索结果列表展示的数据样式，应该和首页是类似的。所以可以直接使用首页的布局。代码如下：</p>
+<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/3118496d7dd94eae9cb516dd92e86ef0~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<h2 id="SearchPage-高亮显示搜到的结果"><a href="#SearchPage-高亮显示搜到的结果" class="headerlink" title="SearchPage 高亮显示搜到的结果"></a>SearchPage 高亮显示搜到的结果</h2><p>这里的思路是，高亮显示搜到的结果，那么普通的文本肯定是不行了，必须是富文本。如何找到搜索的关键字在文本中的位置呢，这个不用我们考虑了。flutter 中对字符串有一个分隔方法 <code>split</code>,这个方法跟 iOS 中的字符串的 <code>componentsSeparatedByString:</code> 方法类似，根据传入的参数来分隔字符串。这里贴一下 iOS 的代码：</p>
+<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/c991926b90ac4a6490d95ad1bc0889e2~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>（还是Xcode看着顺眼啊）我们将字符串 <code>abcaa</code> 以字符 <code>a</code> 分组，再将分组的结果拼接回原来的字符串。为什么要这么操作？因为重新拼接新字符串的时候，我们就可以处理富文本字符串了。现在回到 flutter 中来，flutter 中拼接的富文本的方式太方便了，RichText 花样拼接 TextSpan 这个我们在前面也讲过了。</p>
+<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/7bd6ae46acf344e48435c1dfa80dc50f~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p><code>_searchKey</code> 就是我们输入的文本，在 SearchPage 中声明属性，在 SearchBar 的回调中赋值就好了。</p>
+<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/be6eb80c9ad24db5897308c568863416~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/6723d425c75249d488bc3b8d31f9e345~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>现在测试一下，输入 son，APP 显示如图：</p>
+<div align=center>
+<img src='8天让iOS开发者上手Flutter之七/20dad78f11364579aae756585e776407~tplv-k3u1fbpfcp-watermark.png'>
+</div>
+
+<h2 id="滚动列表叫回键盘"><a href="#滚动列表叫回键盘" class="headerlink" title="滚动列表叫回键盘"></a>滚动列表叫回键盘</h2><p>ListView 的滚动，我们在前面已经说过一次，需要将 ListView 包在 <code>NotificationListener</code> 里面。然后叫回键盘的代码 <code>FocusScope.of(context).requestFocus(FocusNode());</code> 这个记住就好了，代码如下：</p>
+<img src="/2021/08/19/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%B8%83/d33048a50ec0451983defba0221a6547~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>到这里我们的 flutter 仿微信 Demo 功能就差不多完了，还剩最后一篇就是介绍 flutter 和原生混合开发的一些东西。这个也是实际项目中应该经常会遇到的情况。其实写到这里会发现很多东西和原生都是相通的或者类似的。除了新的语言 Dart 不是很熟悉之外，其他很多地方比如很多属性的名字，颜色，闭包，都能够看到原生的影子。flutter 创造者们也不会闭门造车，都会去借鉴原生里面的东西。</p>
 ]]></content>
       <categories>
         <category>flutter</category>
@@ -2038,6 +2038,78 @@ Block 的 hook ？应用场景？埋点
       </tags>
   </entry>
   <entry>
+    <title>Category</title>
+    <url>/2025/06/08/Category/</url>
+    <content><![CDATA[<h1 id="分类诞生的历史"><a href="#分类诞生的历史" class="headerlink" title="分类诞生的历史"></a>分类诞生的历史</h1><p>Objective-C 的分类（Category）语法并非随语言初始版本一同出现，而是随着语言发展逐步引入的重要特性。以下是关键时间线和技术背景分析：</p>
+<p>Objective-C 由 Brad Cox 和 Tom Love 在 1980 年代初基于 C 语言开发，旨在添加 Smalltalk 风格的面向对象特性。初始版本（1981年）​​ 仅包含核心的面向对象机制（如类、继承、消息传递），​​未包含分类语法​​。此时语言的核心是“软件组件”（Software-IC）概念，聚焦于通过类封装数据和操作。</p>
+<p>​​Objective-C 的类别（Category）语法是在 1990 年代初加入到 Objective-C 语言中的，具体时间是随着 NeXTSTEP 操作系统的发布而引入的。NeXTSTEP 是苹果公司前首席执行官史蒂夫·乔布斯创办的 NeXT 公司开发的操作系统，它使用了 Objective-C 作为主要编程语言，并引入了类别这一特性。﻿<br>​​<br>​​<strong>设计动机</strong>​​：解决无法修改原始类（如系统框架类）时扩展功能的需求。例如，为 NSString 添加绘图方法而无需继承或修改原始实现。这是最核心的应用场景。早期 Objective-C 依赖继承和组合实现扩展，分类则提供了更轻量、灵活的替代方案，直接为类添加方法。</p>
+<h1 id="核心语法：声明与实现"><a href="#核心语法：声明与实现" class="headerlink" title="核心语法：声明与实现"></a>核心语法：声明与实现</h1><p>分类，分类，顾名思义就知道，它是对类的拆分，所以需要一个明确的类，然后是分类的名称。</p>
+<ul>
+<li>分类的声明：  <figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">ClassName</span> (<span class="title">CategoryName</span>)</span></span><br><span class="line"><span class="comment">// 分类需要的属性。。。</span></span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure></li>
+<li>分类的实现：  <figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">ClassName</span> (<span class="title">CategoryName</span>)</span></span><br><span class="line"><span class="comment">// 方法的实现</span></span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+<h1 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h1><p>按照实际使用频率排序：</p>
+<h2 id="🛠️-一、扩展系统或第三方框架类"><a href="#🛠️-一、扩展系统或第三方框架类" class="headerlink" title="🛠️ 一、扩展系统或第三方框架类"></a>🛠️ 一、扩展系统或第三方框架类</h2><p>场景：为 NSString、NSArray 等系统类或者第三方框架提供的类添加项目所需的特定方法。<br>示例：为 NSString 添加邮箱格式验证方法。</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="comment">// NSString+Validation.h</span></span><br><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">NSString</span> (<span class="title">Validation</span>)</span></span><br><span class="line">- (<span class="type">BOOL</span>)isValidEmail;</span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// NSString+Validation.m</span></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">NSString</span> (<span class="title">Validation</span>)</span></span><br><span class="line">- (<span class="type">BOOL</span>)isValidEmail &#123;</span><br><span class="line">    <span class="comment">// 正则验证逻辑</span></span><br><span class="line">    <span class="keyword">return</span> [emailTest evaluateWithObject:<span class="keyword">self</span>];</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+
+<p>优势：</p>
+<ul>
+<li>不修改 NSString 源码，避免破坏系统类的封装性；</li>
+<li>方法对所有 NSString 实例及子类（如 NSMutableString）生效。</li>
+</ul>
+<h2 id="⚙️-二、面向切面编程（AOP）支持"><a href="#⚙️-二、面向切面编程（AOP）支持" class="headerlink" title="⚙️ 二、面向切面编程（AOP）支持"></a>⚙️ 二、面向切面编程（AOP）支持</h2><p>场景​​：无侵入添加横切关注点（如日志、埋点）。<br>示例​​：通过分类实现方法交换（Method Swizzling）：</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">ViewController</span> (<span class="title">log</span>)</span></span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">ViewController</span> (<span class="title">log</span>)</span></span><br><span class="line">+ (<span class="type">void</span>)load &#123;</span><br><span class="line">    <span class="keyword">static</span> <span class="built_in">dispatch_once_t</span> onceToken;</span><br><span class="line">    <span class="built_in">dispatch_once</span>(&amp;onceToken, ^&#123;</span><br><span class="line">        Method original = class_getInstanceMethod(<span class="keyword">self</span>, <span class="keyword">@selector</span>(viewDidAppear:));</span><br><span class="line">        Method swizzled = class_getInstanceMethod(<span class="keyword">self</span>, <span class="keyword">@selector</span>(swizzled_viewDidAppear:));</span><br><span class="line">        method_exchangeImplementations(original, swizzled);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br><span class="line">- (<span class="type">void</span>)swizzled_viewDidAppear:(<span class="type">BOOL</span>)animated &#123;</span><br><span class="line">    <span class="comment">// 调用原始方法实现</span></span><br><span class="line">    [<span class="keyword">self</span> swizzled_viewDidAppear:animated];</span><br><span class="line">    <span class="comment">// 实现需求</span></span><br><span class="line">    [Analytics logEvent:<span class="string">@&quot;ScreenAppeared&quot;</span> forView:<span class="keyword">self</span>];</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+
+<p>​​优势​​：</p>
+<ul>
+<li>统一埋点逻辑，避免污染业务代码；</li>
+<li>适用于调试、性能监控等全局行为。</li>
+</ul>
+<h2 id="🧩-三、代码模块化与可读性提升"><a href="#🧩-三、代码模块化与可读性提升" class="headerlink" title="🧩 三、代码模块化与可读性提升"></a>🧩 三、代码模块化与可读性提升</h2><p>场景​​：将大型类的功能拆分到多个分类中，按逻辑分组管理。<br>示例​​：自定义 UIView 时分离布局、动画、样式代码；或者 NSApplication.h，UIApplication.h 头文件的实现方式</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="comment">// UIView+Layout.h  (布局相关)</span></span><br><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">UIView</span> (<span class="title">Layout</span>)</span></span><br><span class="line">- (<span class="type">void</span>)autoCenterInSuperview;</span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// UIView+Animation.h  (动画相关)</span></span><br><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">UIView</span> (<span class="title">Animation</span>)</span></span><br><span class="line">- (<span class="type">void</span>)fadeInWithDuration:(<span class="built_in">NSTimeInterval</span>)duration;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h1 id="底层实现原理"><a href="#底层实现原理" class="headerlink" title="底层实现原理"></a>底层实现原理</h1><p>分类中的方法都会合并到类对象的方法列表中。具体来说，分类中的实例方法会被合并到类对象的方法列表中，分类中的类方法会被合并到元类对象的方法列表。</p>
+<p>那么这个合并的动作发生在什么时刻？是程序启动的时候？还是编译源码的时候？</p>
+<p>根据分类的能力来说，分类可以给系统的类和第三方的类添加方法，那么可以推理出一定不是在编译时进行合并的，因为在编译时根本无法获取到系统的类和第三方的类对象啊，只能在运行时加载系统的类和第三方类的时候将分类中的方法添加到类中。其实实际上也确实这样的，我们可以从 Objective-C 的运行时库源码和编译后的产物中得到验证。</p>
+<h2 id="1-编译时的处理"><a href="#1-编译时的处理" class="headerlink" title="1. 编译时的处理"></a>1. 编译时的处理</h2><p>分类的底层结构，即编译器是如何处理我们编写的分类的。</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">NSDate</span> (<span class="title">custom</span>)</span></span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">NSDate</span> (<span class="title">custom</span>)</span></span><br><span class="line">- (<span class="type">void</span>)hello &#123;</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@&quot;%s&quot;</span>, __func__);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+
+<p>我们在源码中创建了多少个分类，在编译时就会产生多少个分类的结构体变量。如：你给 NSObject 创建了 2 个分类，那么在编译时就生成了 2 个分类结构体变量。分类的名字就是变量名的最后部分。通过查看编译后的分类结构也能验证，并不是在编译时就合并到类中了。编译时仅仅是将分类的信息保存了下来。</p>
+<h2 id="2-运行时的合并"><a href="#2-运行时的合并" class="headerlink" title="2. 运行时的合并"></a>2. 运行时的合并</h2><p>那运行时到底是如何合并分类信息到类中的呢？那就是 objc4 的源码分析了</p>
+<p><code>_objc_init -&gt; map_images -&gt; map_images_nolock() -&gt; _read_images()</code></p>
+<p>在 <code>_read_images()</code> 函数里面。核心方法 <code>remethodizeClass()</code> 里面有一个 <code>attachCategories()</code> 方法。最后是 class 的 rw 的 attachLists 方法的实现。</p>
+<p>首先将方法数组扩容，然后将原始的方法列表移动到数组的末尾，再将所有分类的方法列表复制到前面。这样就导致了分类的方法列表会在原始的方法列表前面，造成了类似覆盖的效果。就是说分类中如果存在和原始类中同名的方法，那么就会导致原始类中的方法不会被调用，而是调用分类中的方法。而如多个分类中存在同名的方法，则会按照编译的顺序优先调用，最后编译的分类中的方法会放在数组前面导致的。</p>
+<p>分类涉及的相关知识还是挺深的。。。个人认为，想要掌握 Category 的底层原理，必须先掌握，Objective-C 对象模型，运行时库初始化，等等底层知识。</p>
+<h1 id="使用注意点"><a href="#使用注意点" class="headerlink" title="使用注意点"></a>使用注意点</h1><p>理解了分类的底层原理之后，自然而然的就会考虑到不恰当使用分类可能会导致的问题：</p>
+<h2 id="不能添加实例变量"><a href="#不能添加实例变量" class="headerlink" title="不能添加实例变量"></a>不能添加实例变量</h2><p>这一点需要结合分类的设计初衷来讲，虽然从技术上来说，分类可以做到给类添加实例变量，但是会带来巨大的不稳定性和性能开销以及破坏类的封装性，从多方面考虑让分类支持添加实例变量都不是一个合适的选择。所以实际上也并没有让分类支持添加实例变量的能力，而是提供了关联对象技术达到类似实例变量的效果。</p>
+<h2 id="命名冲突风险"><a href="#命名冲突风险" class="headerlink" title="命名冲突风险"></a>命名冲突风险</h2><p>这是一个非常有可能会遇到的问题，多个分类中如果存在同名的方法，那么运行时到底会执行哪一个方法这是有答案的。取决于最后编译的是哪个分类，从前面的底层原理中得知，最后面的编译的分类会被添加到类的方法列表的前面。但是实际运用分类过程中是极不推荐在分类中使用同名方法的，应该尽量避免，解决办法就是给每个分类的方法添加一个前缀，这样大大降低了同名的可能。</p>
+<h2 id="不可覆盖原生方法"><a href="#不可覆盖原生方法" class="headerlink" title="不可覆盖原生方法"></a>不可覆盖原生方法</h2><p>覆盖系统方法可能导致框架行为异常。这也是非常有可能出现的问题，而且危险性较高，建议分类仅用来添加新功能，而不是修改原有的逻辑。</p>
+<blockquote>
+<p>分类的核心价值在于 ​​“无侵入式扩展”​​，任何可能破坏类封装性或导致运行时冲突的方案（如方法覆盖），都应优先考虑替代设计。</p>
+</blockquote>
+<h1 id="相关面试题"><a href="#相关面试题" class="headerlink" title="相关面试题"></a>相关面试题</h1><ul>
+<li>Category 的使用场景是什么</li>
+<li>Category 的实现原理</li>
+<li>Category 和 Extension 的区别是什么</li>
+<li>Category 有 load 方法吗？load 方法在什么时候被调用？load 方法能继承吗？<ul>
+<li>分类有没有 load 方法？这个问题十分奇怪？分类哪里来的 load 方法？你在分类里写了 load 方法就肯定有，没写就肯定没有啊。。。</li>
+<li>这回是 load_images 方法的源码分析了。先调用类的 load 方法，再调用分类的 load 方法。</li>
+<li>objc 运行时在初始化的时候，会直接调用类的 load 方法，而不是通过消息发送的形式调用 load 方法。</li>
+<li>我觉得，你得先搞懂 Objective-C 语言提供 load 方法的目的是什么？</li>
+<li>load，initialize 方法在 NSObject.h 文件中声明，并没有实现。那么 Objective-C 语言在 NSObject.h 文件中声明 load 和 initialize 又不实现的目的是什么呢？</li>
+</ul>
+</li>
+<li>load、initialize 方法的区别是什么？它们在 category 中的时候被调用的顺序是什么？出现继承时它们之间的被调用过程是怎样的？</li>
+<li>category 能否添加成员变量？如果可以，如何添加，如果不可以，解释为什么不可以？</li>
+</ul>
+]]></content>
+      <categories>
+        <category>iOS 底层原理</category>
+      </categories>
+  </entry>
+  <entry>
     <title>Cycript</title>
     <url>/2023/08/23/Cycript/</url>
     <content><![CDATA[<h1 id="什么是-Cycript"><a href="#什么是-Cycript" class="headerlink" title="什么是 Cycript"></a>什么是 Cycript</h1><p>Cycript 是一种用于 iOS 操作系统的脚本语言，同时也是该语言的解释器（一般来说不需要编译的脚本语言都会提供它对应的解释器，比如 Python、JavaScript、Ruby、PHP 等），Cycript 是 JavaScript，Objective-C++ 等语言的混合物这意味着它能理解 JavaScript，Objective-C++ 甚至是 Objective-C 语法，但是需要注意的是 Cycript 主要支持 JavaScript 的语法，对前端开发人员比较友好，而由于 Swift 吸收了 JavaScript 等其他各种语言的优点，所以 Cycript 中也能看到 Swift 的影子，Cycript 对 Objective-C 语法并不是完全支持，比如 Objective-C 创建一个 UIView 的代码是</p>
@@ -2211,78 +2283,6 @@ Block 的 hook ？应用场景？埋点
 ]]></content>
       <categories>
         <category>iOS 逆向与安全</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>Category</title>
-    <url>/2025/06/08/Category/</url>
-    <content><![CDATA[<h1 id="分类诞生的历史"><a href="#分类诞生的历史" class="headerlink" title="分类诞生的历史"></a>分类诞生的历史</h1><p>Objective-C 的分类（Category）语法并非随语言初始版本一同出现，而是随着语言发展逐步引入的重要特性。以下是关键时间线和技术背景分析：</p>
-<p>Objective-C 由 Brad Cox 和 Tom Love 在 1980 年代初基于 C 语言开发，旨在添加 Smalltalk 风格的面向对象特性。初始版本（1981年）​​ 仅包含核心的面向对象机制（如类、继承、消息传递），​​未包含分类语法​​。此时语言的核心是“软件组件”（Software-IC）概念，聚焦于通过类封装数据和操作。</p>
-<p>​​Objective-C 的类别（Category）语法是在 1990 年代初加入到 Objective-C 语言中的，具体时间是随着 NeXTSTEP 操作系统的发布而引入的。NeXTSTEP 是苹果公司前首席执行官史蒂夫·乔布斯创办的 NeXT 公司开发的操作系统，它使用了 Objective-C 作为主要编程语言，并引入了类别这一特性。﻿<br>​​<br>​​<strong>设计动机</strong>​​：解决无法修改原始类（如系统框架类）时扩展功能的需求。例如，为 NSString 添加绘图方法而无需继承或修改原始实现。这是最核心的应用场景。早期 Objective-C 依赖继承和组合实现扩展，分类则提供了更轻量、灵活的替代方案，直接为类添加方法。</p>
-<h1 id="核心语法：声明与实现"><a href="#核心语法：声明与实现" class="headerlink" title="核心语法：声明与实现"></a>核心语法：声明与实现</h1><p>分类，分类，顾名思义就知道，它是对类的拆分，所以需要一个明确的类，然后是分类的名称。</p>
-<ul>
-<li>分类的声明：  <figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">ClassName</span> (<span class="title">CategoryName</span>)</span></span><br><span class="line"><span class="comment">// 分类需要的属性。。。</span></span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure></li>
-<li>分类的实现：  <figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">ClassName</span> (<span class="title">CategoryName</span>)</span></span><br><span class="line"><span class="comment">// 方法的实现</span></span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure></li>
-</ul>
-<h1 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h1><p>按照实际使用频率排序：</p>
-<h2 id="🛠️-一、扩展系统或第三方框架类"><a href="#🛠️-一、扩展系统或第三方框架类" class="headerlink" title="🛠️ 一、扩展系统或第三方框架类"></a>🛠️ 一、扩展系统或第三方框架类</h2><p>场景：为 NSString、NSArray 等系统类或者第三方框架提供的类添加项目所需的特定方法。<br>示例：为 NSString 添加邮箱格式验证方法。</p>
-<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="comment">// NSString+Validation.h</span></span><br><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">NSString</span> (<span class="title">Validation</span>)</span></span><br><span class="line">- (<span class="type">BOOL</span>)isValidEmail;</span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// NSString+Validation.m</span></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">NSString</span> (<span class="title">Validation</span>)</span></span><br><span class="line">- (<span class="type">BOOL</span>)isValidEmail &#123;</span><br><span class="line">    <span class="comment">// 正则验证逻辑</span></span><br><span class="line">    <span class="keyword">return</span> [emailTest evaluateWithObject:<span class="keyword">self</span>];</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
-
-<p>优势：</p>
-<ul>
-<li>不修改 NSString 源码，避免破坏系统类的封装性；</li>
-<li>方法对所有 NSString 实例及子类（如 NSMutableString）生效。</li>
-</ul>
-<h2 id="⚙️-二、面向切面编程（AOP）支持"><a href="#⚙️-二、面向切面编程（AOP）支持" class="headerlink" title="⚙️ 二、面向切面编程（AOP）支持"></a>⚙️ 二、面向切面编程（AOP）支持</h2><p>场景​​：无侵入添加横切关注点（如日志、埋点）。<br>示例​​：通过分类实现方法交换（Method Swizzling）：</p>
-<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">ViewController</span> (<span class="title">log</span>)</span></span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">ViewController</span> (<span class="title">log</span>)</span></span><br><span class="line">+ (<span class="type">void</span>)load &#123;</span><br><span class="line">    <span class="keyword">static</span> <span class="built_in">dispatch_once_t</span> onceToken;</span><br><span class="line">    <span class="built_in">dispatch_once</span>(&amp;onceToken, ^&#123;</span><br><span class="line">        Method original = class_getInstanceMethod(<span class="keyword">self</span>, <span class="keyword">@selector</span>(viewDidAppear:));</span><br><span class="line">        Method swizzled = class_getInstanceMethod(<span class="keyword">self</span>, <span class="keyword">@selector</span>(swizzled_viewDidAppear:));</span><br><span class="line">        method_exchangeImplementations(original, swizzled);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br><span class="line">- (<span class="type">void</span>)swizzled_viewDidAppear:(<span class="type">BOOL</span>)animated &#123;</span><br><span class="line">    <span class="comment">// 调用原始方法实现</span></span><br><span class="line">    [<span class="keyword">self</span> swizzled_viewDidAppear:animated];</span><br><span class="line">    <span class="comment">// 实现需求</span></span><br><span class="line">    [Analytics logEvent:<span class="string">@&quot;ScreenAppeared&quot;</span> forView:<span class="keyword">self</span>];</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
-
-<p>​​优势​​：</p>
-<ul>
-<li>统一埋点逻辑，避免污染业务代码；</li>
-<li>适用于调试、性能监控等全局行为。</li>
-</ul>
-<h2 id="🧩-三、代码模块化与可读性提升"><a href="#🧩-三、代码模块化与可读性提升" class="headerlink" title="🧩 三、代码模块化与可读性提升"></a>🧩 三、代码模块化与可读性提升</h2><p>场景​​：将大型类的功能拆分到多个分类中，按逻辑分组管理。<br>示例​​：自定义 UIView 时分离布局、动画、样式代码；或者 NSApplication.h，UIApplication.h 头文件的实现方式</p>
-<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="comment">// UIView+Layout.h  (布局相关)</span></span><br><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">UIView</span> (<span class="title">Layout</span>)</span></span><br><span class="line">- (<span class="type">void</span>)autoCenterInSuperview;</span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// UIView+Animation.h  (动画相关)</span></span><br><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">UIView</span> (<span class="title">Animation</span>)</span></span><br><span class="line">- (<span class="type">void</span>)fadeInWithDuration:(<span class="built_in">NSTimeInterval</span>)duration;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
-
-
-
-<h1 id="底层实现原理"><a href="#底层实现原理" class="headerlink" title="底层实现原理"></a>底层实现原理</h1><p>分类中的方法都会合并到类对象的方法列表中。具体来说，分类中的实例方法会被合并到类对象的方法列表中，分类中的类方法会被合并到元类对象的方法列表。</p>
-<p>那么这个合并的动作发生在什么时刻？是程序启动的时候？还是编译源码的时候？</p>
-<p>根据分类的能力来说，分类可以给系统的类和第三方的类添加方法，那么可以推理出一定不是在编译时进行合并的，因为在编译时根本无法获取到系统的类和第三方的类对象啊，只能在运行时加载系统的类和第三方类的时候将分类中的方法添加到类中。其实实际上也确实这样的，我们可以从 Objective-C 的运行时库源码和编译后的产物中得到验证。</p>
-<h2 id="1-编译时的处理"><a href="#1-编译时的处理" class="headerlink" title="1. 编译时的处理"></a>1. 编译时的处理</h2><p>分类的底层结构，即编译器是如何处理我们编写的分类的。</p>
-<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">NSDate</span> (<span class="title">custom</span>)</span></span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">NSDate</span> (<span class="title">custom</span>)</span></span><br><span class="line">- (<span class="type">void</span>)hello &#123;</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@&quot;%s&quot;</span>, __func__);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
-
-<p>我们在源码中创建了多少个分类，在编译时就会产生多少个分类的结构体变量。如：你给 NSObject 创建了 2 个分类，那么在编译时就生成了 2 个分类结构体变量。分类的名字就是变量名的最后部分。通过查看编译后的分类结构也能验证，并不是在编译时就合并到类中了。编译时仅仅是将分类的信息保存了下来。</p>
-<h2 id="2-运行时的合并"><a href="#2-运行时的合并" class="headerlink" title="2. 运行时的合并"></a>2. 运行时的合并</h2><p>那运行时到底是如何合并分类信息到类中的呢？那就是 objc4 的源码分析了</p>
-<p><code>_objc_init -&gt; map_images -&gt; map_images_nolock() -&gt; _read_images()</code></p>
-<p>在 <code>_read_images()</code> 函数里面。核心方法 <code>remethodizeClass()</code> 里面有一个 <code>attachCategories()</code> 方法。最后是 class 的 rw 的 attachLists 方法的实现。</p>
-<p>首先将方法数组扩容，然后将原始的方法列表移动到数组的末尾，再将所有分类的方法列表复制到前面。这样就导致了分类的方法列表会在原始的方法列表前面，造成了类似覆盖的效果。就是说分类中如果存在和原始类中同名的方法，那么就会导致原始类中的方法不会被调用，而是调用分类中的方法。而如多个分类中存在同名的方法，则会按照编译的顺序优先调用，最后编译的分类中的方法会放在数组前面导致的。</p>
-<p>分类涉及的相关知识还是挺深的。。。个人认为，想要掌握 Category 的底层原理，必须先掌握，Objective-C 对象模型，运行时库初始化，等等底层知识。</p>
-<h1 id="使用注意点"><a href="#使用注意点" class="headerlink" title="使用注意点"></a>使用注意点</h1><p>理解了分类的底层原理之后，自然而然的就会考虑到不恰当使用分类可能会导致的问题：</p>
-<h2 id="不能添加实例变量"><a href="#不能添加实例变量" class="headerlink" title="不能添加实例变量"></a>不能添加实例变量</h2><p>这一点需要结合分类的设计初衷来讲，虽然从技术上来说，分类可以做到给类添加实例变量，但是会带来巨大的不稳定性和性能开销以及破坏类的封装性，从多方面考虑让分类支持添加实例变量都不是一个合适的选择。所以实际上也并没有让分类支持添加实例变量的能力，而是提供了关联对象技术达到类似实例变量的效果。</p>
-<h2 id="命名冲突风险"><a href="#命名冲突风险" class="headerlink" title="命名冲突风险"></a>命名冲突风险</h2><p>这是一个非常有可能会遇到的问题，多个分类中如果存在同名的方法，那么运行时到底会执行哪一个方法这是有答案的。取决于最后编译的是哪个分类，从前面的底层原理中得知，最后面的编译的分类会被添加到类的方法列表的前面。但是实际运用分类过程中是极不推荐在分类中使用同名方法的，应该尽量避免，解决办法就是给每个分类的方法添加一个前缀，这样大大降低了同名的可能。</p>
-<h2 id="不可覆盖原生方法"><a href="#不可覆盖原生方法" class="headerlink" title="不可覆盖原生方法"></a>不可覆盖原生方法</h2><p>覆盖系统方法可能导致框架行为异常。这也是非常有可能出现的问题，而且危险性较高，建议分类仅用来添加新功能，而不是修改原有的逻辑。</p>
-<blockquote>
-<p>分类的核心价值在于 ​​“无侵入式扩展”​​，任何可能破坏类封装性或导致运行时冲突的方案（如方法覆盖），都应优先考虑替代设计。</p>
-</blockquote>
-<h1 id="相关面试题"><a href="#相关面试题" class="headerlink" title="相关面试题"></a>相关面试题</h1><ul>
-<li>Category 的使用场景是什么</li>
-<li>Category 的实现原理</li>
-<li>Category 和 Extension 的区别是什么</li>
-<li>Category 有 load 方法吗？load 方法在什么时候被调用？load 方法能继承吗？<ul>
-<li>分类有没有 load 方法？这个问题十分奇怪？分类哪里来的 load 方法？你在分类里写了 load 方法就肯定有，没写就肯定没有啊。。。</li>
-<li>这回是 load_images 方法的源码分析了。先调用类的 load 方法，再调用分类的 load 方法。</li>
-<li>objc 运行时在初始化的时候，会直接调用类的 load 方法，而不是通过消息发送的形式调用 load 方法。</li>
-<li>我觉得，你得先搞懂 Objective-C 语言提供 load 方法的目的是什么？</li>
-<li>load，initialize 方法在 NSObject.h 文件中声明，并没有实现。那么 Objective-C 语言在 NSObject.h 文件中声明 load 和 initialize 又不实现的目的是什么呢？</li>
-</ul>
-</li>
-<li>load、initialize 方法的区别是什么？它们在 category 中的时候被调用的顺序是什么？出现继承时它们之间的被调用过程是怎样的？</li>
-<li>category 能否添加成员变量？如果可以，如何添加，如果不可以，解释为什么不可以？</li>
-</ul>
-]]></content>
-      <categories>
-        <category>iOS 底层原理</category>
       </categories>
   </entry>
   <entry>
@@ -2559,7 +2559,8 @@ Block 的 hook ？应用场景？埋点
   <entry>
     <title>KVO</title>
     <url>/2025/02/23/KVO/</url>
-    <content><![CDATA[<h1 id="KVO-的基本和高级使用"><a href="#KVO-的基本和高级使用" class="headerlink" title="KVO 的基本和高级使用"></a>KVO 的基本和高级使用</h1><ol>
+    <content><![CDATA[<p>KVO 的官方文档相较于 KVC 的官方文档要好上很多，不会像 KVC 那样出现大量的莫名奇妙的内容。</p>
+<h1 id="KVO-的基本和高级使用"><a href="#KVO-的基本和高级使用" class="headerlink" title="KVO 的基本和高级使用"></a>KVO 的基本和高级使用</h1><ol>
 <li>context 如果不需要使用，填 NULL。如果需要使用 context 推荐传递静态变量。官方文档中还提到，在父类和子类中同时监听某个属性时无法使用 keyPath 区分的情况下就可以使用 context 进行区分。</li>
 <li>是否有必要移除观察者？当然有必要，该移除的时候就一定要移除</li>
 <li><code>automaticallyNotifiesObserversForKey:</code> 的使用</li>
@@ -2573,10 +2574,22 @@ Block 的 hook ？应用场景？埋点
 
 
 <h1 id="KVO-的底层实现原理"><a href="#KVO-的底层实现原理" class="headerlink" title="KVO 的底层实现原理"></a>KVO 的底层实现原理</h1><p>isa-swizzling</p>
-<h1 id="自己实现一个简单的-KVO"><a href="#自己实现一个简单的-KVO" class="headerlink" title="自己实现一个简单的 KVO"></a>自己实现一个简单的 KVO</h1><h1 id="查看-GNU-的-KVO-实现或逆向分析-Foundation-源码"><a href="#查看-GNU-的-KVO-实现或逆向分析-Foundation-源码" class="headerlink" title="查看 GNU 的 KVO 实现或逆向分析 Foundation 源码"></a>查看 GNU 的 KVO 实现或逆向分析 Foundation 源码</h1>]]></content>
+<h1 id="自己实现一个简单的-KVO"><a href="#自己实现一个简单的-KVO" class="headerlink" title="自己实现一个简单的 KVO"></a>自己实现一个简单的 KVO</h1><h1 id="查看-GNU-的-KVO-实现或逆向分析-Foundation-源码"><a href="#查看-GNU-的-KVO-实现或逆向分析-Foundation-源码" class="headerlink" title="查看 GNU 的 KVO 实现或逆向分析 Foundation 源码"></a>查看 GNU 的 KVO 实现或逆向分析 Foundation 源码</h1><h1 id="面试题"><a href="#面试题" class="headerlink" title="面试题"></a>面试题</h1><ol>
+<li><p>iOS 用什么方式实现对一个对象的 KVO？（KVO的本质是什么？）</p>
+<p> isa_swizzing</p>
+</li>
+<li><p>如何手动触发 KVO？</p>
+<p> <code>willChangeValueForKey:</code> 和 <code>didChangeValueForKey:</code></p>
+</li>
+</ol>
+]]></content>
       <categories>
         <category>iOS 底层原理</category>
       </categories>
+      <tags>
+        <tag>iOS</tag>
+        <tag>KVO</tag>
+      </tags>
   </entry>
   <entry>
     <title>LLVM之clang插件开发</title>
@@ -3730,47 +3743,6 @@ commonModes并不是一个真正单独的模式
       </categories>
   </entry>
   <entry>
-    <title>iOS 底层原理导图</title>
-    <url>/2025/04/25/iOS-%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86%E5%AF%BC%E5%9B%BE/</url>
-    <content><![CDATA[<h1 id="iOS-底层原理导图"><a href="#iOS-底层原理导图" class="headerlink" title="iOS 底层原理导图"></a>iOS 底层原理导图</h1><ul>
-<li><p>iOS 底层知识入门</p>
-</li>
-<li><p>KVC </p>
-</li>
-<li><p>KVO </p>
-</li>
-<li><p>Category</p>
-</li>
-<li><p>关联对象</p>
-</li>
-<li><p>Block</p>
-</li>
-<li><p>Runtime</p>
-<ul>
-<li>深入理解iOS对象模型（一）：实例对象的内存探秘</li>
-<li>Objective-C 类对象</li>
-</ul>
-</li>
-<li><p>Runloop</p>
-</li>
-<li><p>多线程</p>
-<ul>
-<li>线程同步方案（锁、串行队列）</li>
-</ul>
-</li>
-<li><p>内存管理</p>
-</li>
-<li><p>性能优化</p>
-</li>
-<li><p>架构设计</p>
-</li>
-</ul>
-]]></content>
-      <categories>
-        <category>iOS 底层原理</category>
-      </categories>
-  </entry>
-  <entry>
     <title>iOS 应用重签名</title>
     <url>/2021/06/20/iOS-%E5%BA%94%E7%94%A8%E9%87%8D%E7%AD%BE%E5%90%8D/</url>
     <content><![CDATA[<p>上一篇文章作者讲解了 iOS 应用签名的原理。理解了签名的流程之后，我们知道签名保证的是自签名之后原始数据没有被其他人篡改，我们的 App 在调试过程中每次安装到设备上都会签名，假设我们使用自己的配置文件和证书对他人的 App 进行签名，是不是就能冒充是我们自己开发的 APP 了？</p>
@@ -3883,6 +3855,47 @@ commonModes并不是一个真正单独的模式
 ]]></content>
       <categories>
         <category>iOS 逆向与安全</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>iOS 底层原理导图</title>
+    <url>/2025/04/25/iOS-%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86%E5%AF%BC%E5%9B%BE/</url>
+    <content><![CDATA[<h1 id="iOS-底层原理导图"><a href="#iOS-底层原理导图" class="headerlink" title="iOS 底层原理导图"></a>iOS 底层原理导图</h1><ul>
+<li><p>iOS 底层知识入门</p>
+</li>
+<li><p>KVC </p>
+</li>
+<li><p>KVO </p>
+</li>
+<li><p>Category</p>
+</li>
+<li><p>关联对象</p>
+</li>
+<li><p>Block</p>
+</li>
+<li><p>Runtime</p>
+<ul>
+<li>深入理解iOS对象模型（一）：实例对象的内存探秘</li>
+<li>Objective-C 类对象</li>
+</ul>
+</li>
+<li><p>Runloop</p>
+</li>
+<li><p>多线程</p>
+<ul>
+<li>线程同步方案（锁、串行队列）</li>
+</ul>
+</li>
+<li><p>内存管理</p>
+</li>
+<li><p>性能优化</p>
+</li>
+<li><p>架构设计</p>
+</li>
+</ul>
+]]></content>
+      <categories>
+        <category>iOS 底层原理</category>
       </categories>
   </entry>
   <entry>
@@ -4076,6 +4089,61 @@ commonModes并不是一个真正单独的模式
     <title>iOS 逆向与安全导航</title>
     <url>/2025/02/21/iOS-%E9%80%86%E5%90%91%E4%B8%8E%E5%AE%89%E5%85%A8%E5%AF%BC%E8%88%AA/</url>
     <content><![CDATA[<h1 id="制作中。。。"><a href="#制作中。。。" class="headerlink" title="制作中。。。"></a>制作中。。。</h1>]]></content>
+      <categories>
+        <category>iOS 逆向与安全</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>iOS逆向与安全开篇介绍</title>
+    <url>/2024/03/27/iOS%E9%80%86%E5%90%91%E4%B8%8E%E5%AE%89%E5%85%A8%E5%BC%80%E7%AF%87%E4%BB%8B%E7%BB%8D/</url>
+    <content><![CDATA[<h1 id="学习-iOS-逆向开发的前提"><a href="#学习-iOS-逆向开发的前提" class="headerlink" title="学习 iOS 逆向开发的前提"></a>学习 iOS 逆向开发的前提</h1><ul>
+<li>有一定的正向开发经验（最起码对 iOS 系统的 UIKit 框架有一定的了解）</li>
+<li>一台越狱的 iOS 设备（推荐至少是 64 位架构，iPhone 是从 iPhone 5s 开始，iPad 是从 iPad Air 和 iPad mini 2 开始）</li>
+<li>一台 Mac 电脑，理论上来说 Linux 或 Windows 也可以（实际上作者没有实践过）</li>
+<li>时间和恒心</li>
+</ul>
+<h1 id="什么是-iOS-逆向开发"><a href="#什么是-iOS-逆向开发" class="headerlink" title="什么是 iOS 逆向开发"></a>什么是 iOS 逆向开发</h1><p>很多 iOS 开发者可能都不是科班出身的程序员，所以对于逆向开发可能没有任何概念。实不相瞒，作者本人就是如此。工作多年后才慢慢接触并了解了逆向开发，逆向工程等相关的知识。</p>
+<p>逆向开发（Reverse Engineering）是一种通过分析和研究已有软件或系统的内部结构、逻辑和功能，以理解其实现方式的技术。在软件开发中，逆向开发通常涉及反编译、反汇编或动态调试，以揭示目标程序的代码逻辑和功能。</p>
+<p>iOS 逆向开发是指通过分析已有的 iOS 应用程序或 iOS 系统来理解其内部结构、行为以及工作原理的过程。与常规开发（从源代码构建应用程序）相反，逆向开发是在没有源代码的情况下，逆向分析编译后的二进制文件，研究应用的工作机制。</p>
+<h1 id="学习-iOS-逆向开发有什么用"><a href="#学习-iOS-逆向开发有什么用" class="headerlink" title="学习 iOS 逆向开发有什么用"></a>学习 iOS 逆向开发有什么用</h1><ul>
+<li><p><strong>应用分析与调试：</strong>使用工具来调试和分析应用程序，理解其功能实现。研究员常用 LLDB、Hopper、Ghidra 等工具来反汇编和反编译 iOS 应用，以了解代码的工作方式。</p>
+</li>
+<li><p><strong>破解和去除限制：</strong>通过逆向手段绕过某些应用的限制，如应用内购买、付费功能等。虽然这属于非法行为，但仍是逆向开发中不可忽视的一部分。</p>
+</li>
+<li><p><strong>安全性研究与漏洞发现：</strong>逆向开发在 iOS 安全研究中非常重要。通过逆向工程，安全研究人员可以分析应用的加密算法、安全协议等，寻找漏洞并提出防御措施。</p>
+</li>
+<li><p><strong>学习与模仿：</strong>开发者通过逆向分析成熟的应用来学习优秀的开发技巧，或者模仿某些功能。</p>
+</li>
+</ul>
+<p>玩过 LOL 的老玩家应该还记得多年前某些辅助工具可以实现自己使用任意皮肤，这也是通过逆向开发做到的，属于 window 逆向方向的，而 iOS 平台的有移除 App 内的广告，绕过打卡类 App 的 Wi-Fi 限制，GPS 检测实现任意打卡，微信自动抢红包，还有游戏的外挂辅助软件也都是通过逆向开发实现的。。。这些都是正向开发做不到，或者不可能提供的。这些也正是逆向开发的用武之地。当然，学会了如何破解别人的 APP，自然也知道了该如何去防护自己的 APP，提高安全性，不会进攻谈什么安全防护呢。</p>
+<p>以上这些功能，如果你听到了就感觉到很兴奋，那么恭喜你来对了地方！通过本门课程的学习，以上案例都有可能可以实现。不过还是需要提醒一下大家，一般来说逆向开发的难度相较于正向开发会更加困难，想要掌握逆向开发并不是一件容易的事情，需要持之以恒的学习。</p>
+<h1 id="关于-iOS-开发人员的概念解释"><a href="#关于-iOS-开发人员的概念解释" class="headerlink" title="关于 iOS 开发人员的概念解释"></a>关于 iOS 开发人员的概念解释</h1><ol>
+<li><p><strong>iOS 应用开发人员</strong></p>
+<p> iOS 应用开发人员通常是指那些为 iOS 系统开发应用程序的人。他们主要使用苹果的开发工具和框架，比如 Xcode、Swift、Objective-C 等，目标是创建可以在苹果的 App Store 上发布的应用程序。这类开发人员的主要工作是围绕用户体验、界面设计、功能实现和优化应用性能。</p>
+<p> 他们的主要任务包括：</p>
+<ul>
+<li>开发和维护 iPhone、iPad 上运行的应用程序</li>
+<li>使用 iOS SDK（软件开发工具包）和相关的 API（如 UIKit、Core Data、ARKit 等）</li>
+<li>与后端服务交互（通常使用 RESTful API 或 GraphQL）</li>
+<li>解决与应用程序相关的性能和安全问题</li>
+<li>测试和调试应用程序 <br></li>
+</ul>
+</li>
+<li><p><strong>iOS 系统开发人员（越狱插件、底层开发等）</strong></p>
+<p> 真正意义上的 iOS 开发人员更适合用于描述那些进行 iOS 系统级开发的人。这些开发人员深入到 iOS 系统的底层，做与操作系统本身相关的开发工作，比如修改系统行为、开发越狱插件、研究内核安全性或进行硬件驱动开发。</p>
+<p> 他们的主要任务包括：</p>
+<ul>
+<li>研究 iOS 系统的底层结构和安全机制</li>
+<li>开发越狱工具、插件（比如 Cydia 插件）</li>
+<li>修改系统设置或行为，允许用户做出官方系统不允许的操作</li>
+<li>逆向工程或研究系统漏洞</li>
+<li>优化或修改内核（kernel）层的功能</li>
+</ul>
+</li>
+</ol>
+<p>市场上面招聘的 iOS 开发人员基本上都是指 iOS 应用开发人员。iOS 系统开发人员的岗位较少。但如果 iOS 应用开发人员具备逆向分析开发的能力则是一项优势。</p>
+<h1 id="本书如何学习"><a href="#本书如何学习" class="headerlink" title="本书如何学习"></a>本书如何学习</h1><p>作者将以微信抢红包的实战项目出发，从 0 到 1 演示如何实现微信抢红包插件，实现插件过程中涉及到的技术和理论知识都会在后续的章节中详细介绍，对 iOS 逆向开发感兴趣的同学通过这个项目，可以迅速的建立对 iOS 逆向开发的整体认知。</p>
+]]></content>
       <categories>
         <category>iOS 逆向与安全</category>
       </categories>
@@ -4337,61 +4405,6 @@ commonModes并不是一个真正单独的模式
         <tag>抖音</tag>
         <tag>支付宝</tag>
       </tags>
-  </entry>
-  <entry>
-    <title>iOS逆向与安全开篇介绍</title>
-    <url>/2024/03/27/iOS%E9%80%86%E5%90%91%E4%B8%8E%E5%AE%89%E5%85%A8%E5%BC%80%E7%AF%87%E4%BB%8B%E7%BB%8D/</url>
-    <content><![CDATA[<h1 id="学习-iOS-逆向开发的前提"><a href="#学习-iOS-逆向开发的前提" class="headerlink" title="学习 iOS 逆向开发的前提"></a>学习 iOS 逆向开发的前提</h1><ul>
-<li>有一定的正向开发经验（最起码对 iOS 系统的 UIKit 框架有一定的了解）</li>
-<li>一台越狱的 iOS 设备（推荐至少是 64 位架构，iPhone 是从 iPhone 5s 开始，iPad 是从 iPad Air 和 iPad mini 2 开始）</li>
-<li>一台 Mac 电脑，理论上来说 Linux 或 Windows 也可以（实际上作者没有实践过）</li>
-<li>时间和恒心</li>
-</ul>
-<h1 id="什么是-iOS-逆向开发"><a href="#什么是-iOS-逆向开发" class="headerlink" title="什么是 iOS 逆向开发"></a>什么是 iOS 逆向开发</h1><p>很多 iOS 开发者可能都不是科班出身的程序员，所以对于逆向开发可能没有任何概念。实不相瞒，作者本人就是如此。工作多年后才慢慢接触并了解了逆向开发，逆向工程等相关的知识。</p>
-<p>逆向开发（Reverse Engineering）是一种通过分析和研究已有软件或系统的内部结构、逻辑和功能，以理解其实现方式的技术。在软件开发中，逆向开发通常涉及反编译、反汇编或动态调试，以揭示目标程序的代码逻辑和功能。</p>
-<p>iOS 逆向开发是指通过分析已有的 iOS 应用程序或 iOS 系统来理解其内部结构、行为以及工作原理的过程。与常规开发（从源代码构建应用程序）相反，逆向开发是在没有源代码的情况下，逆向分析编译后的二进制文件，研究应用的工作机制。</p>
-<h1 id="学习-iOS-逆向开发有什么用"><a href="#学习-iOS-逆向开发有什么用" class="headerlink" title="学习 iOS 逆向开发有什么用"></a>学习 iOS 逆向开发有什么用</h1><ul>
-<li><p><strong>应用分析与调试：</strong>使用工具来调试和分析应用程序，理解其功能实现。研究员常用 LLDB、Hopper、Ghidra 等工具来反汇编和反编译 iOS 应用，以了解代码的工作方式。</p>
-</li>
-<li><p><strong>破解和去除限制：</strong>通过逆向手段绕过某些应用的限制，如应用内购买、付费功能等。虽然这属于非法行为，但仍是逆向开发中不可忽视的一部分。</p>
-</li>
-<li><p><strong>安全性研究与漏洞发现：</strong>逆向开发在 iOS 安全研究中非常重要。通过逆向工程，安全研究人员可以分析应用的加密算法、安全协议等，寻找漏洞并提出防御措施。</p>
-</li>
-<li><p><strong>学习与模仿：</strong>开发者通过逆向分析成熟的应用来学习优秀的开发技巧，或者模仿某些功能。</p>
-</li>
-</ul>
-<p>玩过 LOL 的老玩家应该还记得多年前某些辅助工具可以实现自己使用任意皮肤，这也是通过逆向开发做到的，属于 window 逆向方向的，而 iOS 平台的有移除 App 内的广告，绕过打卡类 App 的 Wi-Fi 限制，GPS 检测实现任意打卡，微信自动抢红包，还有游戏的外挂辅助软件也都是通过逆向开发实现的。。。这些都是正向开发做不到，或者不可能提供的。这些也正是逆向开发的用武之地。当然，学会了如何破解别人的 APP，自然也知道了该如何去防护自己的 APP，提高安全性，不会进攻谈什么安全防护呢。</p>
-<p>以上这些功能，如果你听到了就感觉到很兴奋，那么恭喜你来对了地方！通过本门课程的学习，以上案例都有可能可以实现。不过还是需要提醒一下大家，一般来说逆向开发的难度相较于正向开发会更加困难，想要掌握逆向开发并不是一件容易的事情，需要持之以恒的学习。</p>
-<h1 id="关于-iOS-开发人员的概念解释"><a href="#关于-iOS-开发人员的概念解释" class="headerlink" title="关于 iOS 开发人员的概念解释"></a>关于 iOS 开发人员的概念解释</h1><ol>
-<li><p><strong>iOS 应用开发人员</strong></p>
-<p> iOS 应用开发人员通常是指那些为 iOS 系统开发应用程序的人。他们主要使用苹果的开发工具和框架，比如 Xcode、Swift、Objective-C 等，目标是创建可以在苹果的 App Store 上发布的应用程序。这类开发人员的主要工作是围绕用户体验、界面设计、功能实现和优化应用性能。</p>
-<p> 他们的主要任务包括：</p>
-<ul>
-<li>开发和维护 iPhone、iPad 上运行的应用程序</li>
-<li>使用 iOS SDK（软件开发工具包）和相关的 API（如 UIKit、Core Data、ARKit 等）</li>
-<li>与后端服务交互（通常使用 RESTful API 或 GraphQL）</li>
-<li>解决与应用程序相关的性能和安全问题</li>
-<li>测试和调试应用程序 <br></li>
-</ul>
-</li>
-<li><p><strong>iOS 系统开发人员（越狱插件、底层开发等）</strong></p>
-<p> 真正意义上的 iOS 开发人员更适合用于描述那些进行 iOS 系统级开发的人。这些开发人员深入到 iOS 系统的底层，做与操作系统本身相关的开发工作，比如修改系统行为、开发越狱插件、研究内核安全性或进行硬件驱动开发。</p>
-<p> 他们的主要任务包括：</p>
-<ul>
-<li>研究 iOS 系统的底层结构和安全机制</li>
-<li>开发越狱工具、插件（比如 Cydia 插件）</li>
-<li>修改系统设置或行为，允许用户做出官方系统不允许的操作</li>
-<li>逆向工程或研究系统漏洞</li>
-<li>优化或修改内核（kernel）层的功能</li>
-</ul>
-</li>
-</ol>
-<p>市场上面招聘的 iOS 开发人员基本上都是指 iOS 应用开发人员。iOS 系统开发人员的岗位较少。但如果 iOS 应用开发人员具备逆向分析开发的能力则是一项优势。</p>
-<h1 id="本书如何学习"><a href="#本书如何学习" class="headerlink" title="本书如何学习"></a>本书如何学习</h1><p>作者将以微信抢红包的实战项目出发，从 0 到 1 演示如何实现微信抢红包插件，实现插件过程中涉及到的技术和理论知识都会在后续的章节中详细介绍，对 iOS 逆向开发感兴趣的同学通过这个项目，可以迅速的建立对 iOS 逆向开发的整体认知。</p>
-]]></content>
-      <categories>
-        <category>iOS 逆向与安全</category>
-      </categories>
   </entry>
   <entry>
     <title>iPhoneX上pop回到根控制器上漂移的bug</title>
