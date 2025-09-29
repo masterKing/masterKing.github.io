@@ -2559,27 +2559,377 @@ Block 的 hook ？应用场景？埋点
   <entry>
     <title>KVO</title>
     <url>/2025/02/23/KVO/</url>
-    <content><![CDATA[<p>KVO 的官方文档相较于 KVC 的官方文档要好上很多，不会像 KVC 那样出现大量的莫名奇妙的内容。</p>
-<h1 id="KVO-的基本和高级使用"><a href="#KVO-的基本和高级使用" class="headerlink" title="KVO 的基本和高级使用"></a>KVO 的基本和高级使用</h1><ol>
-<li>context 如果不需要使用，填 NULL。如果需要使用 context 推荐传递静态变量。官方文档中还提到，在父类和子类中同时监听某个属性时无法使用 keyPath 区分的情况下就可以使用 context 进行区分。</li>
-<li>是否有必要移除观察者？当然有必要，该移除的时候就一定要移除</li>
-<li><code>automaticallyNotifiesObserversForKey:</code> 的使用</li>
-<li><code>keyPathsForValuesAffectingValueForKey:</code> 的使用</li>
-<li>可变数组属性的 KVO 问题</li>
+    <content><![CDATA[<p>KVO 的官方文档相较于 KVC 的官方文档要好上很多，不会像 KVC 那样出现大量的莫名奇妙的内容，但我个人感觉说实话作为 Apple 出的官方文档，这个水平写的也是真的不能说好，只是相对而言比 KVC 写的要更加像是给人看的。同样作者也对该文档做了全篇翻译，有需要的读者可以自行 <a href="./book.zip">下载</a>。</p>
+<h1 id="是什么？"><a href="#是什么？" class="headerlink" title="是什么？"></a>是什么？</h1><p>KVO 是英文 Key-Value Observing 的首字母拼接来的，翻译成中文就是键值观察。它是 Apple 公司使用 Objective-C 语言开发的一种技术，当被观察者的被观察属性发生变化的时候会主动通知观察者来及时的响应这个变化。这样就不需要定时查询被观察者的被观察属性是否发生了变化。KVO 是 Apple 对观察者设计模式的一种具体且强大的实现。</p>
+<p>KVO 的实现方式和 KVC 一样，都是在 Foundation 框架下的一对 Objective-C 文件。NSKeyValueObserving.h 和 NSKeyValueObserving.m。查阅头文件可以知道 KVO 跟 KVC 一样都是通过 Objective-C 语言的分类功能给 NSObject 添加了一系列相关的方法声明供开发者使用。 </p>
+<h1 id="首次面世的时间？"><a href="#首次面世的时间？" class="headerlink" title="首次面世的时间？"></a>首次面世的时间？</h1><p>根据 Apple 的 <a href="https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/KeyValueObserving/RevisionHistory.html#//apple_ref/doc/uid/20001841-CJBGIAGF">KVO 官方文档</a> 版本历史记录可以得知，KVO 作为公开的 API 出现在 macOS 系统的 Cocoa 框架中的时间是 2003 年 10 月 15 日。在后续 Apple 发布（2007 年）的 iOS 系统中的 Cocoa Touch 框架中同样存在。所以在 iOS 系统发布之前就已经存在 KVO 技术了。</p>
+<h1 id="设计它的初衷？"><a href="#设计它的初衷？" class="headerlink" title="设计它的初衷？"></a>设计它的初衷？</h1><p>KVO（Key-Value Observing）的设计初衷源于苹果在构建 ​​Cocoa 框架（特别是其 Model-View-Controller 架构）​​ 时面临的核心挑战和追求的目标。它的出现并非偶然，而是为了解决当时开发模式中的痛点并提升框架的优雅性和效率。它的引入是为了更好地支持 MVC 架构，实现模型和视图之间的解耦与通信。</p>
+<p>实现 Model 和 View 的自动化同步、解耦：</p>
+<ul>
+<li>核心问题：在图形化用户界面应用程序中，数据模型（Model）的属性发生变化时，依赖这些数据的视图（View）应该及时更新以反映数据的变化。传统做法（在 KVO 之前）通常需要：<ul>
+<li>Model 对象持有对 View 对象的引用，并在数据变化时<strong>显式调用</strong> View 的更新方法。</li>
+<li>或在 Controller 中注册 Model 发生变化了的回调，然后在回调中<strong>显式调用</strong> View 的更新方法。</li>
+<li>或者，使用 Notification（通知）广播模型变化，View 注册监听通知并响应更新。</li>
+</ul>
+</li>
+<li>痛点：<ul>
+<li>强耦合：Model 需要知晓 View 的存在或依赖 Controller 作为中介，违反了 MVC 的松耦合原则。</li>
+<li>繁琐易错：开发者需要手动管理更新逻辑，容易遗漏更新点，尤其是在属性间存在依赖关系或嵌套对象变化时。</li>
+<li>性能：通知广播可能给不相关的观察者带来开销。</li>
+</ul>
+</li>
+<li>KVO 解决方案：KVO 允许 View（或任何对象）直接观察 Model 对象的符合条件的属性。当属性值通过 KVC 兼容的方式发生变化时，KVO 机制<strong>自动通知</strong>所有注册的观察者。这实现了：<ul>
+<li>自动化：Model 属性的变化<strong>自动触发</strong>观察者的更新回调，无需 Model 主动通知。</li>
+<li>解耦：Model 完全不知道谁在观察它，只需专注于管理自身的状态。View 只需注册自己关心的属性。</li>
+<li>精准：观察者只接收其注册的特定属性变化的通知。</li>
+</ul>
+</li>
+</ul>
+<p>当初最想解决的问题一句话概括就是：<strong>减少样板、解耦组件、方便把模型状态与视图&#x2F;控制器保持同步，即实现更方便的MVC&#x2F;Bindings</strong></p>
+<h1 id="使用场景？"><a href="#使用场景？" class="headerlink" title="使用场景？"></a>使用场景？</h1><h2 id="依赖-KVO-的-Cocoa-技术"><a href="#依赖-KVO-的-Cocoa-技术" class="headerlink" title="依赖 KVO 的 Cocoa 技术"></a>依赖 KVO 的 Cocoa 技术</h2><ul>
+<li><p>Cocoa Bindings：​​ KVO 是 ​​Cocoa Bindings​​ 技术的基石。Bindings 是一种只存在于 macOS 上的技术并没有推广到 iOS 上，它允许在 Interface Builder 或代码中直接将 View 的属性（如 NSTextField 的 value）​​绑定​​到 Model 的属性（如 Person 对象的 name）。这种绑定的动态更新能力完全依赖于 KVO 在底层自动监测 Model 属性的变化并通知 View。</p>
+</li>
+<li><p>Core Data：​​ Core Data 的托管对象（NSManagedObject）严重依赖 KVO。它使用 KVO 来：</p>
+<ul>
+<li>跟踪对象属性（包括关系）的变化，以管理脏状态（isChanged）。</li>
+<li>实现延迟加载（Faulting）和关系维护。</li>
+<li>通知 NSFetchedResultsController（在 iOS&#x2F;macOS 中）关于数据变化，以驱动表格视图更新。</li>
+</ul>
+</li>
+</ul>
+<p>对于 iOS 开发者来说，Cocoa Bindings 是一个挺陌生的东西。而 CoreData 相对来说并没有那么陌生，相信大部分 iOS 开发者应该都听闻过或者使用过。以下说明为什么 Cocoa Bindings 没有在 iOS 上推广使用，以及 Core Data 在 iOS 的现状。</p>
+<h3 id="为什么-Cocoa-Bindings-没有在-iOS-上推广使用？​"><a href="#为什么-Cocoa-Bindings-没有在-iOS-上推广使用？​" class="headerlink" title="为什么 Cocoa Bindings 没有在 iOS 上推广使用？​"></a>为什么 Cocoa Bindings 没有在 iOS 上推广使用？​</h3><ol>
+<li>​​技术根源与时代背景：​​<ul>
+<li>Cocoa Bindings 的 macOS 基因：​​ Bindings 是深度集成在 ​​macOS AppKit 框架​​ 和 ​​Interface Builder (IB)​​ 中的技术。它依赖于 AppKit 特有的 NSController 类族（NSObjectController, NSArrayController 等）以及 IB 强大的可视化绑定设置界面。</li>
+<li>iOS 的 UIKit 起源：​​ iOS 诞生时（2007年），其 UIKit 框架是一个​​全新的、为移动设备优化设计的框架​​，而不是直接从 macOS AppKit 移植。Apple 在 UIKit 1.0 中做了​​战略性取舍​​，优先保证框架的​​轻量级、高性能和运行效率​​（特别是在早期 iPhone 硬件性能有限的情况下）。移植 Bindings 这套相对重量级、依赖特定 IDE 的复杂机制并非优先事项，甚至可能被视为包袱。</li>
+<li>技术路径依赖：​​ UIKit 和 AppKit 虽然共享 Cocoa Touch &#x2F; Cocoa 基础（Foundation, Core Data），但在 UI 层差异很大。为 UIKit 重新设计和实现一套等效的 Bindings 系统（包括控制器、可视化工具）是一个巨大的工程。Apple 可能认为在移动开发的初期，投入资源到更核心的 UIKit 控件、触摸交互、动画和性能优化上更为重要。</li>
+</ul>
+</li>
+<li>设计理念差异：<ul>
+<li>macOS 的“声明式”偏好：​​ Cocoa Bindings 代表了 macOS 开发中一种​​高度声明式​​的 UI 构建理念。开发者主要在 IB 中通过拖拽和配置建立绑定关系，代码量少。</li>
+<li>iOS 早期的“命令式”主导：​​ 早期 iOS 开发更侧重于​​命令式编程​​。UITableViewDataSource 和 UITableViewDelegate 就是典型的命令式模式，开发者需要明确提供数据项数量、配置每个单元格等。虽然代码量可能更多，但它提供了​​更精细的控制​​，这对于资源受限、需要高度优化 UI 性能和内存占用的移动设备来说，在当时被认为更合适、更透明。Apple 为 iOS 提供了 Key-Value Observing (KVO)，开发者可以​​手动​​利用 KVO 在 MVC 中实现类似 Bindings 的自动同步效果，但这需要自己写代码（注册观察者、实现回调、处理解绑），不如 Bindings 那么“开箱即用”和可视化。</li>
+</ul>
+</li>
+<li>移动开发的挑战：​<ul>
+<li>​​视图控制器的复杂性：​​ iOS 应用通常涉及更复杂的视图控制器层级和导航（UINavigationController, UITabBarController），以及更频繁的视图创建和销毁（内存管理压力）。Bindings 建立的绑定关系在这种动态环境下管理起来可能更复杂（需要处理观察者的生命周期，避免野指针），不如命令式代码清晰可控。</li>
+<li>​​性能考量（特别是集合视图）：​​ NSArrayController 的自动管理在复杂数据集和频繁更新下可能引入性能开销（虽然做了优化）。对于需要极致流畅滚动的 iOS UITableView 或 UICollectionView，直接控制数据源 (UITableViewDataSource) 和更新过程 (beginUpdates&#x2F;endUpdates) 能提供​​最精准的性能调优手段​​。Apple 后来推出的 NSFetchedResultsController 就是为 Core Data + UITableView 量身定做的优化方案，它内部使用 KVO 但提供了更结构化的更新信息。</li>
+</ul>
+</li>
+<li>​​替代方案的演进：​​<ul>
+<li>​​手动 KVO：​​ 开发者可以利用 KVO 自行实现 Model 到 View&#x2F;Controller 的同步。虽然不如 Bindings 方便，但提供了灵活性。</li>
+<li>​​更好的设计模式：​​ Apple 推动的 Model-View-ViewModel (MVVM) 模式在 iOS 社区流行。在 MVVM 中，ViewModel 暴露可观察的属性（常借助 KVO 的现代替代品，如 Combine 的 @Published 或 RxSwift&#x2F;ReactiveSwift 的 Observables），View (Controller) 观察这些属性并更新 UI。这比原始的 MVC + 手动 KVO 更结构化，同时也避免了 Bindings 的复杂性和平台绑定。</li>
+<li>现代声明式 UI 框架：​​ ​​SwiftUI (2019)​​ 的出现从根本上改变了局面。SwiftUI 的 @State, @ObservedObject, @EnvironmentObject 等属性包装器，以及 Bindable 协议，提供了一套​​现代化、跨平台（Apple 生态内）、类型安全、编译期支持​​的声明式数据绑定机制。它解决了 Cocoa Bindings 的许多缺点（如字符串 KeyPath、运行时错误、平台限制、IDE 依赖），代表了 Apple 在数据绑定技术上的​​未来方向​​。SwiftUI 可以被视为 Cocoa Bindings 理念在新时代的​​精神继承者和全面升级版​​。因此，Apple 更没有动力将老式的 Cocoa Bindings 移植到 UIKit 或 iOS 了。</li>
+</ul>
+</li>
 </ol>
-<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="comment">/* 用于与 `-addObserver:forKeyPath:options:context:` 和 `-addObserver:toObjectsAtIndexes:forKeyPath:options:context:` 一起使用的选项。</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="built_in">NS_OPTIONS</span>(<span class="built_in">NSUInteger</span>, <span class="built_in">NSKeyValueObservingOptions</span>) &#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 通知中发送的变更字典是否应分别包含 `NSKeyValueChangeNewKey` 和 `NSKeyValueChangeOldKey` 条目。</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="built_in">NSKeyValueObservingOptionNew</span> = <span class="number">0x01</span>,</span><br><span class="line">    <span class="built_in">NSKeyValueObservingOptionOld</span> = <span class="number">0x02</span>,</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 是否应在观察者注册方法返回之前立即向观察者发送通知。</span></span><br><span class="line"><span class="comment">    如果同时指定了 `NSKeyValueObservingOptionNew`，则通知中的变更字典将始终包含 `NSKeyValueChangeNewKey` 条目，但永远不会包含 `NSKeyValueChangeOldKey` 条目。（在初始通知中，被观察属性的当前值可能是旧的，但对观察者来说是新的。）</span></span><br><span class="line"><span class="comment">    你可以使用此选项，而不是在同一时间显式调用观察者的 `-observeValueForKeyPath:ofObject:change:context:` 方法也会调用的代码。</span></span><br><span class="line"><span class="comment">    当此选项与 `-addObserver:toObjectsAtIndexes:forKeyPath:options:context:` 一起使用时，将为每个被添加观察者的索引对象发送通知。</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="built_in">NSKeyValueObservingOptionInitial</span> API_AVAILABLE(macos(<span class="number">10.5</span>), ios(<span class="number">2.0</span>), watchos(<span class="number">2.0</span>), tvos(<span class="number">9.0</span>)) = <span class="number">0x04</span>,</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 是否应在每次变更前后分别向观察者发送通知，而不是在变更后发送单一通知。</span></span><br><span class="line"><span class="comment">    在变更前发送的通知中的变更字典始终包含一个 `NSKeyValueChangeNotificationIsPriorKey` 条目，其值为 `[NSNumber numberWithBool:YES]`，但永远不会包含 `NSKeyValueChangeNewKey` 条目。</span></span><br><span class="line"><span class="comment">    当观察者自身的 KVO 合规性要求其为其自身属性之一调用 `-willChange...` 方法，并且该属性的值取决于被观察对象属性的值时，可以使用此选项。（在这种情况下，在接收到 `-observeValueForKeyPath:ofObject:change:context:` 消息后，已经太晚，无法轻松地正确调用 `-willChange...`。）</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">	当指定此选项时，变更后发送的通知中的变更字典将包含与未指定此选项时相同的条目，除了由 `NSOrderedSet` 表示的有序唯一对多关系。</span></span><br><span class="line"><span class="comment">	对于这些关系，对于 `NSKeyValueChangeInsertion` 和 `NSKeyValueChangeReplacement` 变更，will-change 通知的变更字典包含一个 `NSKeyValueChangeIndexesKey`（以及在 	`Replacement` 情况下，如果注册时指定了 `NSKeyValueObservingOptionOld` 选项，则还包含 `NSKeyValueChangeOldKey`），这些条目给出了可能被操作更改的索引（和对象）。</span></span><br><span class="line"><span class="comment">	第二个通知，即变更后的通知，包含报告实际发生变更的条目。</span></span><br><span class="line"><span class="comment">	对于 `NSKeyValueChangeRemoval` 变更，按索引的删除是精确的。</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="built_in">NSKeyValueObservingOptionPrior</span> API_AVAILABLE(macos(<span class="number">10.5</span>), ios(<span class="number">2.0</span>), watchos(<span class="number">2.0</span>), tvos(<span class="number">9.0</span>)) = <span class="number">0x08</span></span><br><span class="line"></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h3 id="​​Core-Data-在-iOS-的现状与第三方替代品：​​"><a href="#​​Core-Data-在-iOS-的现状与第三方替代品：​​" class="headerlink" title="​​Core Data 在 iOS 的现状与第三方替代品：​​"></a>​​Core Data 在 iOS 的现状与第三方替代品：​​</h3><ol>
+<li>​​Core Data 依然是 Apple 生态的官方主力：​<ul>
+<li><strong>深度集成：</strong>​​ Core Data 与 iOS&#x2F;macOS&#x2F;iPadOS&#x2F;watchOS&#x2F;tvOS 系统深度集成。它与 CloudKit (NSPersistentCloudKitContainer) 的配合提供了开箱可用的云同步方案，这是​​其他库难以复制的核心优势​​。</li>
+<li><strong>强大的工具链：</strong>​​ Xcode 提供了强大的 Core Data 模型编辑器、代码生成（NSManagedObject 子类）、调试工具（如 SQL Debug 输出）。</li>
+<li><strong>成熟稳定：</strong>​​ 经过多年发展，Core Data 非常成熟，稳定性高，功能丰富（关系管理、迁移、撤销重做、谓词查询等）。</li>
+<li><strong>Apple 持续投入：</strong>​​ Apple 仍在积极维护和更新 Core Data，加入新特性（如 NSPersistentHistoryTracking, 更现代的并发模型支持）。</li>
+</ul>
+</li>
+<li>第三方 ORM&#x2F;数据库的兴起：​​<ul>
+<li>​​易用性诉求：​​ Core Data 的学习曲线相对陡峭，其概念（Managed Object Context, Persistent Store Coordinator, Faulting 等）和 API 对新手不友好。开发者社区追求更简单、更符合直觉的 API。</li>
+<li>SQLite 直接封装：​​ 像 ​​FMDB​​ 这样的库提供了对 SQLite 更直接、更轻量级的封装，深受熟悉 SQL 的开发者的喜爱。</li>
+<li>现代对象关系映射 (ORM)：​​ ​​Realm​​ 是 Core Data 最著名的挑战者。它的优势在于：<ul>
+<li>极简 API：​​ 学习曲线平缓，操作对象更直观。</li>
+<li>​​卓越性能：​​ 在某些基准测试（尤其是写入和复杂查询）上表现优异。</li>
+<li>​​跨平台支持：​​ 原生支持 Android，方便跨平台项目共享数据模型和逻辑。</li>
+<li>实时协作 (Realm Sync)：​​ 提供了强大的实时同步解决方案。</li>
+</ul>
+</li>
+<li>​​轻量级替代：​​ 对于简单需求，UserDefaults, 文件存储 (Codable + FileManager), 甚至简单的内存缓存库就能满足。</li>
+</ul>
+</li>
+<li>Core Data 的挑战与共存：​​<ul>
+<li>​​“替代趋势”存在，但非取代：​​ 确实存在开发者（尤其是新项目或特定需求）选择 Realm 或其他方案的趋势，但这更多是​​多样化选择​​的表现，而非 Core Data 被淘汰。Realm 等提供了有价值的替代选项，满足了不同开发者的偏好和项目需求。</li>
+<li>适用场景差异：<ul>
+<li>​​Core Data：​​ 适合中大型复杂应用，需要深度系统集成（如 Spotlight 搜索、CloudKit 同步）、利用现有 Cocoa 模式（如 NSFetchedResultsController）、以及需要其高级功能（复杂迁移、撤销管理）的场景。</li>
+<li>​​Realm：​​ 适合追求快速开发、极致性能（特定操作）、跨平台（尤其 Android 共存）、或偏好其 API 设计风格的项目。</li>
+<li>​​SQLite&#x2F;FMDB：​​ 适合需要直接、精细控制 SQLite 或对文件大小有严格限制的场景。</li>
+<li>​​轻量级方案：​​ 适合存储少量简单数据。</li>
+</ul>
+</li>
+<li>​​Swift 的影响：​​ Core Data 的 API 设计带有浓重的 Objective-C 历史印记。虽然可以使用 @NSManaged 和代码生成，但它在与 Swift 语言特性（如强类型、可选值安全、并发模型）的融合上曾遇到挑战（Apple 正在持续改进，如 NSPersistentContainer 和新的并发 API）。一些现代的 Swift ORM 库（如 GRDB）试图结合 SQLite 的强大和 Swift 的现代特性。</li>
+</ul>
+</li>
+</ol>
+<blockquote>
+<p>总结</p>
+<p>Cocoa Bindings 未登陆 iOS：​​ 根本原因是技术路线分歧（UIKit 独立发展）、设计理念差异（早期 iOS 侧重命令式控制）、移动环境挑战（性能、生命周期）以及平台特性（缺乏 NSController 和深度 IB 集成）。其核心思想最终被 ​​SwiftUI 的现代化声明式绑定​​所继承和超越。</p>
+<p>​​Core Data 现状：​​ 它仍是 ​​Apple 官方首选且功能强大的持久化框架​​，尤其在深度系统集成和 CloudKit 同步方面无可替代。虽然面临 ​​Realm 等优秀第三方库的竞争​​（主要在易用性、性能、API 设计），但这更多是丰富了开发者的选择。Core Data 在复杂、原生集成要求高的场景中依然稳固，而第三方库则在特定优势领域（易用性、跨平台、特定性能）赢得青睐。两者（甚至更多方案）将在 iOS 生态中​​长期共存​​，开发者根据项目需求和偏好进行选择。</p>
+</blockquote>
+<h2 id="在-iOS-中情况"><a href="#在-iOS-中情况" class="headerlink" title="在 iOS 中情况"></a>在 iOS 中情况</h2><p>在 SwiftUI 出现之前，​​纯 Objective-C 或早期 Swift 开发 iOS 应用时，KVO 的应用场景确实远不如在 macOS Cocoa Bindings 中那样普遍和“开箱即用”​​，尤其是在构建 UITableView &#x2F; UICollectionView 这类核心 UI 组件时。在 iOS 中自定义 Cell + 模型属性显式赋值 是​​绝对的主流实践​​，但 KVO 在 iOS 中也并非毫无用处。原因如下：</p>
+<h3 id="📌-为何-KVO-在传统-iOS-开发中应用相对受限？"><a href="#📌-为何-KVO-在传统-iOS-开发中应用相对受限？" class="headerlink" title="📌 为何 KVO 在传统 iOS 开发中应用相对受限？"></a>📌 为何 KVO 在传统 iOS 开发中应用相对受限？</h3><ol>
+<li>UIKit 设计范式：命令式数据源 (Imperative Data Source)​​<ul>
+<li>UITableViewDataSource 协议是核心：​​ 这是 UIKit 为表格视图设计的​​标准、官方、强制性的接口​​。开发者​​必须​​实现 numberOfRowsInSection: 和 cellForRowAtIndexPath: 等方法。</li>
+<li>​​cellForRowAtIndexPath: 是赋值点：​​ 在这个方法里，开发者从数据源数组（Model）中取出对应 indexPath 的数据对象，然后调用自定义 Cell 的方法（通常是 configureWithModel: 或直接设置其 model 属性）来​​显式地、一次性​​将模型数据“灌”给 Cell 进行显示。这是 UIKit 框架本身引导的模式。</li>
+<li>清晰的生命周期与性能：​​ 这种模式非常清晰：<ul>
+<li>Cell 被创建或复用 -&gt; 系统调用 cellForRowAtIndexPath: -&gt; 开发者从数据源获取最新模型 -&gt; 设置给 Cell -&gt; Cell 根据模型属性更新 UI。</li>
+<li>它避免了在 Cell 内部或外部对模型进行 KVO 观察带来的潜在复杂性（注册&#x2F;注销、多观察者、性能开销）。​​一次赋值，显示即确定。​​</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Cell 的复用机制与 KVO 的冲突风险​​<ul>
+<li>复用池 (Reuse Pool)：​​ UITableView 的核心优化是复用 Cell。当 Cell 滚出屏幕进入复用池时，它会被稍后其他行复用。</li>
+<li>​​KVO 观察的生命周期问题：​​ 如果一个 Cell 在其 model 属性的 setter 方法中​​自动注册 KVO 观察​​ (观察该模型的属性变化)，那么当 Cell 被复用时：<ul>
+<li>需要​​注销​​对旧模型（之前设置的那个）的观察。</li>
+<li>需要​​重新注册​​对新模型（新设置的那个）的观察。</li>
+</ul>
+</li>
+<li>​​实现复杂度与易错性：​​ 正确处理这个​​注册&#x2F;注销​​的时机（尤其是在 prepareForReuse 中注销旧模型）对初学者不友好，容易遗漏导致野指针崩溃（观察者被销毁但未注销）或观察了错误的对象。显式赋值模式则完全规避了这个问题。</li>
+</ul>
+</li>
+<li>性能考量<ul>
+<li>​​KVO 的开销：​​ KVO 的运行时动态创建子类、消息转发等机制会带来​​轻微但可测量​​的性能开销。在需要极致流畅滚动的列表视图（尤其是包含复杂 Cell 或大量数据）中，避免每个 Cell 都建立 KVO 观察链是更安全的选择。</li>
+<li>​​批量更新效率：​​ 当需要更新整个列表（如排序、筛选）或大批量数据时，直接操作数据源数组，然后调用 reloadData 或 performBatchUpdates 是最高效的方式。KVO 可能触发大量离散的、逐行甚至逐属性的通知，反而不如批量刷新高效可控。</li>
+</ul>
+</li>
+<li>​​模型变更的集中管理​​<ul>
+<li>在典型 MVC 中，模型数据的变更通常发生在 ​​Controller 层​​（网络请求回调、用户操作处理等）。当 Model 变化时，Controller 能​​直接感知​​（因为是它持有数据源数组和触发了变更）。</li>
+<li>Controller 可以选择：<ul>
+<li>直接更新数据源数组。</li>
+<li>判断是否需要局部刷新（计算 indexPaths 变化，调用 reloadRowsAtIndexPaths: &#x2F; insertRowsAtIndexPaths: &#x2F; deleteRowsAtIndexPaths:）。</li>
+<li>或者简单调用 reloadData。</li>
+</ul>
+</li>
+<li>Controller 是变化的发起者和协调者，它天然知道哪里需要刷新。​​ 让每个 Cell 自己去观察模型变化显得冗余且难以协调（例如，当模型变化源于网络请求时，Cell 可能还未创建）。</li>
+</ul>
+</li>
+<li>KVO 的 API 体验​​<ul>
+<li>字符串 KeyPath：​​ Objective-C 时代的 KVO 依赖字符串 KeyPath (@”propertyName”)，容易拼写错误，编译器无法检查，运行时才发现失败。Swift 虽然引入了 #keyPath() 语法改善，但仍不如点语法安全直接。</li>
+<li>​​繁琐的回调处理：​​ 需要实现冗长的 observeValueForKeyPath:ofObject:change:context: 方法，并在其中进行 KeyPath 判断，代码不够优雅。</li>
+<li>手动管理注册&#x2F;注销：​​ 如前所述，需要仔细管理观察者的生命周期（addObserver: &#x2F; removeObserver:）。尤其在复杂视图层级或异步场景中，容易出错。</li>
+</ul>
+</li>
+</ol>
+<h3 id="✅-传统-iOS-开发中-KVO-的实际应用场景-相对常见的"><a href="#✅-传统-iOS-开发中-KVO-的实际应用场景-相对常见的" class="headerlink" title="✅ 传统 iOS 开发中 KVO 的实际应用场景 (相对常见的)"></a>✅ 传统 iOS 开发中 KVO 的实际应用场景 (相对常见的)</h3><p>尽管在 Cell 绑定中不主流，KVO 在以下场景仍有其价值：</p>
+<ol>
+<li>监听系统组件或框架对象的状态变化：​​<ul>
+<li>AVPlayer &#x2F; AVPlayerItem:​​ 监听 status, rate, currentItem 等属性变化来更新播放器 UI 或处理错误。</li>
+<li>NSOperation &#x2F; NSOperationQueue:​​ 监听 isFinished, isCancelled, isExecuting 等状态。</li>
+<li>UIView 动画 (较少用)：​​ 理论上可监听 frame, bounds 等，但通常用动画 block 或 delegate 更合适。</li>
+<li>Core Animation (CALayer)：​​ 监听 position, bounds 等属性变化。</li>
+<li>NSTimer (非 GCD timer)：​​ 监听其有效性 (但通常用其他方式)。</li>
+</ul>
+</li>
+<li>自定义 Model 属性变化触发跨组件更新 (非 Cell)：​<ul>
+<li>一个全局配置对象 (SettingsModel) 的某个属性改变，需要通知多个不同的 ViewController 或 View 更新其 UI (非列表)。Controller 或 View 注册观察该配置属性。</li>
+<li>一个数据模型 (UserProfile) 的改变，需要更新导航栏标题、底部工具栏等多个分散的 UI 元素。</li>
+<li>此时 Controller 作为观察者，协调更新多个视图。​​ 这比让每个视图都去直接观察模型更可控。</li>
+</ul>
+</li>
+<li>配合 NSFetchedResultsController (Core Data)：​​<ul>
+<li>如前所述，FRC（NSFetchedResultsController） ​​内部​​大量使用 KVO 监听 NSManagedObjectContext 的变化。</li>
+<li>开发者不直接操作 KVO，而是通过 FRC 提供的 delegate 方法来获得结构化的变更信息，从而驱动 UITableView &#x2F; UICollectionView 的局部刷新。</li>
+</ul>
+</li>
+<li>依赖键 (keyPathsForValuesAffectingValueForKey:):​​<ul>
+<li>当计算属性 (fullName &#x3D; firstName + lastName) 依赖于其他属性时，使用 KVO 的依赖键机制可以自动在 firstName 或 lastName 改变时触发 fullName 的 KVO 通知。这在 Model 层内部很有用。</li>
+</ul>
+</li>
+</ol>
+<h3 id="🔄-总结：KVO-在传统-iOS-开发中的定位"><a href="#🔄-总结：KVO-在传统-iOS-开发中的定位" class="headerlink" title="🔄 总结：KVO 在传统 iOS 开发中的定位"></a>🔄 总结：KVO 在传统 iOS 开发中的定位</h3><ul>
+<li>在 UITableView&#x2F;UICollectionView Cell 绑定上，KVO 是“非主流”：​​ 主流是​​命令式、一次性的显式数据赋值模式​​（cellForRowAtIndexPath: + configureWithModel:）。这由 UIKit 设计范式、Cell 复用机制、性能考量、易管理性共同决定。</li>
+<li>KVO 有其特定价值场景：​​ 主要用于​​监听系统框架对象状态​​、在 ​​Controller 层协调 Model 变化更新多个非列表视图​​、​​Core Data (FRC) 内部驱动​​以及 ​​Model 内部的依赖键管理​​。</li>
+<li>缺点限制了其普遍性：​​ 字符串 KeyPath、繁琐的生命周期管理、潜在性能开销、与 Cell 复用机制的冲突风险，使其在需要精细控制和性能敏感的列表视图中竞争力不足。</li>
+</ul>
+<p>SwiftUI 的声明式绑定 (@State, @ObservableObject, @Binding)​​ 才真正为 iOS 带来了类似 Cocoa Bindings 的、对开发者友好的、安全高效的 Model-View 自动同步体验，从根本上改变了数据驱动的 UI 开发方式。在 SwiftUI 之前，iOS 开发者更多地依赖显式模式和框架提供的特定更新机制（如 dataSource 协议、FRC 的 delegate）。</p>
+<h1 id="如何使用？"><a href="#如何使用？" class="headerlink" title="如何使用？"></a>如何使用？</h1><p>如何使用这里就不多做介绍了，因为官方文档中的 注册键值观察 介绍的很不错了。如果不太看得习惯英文文档，也可以下载作者翻译好的中文版。</p>
+<h1 id="底层原理如何？"><a href="#底层原理如何？" class="headerlink" title="底层原理如何？"></a>底层原理如何？</h1><p>底层原理是这篇文章的重点，也是难点，也是面试有可能会考察的地方。</p>
+<h2 id="怎么探索-KVO-的底层原理？"><a href="#怎么探索-KVO-的底层原理？" class="headerlink" title="怎么探索 KVO 的底层原理？"></a>怎么探索 KVO 的底层原理？</h2><table>
+<thead>
+<tr>
+<th align="left">方案</th>
+<th align="left">结论</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">1. 官方文档</td>
+<td align="left">只有简单的一句话，没有详细讲解</td>
+</tr>
+<tr>
+<td align="left">2. Apple 开源工程</td>
+<td align="left">KVO 在 Foundation 框架，Apple 并没有开源</td>
+</tr>
+<tr>
+<td align="left">3. 市面上的书籍资料？</td>
+<td align="left">基本没有讲解 KVO 底层原理的。都是介绍基本使用的。</td>
+</tr>
+<tr>
+<td align="left">4. 利用底层知识和 lldb 调试探索了</td>
+<td align="left">可行，但是对知识储备要求也不低。一般的 iOS 应用开发者根本发现不了。</td>
+</tr>
+<tr>
+<td align="left">5. 逆向工程？</td>
+<td align="left">可行，但是难度较高。可以作为没有其他办法的情况下最后的手段吧。</td>
+</tr>
+</tbody></table>
+<p>综合考虑和实践下来，对于 KVO 的底层原理探索来说，方案 4 是最推荐的。</p>
+<h2 id="利用底层知识和-lldb-探索-KVO-底层"><a href="#利用底层知识和-lldb-探索-KVO-底层" class="headerlink" title="利用底层知识和 lldb 探索 KVO 底层"></a>利用底层知识和 lldb 探索 KVO 底层</h2><p>首先是 KVO 的最基本使用，对比不使用 KVO，观察现象。下面是一段 macOS 的 Command Line Tool 工程代码，选择它的原因是使用 KVO 并不是一定要用到 iOS，对于 KVO 的底层研究使用它足够了。</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="meta">#import <span class="string">&lt;Foundation/Foundation.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">Observer</span> : <span class="title">NSObject</span></span></span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">Observer</span></span></span><br><span class="line">- (<span class="type">void</span>)observeValueForKeyPath:(<span class="built_in">NSString</span> *)keyPath ofObject:(<span class="type">id</span>)object change:(<span class="built_in">NSDictionary</span>&lt;<span class="built_in">NSKeyValueChangeKey</span>,<span class="type">id</span>&gt; *)change context:(<span class="type">void</span> *)context &#123;</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@&quot;%@&quot;</span>, change);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">Person</span> : <span class="title">NSObject</span></span></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>) <span class="built_in">NSString</span> *name;</span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">Person</span></span></span><br><span class="line">- (<span class="type">void</span>)setName:(<span class="built_in">NSString</span> *)name &#123;</span><br><span class="line">    _name = name;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> main(<span class="type">int</span> argc, <span class="keyword">const</span> <span class="type">char</span> *argv[]) &#123;</span><br><span class="line">    Observer *observer = [Observer new];</span><br><span class="line">    </span><br><span class="line">    Person *person1 = [Person new];</span><br><span class="line">    Person *person2 = [Person new];</span><br><span class="line"></span><br><span class="line">    [person1 addObserver:observer forKeyPath:<span class="string">@&quot;name&quot;</span> options:<span class="built_in">NSKeyValueObservingOptionNew</span> context:<span class="literal">NULL</span>];</span><br><span class="line">    </span><br><span class="line">    person1.name = <span class="string">@&quot;Steve Jobs&quot;</span>;</span><br><span class="line">    person2.name = <span class="string">@&quot;Tim Cook&quot;</span>;</span><br><span class="line">    </span><br><span class="line">    [person1 removeObserver:observer forKeyPath:<span class="string">@&quot;name&quot;</span>];</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">NSObject</span>(<span class="title">NSKeyValueObserving</span>)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* 假设接收者已经注册为相对于某个对象的键路径的值的观察者，当该值发生变化时，接收者会收到通知。</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">变更字典始终包含一个 `NSKeyValueChangeKindKey` 条目，其值是一个包装了 `NSKeyValueChange` 的 `NSNumber`（使用 `-[NSNumber unsignedIntegerValue]` 获取）。`NSKeyValueChange` 的含义取决于键路径所标识的属性的类型：</span></span><br><span class="line"><span class="comment">    - 对于任何类型的属性（属性、一对一关系、有序或无序的多对多关系），`NSKeyValueChangeSetting` 表示被观察对象收到了 `-setValue:forKey:` 消息，或者调用了符合键值编码的 set 方法，或者以其他方式调用了 `-willChangeValueForKey:/-didChangeValueForKey:` 对。</span></span><br><span class="line"><span class="comment">    - 对于**有序**的多对多关系，`NSKeyValueChangeInsertion`、`NSKeyValueChangeRemoval` 和 `NSKeyValueChangeReplacement` 表示向对象发送的 `-mutableArrayValueForKey:` 消息返回的数组，或向对象发送的 `-mutableOrderedSetValueForKey:` 消息返回的有序集合，被发送了修改消息，或者调用了符合键值编码的数组或有序集合的修改方法，或者以其他方式调用了 `-willChange:valuesAtIndexes:forKey:/-didChange:valuesAtIndexes:forKey:` 对。</span></span><br><span class="line"><span class="comment">    - 对于**无序**的多对多关系（在 Mac OS 10.4 中引入），`NSKeyValueChangeInsertion`、`NSKeyValueChangeRemoval` 和 `NSKeyValueChangeReplacement` 表示向对象发送的 `-mutableSetValueForKey:` 消息返回的集合被发送了修改消息，或者调用了符合键值编码的集合的修改方法，或者以其他方式调用了 `-willChangeValueForKey:withSetMutation:usingObjects:/-didChangeValueForKey:withSetMutation:usingObjects:` 对。</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">对于任何类型的属性，如果在观察者注册时指定了 `NSKeyValueObservingOptionNew`，并且是正确类型的变更，且这不是一个“变更前”通知，则变更字典包含一个 `NSKeyValueChangeNewKey` 条目。如果在观察者注册时指定了 `NSKeyValueObservingOptionOld`，并且是正确类型的变更，则变更字典包含一个 `NSKeyValueChangeOldKey` 条目。关于这些条目的值可能是什么，请参阅 `NSKeyValueObserverNotification` 非正式协议方法的注释。</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">对于**有序**的多对多关系，除非变更是 `NSKeyValueChangeSetting`，否则变更字典始终包含一个 `NSKeyValueChangeIndexesKey` 条目，其值是一个包含插入、删除或替换对象的索引的 `NSIndexSet`。</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">如果在观察者注册时指定了 `NSKeyValueObservingOptionPrior`（在 Mac OS 10.5 中引入），并且此通知是由于变更前发送的通知，则变更字典包含一个 `NSKeyValueChangeNotificationIsPriorKey` 条目，其值是一个包装了 `YES` 的 `NSNumber`（使用 `-[NSNumber boolValue]` 获取）。</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">`context` 始终与观察者注册时传入的指针相同。</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line">- (<span class="type">void</span>)observeValueForKeyPath:(<span class="keyword">nullable</span> <span class="built_in">NSString</span> *)keyPath ofObject:(<span class="keyword">nullable</span> <span class="type">id</span>)object change:(<span class="keyword">nullable</span> <span class="built_in">NSDictionary</span>&lt;<span class="built_in">NSKeyValueChangeKey</span>, <span class="type">id</span>&gt; *)change context:(<span class="keyword">nullable</span> <span class="type">void</span> *)context;</span><br><span class="line"></span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+<p>观察上面代码，<code>person1.name = @&quot;Steve Jobs&quot;; </code> 执行的时候触发了观察者的观察方法。但是 <code>person2.name = @&quot;Tim Cook&quot;;</code> 执行的时候没有触发。这就非常奇怪了，从表面上来看可以说是同样的代码执行的流程却不一样？</p>
+<p>这不科学，不符合逻辑，不讲道理。。。一定是有什么不对劲的地方。从代码层面分析，对象 <code>person1</code> 和 <code>person2</code> 唯一不同之处就是 <code>person1</code> 调用了 KVO 的 <code>addObserver:forKeyPath:options:context:</code> 方法而 <code>person2</code> 没有。</p>
+<p>那么推测应该是 <code>person1</code> 调用了 KVO 的注册监听方法 <code>addObserver:forKeyPath:options:context:</code> 之后发生了某些变化。那么使用 lldb 调试工具进行分析一下。对于知识储备不足或者说一般的 iOS 开发者，肯定只会打印 <code>person1</code> 和 <code>person2</code> 或者查看对象的 <code>class</code>，结果发现两者都是一样的。如下图所示：</p>
+<img src="/2025/02/23/KVO/Snipaste_2025-09-13_16-00-20.png" class="">
 
+<p>其实应该打印这些东西，对象的 <code>isa</code> 属性，或者调用 runtime 的 <code>object_getClassName</code> 或 <code>object_getClass</code>。这时候有些读者可能会问了，你怎么知道要打印对象的 <code>isa</code> 属性了，或者调用 <code>object_getClassName</code> <code>object_getClass</code> 等方法了？没办法，只有学习了 iOS 底层，runtime 相关知识自然而然就知道这些了。</p>
+<img src="/2025/02/23/KVO/Snipaste_2025-09-13_16-07-44.png" class="">
 
+<p>从打印结果可以明显的看到，对象 <code>person1</code> 所属的类居然发生了变化，按照代码逻辑预期它应该也是 <code>Person</code> 的实例，实际却是一个不知道哪里来的 <code>NSKVONotifying_Person</code> 类的实例。虽然暂时不知道 <code>NSKVONotifying_Person</code> 类是从何而来（猜测应该是在 <code>addObserver:forKeyPath:options:context:</code> 方法中创建的）但目前可以合理解释为什么同样是调用 setter 方法，代码执行流程不一样的问题了，因为 <code>person1</code> 在调用 <code>addObserver:forKeyPath:options:context:</code> 方法之后它变成了 <code>NSKVONotifying_Person</code> 类的实例，这样在调用 setter 方法时执行的肯定是 <code>NSKVONotifying_Person</code> 类的 setter 方法逻辑，而不是 <code>Person</code> 类的 setter 方法逻辑了。从这里也可以看出 Objective-C 这样的语言居然可以在运行时动态创建一个新的类，并且可以修改对象的 <code>isa</code> 属性改变其原始的类。</p>
+<p>此时有几个新问题：</p>
+<ol>
+<li><p><code>NSKVONotifying_Person</code> 和 <code>Person</code> 类是什么关系？</p>
+<p> 按名字来猜测，应该是父子类关系，因为一般在开发中都是用这种习惯命名的，子类命名都是在父类的基础上加前缀。</p>
+<p> 可以借助 lldb 命令 <code>po class_getSuperclass((Class)object_getClass(person1))</code> 打印 <code>person1</code> 和 <code>person2</code> 的父类来验证：</p>
+ <img src="/2025/02/23/KVO/Snipaste_2025-09-15_17-59-51.png" class="">	</li>
+<li><p><code>NSKVONotifying_Person</code> 类里是不是真的有它自己的 <code>setName:</code> 方法？还有没有其他方法？如何知道一个类的所有方法？</p>
+<p> 可以通过 runtime API 来实现一个函数或方法打印类的方法列表。这里需要注意对象方法存放在类对象的方法列表中，类方法存放在元类对象的方法列表中，所以如果你传入的参数是类对象那么打印的就是对象方法，如果传入的参数是元类对象那么打印的就是类方法，对象方法和类方法并没有什么本质的不同，在底层它们都是 C 函数只是保存的位置不同。代码如下：</p>
+ <figure class="highlight objc"><table><tr><td class="code"><pre><span class="line">- (<span class="type">void</span>)printMethodNamesOfClass:(Class)cls &#123;</span><br><span class="line">	<span class="built_in">NSMutableString</span> *methodNames = [<span class="built_in">NSMutableString</span> string];</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">int</span> count = <span class="number">0</span>;</span><br><span class="line">	Method *list = class_copyMethodList(cls, &amp;count);</span><br><span class="line">	<span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; count; i++) &#123;</span><br><span class="line">		Method method = list[i];</span><br><span class="line">		<span class="built_in">NSString</span> *methodName = <span class="built_in">NSStringFromSelector</span>(method_getName(method));</span><br><span class="line">		[methodNames appendString:methodName];</span><br><span class="line">		[methodNames appendString:<span class="string">@&quot;, &quot;</span>];</span><br><span class="line">	&#125;</span><br><span class="line">	free(list);</span><br><span class="line">	<span class="built_in">NSLog</span>(<span class="string">@&quot;%@ %@&quot;</span>, cls, methodNames);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p> 然后在合适的地方调用该函数查看打印的结果：</p>
+ <img src="/2025/02/23/KVO/Snipaste_2025-09-16_16-22-08.png" class="">
+</li>
+<li><p><code>NSKVONotifying_Person</code> 有它自己的 <code>setName:</code> 方法没有问题，那它这个 <code>setName:</code> 方法是如何实现触发 KVO 的观察者通知的？</p>
+<p> 这个问题算是触及到 KVO 的核心了。其实如果阅读过完整的 KVO 文档，就能知道手动触发 KVO 通知的时候出现了一对方法，<code>willChangeValueForKey:</code> 和 <code>didChangeValueForKey:</code>。那么就可以猜测到就是这两个方法触发了 KVO 的观察者通知，当然目前这个只是猜测，如果能看到 <code>NSKVONotifying_Person</code> 的 <code>setName:</code> 方法中调用了上面两个方法就算是验证了这个猜测。那么接下来就利用 lldb + runtime API + 分析汇编来验证一下：</p>
+<p> 在 <code>person1</code> 调用添加观察者方法之后打一个断点，然后获取它的类 <code>NSKVONotifying_Person</code> 的 <code>setName:</code> 方法的实现，可以通过以下两种方法实现：</p>
+<ul>
+<li><code>p (IMP)class_getMethodImplementation((Class)object_getClass(person1), @selector(setName:))</code></li>
+<li><code>p (IMP)[person1 methodForSelector:@selector(setName:)]</code></li>
+</ul>
+<p> 最后通过 <code>dis -a 内存地址</code> 查看汇编代码，如下图所示：</p>
+ <img src="/2025/02/23/KVO/Snipaste_2025-09-16_22-05-24.png" class="">
+<p> 由于完整的汇编代码比较长，截图不方便，我就当成代码贴到下面了：</p>
+ <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">(lldb) dis -a 0x00007ff81c962051</span><br><span class="line">Foundation`_NSSetObjectValueAndNotify:</span><br><span class="line">    0x7ff81c962051 &lt;+0&gt;:   pushq  %rbp</span><br><span class="line">    0x7ff81c962052 &lt;+1&gt;:   movq   %rsp, %rbp</span><br><span class="line">    0x7ff81c962055 &lt;+4&gt;:   pushq  %r15</span><br><span class="line">    0x7ff81c962057 &lt;+6&gt;:   pushq  %r14</span><br><span class="line">    0x7ff81c962059 &lt;+8&gt;:   pushq  %r13</span><br><span class="line">    0x7ff81c96205b &lt;+10&gt;:  pushq  %r12</span><br><span class="line">    0x7ff81c96205d &lt;+12&gt;:  pushq  %rbx</span><br><span class="line">    0x7ff81c96205e &lt;+13&gt;:  subq   $0x58, %rsp</span><br><span class="line">    0x7ff81c962062 &lt;+17&gt;:  movq   %rdx, %r14</span><br><span class="line">    0x7ff81c962065 &lt;+20&gt;:  movq   %rsi, %r15</span><br><span class="line">    0x7ff81c962068 &lt;+23&gt;:  movq   %rdi, %rbx</span><br><span class="line">    0x7ff81c96206b &lt;+26&gt;:  movq   0x3eea59c6(%rip), %rax    ; (void *)0x00007ff85e593e90: __stack_chk_guard</span><br><span class="line">    0x7ff81c962072 &lt;+33&gt;:  movq   (%rax), %rax</span><br><span class="line">    0x7ff81c962075 &lt;+36&gt;:  movq   %rax, -0x30(%rbp)</span><br><span class="line">    0x7ff81c962079 &lt;+40&gt;:  callq  0x7ff81d34ae80            ; symbol stub for: object_getClass</span><br><span class="line">    0x7ff81c96207e &lt;+45&gt;:  movq   %rax, %r12</span><br><span class="line">    0x7ff81c962081 &lt;+48&gt;:  movq   0x3ef5db18(%rip), %rsi    ; &quot;_isKVOA&quot;</span><br><span class="line">    0x7ff81c962088 &lt;+55&gt;:  movq   %rax, %rdi</span><br><span class="line">    0x7ff81c96208b &lt;+58&gt;:  callq  0x7ff81d34a7ae            ; symbol stub for: class_getMethodImplementation</span><br><span class="line">    0x7ff81c962090 &lt;+63&gt;:  leaq   0x88e4ac(%rip), %rcx      ; NSKVOIsAutonotifying</span><br><span class="line">    0x7ff81c962097 &lt;+70&gt;:  cmpq   %rcx, %rax</span><br><span class="line">    0x7ff81c96209a &lt;+73&gt;:  je     0x7ff81c9620cd            ; &lt;+124&gt;</span><br><span class="line">    0x7ff81c96209c &lt;+75&gt;:  movq   0x3eea5995(%rip), %rax    ; (void *)0x00007ff85e593e90: __stack_chk_guard</span><br><span class="line">    0x7ff81c9620a3 &lt;+82&gt;:  movq   (%rax), %rax</span><br><span class="line">    0x7ff81c9620a6 &lt;+85&gt;:  cmpq   -0x30(%rbp), %rax</span><br><span class="line">    0x7ff81c9620aa &lt;+89&gt;:  jne    0x7ff81c9621e5            ; &lt;+404&gt;</span><br><span class="line">    0x7ff81c9620b0 &lt;+95&gt;:  movq   %rbx, %rdi</span><br><span class="line">    0x7ff81c9620b3 &lt;+98&gt;:  movq   %r15, %rsi</span><br><span class="line">    0x7ff81c9620b6 &lt;+101&gt;: movq   %r14, %rdx</span><br><span class="line">    0x7ff81c9620b9 &lt;+104&gt;: addq   $0x58, %rsp</span><br><span class="line">    0x7ff81c9620bd &lt;+108&gt;: popq   %rbx</span><br><span class="line">    0x7ff81c9620be &lt;+109&gt;: popq   %r12</span><br><span class="line">    0x7ff81c9620c0 &lt;+111&gt;: popq   %r13</span><br><span class="line">    0x7ff81c9620c2 &lt;+113&gt;: popq   %r14</span><br><span class="line">    0x7ff81c9620c4 &lt;+115&gt;: popq   %r15</span><br><span class="line">    0x7ff81c9620c6 &lt;+117&gt;: popq   %rbp</span><br><span class="line">    0x7ff81c9620c7 &lt;+118&gt;: jmpq   *0x3eea6b63(%rip)         ; (void *)0x00007ff81b464e40: objc_msgSend</span><br><span class="line">    0x7ff81c9620cd &lt;+124&gt;: movq   %r12, %rdi</span><br><span class="line">    0x7ff81c9620d0 &lt;+127&gt;: callq  0x7ff81d34ae8c            ; symbol stub for: object_getIndexedIvars</span><br><span class="line">    0x7ff81c9620d5 &lt;+132&gt;: testq  %rax, %rax</span><br><span class="line">    0x7ff81c9620d8 &lt;+135&gt;: je     0x7ff81c96209c            ; &lt;+75&gt;</span><br><span class="line">    0x7ff81c9620da &lt;+137&gt;: movq   %rax, %r12</span><br><span class="line">    0x7ff81c9620dd &lt;+140&gt;: movq   %rax, %r13</span><br><span class="line">    0x7ff81c9620e0 &lt;+143&gt;: addq   $0x20, %r13</span><br><span class="line">    0x7ff81c9620e4 &lt;+147&gt;: movq   %r13, %rdi</span><br><span class="line">    0x7ff81c9620e7 &lt;+150&gt;: xorl   %esi, %esi</span><br><span class="line">    0x7ff81c9620e9 &lt;+152&gt;: callq  0x7ff81d34aefe            ; symbol stub for: os_unfair_recursive_lock_lock_with_options</span><br><span class="line">    0x7ff81c9620ee &lt;+157&gt;: movq   0x18(%r12), %rdi</span><br><span class="line">    0x7ff81c9620f3 &lt;+162&gt;: movq   %r15, %rsi</span><br><span class="line">    0x7ff81c9620f6 &lt;+165&gt;: callq  0x7ff81d34951e            ; symbol stub for: CFDictionaryGetValue</span><br><span class="line">    0x7ff81c9620fb &lt;+170&gt;: movq   0x3ef599b6(%rip), %rsi    ; &quot;copyWithZone:&quot;</span><br><span class="line">    0x7ff81c962102 &lt;+177&gt;: movq   %rax, %rdi</span><br><span class="line">    0x7ff81c962105 &lt;+180&gt;: xorl   %edx, %edx</span><br><span class="line">    0x7ff81c962107 &lt;+182&gt;: callq  *0x3eea6b23(%rip)         ; (void *)0x00007ff81b464e40: objc_msgSend</span><br><span class="line">    0x7ff81c96210d &lt;+188&gt;: movq   %rax, -0x78(%rbp)</span><br><span class="line">    0x7ff81c962111 &lt;+192&gt;: movq   %r13, %rdi</span><br><span class="line">    0x7ff81c962114 &lt;+195&gt;: callq  0x7ff81d34af04            ; symbol stub for: os_unfair_recursive_lock_unlock</span><br><span class="line">    0x7ff81c962119 &lt;+200&gt;: cmpb   $0x0, 0x28(%r12)</span><br><span class="line">    0x7ff81c96211f &lt;+206&gt;: je     0x7ff81c962164            ; &lt;+275&gt;</span><br><span class="line">    0x7ff81c962121 &lt;+208&gt;: movq   0x3ef59408(%rip), %rsi    ; &quot;willChangeValueForKey:&quot;</span><br><span class="line">    0x7ff81c962128 &lt;+215&gt;: movq   %rbx, %rdi</span><br><span class="line">    0x7ff81c96212b &lt;+218&gt;: movq   -0x78(%rbp), %r13</span><br><span class="line">    0x7ff81c96212f &lt;+222&gt;: movq   %r13, %rdx</span><br><span class="line">    0x7ff81c962132 &lt;+225&gt;: callq  *0x3eea6af8(%rip)         ; (void *)0x00007ff81b464e40: objc_msgSend</span><br><span class="line">    0x7ff81c962138 &lt;+231&gt;: movq   (%r12), %rdi</span><br><span class="line">    0x7ff81c96213c &lt;+235&gt;: movq   %r15, %rsi</span><br><span class="line">    0x7ff81c96213f &lt;+238&gt;: callq  0x7ff81d34a7ae            ; symbol stub for: class_getMethodImplementation</span><br><span class="line">    0x7ff81c962144 &lt;+243&gt;: movq   %rbx, %rdi</span><br><span class="line">    0x7ff81c962147 &lt;+246&gt;: movq   %r15, %rsi</span><br><span class="line">    0x7ff81c96214a &lt;+249&gt;: movq   %r14, %rdx</span><br><span class="line">    0x7ff81c96214d &lt;+252&gt;: callq  *%rax</span><br><span class="line">    0x7ff81c96214f &lt;+254&gt;: movq   0x3ef593f2(%rip), %rsi    ; &quot;didChangeValueForKey:&quot;</span><br><span class="line">    0x7ff81c962156 &lt;+261&gt;: movq   %rbx, %rdi</span><br><span class="line">    0x7ff81c962159 &lt;+264&gt;: movq   %r13, %rdx</span><br><span class="line">    0x7ff81c96215c &lt;+267&gt;: callq  *0x3eea6ace(%rip)         ; (void *)0x00007ff81b464e40: objc_msgSend</span><br><span class="line">    0x7ff81c962162 &lt;+273&gt;: jmp    0x7ff81c9621bd            ; &lt;+364&gt;</span><br><span class="line">    0x7ff81c962164 &lt;+275&gt;: movq   0x3eea5645(%rip), %rax    ; (void *)0x00007ff85e58c448: _NSConcreteStackBlock</span><br><span class="line">    0x7ff81c96216b &lt;+282&gt;: leaq   -0x70(%rbp), %r9</span><br><span class="line">    0x7ff81c96216f &lt;+286&gt;: movq   %rax, (%r9)</span><br><span class="line">    0x7ff81c962177 &lt;+294&gt;: movq   %rax, 0x8(%r9)</span><br><span class="line">    0x7ff81c96217b &lt;+298&gt;: leaq   0x7077(%rip), %rax        ; ___NSSetObjectValueAndNotify_block_invoke</span><br><span class="line">    0x7ff81c962182 &lt;+305&gt;: movq   %rax, 0x10(%r9)</span><br><span class="line">    0x7ff81c962186 &lt;+309&gt;: leaq   0x3eed7753(%rip), %rax    ; __block_descriptor_64_e8_32o40o_e5_v8?0l</span><br><span class="line">    0x7ff81c96218d &lt;+316&gt;: movq   %rax, 0x18(%r9)</span><br><span class="line">    0x7ff81c962191 &lt;+320&gt;: movq   %r12, 0x30(%r9)</span><br><span class="line">    0x7ff81c962195 &lt;+324&gt;: movq   %r15, 0x38(%r9)</span><br><span class="line">    0x7ff81c962199 &lt;+328&gt;: movq   %rbx, 0x20(%r9)</span><br><span class="line">    0x7ff81c96219d &lt;+332&gt;: movq   %r14, 0x28(%r9)</span><br><span class="line">    0x7ff81c9621a1 &lt;+336&gt;: movq   0x3ef5da18(%rip), %rsi    ; &quot;_changeValueForKey:key:key:usingBlock:&quot;</span><br><span class="line">    0x7ff81c9621a8 &lt;+343&gt;: movq   %rbx, %rdi</span><br><span class="line">    0x7ff81c9621ab &lt;+346&gt;: movq   -0x78(%rbp), %r13</span><br><span class="line">    0x7ff81c9621af &lt;+350&gt;: movq   %r13, %rdx</span><br><span class="line">    0x7ff81c9621b2 &lt;+353&gt;: xorl   %ecx, %ecx</span><br><span class="line">    0x7ff81c9621b4 &lt;+355&gt;: xorl   %r8d, %r8d</span><br><span class="line">    0x7ff81c9621b7 &lt;+358&gt;: callq  *0x3eea6a73(%rip)         ; (void *)0x00007ff81b464e40: objc_msgSend</span><br><span class="line">    0x7ff81c9621bd &lt;+364&gt;: movq   %r13, %rdi</span><br><span class="line">    0x7ff81c9621c0 &lt;+367&gt;: callq  *0x3eea6aba(%rip)         ; (void *)0x00007ff81b467350: objc_release</span><br><span class="line">    0x7ff81c9621c6 &lt;+373&gt;: movq   0x3eea586b(%rip), %rax    ; (void *)0x00007ff85e593e90: __stack_chk_guard</span><br><span class="line">    0x7ff81c9621cd &lt;+380&gt;: movq   (%rax), %rax</span><br><span class="line">    0x7ff81c9621d0 &lt;+383&gt;: cmpq   -0x30(%rbp), %rax</span><br><span class="line">    0x7ff81c9621d4 &lt;+387&gt;: jne    0x7ff81c9621e5            ; &lt;+404&gt;</span><br><span class="line">    0x7ff81c9621d6 &lt;+389&gt;: addq   $0x58, %rsp</span><br><span class="line">    0x7ff81c9621da &lt;+393&gt;: popq   %rbx</span><br><span class="line">    0x7ff81c9621db &lt;+394&gt;: popq   %r12</span><br><span class="line">    0x7ff81c9621dd &lt;+396&gt;: popq   %r13</span><br><span class="line">    0x7ff81c9621df &lt;+398&gt;: popq   %r14</span><br><span class="line">    0x7ff81c9621e1 &lt;+400&gt;: popq   %r15</span><br><span class="line">    0x7ff81c9621e3 &lt;+402&gt;: popq   %rbp</span><br><span class="line">    0x7ff81c9621e4 &lt;+403&gt;: retq   </span><br><span class="line">    0x7ff81c9621e5 &lt;+404&gt;: callq  0x7ff81d34a556            ; symbol stub for: __stack_chk_fail</span><br></pre></td></tr></table></figure>
+<p> 如果看不懂汇编也没有关系，只要在 62 和 74 行的看到了熟悉的 <code>willChangeValueForKey:</code> 和 <code>didChangeValueForKey:</code> 也能猜到是调用了这两个方法，因此刚刚的猜测得到了验证。</p>
+<p> 其实刚刚的说法还有一点小小的问题，会让人非常的困惑？到底是 <code>willChangeValueForKey:</code> 触发了通知，还是 <code>didChangeValueForKey:</code> 触发了通知，还是说一定要两者搭配才能触发通知？实际的情况是 <code>willChangeValueForKey:</code> 会触发观察者通知，<code>didChangeValueForKey:</code> 也会触发观察者通知，不是一定要两者配对出现才能触发 KVO 通知，不然 KVO 底层还得增加这个保证配对出现才会触发 KVO 的逻辑，这个怎么实现？想想也挺头疼。</p>
+<p> 但是实际使用手动 KVO 通知的时候为什么经常会强调要成对调用了？那是为了保证 KVO 功能的完整性。在指定特定的 Options 值 <code>NSKeyValueObservingOptionPrior</code> 的时候 <code>willChangeValueForKey:</code> 会在调用 setter 方法修改属性值之前就触发一次观察者通知，在调用完 setter 方法修改完属性值之后 <code>didChangeValueForKey:</code> 再去触发一次观察者通知方法。如果某些需求的确需要在调用 setter 方法之前触发观察者通知，而你手动实现的 KVO 通知时没有调用 <code>willChangeValueForKey:</code> 方法的话自然就不会触发观察者通知导致出现 bug。可能说的比较绕，总结下来就是 <code>willChangeValueForKey:</code> 方法内触发观察者通知是有条件判断的，而 <code>didChangeValueForKey:</code> 方法内触发观察者通知是无条件判断的。可以在 <code>Person</code> 中重写 <code>willChangeValueForKey:</code> 和 <code>didChangeValueForKey:</code> 和指定 <code>NSKeyValueObservingOptionPrior</code> 然后查看打印信息验证一下。</p>
+</li>
+</ol>
+<h2 id="一句话概括"><a href="#一句话概括" class="headerlink" title="一句话概括"></a>一句话概括</h2><p>KVO 的“底层原理”是 在运行时为被观察对象动态创建一个私有子类（通常名为 NSKVONotifying_原类名），把对象的 isa 指向这个子类，并在子类中重写相关的 setter（或触发点）以插入 <code>willChangeValueForKey: / didChangeValueForKey:</code> 的通知逻辑；观察者信息则以运行时的对象关联或侧表（SideTable）形式存储。这整个过程就是常说的 isa-swizzling &#x2F; 动态子类化。</p>
+<h1 id="实现一个简单的-KVO"><a href="#实现一个简单的-KVO" class="headerlink" title="实现一个简单的 KVO"></a>实现一个简单的 KVO</h1><!--
+在使用 Apple 的 KVO 的时候，存在一些明显的不方便的地方。
 
-<h1 id="KVO-的底层实现原理"><a href="#KVO-的底层实现原理" class="headerlink" title="KVO 的底层实现原理"></a>KVO 的底层实现原理</h1><p>isa-swizzling</p>
-<h1 id="自己实现一个简单的-KVO"><a href="#自己实现一个简单的-KVO" class="headerlink" title="自己实现一个简单的 KVO"></a>自己实现一个简单的 KVO</h1><h1 id="查看-GNU-的-KVO-实现或逆向分析-Foundation-源码"><a href="#查看-GNU-的-KVO-实现或逆向分析-Foundation-源码" class="headerlink" title="查看 GNU 的 KVO 实现或逆向分析 Foundation 源码"></a>查看 GNU 的 KVO 实现或逆向分析 Foundation 源码</h1><h1 id="面试题"><a href="#面试题" class="headerlink" title="面试题"></a>面试题</h1><ol>
+- API 设计的非常分散，最基本的使用需要注册观察者，移除观察者，观察者实现通知方法。三个步骤需要写在三个不同的地方。
+- 如果忘记移除观察者，会导致潜在的崩溃。
+
+那么在我们自定义 KVO 的时候，可以尝试解决以上问题。一是将 KVO 的使用改为 block 的形式，这样在添加观察的同时就能在 block 内处理观察之后的逻辑。二是尝试自动地移除观察者，就是当被观察对象自己将要释放的时候，自动地移除它所有的观察者。这样就不必让开发者显式的调用移除观察者代码。
+-->
+
+<p>在知道了 KVO 的底层原理之后，我们可以尝试着自己实现一个极简的 KVO。只需要实现最基本的功能就足够了，如：</p>
+<ul>
+<li>可以添加观察者，被观察的属性。</li>
+<li>属性修改之后能通知观察者。</li>
+<li>可以移除观察者。</li>
+</ul>
+<h2 id="自定义-KVO-的-API-设计"><a href="#自定义-KVO-的-API-设计" class="headerlink" title="自定义 KVO 的 API 设计"></a>自定义 KVO 的 API 设计</h2><p>这需要对 iOS 的 runtime 有足够的知识储备，否则是不建议自己动手尝试的。首先是 API 的设计，这个不需要做过多的思考，直接参考 Apple 的 KVO 接口设计就好了。自己新建一个 NSObject 的分类，提供三个方法，分别是添加观察者，移除观察者，观察者通知方法。如下：</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">NSObject</span> (<span class="title">CustomKeyValueObserver</span>)</span></span><br><span class="line">- (<span class="type">void</span>)mk_addObserver:(<span class="built_in">NSObject</span> *)observer forKey:(<span class="built_in">NSString</span> *)key;</span><br><span class="line">- (<span class="type">void</span>)mk_removeObserver:(<span class="built_in">NSObject</span> *)observer forKey:(<span class="built_in">NSString</span> *)key;</span><br><span class="line">- (<span class="type">void</span>)mk_observeValueForKey:(<span class="built_in">NSString</span> *)key ofObject:(<span class="type">id</span>)object change:(<span class="built_in">NSDictionary</span> *)change;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="自定义-KVO-的实现代码"><a href="#自定义-KVO-的实现代码" class="headerlink" title="自定义 KVO 的实现代码"></a>自定义 KVO 的实现代码</h2><p>接下来就是如何实现这几个方法了。其中添加和移除观察者是最关键的方法，而 <code>mk_observeValueForKey:ofObject:change:</code> 方法实现或者不实现都不重要，因为本来就是提供给观察者类自己去实现的。</p>
+<h3 id="初步实现添加观察者方法"><a href="#初步实现添加观察者方法" class="headerlink" title="初步实现添加观察者方法"></a>初步实现添加观察者方法</h3><p>首先我们来实现 <code>- (void)mk_addObserver:(NSObject *)observer forKey:(NSString *)key;</code> 方法。通过前文对 KVO 底层的讲解，我们大致知道了应该做什么。</p>
+<ol>
+<li>获取动态子类，如果已经存在则直接获取，如果不存在则使用运行时创建</li>
+<li>给动态子类添加必要的方法</li>
+<li>修改 self 的 isa 属性为动态子类</li>
+</ol>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="meta">#import <span class="string">&quot;NSObject+CustomKeyValueObserver.h&quot;</span></span></span><br><span class="line"><span class="meta">#import <span class="string">&lt;objc/runtime.h&gt;</span></span></span><br><span class="line"><span class="meta">#import <span class="string">&lt;objc/message.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">static</span> <span class="built_in">NSString</span> *mk_setterForKey(<span class="built_in">NSString</span> *key) &#123;</span><br><span class="line">    <span class="keyword">if</span> (key.length == <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">nil</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">NSString</span> *first = [[key substringToIndex:<span class="number">1</span>] uppercaseString];</span><br><span class="line">    <span class="built_in">NSString</span> *rest = [key substringFromIndex:<span class="number">1</span>];</span><br><span class="line">    <span class="keyword">return</span> [<span class="built_in">NSString</span> stringWithFormat:<span class="string">@&quot;set%@%@:&quot;</span>, first, rest];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Class <span class="keyword">class</span>(<span class="type">id</span> <span class="keyword">self</span>, SEL _cmd) &#123;</span><br><span class="line">    <span class="keyword">return</span> class_getSuperclass(object_getClass(<span class="keyword">self</span>));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">NSObject</span> (<span class="title">CustomKeyValueObserver</span>)</span></span><br><span class="line">- (<span class="type">void</span>)mk_addObserver:(<span class="built_in">NSObject</span> *)observer forKey:(<span class="built_in">NSString</span> *)key &#123;</span><br><span class="line">    <span class="keyword">if</span> (!observer || key.length == <span class="number">0</span>) <span class="keyword">return</span>;</span><br><span class="line">    <span class="comment">// 获取动态子类，如果已经存在则直接获取，如果不存在则使用运行时创建</span></span><br><span class="line">    <span class="comment">// 这里就体现了动态子类重写 class 方法返回父类即原始类的必要性。</span></span><br><span class="line">    <span class="comment">// 因为当前添加观察者方法可以调用多次以观察不同的属性或者添加多个观察者。</span></span><br><span class="line">    <span class="comment">// 以 Person *person 为例，当 person 对象第一次调用当前方法时，subClassName 是 @&quot;MKKVONotifying_Person&quot;，运行时还没有创建这个动态子类于是进入判断条件去创建动态子类。</span></span><br><span class="line">    <span class="comment">// 当 person 对象后续再次调用当前方法时，此时的 person 对象应该已经是 MKKVONotifying_Person 的实例了，如果不重写 class 方法返回父类的话，subClassName 就会变为 @&quot;MKKVONotifying_MKKVONotifying_Person&quot; 这是很明显的逻辑错误。</span></span><br><span class="line">    <span class="built_in">NSString</span> *subClassName = [<span class="built_in">NSString</span> stringWithFormat:<span class="string">@&quot;MKKVONotifying_%@&quot;</span>, <span class="built_in">NSStringFromClass</span>([<span class="keyword">self</span> <span class="keyword">class</span>])];</span><br><span class="line">    Class subClass = <span class="built_in">NSClassFromString</span>(subClassName);</span><br><span class="line">    <span class="keyword">if</span> (!subClass) &#123;</span><br><span class="line">        <span class="comment">// 动态创建类</span></span><br><span class="line">        subClass = objc_allocateClassPair([<span class="keyword">self</span> <span class="keyword">class</span>], subClassName.UTF8String, <span class="number">0</span>);</span><br><span class="line">        <span class="comment">// 注册到运行时</span></span><br><span class="line">        objc_registerClassPair(subClass);</span><br><span class="line">        <span class="comment">// 给动态子类添加 class 方法</span></span><br><span class="line">        <span class="keyword">const</span> <span class="type">char</span> *typeEncoding1 = method_getTypeEncoding(class_getInstanceMethod([<span class="keyword">self</span> <span class="keyword">class</span>], <span class="keyword">@selector</span>(<span class="keyword">class</span>)));</span><br><span class="line">        class_addMethod(subClass, <span class="keyword">@selector</span>(<span class="keyword">class</span>), (IMP)<span class="keyword">class</span>, typeEncoding1);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 给动态子类添加属性 key 的 setter 方法。</span></span><br><span class="line">    SEL setterSel = <span class="built_in">NSSelectorFromString</span>(mk_setterForKey(key));</span><br><span class="line">    <span class="keyword">const</span> <span class="type">char</span> *typeEncoding2 = method_getTypeEncoding(class_getInstanceMethod([<span class="keyword">self</span> <span class="keyword">class</span>], setterSel));</span><br><span class="line">    class_addMethod(subClass, setterSel, (IMP)<span class="keyword">setter</span>, typeEncoding2);</span><br><span class="line">        </span><br><span class="line">    <span class="comment">// 修改 isa 指针</span></span><br><span class="line">    object_setClass(<span class="keyword">self</span>, subClass);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="保存观察者对象"><a href="#保存观察者对象" class="headerlink" title="保存观察者对象"></a>保存观察者对象</h3><p>在注释这里动态子类的 <code>class</code> 方法我们已经知道如何实现了，返回它的父类。然后是动态子类的 setter 方法，这个方法是实现 KVO 通知的关键。要做的事情是给属性真正的赋值，然后通知观察者属性发生了变化。在子类中我们一般无法获取到父类的属性对应的成员变量，无法直接赋值（这是面向对象编程的封装特性要求的），只能通过调用父类的 setter 方法实现。然后是通知观察者属性发生了变化，那么在动态子类的 setter 方法中我们需要拿到观察者，而观察者又是在 <code>mk_addObserver:forKey:</code> 方法中传入的，于是我们需要在这个方法中对观察者进行保存。从极简思维出发，暂时先不考虑太多复杂的问题，我们可以使用关联对象对观察者进行简单的保存。那么我们的代码就应该变成了下面这样：</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="meta">#import <span class="string">&quot;NSObject+CustomKeyValueObserver.h&quot;</span></span></span><br><span class="line"><span class="meta">#import <span class="string">&lt;objc/runtime.h&gt;</span></span></span><br><span class="line"><span class="meta">#import <span class="string">&lt;objc/message.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">static</span> <span class="built_in">NSString</span> *mk_setterForKey(<span class="built_in">NSString</span> *key) &#123;</span><br><span class="line">    <span class="keyword">if</span> (key.length == <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">nil</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">NSString</span> *first = [[key substringToIndex:<span class="number">1</span>] uppercaseString];</span><br><span class="line">    <span class="built_in">NSString</span> *rest = [key substringFromIndex:<span class="number">1</span>];</span><br><span class="line">    <span class="keyword">return</span> [<span class="built_in">NSString</span> stringWithFormat:<span class="string">@&quot;set%@%@:&quot;</span>, first, rest];</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">static</span> <span class="built_in">NSString</span> *mk_getterForSetter(<span class="built_in">NSString</span> *<span class="keyword">setter</span>) &#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">setter</span>.length &lt;= <span class="number">4</span> || ![<span class="keyword">setter</span> hasPrefix:<span class="string">@&quot;set&quot;</span>] || ![<span class="keyword">setter</span> hasSuffix:<span class="string">@&quot;:&quot;</span>]) <span class="keyword">return</span> <span class="literal">nil</span>;</span><br><span class="line">    <span class="built_in">NSString</span> *body = [<span class="keyword">setter</span> substringWithRange:<span class="built_in">NSMakeRange</span>(<span class="number">3</span>, <span class="keyword">setter</span>.length - <span class="number">4</span>)];</span><br><span class="line">    <span class="built_in">NSString</span> *first = [[body substringToIndex:<span class="number">1</span>] lowercaseString];</span><br><span class="line">    <span class="built_in">NSString</span> *rest = [body substringFromIndex:<span class="number">1</span>];</span><br><span class="line">    <span class="keyword">return</span> [first stringByAppendingString:rest];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">static</span> <span class="type">char</span> *kvo_observer_key = <span class="string">&quot;kvo_observer_key&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">NSObject</span> (<span class="title">CustomKeyValueObserver</span>)</span></span><br><span class="line"></span><br><span class="line">Class <span class="keyword">class</span>(<span class="type">id</span> <span class="keyword">self</span>, SEL _cmd) &#123;</span><br><span class="line">    <span class="keyword">return</span> class_getSuperclass(object_getClass(<span class="keyword">self</span>));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 动态子类的属性 key 的 setter 方法实现，这个是必要的</span></span><br><span class="line"><span class="type">void</span> <span class="keyword">setter</span>(<span class="type">id</span> <span class="keyword">self</span>, SEL _cmd, <span class="type">id</span> newValue) &#123;</span><br><span class="line">    <span class="built_in">NSString</span> *key = mk_getterForSetter(<span class="built_in">NSStringFromSelector</span>(_cmd));</span><br><span class="line">    <span class="type">id</span> old = [<span class="keyword">self</span> valueForKey:key];</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 调用父类的 setter 方法实现去真正的修改属性（因为子类无法获取父类的实例变量进行赋值，只能通过父类提供的 setter 方法进行真实的给属性赋值）</span></span><br><span class="line">    <span class="keyword">struct</span> objc_super sup = &#123;</span><br><span class="line">        .receiver = <span class="keyword">self</span>,</span><br><span class="line">        .super_class = class_getSuperclass(object_getClass(<span class="keyword">self</span>))</span><br><span class="line">    &#125;;</span><br><span class="line">    ((<span class="type">void</span> (*)(<span class="keyword">struct</span> objc_super *, SEL, <span class="type">id</span>))objc_msgSendSuper)(&amp;sup, _cmd, newValue);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 属性修改完成之后，通知所有观察者属性发生了变化</span></span><br><span class="line">    <span class="type">id</span> observer = objc_getAssociatedObject(<span class="keyword">self</span>, kvo_observer_key);</span><br><span class="line">    [observer mk_observeValueForKey:key ofObject:<span class="keyword">self</span> change:@&#123;<span class="string">@&quot;old&quot;</span>: old?:[<span class="built_in">NSNull</span> null], <span class="string">@&quot;new&quot;</span>: newValue&#125;];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="type">void</span>)mk_addObserver:(<span class="built_in">NSObject</span> *)observer forKey:(<span class="built_in">NSString</span> *)key &#123;</span><br><span class="line">    <span class="keyword">if</span> (!observer || key.length == <span class="number">0</span>) <span class="keyword">return</span>;</span><br><span class="line">    <span class="comment">// 获取动态子类，如果已经存在则直接获取，如果不存在则使用运行时创建</span></span><br><span class="line">    <span class="comment">// 这里就体现了动态子类重写 class 方法返回父类即原始类的必要性。</span></span><br><span class="line">    <span class="comment">// 因为当前添加观察者方法可以调用多次以观察不同的属性或者添加多个观察者。</span></span><br><span class="line">    <span class="comment">// 以 Person *person 为例，当 person 对象第一次调用当前方法时，subClassName 是 @&quot;MKKVONotifying_Person&quot;，运行时还没有创建这个动态子类于是进入判断条件去创建动态子类。</span></span><br><span class="line">    <span class="comment">// 当 person 对象后续再次调用当前方法时，此时的 person 对象应该已经是 MKKVONotifying_Person 的实例了，如果不重写 class 方法返回父类的话，subClassName 就会变为 @&quot;MKKVONotifying_MKKVONotifying_Person&quot; 这是很明显的逻辑错误。</span></span><br><span class="line">    <span class="built_in">NSString</span> *subClassName = [<span class="built_in">NSString</span> stringWithFormat:<span class="string">@&quot;MKKVONotifying_%@&quot;</span>, <span class="built_in">NSStringFromClass</span>([<span class="keyword">self</span> <span class="keyword">class</span>])];</span><br><span class="line">    Class subClass = <span class="built_in">NSClassFromString</span>(subClassName);</span><br><span class="line">    <span class="keyword">if</span> (!subClass) &#123;</span><br><span class="line">        <span class="comment">// 动态创建类</span></span><br><span class="line">        subClass = objc_allocateClassPair([<span class="keyword">self</span> <span class="keyword">class</span>], subClassName.UTF8String, <span class="number">0</span>);</span><br><span class="line">        <span class="comment">// 注册到运行时</span></span><br><span class="line">        objc_registerClassPair(subClass);</span><br><span class="line">        <span class="comment">// 给动态子类添加 class 方法</span></span><br><span class="line">        <span class="keyword">const</span> <span class="type">char</span> *typeEncoding1 = method_getTypeEncoding(class_getInstanceMethod([<span class="keyword">self</span> <span class="keyword">class</span>], <span class="keyword">@selector</span>(<span class="keyword">class</span>)));</span><br><span class="line">        class_addMethod(subClass, <span class="keyword">@selector</span>(<span class="keyword">class</span>), (IMP)<span class="keyword">class</span>, typeEncoding1);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 给动态子类添加属性 key 的 setter 方法。</span></span><br><span class="line">    SEL setterSel = <span class="built_in">NSSelectorFromString</span>(mk_setterForKey(key));</span><br><span class="line">    <span class="keyword">const</span> <span class="type">char</span> *typeEncoding2 = method_getTypeEncoding(class_getInstanceMethod([<span class="keyword">self</span> <span class="keyword">class</span>], setterSel));</span><br><span class="line">    class_addMethod(subClass, setterSel, (IMP)<span class="keyword">setter</span>, typeEncoding2);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 保存观察者信息</span></span><br><span class="line">    objc_setAssociatedObject(<span class="keyword">self</span>, kvo_observer_key, observer, OBJC_ASSOCIATION_RETAIN_NONATOMIC);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 修改 isa 指针</span></span><br><span class="line">    object_setClass(<span class="keyword">self</span>, subClass);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="初步实现移除观察者方法"><a href="#初步实现移除观察者方法" class="headerlink" title="初步实现移除观察者方法"></a>初步实现移除观察者方法</h3><p>添加观察者的方法到这里暂时就算实现了最基本的功能，接下是移除观察者方法的实现。移除观察者的实现相对来说比较简单，就是通过关联对象移除观察者，当没有观察者了的时候恢复 isa 的指向为原始的类。代码如下：</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line">- (<span class="type">void</span>)mk_removeObserver:(<span class="built_in">NSObject</span> *)observer forKey:(<span class="built_in">NSString</span> *)key &#123;</span><br><span class="line">    <span class="comment">// 移除观察者</span></span><br><span class="line">    objc_setAssociatedObject(<span class="keyword">self</span>, kvo_observer_key, <span class="literal">nil</span>, OBJC_ASSOCIATION_RETAIN_NONATOMIC);</span><br><span class="line">    <span class="comment">// 恢复 isa 指针为原始类</span></span><br><span class="line">    object_setClass(<span class="keyword">self</span>, [<span class="keyword">self</span> <span class="keyword">class</span>]);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="测试基本功能是否正常"><a href="#测试基本功能是否正常" class="headerlink" title="测试基本功能是否正常"></a>测试基本功能是否正常</h3><p>到这里算是实现最基本的 KVO 功能，可以测试一下能否实现最基本的键值观察。不出意外是能正常实现监听功能的。但此时代码中还是存在很多明显问题的。一是无法添加多个观察者，二是在控制器中使用时，会发现控制器无法释放了（这个问题其实是循环引用了）。代码如下：</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="meta">#import <span class="string">&quot;ViewController.h&quot;</span></span></span><br><span class="line"><span class="meta">#import <span class="string">&quot;Person.h&quot;</span></span></span><br><span class="line"><span class="meta">#import <span class="string">&quot;NSObject+CustomKeyValueObserver.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">ViewController</span> ()</span></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>) Person *person;</span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">ViewController</span></span></span><br><span class="line"></span><br><span class="line">- (<span class="type">void</span>)viewDidLoad &#123;</span><br><span class="line">    [<span class="variable language_">super</span> viewDidLoad];</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">self</span>.person = [[Person alloc] init];</span><br><span class="line">    [<span class="keyword">self</span>.person mk_addObserver:<span class="keyword">self</span> forKey:<span class="string">@&quot;nickName&quot;</span>];</span><br><span class="line">    <span class="keyword">self</span>.person.nickName = <span class="string">@&quot;Tim Cook&quot;</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="type">void</span>)mk_observeValueForKey:(<span class="built_in">NSString</span> *)key ofObject:(<span class="type">id</span>)object change:(<span class="built_in">NSDictionary</span> *)change &#123;</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@&quot;%@ 的 %@ 变化：%@&quot;</span>, object, key, change);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="type">void</span>)touchesBegan:(<span class="built_in">NSSet</span>&lt;<span class="built_in">UITouch</span> *&gt; *)touches withEvent:(<span class="built_in">UIEvent</span> *)event&#123;</span><br><span class="line">    <span class="keyword">self</span>.person.nickName = [<span class="built_in">NSString</span> stringWithFormat:<span class="string">@&quot;%@+&quot;</span>,<span class="keyword">self</span>.person.nickName];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="type">void</span>)dealloc&#123;</span><br><span class="line">    [<span class="keyword">self</span>.person mk_removeObserver:<span class="keyword">self</span> forKey:<span class="string">@&quot;nickName&quot;</span>];</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@&quot;%s&quot;</span>, __func__);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="解决循环引用导致观察者（ViewController）无法释放的问题"><a href="#解决循环引用导致观察者（ViewController）无法释放的问题" class="headerlink" title="解决循环引用导致观察者（ViewController）无法释放的问题"></a>解决循环引用导致观察者（ViewController）无法释放的问题</h3><p>通过导航控制器 push 进入当前 ViewController 视图控制器测试一下能正常监听了，但是当前视图控制器退出时无法释放了，即 <code>dealloc</code> 方法不执行了。原因是当前视图控制器对 Person 是强引用的，然后 person 对象在添加观察者时，使用关联对象对观察者也就是当前视图控制器也进行了强引用。解决办法有多个</p>
+<ol>
+<li>设置关联对象时，不要 retain 传入的对象。即使用 OBJC_ASSOCIATION_ASSIGN。</li>
+<li>使用一个中间对象封装观察者，并使用 weak 修饰观察者属性。</li>
+</ol>
+<p>虽然在我们这个简单的 KVO 实现中，目前的情况使用方法 1 能解决控制器无法释放的问题，但是这并不是一个较好的解决方法。因为这样的方式，被观察者（person 实例对象）无法保证观察者（控制器对象）的生命，当观察者被释放的时候，被观察者如果继续使用、访问这个观察者的时候就会导致糟糕的内存访问崩溃。</p>
+<p>所以这里还是采用第 2 种方式来解决循环引用问题。代码如下：</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">MKKVOInfo</span> : <span class="title">NSObject</span></span></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">weak</span>) <span class="built_in">NSObject</span> *observer;</span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>) <span class="built_in">NSString</span> *key;</span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">MKKVOInfo</span></span></span><br><span class="line">- (<span class="keyword">instancetype</span>)initWithObserve:(<span class="built_in">NSObject</span> *)observer key:(<span class="built_in">NSString</span> *)key &#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">self</span> = [<span class="variable language_">super</span> init]) &#123;</span><br><span class="line">        _observer = observer;</span><br><span class="line">        _key = key;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">self</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+
+<p>然后更新动态子类的 <code>setter</code> 方法和 <code>mk_addObserver:forKey:</code> 方法。代码如下：</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="type">void</span> <span class="keyword">setter</span>(<span class="type">id</span> <span class="keyword">self</span>, SEL _cmd, <span class="type">id</span> newValue) &#123;</span><br><span class="line">    <span class="built_in">MKKVOInfo</span> *info = objc_getAssociatedObject(<span class="keyword">self</span>, kvo_observer_key);</span><br><span class="line">    <span class="type">id</span> old = [<span class="keyword">self</span> valueForKey:info.key];</span><br><span class="line">    <span class="keyword">struct</span> objc_super sup = &#123;</span><br><span class="line">        .receiver = <span class="keyword">self</span>,</span><br><span class="line">        .super_class = class_getSuperclass(object_getClass(<span class="keyword">self</span>))</span><br><span class="line">    &#125;;</span><br><span class="line">    ((<span class="type">void</span> (*)(<span class="keyword">struct</span> objc_super *, SEL, <span class="type">id</span>))objc_msgSendSuper)(&amp;sup, _cmd, newValue);</span><br><span class="line">    [info.observer mk_observeValueForKey:info.key ofObject:<span class="keyword">self</span> change:@&#123;<span class="string">@&quot;old&quot;</span>: old?:[<span class="built_in">NSNull</span> null], <span class="string">@&quot;new&quot;</span>: newValue&#125;];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="type">void</span>)mk_addObserver:(<span class="built_in">NSObject</span> *)observer forKey:(<span class="built_in">NSString</span> *)key &#123;</span><br><span class="line">    <span class="keyword">if</span> (!observer || key.length == <span class="number">0</span>) <span class="keyword">return</span>;</span><br><span class="line">    <span class="built_in">NSString</span> *subClassName = [<span class="built_in">NSString</span> stringWithFormat:<span class="string">@&quot;MKKVONotifying_%@&quot;</span>, <span class="built_in">NSStringFromClass</span>([<span class="keyword">self</span> <span class="keyword">class</span>])];</span><br><span class="line">    Class subClass = <span class="built_in">NSClassFromString</span>(subClassName);</span><br><span class="line">    <span class="keyword">if</span> (!subClass) &#123;</span><br><span class="line">        subClass = objc_allocateClassPair([<span class="keyword">self</span> <span class="keyword">class</span>], subClassName.UTF8String, <span class="number">0</span>);</span><br><span class="line">        objc_registerClassPair(subClass);</span><br><span class="line">        <span class="keyword">const</span> <span class="type">char</span> *typeEncoding1 = method_getTypeEncoding(class_getInstanceMethod([<span class="keyword">self</span> <span class="keyword">class</span>], <span class="keyword">@selector</span>(<span class="keyword">class</span>)));</span><br><span class="line">        class_addMethod(subClass, <span class="keyword">@selector</span>(<span class="keyword">class</span>), (IMP)<span class="keyword">class</span>, typeEncoding1);</span><br><span class="line">    &#125;</span><br><span class="line">    SEL setterSel = <span class="built_in">NSSelectorFromString</span>(mk_setterForKey(key));</span><br><span class="line">    <span class="keyword">const</span> <span class="type">char</span> *typeEncoding2 = method_getTypeEncoding(class_getInstanceMethod([<span class="keyword">self</span> <span class="keyword">class</span>], setterSel));</span><br><span class="line">    class_addMethod(subClass, setterSel, (IMP)<span class="keyword">setter</span>, typeEncoding2);</span><br><span class="line">    <span class="built_in">MKKVOInfo</span> *info = [[<span class="built_in">MKKVOInfo</span> alloc] initWithObserve:observer key:key];</span><br><span class="line">    objc_setAssociatedObject(<span class="keyword">self</span>, kvo_observer_key, info, OBJC_ASSOCIATION_RETAIN_NONATOMIC);</span><br><span class="line">    object_setClass(<span class="keyword">self</span>, subClass);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="解决多个观察者和观察多个属性的问题"><a href="#解决多个观察者和观察多个属性的问题" class="headerlink" title="解决多个观察者和观察多个属性的问题"></a>解决多个观察者和观察多个属性的问题</h3><p>此时，控制器无法释放的问题得到了解决。接下来的问题是，目前的添加观察者方法无法添加多个观察者，如果多次调用添加观察者方法只有最后一次方法调用的观察者能正常收到通知。很明显是因为我们的 <code>mk_addObserver:forKey:</code> 方法中只保存了最后一次调用的时传入的观察者。这里我们可以使用数组保存每次调用 <code>mk_addObserver:forKey:</code> 方法时的观察者及观察的属性 <code>key</code>。为什么使用数组？因为 Apple 自己的 KVO 实现中也是使用的数组且没有做去重的处理，读者可以试试重复添加观察者观察同一个属性和相同的 options 和 context。结果就是重复添加了几次，修改属性时观察者通知就触发几次。所以我们也同样采用数组来实现添加多个观察者，代码如下：</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="meta">#import <span class="string">&quot;NSObject+CustomKeyValueObserver.h&quot;</span></span></span><br><span class="line"><span class="meta">#import <span class="string">&lt;objc/runtime.h&gt;</span></span></span><br><span class="line"><span class="meta">#import <span class="string">&lt;objc/message.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">MKKVOInfo</span> : <span class="title">NSObject</span></span></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">weak</span>) <span class="built_in">NSObject</span> *observer;</span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>) <span class="built_in">NSString</span> *key;</span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">MKKVOInfo</span></span></span><br><span class="line">- (<span class="keyword">instancetype</span>)initWithObserve:(<span class="built_in">NSObject</span> *)observer key:(<span class="built_in">NSString</span> *)key &#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">self</span> = [<span class="variable language_">super</span> init]) &#123;</span><br><span class="line">        _observer = observer;</span><br><span class="line">        _key = key;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">self</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">static</span> <span class="built_in">NSString</span> *mk_setterForKey(<span class="built_in">NSString</span> *key) &#123;</span><br><span class="line">    <span class="keyword">if</span> (key.length == <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">nil</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">NSString</span> *first = [[key substringToIndex:<span class="number">1</span>] uppercaseString];</span><br><span class="line">    <span class="built_in">NSString</span> *rest = [key substringFromIndex:<span class="number">1</span>];</span><br><span class="line">    <span class="keyword">return</span> [<span class="built_in">NSString</span> stringWithFormat:<span class="string">@&quot;set%@%@:&quot;</span>, first, rest];</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">static</span> <span class="built_in">NSString</span> *mk_keyForSetter(<span class="built_in">NSString</span> *<span class="keyword">setter</span>) &#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">setter</span>.length &lt;= <span class="number">4</span> || ![<span class="keyword">setter</span> hasPrefix:<span class="string">@&quot;set&quot;</span>] || ![<span class="keyword">setter</span> hasSuffix:<span class="string">@&quot;:&quot;</span>]) <span class="keyword">return</span> <span class="literal">nil</span>;</span><br><span class="line">    <span class="built_in">NSString</span> *body = [<span class="keyword">setter</span> substringWithRange:<span class="built_in">NSMakeRange</span>(<span class="number">3</span>, <span class="keyword">setter</span>.length - <span class="number">4</span>)];</span><br><span class="line">    <span class="built_in">NSString</span> *first = [[body substringToIndex:<span class="number">1</span>] lowercaseString];</span><br><span class="line">    <span class="built_in">NSString</span> *rest = [body substringFromIndex:<span class="number">1</span>];</span><br><span class="line">    <span class="keyword">return</span> [first stringByAppendingString:rest];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">NSObject</span> ()</span></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>) <span class="built_in">NSMutableArray</span> *observerArray;</span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">NSObject</span> (<span class="title">CustomKeyValueObserver</span>)</span></span><br><span class="line"></span><br><span class="line">- (<span class="built_in">NSMutableArray</span> *)observerArray &#123;</span><br><span class="line">    <span class="type">id</span> obj = objc_getAssociatedObject(<span class="keyword">self</span>, <span class="keyword">@selector</span>(observerArray));</span><br><span class="line">    <span class="keyword">if</span> (obj == <span class="literal">nil</span>) &#123;</span><br><span class="line">        obj = [<span class="built_in">NSMutableArray</span> arrayWithCapacity:<span class="number">1</span>];</span><br><span class="line">        objc_setAssociatedObject(<span class="keyword">self</span>, <span class="keyword">@selector</span>(observerArray), obj, OBJC_ASSOCIATION_RETAIN_NONATOMIC);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> obj;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Class <span class="keyword">class</span>(<span class="type">id</span> <span class="keyword">self</span>, SEL _cmd) &#123;</span><br><span class="line">    <span class="keyword">return</span> class_getSuperclass(object_getClass(<span class="keyword">self</span>));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="keyword">setter</span>(<span class="built_in">NSObject</span>* <span class="keyword">self</span>, SEL _cmd, <span class="type">id</span> newValue) &#123;</span><br><span class="line">    <span class="built_in">NSString</span> *key = mk_keyForSetter(<span class="built_in">NSStringFromSelector</span>(_cmd));</span><br><span class="line">    <span class="type">id</span> old = [<span class="keyword">self</span> valueForKey:key];</span><br><span class="line">    <span class="keyword">struct</span> objc_super sup = &#123;</span><br><span class="line">        .receiver = <span class="keyword">self</span>,</span><br><span class="line">        .super_class = class_getSuperclass(object_getClass(<span class="keyword">self</span>))</span><br><span class="line">    &#125;;</span><br><span class="line">    ((<span class="type">void</span> (*)(<span class="keyword">struct</span> objc_super *, SEL, <span class="type">id</span>))objc_msgSendSuper)(&amp;sup, _cmd, newValue);</span><br><span class="line">    <span class="keyword">for</span> (<span class="built_in">MKKVOInfo</span> *info <span class="keyword">in</span> <span class="keyword">self</span>.observerArray) &#123;</span><br><span class="line">        <span class="keyword">if</span> ([info.key isEqualToString:key]) &#123;</span><br><span class="line">            [info.observer mk_observeValueForKey:info.key ofObject:<span class="keyword">self</span> change:@&#123;<span class="string">@&quot;old&quot;</span>: old?:[<span class="built_in">NSNull</span> null], <span class="string">@&quot;new&quot;</span>: newValue&#125;];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="type">void</span>)mk_addObserver:(<span class="built_in">NSObject</span> *)observer forKey:(<span class="built_in">NSString</span> *)key &#123;</span><br><span class="line">    <span class="keyword">if</span> (!observer || key.length == <span class="number">0</span>) <span class="keyword">return</span>;</span><br><span class="line">    <span class="built_in">NSString</span> *subClassName = [<span class="built_in">NSString</span> stringWithFormat:<span class="string">@&quot;MKKVONotifying_%@&quot;</span>, <span class="built_in">NSStringFromClass</span>([<span class="keyword">self</span> <span class="keyword">class</span>])];</span><br><span class="line">    Class subClass = <span class="built_in">NSClassFromString</span>(subClassName);</span><br><span class="line">    <span class="keyword">if</span> (!subClass) &#123;</span><br><span class="line">        subClass = objc_allocateClassPair([<span class="keyword">self</span> <span class="keyword">class</span>], subClassName.UTF8String, <span class="number">0</span>);</span><br><span class="line">        objc_registerClassPair(subClass);</span><br><span class="line">        <span class="keyword">const</span> <span class="type">char</span> *typeEncoding1 = method_getTypeEncoding(class_getInstanceMethod([<span class="keyword">self</span> <span class="keyword">class</span>], <span class="keyword">@selector</span>(<span class="keyword">class</span>)));</span><br><span class="line">        class_addMethod(subClass, <span class="keyword">@selector</span>(<span class="keyword">class</span>), (IMP)<span class="keyword">class</span>, typeEncoding1);</span><br><span class="line">    &#125;</span><br><span class="line">    SEL setterSel = <span class="built_in">NSSelectorFromString</span>(mk_setterForKey(key));</span><br><span class="line">    <span class="keyword">const</span> <span class="type">char</span> *typeEncoding2 = method_getTypeEncoding(class_getInstanceMethod([<span class="keyword">self</span> <span class="keyword">class</span>], setterSel));</span><br><span class="line">    class_addMethod(subClass, setterSel, (IMP)<span class="keyword">setter</span>, typeEncoding2);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">MKKVOInfo</span> *info = [[<span class="built_in">MKKVOInfo</span> alloc] initWithObserve:observer key:key];</span><br><span class="line">    [<span class="keyword">self</span>.observerArray addObject:info];</span><br><span class="line"></span><br><span class="line">    object_setClass(<span class="keyword">self</span>, subClass);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="type">void</span>)mk_removeObserver:(<span class="built_in">NSObject</span> *)observer forKey:(<span class="built_in">NSString</span> *)key &#123;</span><br><span class="line">    <span class="built_in">NSArray</span> *arr = [<span class="keyword">self</span>.observerArray <span class="keyword">copy</span>];</span><br><span class="line">    <span class="keyword">for</span> (<span class="built_in">MKKVOInfo</span> *info <span class="keyword">in</span> arr) &#123;</span><br><span class="line">        <span class="keyword">if</span> (info.observer == observer &amp;&amp; [info.key isEqualToString:key]) &#123;</span><br><span class="line">            [<span class="keyword">self</span>.observerArray removeObject:info];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">self</span>.observerArray.count == <span class="number">0</span>) &#123;</span><br><span class="line">        object_setClass(<span class="keyword">self</span>, [<span class="keyword">self</span> <span class="keyword">class</span>]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="type">void</span>)mk_observeValueForKey:(<span class="keyword">nonnull</span> <span class="built_in">NSString</span> *)key ofObject:(<span class="keyword">nonnull</span> <span class="type">id</span>)object change:(<span class="keyword">nonnull</span> <span class="built_in">NSDictionary</span> *)change &#123;</span><br><span class="line">    </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+
+<p>以上，就完成了一个实现基本功能的自定义 KVO。虽然基本功能是实现了，但是代码明显不够健壮，很多边界情况条件都没有仔细考虑，多线程环境没有考虑，功能也不够完善，没有 options，context 参数等很多小问题。实际上也并不建议去实现一个 KVO 去取代 Apple 的 KVO，更现实的做法是给 Apple 的 KVO 做一层封装，来解决 Apple 的 KVO 使用过程中的一些缺陷或者痛点，如 <a href="https://github.com/facebookarchive/KVOController">FBKVOController</a>。</p>
+<h1 id="使用-KVO-需要注意什么？"><a href="#使用-KVO-需要注意什么？" class="headerlink" title="使用 KVO 需要注意什么？"></a>使用 KVO 需要注意什么？</h1><ul>
+<li>直接修改 ivar 会绕过 KVO<br>  KVO 依赖 setter，如果你直接写 <code>_ivar = x</code>，那么动态子类中重写的 setter 不会被调用自然无法触发 KVO 的观察者通知，除非你手动调用 <code>willChangeValueForKey:</code> <code>didChangeValueForKey:</code>。</li>
+<li>与其他“isa swizzle&#x2F;修改”冲突<br>  如果某些第三方库也在修改 <code>isa</code> 或全局 swizzle，会和 KVO 产生冲突，导致奇怪崩溃或者通知缺失。所以在使用第三方库时需要留意它们的实现原理。</li>
+<li>添加和移除观察者要保证匹配。否则可能会导致崩溃，或者触发多余的通知<ul>
+<li>如果多次添加相同的观察者，keyPath，options，context，那么在修改被观察对象的 keyPath 的时候就会触发多少次通知</li>
+<li>如果没有移除观察者可能会导致糟糕的访问崩溃，即访问了已经释放的对象。</li>
+<li>如果重复移除同一个观察者会触发未捕获的异常</li>
+</ul>
+</li>
+</ul>
+<h1 id="FBKVOController-介绍"><a href="#FBKVOController-介绍" class="headerlink" title="FBKVOController 介绍"></a>FBKVOController 介绍</h1><p>FBKVOController 是 Facebook（Meta）开源的一个 Objective-C 库，用于简化和增强 Key-Value Observing (KVO) 的使用。它的 GitHub 项目地址是：<br>👉 <a href="https://github.com/facebookarchive/KVOController">facebook&#x2F;KVOController</a></p>
+<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>在使用 Objective-C 的 iOS &#x2F; macOS 开发中，KVO 是观察者模式的基础机制，但原生 API 存在几个常见问题：</p>
+<ol>
+<li>代码分散，添加，移除，响应通知回调分散在三个不同的地方。使用起来不是很方便。</li>
+<li>容易出错，重复添加一模一样的观察者属性会触发多次通知。移除不匹配添加会导致未捕获的异常。不移除观察者会有潜在的崩溃可能（访问了已经释放的对象导致糟糕的访问崩溃）</li>
+<li>维护困难，在回调方法里需要自己添加很多的判断，如 keyPath、context。</li>
+</ol>
+<h2 id="FBKVOController-的特点"><a href="#FBKVOController-的特点" class="headerlink" title="FBKVOController 的特点"></a>FBKVOController 的特点</h2><ol>
+<li>安全：内部会在观察者释放的时候，自动将观察者从 KVO 中移除，从而不需要开发者显式的移除观察者，也避免了忘记移除时可能的崩溃。</li>
+<li>简洁：提供了 Block、SEL 的 API，注册观察者，响应回调都在一起，编码时非常方便。</li>
+<li>支持多个 keyPath：一次调用可以同时监听多个属性的变化</li>
+<li>解除耦合：每个对象都自带 KVOController 属性（通过分类），不需要额外管理复杂的 observer 生命周期。</li>
+<li>性能优化：相对于手写的 KVO，它内部有一些高效的实现方式。</li>
+</ol>
+<h2 id="适用场景"><a href="#适用场景" class="headerlink" title="适用场景"></a>适用场景</h2><ul>
+<li>需要大量使用 KVO 的项目。</li>
+<li>想避免 KVO crash 的情况。</li>
+<li>对于 MVC &#x2F; MVVM 模式，监听模型层属性变化时非常实用。</li>
+</ul>
+<h2 id="局限性"><a href="#局限性" class="headerlink" title="局限性"></a>局限性</h2><ul>
+<li>仅适用于 Objective-C，不适合纯 Swift 项目（Swift 社区更推荐 Combine 或 RxSwift）。</li>
+<li>Facebook 几年前已经停止积极维护（但代码稳定，仍然可用）。</li>
+</ul>
+<h2 id="实现原理分析"><a href="#实现原理分析" class="headerlink" title="实现原理分析"></a>实现原理分析</h2><p>FBKVOController 的源码非常简洁但是一点儿也不简单，虽然也许很多人都能看懂源码在干什么，但真让他们从头到尾写一个 KVOController 的时候真的没几个人能写出来的。它使用到的类有三个，分别是 </p>
+<ul>
+<li><code>FBKVOController</code><ul>
+<li><code>weak id observer</code></li>
+<li><code>NSMapTable&lt;id, NSMutableSet&lt;_FBKVOInfo *&gt; *&gt; *_objectInfosMap</code></li>
+<li><code>pthread_mutex_t _lock</code></li>
+</ul>
+</li>
+<li><code>_FBKVOSharedController</code><ul>
+<li><code>NSHashTable&lt;_FBKVOInfo *&gt; *_infos</code></li>
+<li><code>pthread_mutex_t _mutex</code></li>
+</ul>
+</li>
+<li><code>_FBKVOInfo</code><ul>
+<li><code>__weak FBKVOController *_controller</code></li>
+<li><code>NSString *_keyPath</code></li>
+<li><code>NSKeyValueObservingOptions _options</code></li>
+<li><code>SEL _action</code></li>
+<li><code>void *_context</code></li>
+<li><code>FBKVONotificationBlock _block</code></li>
+<li><code>_FBKVOInfoState _state</code></li>
+</ul>
+</li>
+</ul>
+<p><code>FBKVOController</code> 用来记录外部有真实需求得观察者，被观察对象以及被观察属性和相关的观察信息。然后让 <code>_FBKVOSharedController</code> 单例为观察者观察所有被观察对象，当被观察者的属性通过 setter 方法修改时 <code>_FBKVOSharedController</code> 单例会收到通知，然后由它转发给外部有真实需求的观察者响应这次通知事件。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>FBKVOController 是一个 更安全、更好用的 KVO 封装库，如果你在 Objective-C 项目里大量使用 KVO，非常推荐用它来减少 crash 风险和简化代码。</p>
+<h1 id="相关面试题"><a href="#相关面试题" class="headerlink" title="相关面试题"></a>相关面试题</h1><ol>
 <li><p>iOS 用什么方式实现对一个对象的 KVO？（KVO的本质是什么？）</p>
-<p> isa_swizzing</p>
+<p> 上文中的一句话概括的很好。</p>
 </li>
 <li><p>如何手动触发 KVO？</p>
 <p> <code>willChangeValueForKey:</code> 和 <code>didChangeValueForKey:</code></p>
+</li>
+<li><p>直接修改成员变量会触发 KVO 通知吗？</p>
+<p> 不会。但可以在修改前后手动触发 KVO 通知。</p>
 </li>
 </ol>
 ]]></content>
@@ -4094,61 +4444,6 @@ commonModes并不是一个真正单独的模式
       </categories>
   </entry>
   <entry>
-    <title>iOS逆向与安全开篇介绍</title>
-    <url>/2024/03/27/iOS%E9%80%86%E5%90%91%E4%B8%8E%E5%AE%89%E5%85%A8%E5%BC%80%E7%AF%87%E4%BB%8B%E7%BB%8D/</url>
-    <content><![CDATA[<h1 id="学习-iOS-逆向开发的前提"><a href="#学习-iOS-逆向开发的前提" class="headerlink" title="学习 iOS 逆向开发的前提"></a>学习 iOS 逆向开发的前提</h1><ul>
-<li>有一定的正向开发经验（最起码对 iOS 系统的 UIKit 框架有一定的了解）</li>
-<li>一台越狱的 iOS 设备（推荐至少是 64 位架构，iPhone 是从 iPhone 5s 开始，iPad 是从 iPad Air 和 iPad mini 2 开始）</li>
-<li>一台 Mac 电脑，理论上来说 Linux 或 Windows 也可以（实际上作者没有实践过）</li>
-<li>时间和恒心</li>
-</ul>
-<h1 id="什么是-iOS-逆向开发"><a href="#什么是-iOS-逆向开发" class="headerlink" title="什么是 iOS 逆向开发"></a>什么是 iOS 逆向开发</h1><p>很多 iOS 开发者可能都不是科班出身的程序员，所以对于逆向开发可能没有任何概念。实不相瞒，作者本人就是如此。工作多年后才慢慢接触并了解了逆向开发，逆向工程等相关的知识。</p>
-<p>逆向开发（Reverse Engineering）是一种通过分析和研究已有软件或系统的内部结构、逻辑和功能，以理解其实现方式的技术。在软件开发中，逆向开发通常涉及反编译、反汇编或动态调试，以揭示目标程序的代码逻辑和功能。</p>
-<p>iOS 逆向开发是指通过分析已有的 iOS 应用程序或 iOS 系统来理解其内部结构、行为以及工作原理的过程。与常规开发（从源代码构建应用程序）相反，逆向开发是在没有源代码的情况下，逆向分析编译后的二进制文件，研究应用的工作机制。</p>
-<h1 id="学习-iOS-逆向开发有什么用"><a href="#学习-iOS-逆向开发有什么用" class="headerlink" title="学习 iOS 逆向开发有什么用"></a>学习 iOS 逆向开发有什么用</h1><ul>
-<li><p><strong>应用分析与调试：</strong>使用工具来调试和分析应用程序，理解其功能实现。研究员常用 LLDB、Hopper、Ghidra 等工具来反汇编和反编译 iOS 应用，以了解代码的工作方式。</p>
-</li>
-<li><p><strong>破解和去除限制：</strong>通过逆向手段绕过某些应用的限制，如应用内购买、付费功能等。虽然这属于非法行为，但仍是逆向开发中不可忽视的一部分。</p>
-</li>
-<li><p><strong>安全性研究与漏洞发现：</strong>逆向开发在 iOS 安全研究中非常重要。通过逆向工程，安全研究人员可以分析应用的加密算法、安全协议等，寻找漏洞并提出防御措施。</p>
-</li>
-<li><p><strong>学习与模仿：</strong>开发者通过逆向分析成熟的应用来学习优秀的开发技巧，或者模仿某些功能。</p>
-</li>
-</ul>
-<p>玩过 LOL 的老玩家应该还记得多年前某些辅助工具可以实现自己使用任意皮肤，这也是通过逆向开发做到的，属于 window 逆向方向的，而 iOS 平台的有移除 App 内的广告，绕过打卡类 App 的 Wi-Fi 限制，GPS 检测实现任意打卡，微信自动抢红包，还有游戏的外挂辅助软件也都是通过逆向开发实现的。。。这些都是正向开发做不到，或者不可能提供的。这些也正是逆向开发的用武之地。当然，学会了如何破解别人的 APP，自然也知道了该如何去防护自己的 APP，提高安全性，不会进攻谈什么安全防护呢。</p>
-<p>以上这些功能，如果你听到了就感觉到很兴奋，那么恭喜你来对了地方！通过本门课程的学习，以上案例都有可能可以实现。不过还是需要提醒一下大家，一般来说逆向开发的难度相较于正向开发会更加困难，想要掌握逆向开发并不是一件容易的事情，需要持之以恒的学习。</p>
-<h1 id="关于-iOS-开发人员的概念解释"><a href="#关于-iOS-开发人员的概念解释" class="headerlink" title="关于 iOS 开发人员的概念解释"></a>关于 iOS 开发人员的概念解释</h1><ol>
-<li><p><strong>iOS 应用开发人员</strong></p>
-<p> iOS 应用开发人员通常是指那些为 iOS 系统开发应用程序的人。他们主要使用苹果的开发工具和框架，比如 Xcode、Swift、Objective-C 等，目标是创建可以在苹果的 App Store 上发布的应用程序。这类开发人员的主要工作是围绕用户体验、界面设计、功能实现和优化应用性能。</p>
-<p> 他们的主要任务包括：</p>
-<ul>
-<li>开发和维护 iPhone、iPad 上运行的应用程序</li>
-<li>使用 iOS SDK（软件开发工具包）和相关的 API（如 UIKit、Core Data、ARKit 等）</li>
-<li>与后端服务交互（通常使用 RESTful API 或 GraphQL）</li>
-<li>解决与应用程序相关的性能和安全问题</li>
-<li>测试和调试应用程序 <br></li>
-</ul>
-</li>
-<li><p><strong>iOS 系统开发人员（越狱插件、底层开发等）</strong></p>
-<p> 真正意义上的 iOS 开发人员更适合用于描述那些进行 iOS 系统级开发的人。这些开发人员深入到 iOS 系统的底层，做与操作系统本身相关的开发工作，比如修改系统行为、开发越狱插件、研究内核安全性或进行硬件驱动开发。</p>
-<p> 他们的主要任务包括：</p>
-<ul>
-<li>研究 iOS 系统的底层结构和安全机制</li>
-<li>开发越狱工具、插件（比如 Cydia 插件）</li>
-<li>修改系统设置或行为，允许用户做出官方系统不允许的操作</li>
-<li>逆向工程或研究系统漏洞</li>
-<li>优化或修改内核（kernel）层的功能</li>
-</ul>
-</li>
-</ol>
-<p>市场上面招聘的 iOS 开发人员基本上都是指 iOS 应用开发人员。iOS 系统开发人员的岗位较少。但如果 iOS 应用开发人员具备逆向分析开发的能力则是一项优势。</p>
-<h1 id="本书如何学习"><a href="#本书如何学习" class="headerlink" title="本书如何学习"></a>本书如何学习</h1><p>作者将以微信抢红包的实战项目出发，从 0 到 1 演示如何实现微信抢红包插件，实现插件过程中涉及到的技术和理论知识都会在后续的章节中详细介绍，对 iOS 逆向开发感兴趣的同学通过这个项目，可以迅速的建立对 iOS 逆向开发的整体认知。</p>
-]]></content>
-      <categories>
-        <category>iOS 逆向与安全</category>
-      </categories>
-  </entry>
-  <entry>
     <title>iOS反调试与反反调试</title>
     <url>/2025/06/19/iOS%E5%8F%8D%E8%B0%83%E8%AF%95%E4%B8%8E%E5%8F%8D%E5%8F%8D%E8%B0%83%E8%AF%95/</url>
     <content><![CDATA[<h1 id="反调试原理"><a href="#反调试原理" class="headerlink" title="反调试原理"></a>反调试原理</h1><h2 id="ptrace"><a href="#ptrace" class="headerlink" title="ptrace"></a>ptrace</h2><p>​​ptrace (Process Trace)​​ 是 Linux（以及其他一些类 Unix 系统，如 macOS）提供的一个极其强大且底层的​​系统调用​​。它的核心功能是​​允许一个进程（称为 tracer）观察和控制另一个进程（称为 tracee）的执行，并能检查和修改该进程的内存和寄存器。​​</p>
@@ -4405,6 +4700,61 @@ commonModes并不是一个真正单独的模式
         <tag>抖音</tag>
         <tag>支付宝</tag>
       </tags>
+  </entry>
+  <entry>
+    <title>iOS逆向与安全开篇介绍</title>
+    <url>/2024/03/27/iOS%E9%80%86%E5%90%91%E4%B8%8E%E5%AE%89%E5%85%A8%E5%BC%80%E7%AF%87%E4%BB%8B%E7%BB%8D/</url>
+    <content><![CDATA[<h1 id="学习-iOS-逆向开发的前提"><a href="#学习-iOS-逆向开发的前提" class="headerlink" title="学习 iOS 逆向开发的前提"></a>学习 iOS 逆向开发的前提</h1><ul>
+<li>有一定的正向开发经验（最起码对 iOS 系统的 UIKit 框架有一定的了解）</li>
+<li>一台越狱的 iOS 设备（推荐至少是 64 位架构，iPhone 是从 iPhone 5s 开始，iPad 是从 iPad Air 和 iPad mini 2 开始）</li>
+<li>一台 Mac 电脑，理论上来说 Linux 或 Windows 也可以（实际上作者没有实践过）</li>
+<li>时间和恒心</li>
+</ul>
+<h1 id="什么是-iOS-逆向开发"><a href="#什么是-iOS-逆向开发" class="headerlink" title="什么是 iOS 逆向开发"></a>什么是 iOS 逆向开发</h1><p>很多 iOS 开发者可能都不是科班出身的程序员，所以对于逆向开发可能没有任何概念。实不相瞒，作者本人就是如此。工作多年后才慢慢接触并了解了逆向开发，逆向工程等相关的知识。</p>
+<p>逆向开发（Reverse Engineering）是一种通过分析和研究已有软件或系统的内部结构、逻辑和功能，以理解其实现方式的技术。在软件开发中，逆向开发通常涉及反编译、反汇编或动态调试，以揭示目标程序的代码逻辑和功能。</p>
+<p>iOS 逆向开发是指通过分析已有的 iOS 应用程序或 iOS 系统来理解其内部结构、行为以及工作原理的过程。与常规开发（从源代码构建应用程序）相反，逆向开发是在没有源代码的情况下，逆向分析编译后的二进制文件，研究应用的工作机制。</p>
+<h1 id="学习-iOS-逆向开发有什么用"><a href="#学习-iOS-逆向开发有什么用" class="headerlink" title="学习 iOS 逆向开发有什么用"></a>学习 iOS 逆向开发有什么用</h1><ul>
+<li><p><strong>应用分析与调试：</strong>使用工具来调试和分析应用程序，理解其功能实现。研究员常用 LLDB、Hopper、Ghidra 等工具来反汇编和反编译 iOS 应用，以了解代码的工作方式。</p>
+</li>
+<li><p><strong>破解和去除限制：</strong>通过逆向手段绕过某些应用的限制，如应用内购买、付费功能等。虽然这属于非法行为，但仍是逆向开发中不可忽视的一部分。</p>
+</li>
+<li><p><strong>安全性研究与漏洞发现：</strong>逆向开发在 iOS 安全研究中非常重要。通过逆向工程，安全研究人员可以分析应用的加密算法、安全协议等，寻找漏洞并提出防御措施。</p>
+</li>
+<li><p><strong>学习与模仿：</strong>开发者通过逆向分析成熟的应用来学习优秀的开发技巧，或者模仿某些功能。</p>
+</li>
+</ul>
+<p>玩过 LOL 的老玩家应该还记得多年前某些辅助工具可以实现自己使用任意皮肤，这也是通过逆向开发做到的，属于 window 逆向方向的，而 iOS 平台的有移除 App 内的广告，绕过打卡类 App 的 Wi-Fi 限制，GPS 检测实现任意打卡，微信自动抢红包，还有游戏的外挂辅助软件也都是通过逆向开发实现的。。。这些都是正向开发做不到，或者不可能提供的。这些也正是逆向开发的用武之地。当然，学会了如何破解别人的 APP，自然也知道了该如何去防护自己的 APP，提高安全性，不会进攻谈什么安全防护呢。</p>
+<p>以上这些功能，如果你听到了就感觉到很兴奋，那么恭喜你来对了地方！通过本门课程的学习，以上案例都有可能可以实现。不过还是需要提醒一下大家，一般来说逆向开发的难度相较于正向开发会更加困难，想要掌握逆向开发并不是一件容易的事情，需要持之以恒的学习。</p>
+<h1 id="关于-iOS-开发人员的概念解释"><a href="#关于-iOS-开发人员的概念解释" class="headerlink" title="关于 iOS 开发人员的概念解释"></a>关于 iOS 开发人员的概念解释</h1><ol>
+<li><p><strong>iOS 应用开发人员</strong></p>
+<p> iOS 应用开发人员通常是指那些为 iOS 系统开发应用程序的人。他们主要使用苹果的开发工具和框架，比如 Xcode、Swift、Objective-C 等，目标是创建可以在苹果的 App Store 上发布的应用程序。这类开发人员的主要工作是围绕用户体验、界面设计、功能实现和优化应用性能。</p>
+<p> 他们的主要任务包括：</p>
+<ul>
+<li>开发和维护 iPhone、iPad 上运行的应用程序</li>
+<li>使用 iOS SDK（软件开发工具包）和相关的 API（如 UIKit、Core Data、ARKit 等）</li>
+<li>与后端服务交互（通常使用 RESTful API 或 GraphQL）</li>
+<li>解决与应用程序相关的性能和安全问题</li>
+<li>测试和调试应用程序 <br></li>
+</ul>
+</li>
+<li><p><strong>iOS 系统开发人员（越狱插件、底层开发等）</strong></p>
+<p> 真正意义上的 iOS 开发人员更适合用于描述那些进行 iOS 系统级开发的人。这些开发人员深入到 iOS 系统的底层，做与操作系统本身相关的开发工作，比如修改系统行为、开发越狱插件、研究内核安全性或进行硬件驱动开发。</p>
+<p> 他们的主要任务包括：</p>
+<ul>
+<li>研究 iOS 系统的底层结构和安全机制</li>
+<li>开发越狱工具、插件（比如 Cydia 插件）</li>
+<li>修改系统设置或行为，允许用户做出官方系统不允许的操作</li>
+<li>逆向工程或研究系统漏洞</li>
+<li>优化或修改内核（kernel）层的功能</li>
+</ul>
+</li>
+</ol>
+<p>市场上面招聘的 iOS 开发人员基本上都是指 iOS 应用开发人员。iOS 系统开发人员的岗位较少。但如果 iOS 应用开发人员具备逆向分析开发的能力则是一项优势。</p>
+<h1 id="本书如何学习"><a href="#本书如何学习" class="headerlink" title="本书如何学习"></a>本书如何学习</h1><p>作者将以微信抢红包的实战项目出发，从 0 到 1 演示如何实现微信抢红包插件，实现插件过程中涉及到的技术和理论知识都会在后续的章节中详细介绍，对 iOS 逆向开发感兴趣的同学通过这个项目，可以迅速的建立对 iOS 逆向开发的整体认知。</p>
+]]></content>
+      <categories>
+        <category>iOS 逆向与安全</category>
+      </categories>
   </entry>
   <entry>
     <title>iPhoneX上pop回到根控制器上漂移的bug</title>
