@@ -1116,123 +1116,6 @@
       </tags>
   </entry>
   <entry>
-    <title>8天让iOS开发者上手Flutter之六</title>
-    <url>/2021/08/17/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AD/</url>
-    <content><![CDATA[<p>发现了一个宝藏网址，这里讲解的 <a href="https://book.flutterchina.club/">flutter实战</a> 比我写的靠谱多了。</p>
-<h1 id="准备网络数据"><a href="#准备网络数据" class="headerlink" title="准备网络数据"></a>准备网络数据</h1><p>这一步不是很重要，提供一些假数据而已，不是重点嫌麻烦的可以跳过。</p>
-<p>先介绍一个网址：<a href="http://rap2.taobao.org/account/login">http://rap2.taobao.org/account/login</a> 这个网址用来搭建我们需要的网络数据，注册账号非常简单，这里就不多说了。</p>
-<p>注册完成之后，新建一个仓库，简简单单取个名字就够了：</p>
-<img src="/2021/08/17/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AD/4a3c12fb3b244575ac6b794168d93675~tplv-k3u1fbpfcp-watermark.png" class="" alt="Snip20210808_10.png">
-
-<p>之后点击进入仓库，可以看到下图：</p>
-<img src="/2021/08/17/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AD/dfd2860cb5c64f4b947d45551aba9d93~tplv-k3u1fbpfcp-watermark.png" class="" alt="Snip20210808_11.png">
-
-<p>会默认生成以一个示例接口，可以看一看示例接口的生成规则。看不懂也没关系，我们直接直接上手自己新建一个接口，如图所示：</p>
-<img src="/2021/08/17/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AD/0af92d6af9b14eae865b69d5beb874c4~tplv-k3u1fbpfcp-watermark.png" class="" alt="Snip20210808_12.png">
-
-<p>点击右上角的编辑按钮进入编辑模式，新建一个响应 chatlist，类型为 Array。然后生成 chatlist 的数据，imageUrl 表示每条聊天数据的用户头像。其中用户头像的初始值里面有一段 @natural(20,99)，这个是 Mock.js 代码。这里是相关介绍 <a href="http://mockjs.com/">http://mockjs.com/</a></p>
-<img src="/2021/08/17/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AD/4b21769272134c4ea316f9289a9d945d~tplv-k3u1fbpfcp-watermark.png" class="" alt="Snip20210808_14.png">
-
-<p>每条聊天数据，除了 imageUrl 还需要有用户名 name 和消息的内容 message。@cname 用来生成随机的中文名，@cparagraph 用来生成随机的中文段落来表示聊天内容。我们这里只是简单的构造一下这个聊天列表所需要的数据，真正的聊天列表的数据肯定是不会这么简单的。。。</p>
-<img src="/2021/08/17/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AD/c1a42755454d455d9d2be30c80fd6e62~tplv-k3u1fbpfcp-watermark.png" class="" alt="Snip20210808_15.png">
-
-<p>编辑的差不多的时候，记得点击保存,保存之后点击红圈中的图标就可以获取到数据</p>
-<img src="/2021/08/17/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AD/3a1db20c16414845bc45ce901e244a66~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<h1 id="聊天页面导航条"><a href="#聊天页面导航条" class="headerlink" title="聊天页面导航条"></a>聊天页面导航条</h1><h2 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h2><p>默认展示页面改为 <code>_currentIndex</code> 改为 0,新建 chat 目录，将相关文件放在这里。</p>
-<img src="/2021/08/17/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AD/0213b262930d4066b6f26e34993011cc~tplv-k3u1fbpfcp-watermark.png" class="" alt="Snip20210808_17.png">
-
-<h2 id="添加加号按钮"><a href="#添加加号按钮" class="headerlink" title="添加加号按钮"></a>添加加号按钮</h2><p>加号按钮这个东西，我们之前已经添加过类似的了，appBar 的 actions 就是我们需要添加代码的地方。</p>
-<img src="/2021/08/17/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AD/336b5de10dc2451bbb989516bd66049c~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>如果我们按照这个思路写下去的话，就需要自己再去实现一个弹出菜单的类。其实 flutter 提供了我们一些现成的类可以做到类似的效果。</p>
-<h2 id="PopupMenuButton"><a href="#PopupMenuButton" class="headerlink" title="PopupMenuButton"></a><code>PopupMenuButton</code></h2><p><code>PopupMenuButton</code> 类用来弹出一个菜单，必传参数为 <code>itemBuilder</code>，用来实现它需要展示的内容。<code>PopupMenuItem</code> 就是用来展示内容的类。这里有一个细节说一下，<code>PopupMenuButton</code> 有一个 <code>onSelected</code> 属性，这个属性是个闭包，意思是选中某个 <code>PopupMenuItem</code> 的时候，会调用这个闭包。但是有一个前提就是每个 <code>PopupMenuItem</code> 的 <code>value</code> 必须不为 null 的时候，才会执行 <code>onSelected</code> 闭包，我在这里卡了半天，网上找了半天资料也没有明确讲到这里。其他就没什么好讲的了，都比较简单。</p>
-<img src="/2021/08/17/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AD/4b9d82deec2e46e881aa084e25d9bb7d~tplv-k3u1fbpfcp-watermark.png" class="" alt="Snip20210812_19.png">
-
-<p>其中 <code>_buildMenuItem</code> 的实现如下，注意 <code>value</code> 要赋值就好了，不为空就行，不然 <code>PopupMenuButton</code> 的 <code>onSelected</code> 不执行：</p>
-<img src="/2021/08/17/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AD/9f6f5da2ff794264afbf256c95e307a6~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>还有一个小细节，如何设置 <code>PopupMenuButton</code> 的颜色，可以直接设置它的颜色</p>
-<img src="/2021/08/17/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AD/0548c31d2ba248e9b8bdeb375031c487~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>还可以设置APP的主题的 <code>cardColor</code>，不过这个优先级没有直接设置 <code>PopupMenuButton</code> 颜色高。</p>
-<img src="/2021/08/17/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AD/9c19742492944488ba13249b31db685b~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<h1 id="请求网络数据"><a href="#请求网络数据" class="headerlink" title="请求网络数据"></a>请求网络数据</h1><h2 id="https-pub-flutter-io-cn"><a href="#https-pub-flutter-io-cn" class="headerlink" title="https://pub.flutter-io.cn/"></a><a href="https://pub.flutter-io.cn/">https://pub.flutter-io.cn/</a></h2><img src="/2021/08/17/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AD/04224929590b47528f1a1ea05dbe8ab9~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>这个网站可以搜索 flutter 使用的包 packages。我们使用 http 这个包来请求我们的网络数据。这个包是 flutter 官方提供的。实际项目开发的时候可能并不会使用 http 这个包，大部分是使用 dio 来请求网络数据。这里只介绍官方的 http 包如何使用。</p>
-<h2 id="导入http包"><a href="#导入http包" class="headerlink" title="导入http包"></a>导入http包</h2><img src="/2021/08/17/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AD/32044f0faafd4673bc0a0e5cc22ae858~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<img src="/2021/08/17/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AD/1dfb3991238d4f77927c2728ef210d6e~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>粘贴完成之后需要更新一下，就是获取一下包对应的代码。可以通过上方的 <code>Pub get</code>,也可以在终端中输入 <code>flutter packages get</code> </p>
-<img src="/2021/08/17/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AD/dfeb775cd3ae4e96ba22440e706d33d3~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>命令执行完之后，就可以使用这个包了。</p>
-<h2 id="导入-http-头文件并取别名"><a href="#导入-http-头文件并取别名" class="headerlink" title="导入 http 头文件并取别名"></a>导入 http 头文件并取别名</h2><img src="/2021/08/17/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AD/9539435380ef4dd38aa8af4eaa119b38~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<h2 id="发送请求"><a href="#发送请求" class="headerlink" title="发送请求"></a>发送请求</h2><img src="/2021/08/17/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AD/df206f11e0b1474e8086c80ff222d5cf~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>请求的发送写在 <code>initState</code> 里面。<code>getData()</code> 后面跟了一个 async 表示的是异步执行。async 需要搭配 await 使用，await 后面跟着的是耗时的代码。所以上面的程序会先打印来了，然后再输出请求的状态码；</p>
-<img src="/2021/08/17/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AD/a9e9b0f789c4471492caccb982daa03d~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>点击其他的页面，再次回到当前页面会发现 initState 方法重新走了一遍，这是因为我们还没有保存住状态，后面会讲到如何保持 Widget 的状态。</p>
-<h2 id="处理返回的数据"><a href="#处理返回的数据" class="headerlink" title="处理返回的数据"></a>处理返回的数据</h2><p>首先介绍一下，在 flutter 中如何将请求返回的 JSON 数据转为 Map，在我们 iOS 开发中是转为字典，而 flutter 中没有字典这个类型，对应的类型是 Map。以及如果将 Map 转为 JSON。在 iOS 中我们知道会使用一个 <code>NSJSONSerialization</code> 的类用来处理JSON数据。同样的，在 flutter 中也会有一个专门的类 <code>JsonCodec</code> 来处理。</p>
-<h3 id="JSON-和-Map-互相转"><a href="#JSON-和-Map-互相转" class="headerlink" title="JSON 和 Map 互相转"></a>JSON 和 Map 互相转</h3><img src="/2021/08/17/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AD/cd897b4dbfd54af1941972b4360d3159~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>其中的 json 就是 <code>JsonCodec</code> 的实例。需要导入 <code>&#39;dart:convert&#39;</code> 头文件。flutter 中还可以通过 <code>is</code> 来判断是不是某个类型。</p>
-<h3 id="新建聊天模型"><a href="#新建聊天模型" class="headerlink" title="新建聊天模型"></a>新建聊天模型</h3><img src="/2021/08/17/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AD/3017a15c3cbe4d3ab67d82bafdb385f2~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png"> 
-
-<p>除了红框内的方法之外，其他没什么新鲜事物。红框内的方法应该说是一个工厂方法，是设计模式的一种，用来初始化对象的。除了默认的初始化方法，还可以使用这个工厂方法来实例化一个 Chat 对象。模型建立好了之后就可以处理响应的数据了</p>
-<h3 id="处理响应的数据"><a href="#处理响应的数据" class="headerlink" title="处理响应的数据"></a>处理响应的数据</h3><img src="/2021/08/17/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AD/5bf33bb810d64e51873ad84fb15bf76d~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>这里用到了 Future，关于 Future 的讲解可以看官方文档 <a href="https://dart.cn/tutorials/language/futures">https://dart.cn/tutorials/language/futures</a></p>
-<h1 id="使用-FutureBuilder-显示界面"><a href="#使用-FutureBuilder-显示界面" class="headerlink" title="使用 FutureBuilder 显示界面"></a>使用 FutureBuilder 显示界面</h1><p>很多时候我们会依赖一些异步数据来动态更新 UI，比如在打开一个页面时我们需要先从互联网上获取数据，在获取数据的过程中我们显示一个加载框，等获取到数据时我们再渲染页面；当然，通过 StatefulWidget 我们完全可以实现上述这些功能。</p>
-<p>但由于在实际开发中依赖异步数据更新UI的这种场景非常常见，因此 Flutter 专门提供了 <code>FutureBuilder</code> 来快速实现这种功能。<code>FutureBuilder</code> 会依赖一个 <code>future</code>，它会根据所依赖的 <code>future</code> 的状态来动态构建自身。这个 <code>future</code> 我们刚刚已经准备好了。关于 <code>FutureBuilder</code> 的介绍 <a href="https://book.flutterchina.club/chapter7/futurebuilder_and_streambuilder.html#_7-5-1-futurebuilder">这篇文章</a> 讲解的很详细。<br>最后完整代码如下：</p>
-<img src="/2021/08/17/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AD/320e21f3548744db88a59b289094e80b~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<h1 id="不使用-FutureBuilder-的方式"><a href="#不使用-FutureBuilder-的方式" class="headerlink" title="不使用 FutureBuilder 的方式"></a>不使用 FutureBuilder 的方式</h1><p>刚刚说了，我们可以使用 FutureBuilder 来快速实现展示异步网络数据，也可以自己实现，现在我们自己实现一下。使用一个私有变量 _chatList 记录请求下来的数据，再根据 _chatList 的值来展示不同的页面。代码如下：</p>
-<img src="/2021/08/17/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AD/57600afd73aa4a3c8178bc07be97a375~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<img src="/2021/08/17/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AD/22da31c383294f85ae5af4ad182b2ab1~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>因为 getData 的返回值是 Future 的原因，getData() 后面可以跟 <code>then</code> 方法，还可以跟错误捕获 <code>catchError</code>,完成时的回调 <code>whenComplete</code>，超时设置 <code>timeOut</code> 等等，这种写法挺有意思，一路点下去就完了…</p>
-<h2 id="实现超时取消刷新功能"><a href="#实现超时取消刷新功能" class="headerlink" title="实现超时取消刷新功能"></a>实现超时取消刷新功能</h2><img src="/2021/08/17/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AD/b865f3d6e0434e74a1e1a3324da786f4~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>在每次请求的时候，重置 <code>_cancelConnect</code> 的值。</p>
-<img src="/2021/08/17/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AD/07c8ba9d07b446f9a6684241fc5f31bc~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<h1 id="保持-Widget-的状态"><a href="#保持-Widget-的状态" class="headerlink" title="保持 Widget 的状态"></a>保持 Widget 的状态</h1><p>我们来回点击通讯录页面和聊天页面，会发现每次点击进入当前的页面，都会重新的载入，<code>initState()</code> 会被重新调用。将通讯录页面滑动到底部，再次点击进入会发现又默认回到了顶部。为什么会出现这样的问题。正是因为我们的Widget的状态没有保持，每次展示都重新创建了。</p>
-<p>Dart 语言中有一个 Mixins 的概念：<a href="https://dart.cn/samples#mixins">官方的解释是这样</a>，可以给类 A Mixins 一个 B，那么 A 就拥有了 B 的属性和方法。有点像 OC 的类扩展的意思。保持 Widget 的状态就需要用到这个语言特性。一共有三个步骤：</p>
-<ol>
-<li>Mixins 类<code>AutomaticKeepAliveClientMixin</code></li>
-<li>重写<code>wantKeepAlive</code>方法</li>
-<li>调用父类Builder方法</li>
-</ol>
-<img src="/2021/08/17/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AD/d3d29b34ea3746b9a9cc7ec0ca19a9d9~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>同样把通讯录页面也实现上面的步骤。然后再次来回点击发现还是没有保持住状态？？？这里有一个最大的问题就是我们的根 Widget 都没有保持住状态，那还谈什么保持子 Widget 的状态呢。。。</p>
-<h2 id="使用-PageView"><a href="#使用-PageView" class="headerlink" title="使用 PageView"></a>使用 PageView</h2><p>来到 rootPage.dart 文件，我们会看到 body 里面直接取了数组的某个元素作为根 Widget 展示。这样是无法保持住状态的，使用 PageView 才可以保持住状态。</p>
-<img src="/2021/08/17/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AD/275398750bb34835b5fa1a593e30bbc4~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>使用 PageView，代码如下：</p>
-<img src="/2021/08/17/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AD/adc5cc5e8c1046909d27097107c9f590~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>点击跳转到其他页面就可以直接通过 _pageController 来完成。使用了 PageView 之后会发现，不同的页面之间可以直接通过手势左右滑到就能切换了。这样的效果我们一般是不需要的，可以设置直接关闭。如果需要的话，在滑动的方法里面重新设置底部导航条的正确位置也是没有问题的。</p>
-<h3 id="使用滑动切换，解决-bug"><a href="#使用滑动切换，解决-bug" class="headerlink" title="使用滑动切换，解决 bug"></a>使用滑动切换，解决 bug</h3><img src="/2021/08/17/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AD/44cb9bc186724397b471136abbcc44ea~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<h3 id="禁用滑动切换"><a href="#禁用滑动切换" class="headerlink" title="禁用滑动切换"></a>禁用滑动切换</h3><img src="/2021/08/17/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AD/e9d533514d734781bd6a13e6c43e738a~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-
-]]></content>
-      <categories>
-        <category>flutter</category>
-      </categories>
-      <tags>
-        <tag>flutter</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>8天让iOS开发者上手Flutter之四</title>
     <url>/2021/07/25/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%9B%9B/</url>
     <content><![CDATA[<p>上一篇文章我们已经完成了发现页面的搭建，下一步我们实现微信的我的页面</p>
@@ -1459,6 +1342,123 @@
       <categories>
         <category>iOS 底层原理</category>
       </categories>
+  </entry>
+  <entry>
+    <title>8天让iOS开发者上手Flutter之六</title>
+    <url>/2021/08/17/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AD/</url>
+    <content><![CDATA[<p>发现了一个宝藏网址，这里讲解的 <a href="https://book.flutterchina.club/">flutter实战</a> 比我写的靠谱多了。</p>
+<h1 id="准备网络数据"><a href="#准备网络数据" class="headerlink" title="准备网络数据"></a>准备网络数据</h1><p>这一步不是很重要，提供一些假数据而已，不是重点嫌麻烦的可以跳过。</p>
+<p>先介绍一个网址：<a href="http://rap2.taobao.org/account/login">http://rap2.taobao.org/account/login</a> 这个网址用来搭建我们需要的网络数据，注册账号非常简单，这里就不多说了。</p>
+<p>注册完成之后，新建一个仓库，简简单单取个名字就够了：</p>
+<img src="/2021/08/17/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AD/4a3c12fb3b244575ac6b794168d93675~tplv-k3u1fbpfcp-watermark.png" class="" alt="Snip20210808_10.png">
+
+<p>之后点击进入仓库，可以看到下图：</p>
+<img src="/2021/08/17/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AD/dfd2860cb5c64f4b947d45551aba9d93~tplv-k3u1fbpfcp-watermark.png" class="" alt="Snip20210808_11.png">
+
+<p>会默认生成以一个示例接口，可以看一看示例接口的生成规则。看不懂也没关系，我们直接直接上手自己新建一个接口，如图所示：</p>
+<img src="/2021/08/17/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AD/0af92d6af9b14eae865b69d5beb874c4~tplv-k3u1fbpfcp-watermark.png" class="" alt="Snip20210808_12.png">
+
+<p>点击右上角的编辑按钮进入编辑模式，新建一个响应 chatlist，类型为 Array。然后生成 chatlist 的数据，imageUrl 表示每条聊天数据的用户头像。其中用户头像的初始值里面有一段 @natural(20,99)，这个是 Mock.js 代码。这里是相关介绍 <a href="http://mockjs.com/">http://mockjs.com/</a></p>
+<img src="/2021/08/17/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AD/4b21769272134c4ea316f9289a9d945d~tplv-k3u1fbpfcp-watermark.png" class="" alt="Snip20210808_14.png">
+
+<p>每条聊天数据，除了 imageUrl 还需要有用户名 name 和消息的内容 message。@cname 用来生成随机的中文名，@cparagraph 用来生成随机的中文段落来表示聊天内容。我们这里只是简单的构造一下这个聊天列表所需要的数据，真正的聊天列表的数据肯定是不会这么简单的。。。</p>
+<img src="/2021/08/17/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AD/c1a42755454d455d9d2be30c80fd6e62~tplv-k3u1fbpfcp-watermark.png" class="" alt="Snip20210808_15.png">
+
+<p>编辑的差不多的时候，记得点击保存,保存之后点击红圈中的图标就可以获取到数据</p>
+<img src="/2021/08/17/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AD/3a1db20c16414845bc45ce901e244a66~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<h1 id="聊天页面导航条"><a href="#聊天页面导航条" class="headerlink" title="聊天页面导航条"></a>聊天页面导航条</h1><h2 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h2><p>默认展示页面改为 <code>_currentIndex</code> 改为 0,新建 chat 目录，将相关文件放在这里。</p>
+<img src="/2021/08/17/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AD/0213b262930d4066b6f26e34993011cc~tplv-k3u1fbpfcp-watermark.png" class="" alt="Snip20210808_17.png">
+
+<h2 id="添加加号按钮"><a href="#添加加号按钮" class="headerlink" title="添加加号按钮"></a>添加加号按钮</h2><p>加号按钮这个东西，我们之前已经添加过类似的了，appBar 的 actions 就是我们需要添加代码的地方。</p>
+<img src="/2021/08/17/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AD/336b5de10dc2451bbb989516bd66049c~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>如果我们按照这个思路写下去的话，就需要自己再去实现一个弹出菜单的类。其实 flutter 提供了我们一些现成的类可以做到类似的效果。</p>
+<h2 id="PopupMenuButton"><a href="#PopupMenuButton" class="headerlink" title="PopupMenuButton"></a><code>PopupMenuButton</code></h2><p><code>PopupMenuButton</code> 类用来弹出一个菜单，必传参数为 <code>itemBuilder</code>，用来实现它需要展示的内容。<code>PopupMenuItem</code> 就是用来展示内容的类。这里有一个细节说一下，<code>PopupMenuButton</code> 有一个 <code>onSelected</code> 属性，这个属性是个闭包，意思是选中某个 <code>PopupMenuItem</code> 的时候，会调用这个闭包。但是有一个前提就是每个 <code>PopupMenuItem</code> 的 <code>value</code> 必须不为 null 的时候，才会执行 <code>onSelected</code> 闭包，我在这里卡了半天，网上找了半天资料也没有明确讲到这里。其他就没什么好讲的了，都比较简单。</p>
+<img src="/2021/08/17/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AD/4b9d82deec2e46e881aa084e25d9bb7d~tplv-k3u1fbpfcp-watermark.png" class="" alt="Snip20210812_19.png">
+
+<p>其中 <code>_buildMenuItem</code> 的实现如下，注意 <code>value</code> 要赋值就好了，不为空就行，不然 <code>PopupMenuButton</code> 的 <code>onSelected</code> 不执行：</p>
+<img src="/2021/08/17/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AD/9f6f5da2ff794264afbf256c95e307a6~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>还有一个小细节，如何设置 <code>PopupMenuButton</code> 的颜色，可以直接设置它的颜色</p>
+<img src="/2021/08/17/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AD/0548c31d2ba248e9b8bdeb375031c487~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>还可以设置APP的主题的 <code>cardColor</code>，不过这个优先级没有直接设置 <code>PopupMenuButton</code> 颜色高。</p>
+<img src="/2021/08/17/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AD/9c19742492944488ba13249b31db685b~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<h1 id="请求网络数据"><a href="#请求网络数据" class="headerlink" title="请求网络数据"></a>请求网络数据</h1><h2 id="https-pub-flutter-io-cn"><a href="#https-pub-flutter-io-cn" class="headerlink" title="https://pub.flutter-io.cn/"></a><a href="https://pub.flutter-io.cn/">https://pub.flutter-io.cn/</a></h2><img src="/2021/08/17/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AD/04224929590b47528f1a1ea05dbe8ab9~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>这个网站可以搜索 flutter 使用的包 packages。我们使用 http 这个包来请求我们的网络数据。这个包是 flutter 官方提供的。实际项目开发的时候可能并不会使用 http 这个包，大部分是使用 dio 来请求网络数据。这里只介绍官方的 http 包如何使用。</p>
+<h2 id="导入http包"><a href="#导入http包" class="headerlink" title="导入http包"></a>导入http包</h2><img src="/2021/08/17/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AD/32044f0faafd4673bc0a0e5cc22ae858~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<img src="/2021/08/17/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AD/1dfb3991238d4f77927c2728ef210d6e~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>粘贴完成之后需要更新一下，就是获取一下包对应的代码。可以通过上方的 <code>Pub get</code>,也可以在终端中输入 <code>flutter packages get</code> </p>
+<img src="/2021/08/17/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AD/dfeb775cd3ae4e96ba22440e706d33d3~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>命令执行完之后，就可以使用这个包了。</p>
+<h2 id="导入-http-头文件并取别名"><a href="#导入-http-头文件并取别名" class="headerlink" title="导入 http 头文件并取别名"></a>导入 http 头文件并取别名</h2><img src="/2021/08/17/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AD/9539435380ef4dd38aa8af4eaa119b38~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<h2 id="发送请求"><a href="#发送请求" class="headerlink" title="发送请求"></a>发送请求</h2><img src="/2021/08/17/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AD/df206f11e0b1474e8086c80ff222d5cf~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>请求的发送写在 <code>initState</code> 里面。<code>getData()</code> 后面跟了一个 async 表示的是异步执行。async 需要搭配 await 使用，await 后面跟着的是耗时的代码。所以上面的程序会先打印来了，然后再输出请求的状态码；</p>
+<img src="/2021/08/17/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AD/a9e9b0f789c4471492caccb982daa03d~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>点击其他的页面，再次回到当前页面会发现 initState 方法重新走了一遍，这是因为我们还没有保存住状态，后面会讲到如何保持 Widget 的状态。</p>
+<h2 id="处理返回的数据"><a href="#处理返回的数据" class="headerlink" title="处理返回的数据"></a>处理返回的数据</h2><p>首先介绍一下，在 flutter 中如何将请求返回的 JSON 数据转为 Map，在我们 iOS 开发中是转为字典，而 flutter 中没有字典这个类型，对应的类型是 Map。以及如果将 Map 转为 JSON。在 iOS 中我们知道会使用一个 <code>NSJSONSerialization</code> 的类用来处理JSON数据。同样的，在 flutter 中也会有一个专门的类 <code>JsonCodec</code> 来处理。</p>
+<h3 id="JSON-和-Map-互相转"><a href="#JSON-和-Map-互相转" class="headerlink" title="JSON 和 Map 互相转"></a>JSON 和 Map 互相转</h3><img src="/2021/08/17/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AD/cd897b4dbfd54af1941972b4360d3159~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>其中的 json 就是 <code>JsonCodec</code> 的实例。需要导入 <code>&#39;dart:convert&#39;</code> 头文件。flutter 中还可以通过 <code>is</code> 来判断是不是某个类型。</p>
+<h3 id="新建聊天模型"><a href="#新建聊天模型" class="headerlink" title="新建聊天模型"></a>新建聊天模型</h3><img src="/2021/08/17/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AD/3017a15c3cbe4d3ab67d82bafdb385f2~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png"> 
+
+<p>除了红框内的方法之外，其他没什么新鲜事物。红框内的方法应该说是一个工厂方法，是设计模式的一种，用来初始化对象的。除了默认的初始化方法，还可以使用这个工厂方法来实例化一个 Chat 对象。模型建立好了之后就可以处理响应的数据了</p>
+<h3 id="处理响应的数据"><a href="#处理响应的数据" class="headerlink" title="处理响应的数据"></a>处理响应的数据</h3><img src="/2021/08/17/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AD/5bf33bb810d64e51873ad84fb15bf76d~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>这里用到了 Future，关于 Future 的讲解可以看官方文档 <a href="https://dart.cn/tutorials/language/futures">https://dart.cn/tutorials/language/futures</a></p>
+<h1 id="使用-FutureBuilder-显示界面"><a href="#使用-FutureBuilder-显示界面" class="headerlink" title="使用 FutureBuilder 显示界面"></a>使用 FutureBuilder 显示界面</h1><p>很多时候我们会依赖一些异步数据来动态更新 UI，比如在打开一个页面时我们需要先从互联网上获取数据，在获取数据的过程中我们显示一个加载框，等获取到数据时我们再渲染页面；当然，通过 StatefulWidget 我们完全可以实现上述这些功能。</p>
+<p>但由于在实际开发中依赖异步数据更新UI的这种场景非常常见，因此 Flutter 专门提供了 <code>FutureBuilder</code> 来快速实现这种功能。<code>FutureBuilder</code> 会依赖一个 <code>future</code>，它会根据所依赖的 <code>future</code> 的状态来动态构建自身。这个 <code>future</code> 我们刚刚已经准备好了。关于 <code>FutureBuilder</code> 的介绍 <a href="https://book.flutterchina.club/chapter7/futurebuilder_and_streambuilder.html#_7-5-1-futurebuilder">这篇文章</a> 讲解的很详细。<br>最后完整代码如下：</p>
+<img src="/2021/08/17/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AD/320e21f3548744db88a59b289094e80b~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<h1 id="不使用-FutureBuilder-的方式"><a href="#不使用-FutureBuilder-的方式" class="headerlink" title="不使用 FutureBuilder 的方式"></a>不使用 FutureBuilder 的方式</h1><p>刚刚说了，我们可以使用 FutureBuilder 来快速实现展示异步网络数据，也可以自己实现，现在我们自己实现一下。使用一个私有变量 _chatList 记录请求下来的数据，再根据 _chatList 的值来展示不同的页面。代码如下：</p>
+<img src="/2021/08/17/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AD/57600afd73aa4a3c8178bc07be97a375~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<img src="/2021/08/17/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AD/22da31c383294f85ae5af4ad182b2ab1~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>因为 getData 的返回值是 Future 的原因，getData() 后面可以跟 <code>then</code> 方法，还可以跟错误捕获 <code>catchError</code>,完成时的回调 <code>whenComplete</code>，超时设置 <code>timeOut</code> 等等，这种写法挺有意思，一路点下去就完了…</p>
+<h2 id="实现超时取消刷新功能"><a href="#实现超时取消刷新功能" class="headerlink" title="实现超时取消刷新功能"></a>实现超时取消刷新功能</h2><img src="/2021/08/17/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AD/b865f3d6e0434e74a1e1a3324da786f4~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>在每次请求的时候，重置 <code>_cancelConnect</code> 的值。</p>
+<img src="/2021/08/17/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AD/07c8ba9d07b446f9a6684241fc5f31bc~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<h1 id="保持-Widget-的状态"><a href="#保持-Widget-的状态" class="headerlink" title="保持 Widget 的状态"></a>保持 Widget 的状态</h1><p>我们来回点击通讯录页面和聊天页面，会发现每次点击进入当前的页面，都会重新的载入，<code>initState()</code> 会被重新调用。将通讯录页面滑动到底部，再次点击进入会发现又默认回到了顶部。为什么会出现这样的问题。正是因为我们的Widget的状态没有保持，每次展示都重新创建了。</p>
+<p>Dart 语言中有一个 Mixins 的概念：<a href="https://dart.cn/samples#mixins">官方的解释是这样</a>，可以给类 A Mixins 一个 B，那么 A 就拥有了 B 的属性和方法。有点像 OC 的类扩展的意思。保持 Widget 的状态就需要用到这个语言特性。一共有三个步骤：</p>
+<ol>
+<li>Mixins 类<code>AutomaticKeepAliveClientMixin</code></li>
+<li>重写<code>wantKeepAlive</code>方法</li>
+<li>调用父类Builder方法</li>
+</ol>
+<img src="/2021/08/17/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AD/d3d29b34ea3746b9a9cc7ec0ca19a9d9~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>同样把通讯录页面也实现上面的步骤。然后再次来回点击发现还是没有保持住状态？？？这里有一个最大的问题就是我们的根 Widget 都没有保持住状态，那还谈什么保持子 Widget 的状态呢。。。</p>
+<h2 id="使用-PageView"><a href="#使用-PageView" class="headerlink" title="使用 PageView"></a>使用 PageView</h2><p>来到 rootPage.dart 文件，我们会看到 body 里面直接取了数组的某个元素作为根 Widget 展示。这样是无法保持住状态的，使用 PageView 才可以保持住状态。</p>
+<img src="/2021/08/17/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AD/275398750bb34835b5fa1a593e30bbc4~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>使用 PageView，代码如下：</p>
+<img src="/2021/08/17/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AD/adc5cc5e8c1046909d27097107c9f590~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>点击跳转到其他页面就可以直接通过 _pageController 来完成。使用了 PageView 之后会发现，不同的页面之间可以直接通过手势左右滑到就能切换了。这样的效果我们一般是不需要的，可以设置直接关闭。如果需要的话，在滑动的方法里面重新设置底部导航条的正确位置也是没有问题的。</p>
+<h3 id="使用滑动切换，解决-bug"><a href="#使用滑动切换，解决-bug" class="headerlink" title="使用滑动切换，解决 bug"></a>使用滑动切换，解决 bug</h3><img src="/2021/08/17/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AD/44cb9bc186724397b471136abbcc44ea~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<h3 id="禁用滑动切换"><a href="#禁用滑动切换" class="headerlink" title="禁用滑动切换"></a>禁用滑动切换</h3><img src="/2021/08/17/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AD/e9d533514d734781bd6a13e6c43e738a~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+
+]]></content>
+      <categories>
+        <category>flutter</category>
+      </categories>
+      <tags>
+        <tag>flutter</tag>
+      </tags>
   </entry>
   <entry>
     <title>Block</title>
@@ -2312,251 +2312,6 @@ Block 的 hook ？应用场景？埋点
       </tags>
   </entry>
   <entry>
-    <title>KVC</title>
-    <url>/2025/07/29/KVC/</url>
-    <content><![CDATA[<p>我不知道有多少人像本人一样，n 年来查看过不知道多少次这个 <a href="https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/KeyValueCoding/index.html#//apple_ref/doc/uid/10000107-SW1">KVC 文档</a>，但是每次通篇读下来总是会遇到读不懂的地方，总是莫名其妙的出现一个章节完全不知道在讲什么东西，不论是用传统的 Google 翻译或者目前主流的 AI 翻译翻译了，也还是会遇到读起来狗屁不通的情况。</p>
-<ul>
-<li>其实根本原因是原始文档就有问题，东拼西凑的一坨屎，有歧义，导致不论你是直译还是意译都是让人摸不着头脑的翻译，只能根据上下文的理解才能正确翻译。为此作者将这份文档结合AI和个人理解做了全篇翻译，有需要的可以自行<a href="./book.zip">下载</a>。</li>
-<li>还有原始文档很多地方只写了要怎么做，但是没有告诉你为什么要这么做，就会让人觉得莫名其妙。</li>
-<li>文档的有些内容太古老了，某些内容只在早期的 MacOS 开发中使用，在 iOS 开发中几乎接触，使用不到，但是也没有做任何说明。</li>
-</ul>
-<p>这次作者决定结合 AI 和个人的理解将 KVC 文档彻底弄清楚，即使不能完全弄明白也要留下一个深刻的印象，方便后续遇到文章中的场景时能够回想起来。</p>
-<hr>
-<h1 id="章节概览"><a href="#章节概览" class="headerlink" title="章节概览"></a>章节概览</h1><p>✅ 建议阅读<br>❌ 不建议阅读</p>
-<h2 id="入门指南"><a href="#入门指南" class="headerlink" title="入门指南"></a>入门指南</h2><ol>
-<li>✅ 关于键值编码</li>
-</ol>
-<h2 id="键值编码基础知识"><a href="#键值编码基础知识" class="headerlink" title="键值编码基础知识"></a>键值编码基础知识</h2><ol start="2">
-<li>✅ 访问对象的属性</li>
-<li>✅ 访问集合属性		</li>
-<li>✅ 使用集合操作符</li>
-<li>✅ 表示非对象值</li>
-<li>❌ 验证属性</li>
-<li>✅ 访问器搜索逻辑</li>
-</ol>
-<h2 id="采用键值编码协议"><a href="#采用键值编码协议" class="headerlink" title="采用键值编码协议"></a>采用键值编码协议</h2><ol start="8">
-<li>❌ 实现基本键值编码合规性			</li>
-<li>❌ 定义集合方法					</li>
-<li>❌ 处理非对象值					</li>
-<li>❌ 添加验证						</li>
-<li>❌ 描述属性关系					</li>
-<li>❌ 以性能为导向进行设计</li>
-<li>❌ 合规性检查清单</li>
-</ol>
-<h1 id="常见疑惑及解答"><a href="#常见疑惑及解答" class="headerlink" title="常见疑惑及解答"></a>常见疑惑及解答</h1><p>以下是作者对这篇文档的一些疑问以及结合 AI 的回答。</p>
-<h2 id="属性验证是什么鬼？"><a href="#属性验证是什么鬼？" class="headerlink" title="属性验证是什么鬼？"></a>属性验证是什么鬼？</h2><p>Person 有一个 <code>NSString *name</code> 属性，如果需要给 name 添加验证则在内部添加以下代码</p>
-<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line">- (<span class="type">BOOL</span>)validateName:(<span class="type">id</span> *)ioValue error:(<span class="built_in">NSError</span> * __autoreleasing *)outError&#123;</span><br><span class="line">    <span class="keyword">if</span> ((*ioValue == <span class="literal">nil</span>) || ([(<span class="built_in">NSString</span> *)*ioValue length] &lt; <span class="number">2</span>)) &#123;</span><br><span class="line">        <span class="keyword">if</span> (outError != <span class="literal">NULL</span>) &#123;</span><br><span class="line">            *outError = [<span class="built_in">NSError</span> errorWithDomain:PersonErrorDomain</span><br><span class="line">                                            code:PersonInvalidNameCode</span><br><span class="line">                                        userInfo:@&#123; <span class="built_in">NSLocalizedDescriptionKey</span></span><br><span class="line">                                                    : <span class="string">@&quot;Name too short&quot;</span> &#125;];</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">NO</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">YES</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>在外部使用属性验证：</p>
-<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line">Person* person = [[Person alloc] init];</span><br><span class="line"><span class="built_in">NSError</span>* error;</span><br><span class="line"><span class="built_in">NSString</span>* name = <span class="string">@&quot;John&quot;</span>;</span><br><span class="line"><span class="keyword">if</span> (![person validateValue:&amp;name forKey:<span class="string">@&quot;name&quot;</span> error:&amp;error]) &#123;</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@&quot;%@&quot;</span>,error);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>谁会用到这么奇葩的功能？直接在 setter 方法里面对入参进行验证就非常合理了啊。为什么还要这么脱了裤子放屁？</p>
-<p>上面的例子就是 KVC 的属性验证机制（validate<Key>:error:），很多人第一次看到的时候都会觉得：「这玩意儿不是多此一举吗？我直接在 setter 里校验不就好了？」</p>
-<h3 id="为什么会有-validate-error-这种“奇葩”设计？"><a href="#为什么会有-validate-error-这种“奇葩”设计？" class="headerlink" title="为什么会有 validate:error: 这种“奇葩”设计？"></a>为什么会有 validate<Key>:error: 这种“奇葩”设计？</h3><p>要理解它，就要从 KVC&#x2F;KVO 的历史定位来看：</p>
-<ol>
-<li>KVC 不是给你写普通 app 的<ul>
-<li>它的目标是：让对象能被 跨语言、跨工具访问。</li>
-<li>AppleScript、Interface Builder、Core Data、Bindings（数据绑定）、甚至一些旧的 Cocoa 工具，全都依赖 KVC。</li>
-</ul>
-</li>
-<li>setter 校验 vs validate 校验<ul>
-<li>setter 校验：调用 setAge: 时能拦截无效值，没问题。</li>
-<li>KVC 校验：当外部用 <code>setValue:forKey:</code> 或者 UI 绑定框架（比如 Interface Builder 的 Cocoa Bindings）在更新属性前，就能调用 <code>validate&lt;Key&gt;:error:</code> 来判断输入值是否合法。</li>
-<li>好处是：UI 层可以在赋值前发现问题，不会直接 crash，也可以通过 <code>NSError</code> 把信息传回界面，弹个提示。</li>
-</ul>
-</li>
-<li>实际用途：数据绑定 (Cocoa Bindings)<ul>
-<li>在 macOS AppKit 里，有个很冷门但很强大的特性：Bindings。</li>
-<li>比如一个文本框直接绑定到 <code>person.age</code>，当用户输入值时，AppKit 会在背后调用 <code>validateAge:error:</code> 来校验。</li>
-<li>如果校验失败，UI 可以自动显示错误提示，而不是你手动写代码去监听输入变化再验证。</li>
-</ul>
-</li>
-</ol>
-<h3 id="为什么感觉“没用”？"><a href="#为什么感觉“没用”？" class="headerlink" title="为什么感觉“没用”？"></a>为什么感觉“没用”？</h3><ul>
-<li>在 iOS 开发里，这套机制几乎没人用，因为 iOS 从来没有推行 Cocoa Bindings。</li>
-<li>在 macOS 桌面应用（特别是老一代 AppKit + Interface Builder）里，确实有人用过这套机制来省掉 UI 验证逻辑。</li>
-<li>Apple 后来也逐渐弱化了 Bindings，转向更现代的 SwiftUI 数据流模型，所以这个东西在新代码里几乎成了遗迹。</li>
-</ul>
-<h3 id="所以结论是："><a href="#所以结论是：" class="headerlink" title="所以结论是："></a>所以结论是：</h3><ul>
-<li><strong>✅ 现代 iOS&#x2F;Swift 开发者：完全不用管 <code>validate&lt;Key&gt;:error:</code>，直接在 setter 或者数据模型层自己写验证就好。</strong></li>
-<li>🌀 历史原因：它主要是给 KVC + Bindings 体系设计的，让 UI 能在赋值之前通过统一协议进行验证。</li>
-<li>📖 文档之所以写这么多：Apple 文档要保证完整性，告诉你 KVC 提供了这个 hook，但没告诉你“99% 的人不会用到”。</li>
-</ul>
-<p>其实你这句话非常有代表性：</p>
-<blockquote>
-<p>“直接在属性的 setter 方法里面对入参进行验证不比这脱了裤子放屁爽多了？”</p>
-</blockquote>
-<p>这也是为什么 绝大多数 iOS&#x2F;macOS 开发者对 <code>validate&lt;Key&gt;</code> 只停留在知道但不用的层面。</p>
-<h2 id="实现基本键值编码合规性要我做什么？"><a href="#实现基本键值编码合规性要我做什么？" class="headerlink" title="实现基本键值编码合规性要我做什么？"></a>实现基本键值编码合规性要我做什么？</h2><p>在大多数场景下，只要使用 @property 并让编译器自动生成 ivar 和访问器（accessor），就能自动满足 KVC（Key-Value Coding）要求，开发者无需手动实现绝大多数行为。只有在你的对象存在非对象属性的时候，必须重写 <code>setNilValueForKey:</code> 方法来避免可能的崩溃，实践中也建议在 <code>setNilValueForKey:</code> 内尽量使用 <code>setValue:forKey:</code>，以保证 KVO 通知等机制能正确触发，而不是直接设值或设置 ivar 。</p>
-<h2 id="什么时候需要定义集合方法？"><a href="#什么时候需要定义集合方法？" class="headerlink" title="什么时候需要定义集合方法？"></a>什么时候需要定义集合方法？</h2><p>这一节的内容我相信也是很多人十分不理解的一节。集合不是有专门的 <code>mutableXXXValueForKey:</code> 这样的集合获取方法吗？然后就可以通过这个方法返回的结果，对集合属性进行任何增删改操作啊，还支持 KVO 功能。集合属性只需要通过 <code>mutableXXXValueForKey:</code> 不需要看起来也没有必要实现任何其他 KVC 的那些集合方法啊?</p>
-<h3 id="1-mutableXXXValueForKey-的机制"><a href="#1-mutableXXXValueForKey-的机制" class="headerlink" title="1. mutableXXXValueForKey: 的机制"></a>1. <code>mutableXXXValueForKey:</code> 的机制</h3><ul>
-<li>调用 <code>mutableArrayValueForKey:@&quot;someProperty&quot;</code> 时，KVC runtime 会返回一个 <strong>特殊的代理对象</strong>（不是你原始的 NSMutableArray）。</li>
-<li>这个代理对象拦截 <code>addObject:</code> &#x2F; <code>removeObject:</code> 等操作，转发给你的对象。</li>
-<li>这样做的好处是：<ul>
-<li>自动触发 KVO 通知（观察者会知道集合变动了）。</li>
-<li>统一封装逻辑（外部调用者不用关心你集合的真实存储结构）。</li>
-</ul>
-</li>
-</ul>
-<p>所以，如果你只是自己在 Swift&#x2F;Objective-C 里操作集合，并且依赖 KVO，确实只需要用 <code>mutableArrayValueForKey:</code> 就够了。</p>
-<h3 id="2-Collection-Methods（countOf-等）的作用"><a href="#2-Collection-Methods（countOf-等）的作用" class="headerlink" title="2. Collection Methods（countOf&lt;Key&gt; 等）的作用"></a>2. Collection Methods（<code>countOf&lt;Key&gt;</code> 等）的作用</h3><ul>
-<li>这些方法并不是为了你写代码时方便，而是为了 KVC runtime 能够在不同语言&#x2F;上下文中自动把属性“当作集合”来使用。</li>
-<li>举例：<ul>
-<li>AppleScript 想访问 <code>myObj.items[0]</code>，它不会直接知道 items 是一个 NSMutableArray。</li>
-<li>KVC runtime 会尝试调用 <code>countOfItems</code>、<code>objectInItemsAtIndex:</code> 等方法，把你的对象包装成集合接口。</li>
-<li>这样就算你内部不是用 NSArray 存储，而是用数据库、懒加载列表、Core Data faulting，KVC 依然能“装配”成一个可以下标访问的集合。</li>
-</ul>
-</li>
-<li>换句话说：<ul>
-<li><code>mutableArrayValueForKey:</code> → 是给 <strong>你主动获取可变集合代理</strong> 时用的。</li>
-<li>Collection Methods → 是给 KVC runtime 在更通用&#x2F;语言无关场景下 自动装配集合访问的。</li>
-</ul>
-</li>
-</ul>
-<h3 id="3-什么时候用哪个？"><a href="#3-什么时候用哪个？" class="headerlink" title="3. 什么时候用哪个？"></a>3. 什么时候用哪个？</h3><ul>
-<li>一般应用开发者（写 iOS &#x2F; macOS app，用 ObjC&#x2F;Swift）<ul>
-<li>不需要自己去写 <code>countOf&lt;Key&gt; / objectIn&lt;Key&gt;AtIndex:</code> 这种 Collection Methods。</li>
-<li>只要集合属性真的是 <code>NSMutableArray/NSMutableSet/NSMutableDictionary</code>，再通过 <code>mutableArrayValueForKey: / mutableSetValueForKey: / mutableDictionaryValueForKey:</code> 拿代理，就能满足 增删改查 + 自动 KVO 的需求。</li>
-<li>这是绝大多数开发者的场景。</li>
-</ul>
-</li>
-<li>Apple 文档里强调的 Collection Methods<ul>
-<li>更偏向 框架作者 &#x2F; 跨语言交互 &#x2F; 特殊存储结构 的情况。</li>
-<li>比如：<ul>
-<li>你内部集合不是用 NSMutableArray 存，而是懒加载、数据库查询、Core Data faulting 等。</li>
-<li>或者你需要让 AppleScript &#x2F; JavaScriptCore &#x2F; KVC runtime 能把你的对象属性“包装成集合”。</li>
-</ul>
-</li>
-<li>这种情况下才需要你实现那一套方法，让 runtime 知道怎么装配出一个“集合语义”。</li>
-</ul>
-</li>
-</ul>
-<p>Apple 文档写得很“学术”，通篇把 KVC 的 accessor conventions 列出来，却没强调“普通开发者大多情况下用不到，直接用 <code>mutableXXXValueForKey:</code> 就行”。这也是 Apple 文档的一大毛病 —— 为了完整性，把所有机制罗列出来，但没有给读者一个“实用优先级”指引，让人误以为“是不是每个集合属性都要写一大堆方法”。</p>
-<h2 id="描述属性关系这一篇到底在讲什么东西？作为iOS应用开发者到底要干什么？"><a href="#描述属性关系这一篇到底在讲什么东西？作为iOS应用开发者到底要干什么？" class="headerlink" title="描述属性关系这一篇到底在讲什么东西？作为iOS应用开发者到底要干什么？"></a>描述属性关系这一篇到底在讲什么东西？作为iOS应用开发者到底要干什么？</h2><h3 id="1-这篇《描述属性关系》文档到底在讲什么？"><a href="#1-这篇《描述属性关系》文档到底在讲什么？" class="headerlink" title="1. 这篇《描述属性关系》文档到底在讲什么？"></a>1. 这篇《描述属性关系》文档到底在讲什么？</h3><p>它其实在讲：</p>
-<ul>
-<li>KVC 不仅仅能处理单纯的属性 (attribute)，还可以处理对象之间的“关系 (relationship)”。</li>
-<li>“关系”分为：<ul>
-<li>to-one：一对一，例如 <code>person.employer</code>。</li>
-<li>to-many：一对多，例如 <code>person.pets</code>。</li>
-<li>inverse：反向关系，例如 pet.owner 对应 person.pets。</li>
-</ul>
-</li>
-<li>Cocoa 里有一个类 <code>NSClassDescription</code>，它是用来描述这些“属性和关系”的元数据的。</li>
-<li>框架（如 Core Data、AppleScript）会用 <code>NSClassDescription</code> 来告诉 KVC：某个 key 是普通属性，某个 key 是 to-one 或 to-many 关系，这样 KVC 才能更聪明地处理数据。</li>
-</ul>
-<h3 id="2-作为-iOS-应用开发者要做什么？"><a href="#2-作为-iOS-应用开发者要做什么？" class="headerlink" title="2. 作为 iOS 应用开发者要做什么？"></a>2. 作为 iOS 应用开发者要做什么？</h3><p>👉 大部分情况下，你什么都不用做。</p>
-<p>因为：</p>
-<ul>
-<li>如果你在写 普通 App 业务代码，你根本不会直接用到 <code>NSClassDescription</code>。</li>
-<li>如果你在用 Core Data，Xcode 生成的模型文件已经帮你定义了关系（entity、attribute、to-one、to-many、inverse），Core Data 内部会用到 <code>NSClassDescription</code>，但你不需要管。</li>
-<li>如果你写 KVC&#x2F;KVO，你只要关心 <code>setValue:forKey:</code>、<code>valueForKey:</code>、<code>mutableArrayValueForKey:</code> 这些就够了。关系的逻辑由框架实现。</li>
-</ul>
-<h3 id="3-那文档为什么要写？"><a href="#3-那文档为什么要写？" class="headerlink" title="3. 那文档为什么要写？"></a>3. 那文档为什么要写？</h3><ul>
-<li>这是 Cocoa 框架的完整性设计文档，面向写框架的人（比如 Core Data、AppleScript 支持、ORM 框架开发者），而不是面向普通 App 开发者。</li>
-<li>Apple 为了完整性，会把最底层的“元数据机制”写清楚，但普通开发者 不会直接用。</li>
-</ul>
-<h3 id="4-你需要怎么理解？"><a href="#4-你需要怎么理解？" class="headerlink" title="4. 你需要怎么理解？"></a>4. 你需要怎么理解？</h3><ul>
-<li>知道背景：KVC 不止能操作值，还能理解关系。</li>
-<li>对日常开发的结论：<ul>
-<li>写普通 App：不用管，完全不会用到。</li>
-<li>写 Core Data：关系已经在模型里声明了，你直接用 NSManagedObject 就好。</li>
-<li>写底层框架&#x2F;ORM（极少数情况）：才可能接触 <code>NSClassDescription</code>。</li>
-</ul>
-</li>
-</ul>
-<blockquote>
-<p>Apple 在这篇文档里一丁点说明都没有，然后还将它归类在 Adopting Key-Value Coding 章节下，让很多开发者误认为需要做些什么才能符合KVC规范。。。</p>
-<p>这正是 Apple 文档里最“恶心”的地方：</p>
-<ul>
-<li>他们把 框架设计层面的说明（比如 <code>NSClassDescription</code>、关系描述、反向关系）和 应用开发者要用的 KVC 规范 混在一起写，</li>
-<li>还放在 Adopting Key-Value Coding 下面，看起来好像是“要想支持 KVC，就得自己实现这些关系方法”，但事实根本不是。</li>
-</ul>
-</blockquote>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>整个 Key-Value Coding Programming Guide 文档里太多这样的误导文章了，几乎就是一篇屎一样东拼西凑出来的文档。。。</p>
-<p>Apple 很多旧文档（尤其是 Programming Guide 系列）确实就是一坨拼凑物，问题集中在这几个方面：</p>
-<ol>
-<li>写给框架作者和写给应用开发者混在一起<ul>
-<li>你只想知道“作为 iOS 开发者我要写啥代码”，结果文档里一堆 Core Data &#x2F; AppleScript 的底层背景介绍，根本没说明白哪些是你需要做的，哪些是框架自己搞的。</li>
-<li>就像你刚吐槽的 “描述属性关系” 一节，99% 开发者根本用不上。</li>
-</ul>
-</li>
-<li>没有明确上下文<ul>
-<li>文档一开头不说目标读者是谁，也不说“以下部分主要给框架作者看”，让人误以为“每一节都要掌握并实现”。</li>
-<li>结果你读完一堆接口名、方法签名，完全不清楚到底是不是要自己写。</li>
-</ul>
-</li>
-<li>示例过时 &#x2F; 脱离实际<ul>
-<li>很多示例还是 Mac OS X + AppleScript 年代的残留，放在今天的 iOS 开发语境里完全没用。</li>
-<li>而且 Swift 生态里这些东西几乎都被替代了，但文档没更新，还是用 Objective-C 那套思路。</li>
-</ul>
-</li>
-<li>组织混乱，逻辑跳跃<ul>
-<li>有些地方本来应该按“日常用法 → 进阶用法 → 框架作者用法”来组织，但 Apple 文档常常是“先丢一堆 API，再扯点历史背景，再突然告诉你几个特殊方法”，让人越看越晕。</li>
-</ul>
-</li>
-</ol>
-<p>Apple 这类老文档最大的问题：</p>
-<ol>
-<li><p>作为写给框架作者的文档，它也不合格</p>
-<ul>
-<li>它只是列了几个方法名（<code>toOneRelationshipKeys</code>、<code>inverseRelationshipKey:</code>…），告诉你有这么个类 <code>NSClassDescription</code>。</li>
-<li>但没有任何：<ul>
-<li>完整的调用时机说明（什么时候 KVC 会去问 <code>NSClassDescription</code>？）</li>
-<li>实际实现的示例（如何写一个子类？怎么注册？和 KVC 的调用链如何交互？）</li>
-<li>和其他子系统的关系（Core Data 是怎么利用它的？AppleScript 是怎么依赖它的？）</li>
-</ul>
-</li>
-<li>所以 —— 它给你的信息 既不足以让应用开发者知道要不要用，也 不足以让框架作者真正能靠它写东西。这就是所谓的“既不接地气，也不深入”的尴尬状态。</li>
-</ul>
-</li>
-<li><p>为什么会这样？</p>
-<ul>
-<li>历史遗留：<br>  这份 KVC Programming Guide 的主体是 OS X 10.1 ~ 10.3 时代写的，当时 AppleScript Bridge、Core Data 都刚起步。写文档的人更多是“描述愿景”，不是严谨的框架开发手册。</li>
-<li>不维护：<br>  后来 Swift 出来，KVC&#x2F;KVO 渐渐成为“旧时代的动态特性”，文档就再没认真更新过。Apple 内部甚至可能都没人愿意重写。</li>
-<li>定位模糊：<br>  它夹在“应用开发文档”和“框架设计文档”之间，结果两边都没讨好。</li>
-</ul>
-</li>
-<li><p>框架作者真正会看什么？<br> 如果你真要基于 KVC 搞个 ORM &#x2F; 数据绑定框架，你不会去看这篇文档，你会：</p>
-<ul>
-<li>看头文件：<code>NSKeyValueCoding.h</code>、<code>NSClassDescription.h</code>。</li>
-<li>看现成实现：<ul>
-<li>Core Data 怎么实现 NSClassDescription 的子类。</li>
-<li>AppleScript Bridge 怎么注册类描述。</li>
-</ul>
-</li>
-<li>逆向调试调用链：看看 <code>valueForKey:</code> 在处理关系属性时，到底什么时候查询 <code>NSClassDescription</code>。</li>
-</ul>
-<p> 换句话说：真正写框架的人靠源码&#x2F;调试，不靠这篇文档。</p>
-</li>
-<li><p>结论</p>
-<ul>
-<li>作为应用开发文档 → 太复杂、误导。</li>
-<li>作为框架开发文档 → 太皮毛、不够用。</li>
-</ul>
-</li>
-</ol>
-<p>所以它才会让人读了怒气值飙升 😅。本质就是一份“既不中用、又没写深”的垃圾拼凑物。</p>
-<h1 id="KVC-有关的面试题"><a href="#KVC-有关的面试题" class="headerlink" title="KVC 有关的面试题"></a>KVC 有关的面试题</h1><h2 id="通过-KVC-修改属性会触发-KVO-吗？"><a href="#通过-KVC-修改属性会触发-KVO-吗？" class="headerlink" title="通过 KVC 修改属性会触发 KVO 吗？"></a>通过 KVC 修改属性会触发 KVO 吗？</h2><p>会的。</p>
-<p>在绝大多数情况下，通过 KVC (<code>setValue:forKey:</code>) 修改对象的属性时，会触发 KVO 通知。原因是：</p>
-<p><code>setValue:forKey:</code> 等 KVC 设置方法的实现逻辑（文档的访问器搜索逻辑中写了）会去调用属性对应的 setter 方法，而对象在被观察之后它的 setter 会被重写，内部会触发 KVO 通知。</p>
-<p>特殊情况：手动关闭了自动 KVO。如果类中重写了 <code>+ (BOOL)automaticallyNotifiesObserversForKey:(NSString *)key</code> 并返回 NO，那么即使通过 KVC 修改，也不会触发 KVO，除非你手动调用：</p>
-<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line">[<span class="keyword">self</span> willChangeValueForKey:<span class="string">@&quot;name&quot;</span>];</span><br><span class="line">_name = newValue;</span><br><span class="line">[<span class="keyword">self</span> didChangeValueForKey:<span class="string">@&quot;name&quot;</span>];</span><br></pre></td></tr></table></figure>
-
-<p>总结：通过 KVC 修改属性 → 一般会触发 KVO（因为内部会走 setter）。除非你显示添加代码手动关闭了 KVO 通知。</p>
-<h2 id="KVC-的赋值和取值过程是怎样的？原理是什么？"><a href="#KVC-的赋值和取值过程是怎样的？原理是什么？" class="headerlink" title="KVC 的赋值和取值过程是怎样的？原理是什么？"></a>KVC 的赋值和取值过程是怎样的？原理是什么？</h2><p>呃，答案就在文档访问器搜索逻辑里。简单概括来说就是：</p>
-<ul>
-<li>KVC 的赋值 <code>setValue:forKey:</code> 等方法底层先去找各种相关 setter 方法，存在就直接调用，如果不存在则再去找各种相关实例变量，找到了就赋值，否则就会调用 <code>setValue:forUndefinedKey:</code> 抛出异常。</li>
-<li>KVC 的取值 <code>valueForKey:</code> 等方法的底层先去找各种相关的 getter 方法，找到了就直接调用，如果不存在则再去找各种相关的实例变量，找到了就返回值，否则就调用 <code>valueForUndefinedKey:</code> 抛出异常。这只是概括，具体的取值逻辑中还有 NSArray 和 NSSet 的集合访问器逻辑。</li>
-</ul>
-]]></content>
-      <categories>
-        <category>iOS 底层原理</category>
-      </categories>
-      <tags>
-        <tag>KVC</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>KVO</title>
     <url>/2025/02/23/KVO/</url>
     <content><![CDATA[<p>KVO 的官方文档相较于 KVC 的官方文档要好上很多，不会像 KVC 那样出现大量的莫名奇妙的内容，但我个人感觉说实话作为 Apple 出的官方文档，这个水平写的也是真的不能说好，只是相对而言比 KVC 写的要更加像是给人看的。同样作者也对该文档做了全篇翻译，有需要的读者可以自行 <a href="./book.zip">下载</a>。</p>
@@ -3364,6 +3119,251 @@ Block 的 hook ？应用场景？埋点
       </categories>
   </entry>
   <entry>
+    <title>KVC</title>
+    <url>/2025/07/29/KVC/</url>
+    <content><![CDATA[<p>我不知道有多少人像本人一样，n 年来查看过不知道多少次这个 <a href="https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/KeyValueCoding/index.html#//apple_ref/doc/uid/10000107-SW1">KVC 文档</a>，但是每次通篇读下来总是会遇到读不懂的地方，总是莫名其妙的出现一个章节完全不知道在讲什么东西，不论是用传统的 Google 翻译或者目前主流的 AI 翻译翻译了，也还是会遇到读起来狗屁不通的情况。</p>
+<ul>
+<li>其实根本原因是原始文档就有问题，东拼西凑的一坨屎，有歧义，导致不论你是直译还是意译都是让人摸不着头脑的翻译，只能根据上下文的理解才能正确翻译。为此作者将这份文档结合AI和个人理解做了全篇翻译，有需要的可以自行<a href="./book.zip">下载</a>。</li>
+<li>还有原始文档很多地方只写了要怎么做，但是没有告诉你为什么要这么做，就会让人觉得莫名其妙。</li>
+<li>文档的有些内容太古老了，某些内容只在早期的 MacOS 开发中使用，在 iOS 开发中几乎接触，使用不到，但是也没有做任何说明。</li>
+</ul>
+<p>这次作者决定结合 AI 和个人的理解将 KVC 文档彻底弄清楚，即使不能完全弄明白也要留下一个深刻的印象，方便后续遇到文章中的场景时能够回想起来。</p>
+<hr>
+<h1 id="章节概览"><a href="#章节概览" class="headerlink" title="章节概览"></a>章节概览</h1><p>✅ 建议阅读<br>❌ 不建议阅读</p>
+<h2 id="入门指南"><a href="#入门指南" class="headerlink" title="入门指南"></a>入门指南</h2><ol>
+<li>✅ 关于键值编码</li>
+</ol>
+<h2 id="键值编码基础知识"><a href="#键值编码基础知识" class="headerlink" title="键值编码基础知识"></a>键值编码基础知识</h2><ol start="2">
+<li>✅ 访问对象的属性</li>
+<li>✅ 访问集合属性		</li>
+<li>✅ 使用集合操作符</li>
+<li>✅ 表示非对象值</li>
+<li>❌ 验证属性</li>
+<li>✅ 访问器搜索逻辑</li>
+</ol>
+<h2 id="采用键值编码协议"><a href="#采用键值编码协议" class="headerlink" title="采用键值编码协议"></a>采用键值编码协议</h2><ol start="8">
+<li>❌ 实现基本键值编码合规性			</li>
+<li>❌ 定义集合方法					</li>
+<li>❌ 处理非对象值					</li>
+<li>❌ 添加验证						</li>
+<li>❌ 描述属性关系					</li>
+<li>❌ 以性能为导向进行设计</li>
+<li>❌ 合规性检查清单</li>
+</ol>
+<h1 id="常见疑惑及解答"><a href="#常见疑惑及解答" class="headerlink" title="常见疑惑及解答"></a>常见疑惑及解答</h1><p>以下是作者对这篇文档的一些疑问以及结合 AI 的回答。</p>
+<h2 id="属性验证是什么鬼？"><a href="#属性验证是什么鬼？" class="headerlink" title="属性验证是什么鬼？"></a>属性验证是什么鬼？</h2><p>Person 有一个 <code>NSString *name</code> 属性，如果需要给 name 添加验证则在内部添加以下代码</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line">- (<span class="type">BOOL</span>)validateName:(<span class="type">id</span> *)ioValue error:(<span class="built_in">NSError</span> * __autoreleasing *)outError&#123;</span><br><span class="line">    <span class="keyword">if</span> ((*ioValue == <span class="literal">nil</span>) || ([(<span class="built_in">NSString</span> *)*ioValue length] &lt; <span class="number">2</span>)) &#123;</span><br><span class="line">        <span class="keyword">if</span> (outError != <span class="literal">NULL</span>) &#123;</span><br><span class="line">            *outError = [<span class="built_in">NSError</span> errorWithDomain:PersonErrorDomain</span><br><span class="line">                                            code:PersonInvalidNameCode</span><br><span class="line">                                        userInfo:@&#123; <span class="built_in">NSLocalizedDescriptionKey</span></span><br><span class="line">                                                    : <span class="string">@&quot;Name too short&quot;</span> &#125;];</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">NO</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">YES</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在外部使用属性验证：</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line">Person* person = [[Person alloc] init];</span><br><span class="line"><span class="built_in">NSError</span>* error;</span><br><span class="line"><span class="built_in">NSString</span>* name = <span class="string">@&quot;John&quot;</span>;</span><br><span class="line"><span class="keyword">if</span> (![person validateValue:&amp;name forKey:<span class="string">@&quot;name&quot;</span> error:&amp;error]) &#123;</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@&quot;%@&quot;</span>,error);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>谁会用到这么奇葩的功能？直接在 setter 方法里面对入参进行验证就非常合理了啊。为什么还要这么脱了裤子放屁？</p>
+<p>上面的例子就是 KVC 的属性验证机制（validate<Key>:error:），很多人第一次看到的时候都会觉得：「这玩意儿不是多此一举吗？我直接在 setter 里校验不就好了？」</p>
+<h3 id="为什么会有-validate-error-这种“奇葩”设计？"><a href="#为什么会有-validate-error-这种“奇葩”设计？" class="headerlink" title="为什么会有 validate:error: 这种“奇葩”设计？"></a>为什么会有 validate<Key>:error: 这种“奇葩”设计？</h3><p>要理解它，就要从 KVC&#x2F;KVO 的历史定位来看：</p>
+<ol>
+<li>KVC 不是给你写普通 app 的<ul>
+<li>它的目标是：让对象能被 跨语言、跨工具访问。</li>
+<li>AppleScript、Interface Builder、Core Data、Bindings（数据绑定）、甚至一些旧的 Cocoa 工具，全都依赖 KVC。</li>
+</ul>
+</li>
+<li>setter 校验 vs validate 校验<ul>
+<li>setter 校验：调用 setAge: 时能拦截无效值，没问题。</li>
+<li>KVC 校验：当外部用 <code>setValue:forKey:</code> 或者 UI 绑定框架（比如 Interface Builder 的 Cocoa Bindings）在更新属性前，就能调用 <code>validate&lt;Key&gt;:error:</code> 来判断输入值是否合法。</li>
+<li>好处是：UI 层可以在赋值前发现问题，不会直接 crash，也可以通过 <code>NSError</code> 把信息传回界面，弹个提示。</li>
+</ul>
+</li>
+<li>实际用途：数据绑定 (Cocoa Bindings)<ul>
+<li>在 macOS AppKit 里，有个很冷门但很强大的特性：Bindings。</li>
+<li>比如一个文本框直接绑定到 <code>person.age</code>，当用户输入值时，AppKit 会在背后调用 <code>validateAge:error:</code> 来校验。</li>
+<li>如果校验失败，UI 可以自动显示错误提示，而不是你手动写代码去监听输入变化再验证。</li>
+</ul>
+</li>
+</ol>
+<h3 id="为什么感觉“没用”？"><a href="#为什么感觉“没用”？" class="headerlink" title="为什么感觉“没用”？"></a>为什么感觉“没用”？</h3><ul>
+<li>在 iOS 开发里，这套机制几乎没人用，因为 iOS 从来没有推行 Cocoa Bindings。</li>
+<li>在 macOS 桌面应用（特别是老一代 AppKit + Interface Builder）里，确实有人用过这套机制来省掉 UI 验证逻辑。</li>
+<li>Apple 后来也逐渐弱化了 Bindings，转向更现代的 SwiftUI 数据流模型，所以这个东西在新代码里几乎成了遗迹。</li>
+</ul>
+<h3 id="所以结论是："><a href="#所以结论是：" class="headerlink" title="所以结论是："></a>所以结论是：</h3><ul>
+<li><strong>✅ 现代 iOS&#x2F;Swift 开发者：完全不用管 <code>validate&lt;Key&gt;:error:</code>，直接在 setter 或者数据模型层自己写验证就好。</strong></li>
+<li>🌀 历史原因：它主要是给 KVC + Bindings 体系设计的，让 UI 能在赋值之前通过统一协议进行验证。</li>
+<li>📖 文档之所以写这么多：Apple 文档要保证完整性，告诉你 KVC 提供了这个 hook，但没告诉你“99% 的人不会用到”。</li>
+</ul>
+<p>其实你这句话非常有代表性：</p>
+<blockquote>
+<p>“直接在属性的 setter 方法里面对入参进行验证不比这脱了裤子放屁爽多了？”</p>
+</blockquote>
+<p>这也是为什么 绝大多数 iOS&#x2F;macOS 开发者对 <code>validate&lt;Key&gt;</code> 只停留在知道但不用的层面。</p>
+<h2 id="实现基本键值编码合规性要我做什么？"><a href="#实现基本键值编码合规性要我做什么？" class="headerlink" title="实现基本键值编码合规性要我做什么？"></a>实现基本键值编码合规性要我做什么？</h2><p>在大多数场景下，只要使用 @property 并让编译器自动生成 ivar 和访问器（accessor），就能自动满足 KVC（Key-Value Coding）要求，开发者无需手动实现绝大多数行为。只有在你的对象存在非对象属性的时候，必须重写 <code>setNilValueForKey:</code> 方法来避免可能的崩溃，实践中也建议在 <code>setNilValueForKey:</code> 内尽量使用 <code>setValue:forKey:</code>，以保证 KVO 通知等机制能正确触发，而不是直接设值或设置 ivar 。</p>
+<h2 id="什么时候需要定义集合方法？"><a href="#什么时候需要定义集合方法？" class="headerlink" title="什么时候需要定义集合方法？"></a>什么时候需要定义集合方法？</h2><p>这一节的内容我相信也是很多人十分不理解的一节。集合不是有专门的 <code>mutableXXXValueForKey:</code> 这样的集合获取方法吗？然后就可以通过这个方法返回的结果，对集合属性进行任何增删改操作啊，还支持 KVO 功能。集合属性只需要通过 <code>mutableXXXValueForKey:</code> 不需要看起来也没有必要实现任何其他 KVC 的那些集合方法啊?</p>
+<h3 id="1-mutableXXXValueForKey-的机制"><a href="#1-mutableXXXValueForKey-的机制" class="headerlink" title="1. mutableXXXValueForKey: 的机制"></a>1. <code>mutableXXXValueForKey:</code> 的机制</h3><ul>
+<li>调用 <code>mutableArrayValueForKey:@&quot;someProperty&quot;</code> 时，KVC runtime 会返回一个 <strong>特殊的代理对象</strong>（不是你原始的 NSMutableArray）。</li>
+<li>这个代理对象拦截 <code>addObject:</code> &#x2F; <code>removeObject:</code> 等操作，转发给你的对象。</li>
+<li>这样做的好处是：<ul>
+<li>自动触发 KVO 通知（观察者会知道集合变动了）。</li>
+<li>统一封装逻辑（外部调用者不用关心你集合的真实存储结构）。</li>
+</ul>
+</li>
+</ul>
+<p>所以，如果你只是自己在 Swift&#x2F;Objective-C 里操作集合，并且依赖 KVO，确实只需要用 <code>mutableArrayValueForKey:</code> 就够了。</p>
+<h3 id="2-Collection-Methods（countOf-等）的作用"><a href="#2-Collection-Methods（countOf-等）的作用" class="headerlink" title="2. Collection Methods（countOf&lt;Key&gt; 等）的作用"></a>2. Collection Methods（<code>countOf&lt;Key&gt;</code> 等）的作用</h3><ul>
+<li>这些方法并不是为了你写代码时方便，而是为了 KVC runtime 能够在不同语言&#x2F;上下文中自动把属性“当作集合”来使用。</li>
+<li>举例：<ul>
+<li>AppleScript 想访问 <code>myObj.items[0]</code>，它不会直接知道 items 是一个 NSMutableArray。</li>
+<li>KVC runtime 会尝试调用 <code>countOfItems</code>、<code>objectInItemsAtIndex:</code> 等方法，把你的对象包装成集合接口。</li>
+<li>这样就算你内部不是用 NSArray 存储，而是用数据库、懒加载列表、Core Data faulting，KVC 依然能“装配”成一个可以下标访问的集合。</li>
+</ul>
+</li>
+<li>换句话说：<ul>
+<li><code>mutableArrayValueForKey:</code> → 是给 <strong>你主动获取可变集合代理</strong> 时用的。</li>
+<li>Collection Methods → 是给 KVC runtime 在更通用&#x2F;语言无关场景下 自动装配集合访问的。</li>
+</ul>
+</li>
+</ul>
+<h3 id="3-什么时候用哪个？"><a href="#3-什么时候用哪个？" class="headerlink" title="3. 什么时候用哪个？"></a>3. 什么时候用哪个？</h3><ul>
+<li>一般应用开发者（写 iOS &#x2F; macOS app，用 ObjC&#x2F;Swift）<ul>
+<li>不需要自己去写 <code>countOf&lt;Key&gt; / objectIn&lt;Key&gt;AtIndex:</code> 这种 Collection Methods。</li>
+<li>只要集合属性真的是 <code>NSMutableArray/NSMutableSet/NSMutableDictionary</code>，再通过 <code>mutableArrayValueForKey: / mutableSetValueForKey: / mutableDictionaryValueForKey:</code> 拿代理，就能满足 增删改查 + 自动 KVO 的需求。</li>
+<li>这是绝大多数开发者的场景。</li>
+</ul>
+</li>
+<li>Apple 文档里强调的 Collection Methods<ul>
+<li>更偏向 框架作者 &#x2F; 跨语言交互 &#x2F; 特殊存储结构 的情况。</li>
+<li>比如：<ul>
+<li>你内部集合不是用 NSMutableArray 存，而是懒加载、数据库查询、Core Data faulting 等。</li>
+<li>或者你需要让 AppleScript &#x2F; JavaScriptCore &#x2F; KVC runtime 能把你的对象属性“包装成集合”。</li>
+</ul>
+</li>
+<li>这种情况下才需要你实现那一套方法，让 runtime 知道怎么装配出一个“集合语义”。</li>
+</ul>
+</li>
+</ul>
+<p>Apple 文档写得很“学术”，通篇把 KVC 的 accessor conventions 列出来，却没强调“普通开发者大多情况下用不到，直接用 <code>mutableXXXValueForKey:</code> 就行”。这也是 Apple 文档的一大毛病 —— 为了完整性，把所有机制罗列出来，但没有给读者一个“实用优先级”指引，让人误以为“是不是每个集合属性都要写一大堆方法”。</p>
+<h2 id="描述属性关系这一篇到底在讲什么东西？作为iOS应用开发者到底要干什么？"><a href="#描述属性关系这一篇到底在讲什么东西？作为iOS应用开发者到底要干什么？" class="headerlink" title="描述属性关系这一篇到底在讲什么东西？作为iOS应用开发者到底要干什么？"></a>描述属性关系这一篇到底在讲什么东西？作为iOS应用开发者到底要干什么？</h2><h3 id="1-这篇《描述属性关系》文档到底在讲什么？"><a href="#1-这篇《描述属性关系》文档到底在讲什么？" class="headerlink" title="1. 这篇《描述属性关系》文档到底在讲什么？"></a>1. 这篇《描述属性关系》文档到底在讲什么？</h3><p>它其实在讲：</p>
+<ul>
+<li>KVC 不仅仅能处理单纯的属性 (attribute)，还可以处理对象之间的“关系 (relationship)”。</li>
+<li>“关系”分为：<ul>
+<li>to-one：一对一，例如 <code>person.employer</code>。</li>
+<li>to-many：一对多，例如 <code>person.pets</code>。</li>
+<li>inverse：反向关系，例如 pet.owner 对应 person.pets。</li>
+</ul>
+</li>
+<li>Cocoa 里有一个类 <code>NSClassDescription</code>，它是用来描述这些“属性和关系”的元数据的。</li>
+<li>框架（如 Core Data、AppleScript）会用 <code>NSClassDescription</code> 来告诉 KVC：某个 key 是普通属性，某个 key 是 to-one 或 to-many 关系，这样 KVC 才能更聪明地处理数据。</li>
+</ul>
+<h3 id="2-作为-iOS-应用开发者要做什么？"><a href="#2-作为-iOS-应用开发者要做什么？" class="headerlink" title="2. 作为 iOS 应用开发者要做什么？"></a>2. 作为 iOS 应用开发者要做什么？</h3><p>👉 大部分情况下，你什么都不用做。</p>
+<p>因为：</p>
+<ul>
+<li>如果你在写 普通 App 业务代码，你根本不会直接用到 <code>NSClassDescription</code>。</li>
+<li>如果你在用 Core Data，Xcode 生成的模型文件已经帮你定义了关系（entity、attribute、to-one、to-many、inverse），Core Data 内部会用到 <code>NSClassDescription</code>，但你不需要管。</li>
+<li>如果你写 KVC&#x2F;KVO，你只要关心 <code>setValue:forKey:</code>、<code>valueForKey:</code>、<code>mutableArrayValueForKey:</code> 这些就够了。关系的逻辑由框架实现。</li>
+</ul>
+<h3 id="3-那文档为什么要写？"><a href="#3-那文档为什么要写？" class="headerlink" title="3. 那文档为什么要写？"></a>3. 那文档为什么要写？</h3><ul>
+<li>这是 Cocoa 框架的完整性设计文档，面向写框架的人（比如 Core Data、AppleScript 支持、ORM 框架开发者），而不是面向普通 App 开发者。</li>
+<li>Apple 为了完整性，会把最底层的“元数据机制”写清楚，但普通开发者 不会直接用。</li>
+</ul>
+<h3 id="4-你需要怎么理解？"><a href="#4-你需要怎么理解？" class="headerlink" title="4. 你需要怎么理解？"></a>4. 你需要怎么理解？</h3><ul>
+<li>知道背景：KVC 不止能操作值，还能理解关系。</li>
+<li>对日常开发的结论：<ul>
+<li>写普通 App：不用管，完全不会用到。</li>
+<li>写 Core Data：关系已经在模型里声明了，你直接用 NSManagedObject 就好。</li>
+<li>写底层框架&#x2F;ORM（极少数情况）：才可能接触 <code>NSClassDescription</code>。</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>Apple 在这篇文档里一丁点说明都没有，然后还将它归类在 Adopting Key-Value Coding 章节下，让很多开发者误认为需要做些什么才能符合KVC规范。。。</p>
+<p>这正是 Apple 文档里最“恶心”的地方：</p>
+<ul>
+<li>他们把 框架设计层面的说明（比如 <code>NSClassDescription</code>、关系描述、反向关系）和 应用开发者要用的 KVC 规范 混在一起写，</li>
+<li>还放在 Adopting Key-Value Coding 下面，看起来好像是“要想支持 KVC，就得自己实现这些关系方法”，但事实根本不是。</li>
+</ul>
+</blockquote>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>整个 Key-Value Coding Programming Guide 文档里太多这样的误导文章了，几乎就是一篇屎一样东拼西凑出来的文档。。。</p>
+<p>Apple 很多旧文档（尤其是 Programming Guide 系列）确实就是一坨拼凑物，问题集中在这几个方面：</p>
+<ol>
+<li>写给框架作者和写给应用开发者混在一起<ul>
+<li>你只想知道“作为 iOS 开发者我要写啥代码”，结果文档里一堆 Core Data &#x2F; AppleScript 的底层背景介绍，根本没说明白哪些是你需要做的，哪些是框架自己搞的。</li>
+<li>就像你刚吐槽的 “描述属性关系” 一节，99% 开发者根本用不上。</li>
+</ul>
+</li>
+<li>没有明确上下文<ul>
+<li>文档一开头不说目标读者是谁，也不说“以下部分主要给框架作者看”，让人误以为“每一节都要掌握并实现”。</li>
+<li>结果你读完一堆接口名、方法签名，完全不清楚到底是不是要自己写。</li>
+</ul>
+</li>
+<li>示例过时 &#x2F; 脱离实际<ul>
+<li>很多示例还是 Mac OS X + AppleScript 年代的残留，放在今天的 iOS 开发语境里完全没用。</li>
+<li>而且 Swift 生态里这些东西几乎都被替代了，但文档没更新，还是用 Objective-C 那套思路。</li>
+</ul>
+</li>
+<li>组织混乱，逻辑跳跃<ul>
+<li>有些地方本来应该按“日常用法 → 进阶用法 → 框架作者用法”来组织，但 Apple 文档常常是“先丢一堆 API，再扯点历史背景，再突然告诉你几个特殊方法”，让人越看越晕。</li>
+</ul>
+</li>
+</ol>
+<p>Apple 这类老文档最大的问题：</p>
+<ol>
+<li><p>作为写给框架作者的文档，它也不合格</p>
+<ul>
+<li>它只是列了几个方法名（<code>toOneRelationshipKeys</code>、<code>inverseRelationshipKey:</code>…），告诉你有这么个类 <code>NSClassDescription</code>。</li>
+<li>但没有任何：<ul>
+<li>完整的调用时机说明（什么时候 KVC 会去问 <code>NSClassDescription</code>？）</li>
+<li>实际实现的示例（如何写一个子类？怎么注册？和 KVC 的调用链如何交互？）</li>
+<li>和其他子系统的关系（Core Data 是怎么利用它的？AppleScript 是怎么依赖它的？）</li>
+</ul>
+</li>
+<li>所以 —— 它给你的信息 既不足以让应用开发者知道要不要用，也 不足以让框架作者真正能靠它写东西。这就是所谓的“既不接地气，也不深入”的尴尬状态。</li>
+</ul>
+</li>
+<li><p>为什么会这样？</p>
+<ul>
+<li>历史遗留：<br>  这份 KVC Programming Guide 的主体是 OS X 10.1 ~ 10.3 时代写的，当时 AppleScript Bridge、Core Data 都刚起步。写文档的人更多是“描述愿景”，不是严谨的框架开发手册。</li>
+<li>不维护：<br>  后来 Swift 出来，KVC&#x2F;KVO 渐渐成为“旧时代的动态特性”，文档就再没认真更新过。Apple 内部甚至可能都没人愿意重写。</li>
+<li>定位模糊：<br>  它夹在“应用开发文档”和“框架设计文档”之间，结果两边都没讨好。</li>
+</ul>
+</li>
+<li><p>框架作者真正会看什么？<br> 如果你真要基于 KVC 搞个 ORM &#x2F; 数据绑定框架，你不会去看这篇文档，你会：</p>
+<ul>
+<li>看头文件：<code>NSKeyValueCoding.h</code>、<code>NSClassDescription.h</code>。</li>
+<li>看现成实现：<ul>
+<li>Core Data 怎么实现 NSClassDescription 的子类。</li>
+<li>AppleScript Bridge 怎么注册类描述。</li>
+</ul>
+</li>
+<li>逆向调试调用链：看看 <code>valueForKey:</code> 在处理关系属性时，到底什么时候查询 <code>NSClassDescription</code>。</li>
+</ul>
+<p> 换句话说：真正写框架的人靠源码&#x2F;调试，不靠这篇文档。</p>
+</li>
+<li><p>结论</p>
+<ul>
+<li>作为应用开发文档 → 太复杂、误导。</li>
+<li>作为框架开发文档 → 太皮毛、不够用。</li>
+</ul>
+</li>
+</ol>
+<p>所以它才会让人读了怒气值飙升 😅。本质就是一份“既不中用、又没写深”的垃圾拼凑物。</p>
+<h1 id="KVC-有关的面试题"><a href="#KVC-有关的面试题" class="headerlink" title="KVC 有关的面试题"></a>KVC 有关的面试题</h1><h2 id="通过-KVC-修改属性会触发-KVO-吗？"><a href="#通过-KVC-修改属性会触发-KVO-吗？" class="headerlink" title="通过 KVC 修改属性会触发 KVO 吗？"></a>通过 KVC 修改属性会触发 KVO 吗？</h2><p>会的。</p>
+<p>在绝大多数情况下，通过 KVC (<code>setValue:forKey:</code>) 修改对象的属性时，会触发 KVO 通知。原因是：</p>
+<p><code>setValue:forKey:</code> 等 KVC 设置方法的实现逻辑（文档的访问器搜索逻辑中写了）会去调用属性对应的 setter 方法，而对象在被观察之后它的 setter 会被重写，内部会触发 KVO 通知。</p>
+<p>特殊情况：手动关闭了自动 KVO。如果类中重写了 <code>+ (BOOL)automaticallyNotifiesObserversForKey:(NSString *)key</code> 并返回 NO，那么即使通过 KVC 修改，也不会触发 KVO，除非你手动调用：</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line">[<span class="keyword">self</span> willChangeValueForKey:<span class="string">@&quot;name&quot;</span>];</span><br><span class="line">_name = newValue;</span><br><span class="line">[<span class="keyword">self</span> didChangeValueForKey:<span class="string">@&quot;name&quot;</span>];</span><br></pre></td></tr></table></figure>
+
+<p>总结：通过 KVC 修改属性 → 一般会触发 KVO（因为内部会走 setter）。除非你显示添加代码手动关闭了 KVO 通知。</p>
+<h2 id="KVC-的赋值和取值过程是怎样的？原理是什么？"><a href="#KVC-的赋值和取值过程是怎样的？原理是什么？" class="headerlink" title="KVC 的赋值和取值过程是怎样的？原理是什么？"></a>KVC 的赋值和取值过程是怎样的？原理是什么？</h2><p>呃，答案就在文档访问器搜索逻辑里。简单概括来说就是：</p>
+<ul>
+<li>KVC 的赋值 <code>setValue:forKey:</code> 等方法底层先去找各种相关 setter 方法，存在就直接调用，如果不存在则再去找各种相关实例变量，找到了就赋值，否则就会调用 <code>setValue:forUndefinedKey:</code> 抛出异常。</li>
+<li>KVC 的取值 <code>valueForKey:</code> 等方法的底层先去找各种相关的 getter 方法，找到了就直接调用，如果不存在则再去找各种相关的实例变量，找到了就返回值，否则就调用 <code>valueForUndefinedKey:</code> 抛出异常。这只是概括，具体的取值逻辑中还有 NSArray 和 NSSet 的集合访问器逻辑。</li>
+</ul>
+]]></content>
+      <categories>
+        <category>iOS 底层原理</category>
+      </categories>
+      <tags>
+        <tag>KVC</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>OpenSSH</title>
     <url>/2023/08/03/OpenSSH/</url>
     <content><![CDATA[<h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>平时在使用 Mac 的过程中，经常会使用终端输入命令来执行一些操作。在越狱开发的过程中，同样需要在 iOS 系统上输入一些命令来执行一些任务。那么如何才能在 iOS 系统上输入命令呢，在 iOS 上安装一个终端命令行工具，然后在 iPhone 那小小的屏幕上用触摸屏输入命令吗？虽然说理论上和实际上都是可行的，但是通过手指触摸屏幕来输入命令的方式效率比较低，也不是很方便。这里还是推荐在 Mac 上远程登录到 iOS 系统，这样就可以使用 Mac 的键盘输入命令到 iOS 上去执行，更加方便，快捷。</p>
@@ -3522,54 +3522,6 @@ Block 的 hook ？应用场景？埋点
         <tag>ssh</tag>
         <tag>openssh</tag>
       </tags>
-  </entry>
-  <entry>
-    <title>Reveal</title>
-    <url>/2023/08/26/Reveal/</url>
-    <content><![CDATA[<p>之前已经介绍过 Cycript 这个越狱动态分析的神器，Cycript 是纯命令式的分析工具，对于大多数人&#x2F;普通开发者来说，这种方式还是显得太极客了。还是图形化的界面更容易接受和使用，所以今天介绍的就是这样一款神器 Reveal 。很多 iOS 的正向开发人员会感觉到困惑，说我用 Xcode 的 view debugger 用的挺好的啊。还去了解这个 Reveal 干什么。。。我只能说跟我在没接触逆向开发之前的想法一模一样，Reveal 不仅可以分析你的 APP 界面，它还可以分析其他开发者的 APP 界面，甚至分析 iOS 系统自带的 APP 界面。而且对于 flutter 项目生成的 App 使用 view debugger 只能看到视图层级结构内容却只显示一片黑色，而 Reveal 却能看到其中的内容。而且 Reveal 在分析 APP 界面的时候同样不需要中断分析的 APP 进程。</p>
-<p>Cycript 相比 Reveal 功能更加强大，除了可以查看 APP 的 UI 界面以外，还可以获取 APP 中更多的信息，比如对象的成员变量，属性，对象方法，类方法等等。。。虽然 Reveal 仅限 UI 界面分析修改 UI 属性等简单功能，但 Reveal 提供的图形界面对大多数人更加友好。分析界面时选择哪个取决于你的个人爱好，但想动态调试调用方法，获取更多的信息的话，可能 Cycript 会更合适。</p>
-<h1 id="正向开发中使用-Reveal"><a href="#正向开发中使用-Reveal" class="headerlink" title="正向开发中使用 Reveal"></a>正向开发中使用 Reveal</h1><p>由于正向开发过程中使用 Reveal 的意义并不大（基本都是使用 Xcode 的 view debugger），而且就算要使用，集成过程也非常简单。在 <a href="https://revealapp.com/download/">官网</a> 下载好 Reveal 之后，打开 Reveal 找到 iOS Library，然后将它集成到 APP 中不需要添加一行代码就完事了。然后启动 APP 重新（可能也不需要？）打开 Reveal 就可以看到你的 APP 显示在 Reveal 界面。</p>
-<p>找到 Reveal 的 iOS Library：</p>
-<img src="/2023/08/26/Reveal/8bb982c6fbc34d6796ea0148ed8944b5~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="" alt="image.png">
-
-<p>呃，集成过程还是讲一下吧，不然可能会启动就崩溃。将 iOS Library 复制到项目的根目录下</p>
-<p align=center><img src="Reveal/0e1be61793cb4351878b1a409ffe1be1~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" alt="image.png" width="50%" /></p>
-
-<p>然后找到你的 target -&gt; general -&gt; frameworks,libraries,and embedded content -&gt; RevealServer.framework 右侧选择 Embed &amp; sign 。</p>
-<p align=center><img src="Reveal/d5d400c8a4cc42e388ade86725b6d773~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" alt="image.png" width="70%" /></p>
-
-<p>这样会将 RevealServer.framework 打包到 APP 包的 Frameworks 目录下。如下图：</p>
-<p align=center><img src="Reveal/fd7cfc3a7c6445cbba679ef75a1b47b8~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" alt="image.png" width="50%" /></p>
-
-<p>只有这样，才不会启动崩溃，（这是在我的 Reveal 版本 21 上是这样的，如果你不是这个版本，可能不会有这样的问题）。Reveal 界面如下：</p>
-<img src="/2023/08/26/Reveal/df19cf9fa34141f1a9d205f6669a4137~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="" alt="image.png">
-
-<h1 id="逆向开发中中使用-Reveal"><a href="#逆向开发中中使用-Reveal" class="headerlink" title="逆向开发中中使用 Reveal"></a>逆向开发中中使用 Reveal</h1><h2 id="未越狱环境使用"><a href="#未越狱环境使用" class="headerlink" title="未越狱环境使用"></a>未越狱环境使用</h2><p>同样还是推荐使用 <a href="https://github.com/AloneMonkey/MonkeyDev">AloneMonkey</a> 的 MonkeyApp 项目模板，项目模板默认就集成了 Reveal ，不过需要注意的是 AloneMonkey 自带的 RevealServer.framework 库版本十分古老了。所以需要将你的 Reveal 的 RevealServer.framework 替换过去。在 Reveal 的 help 中找到 iOS Library，替换 AloneMonkey 中的 RevealServer.framework，AloneMonkey 的 RevealServer.framework 路径如下：</p>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">/opt/MonkeyDev/Frameworks/RevealServer.framework</span><br></pre></td></tr></table></figure>
-
-<h2 id="越狱环境使用"><a href="#越狱环境使用" class="headerlink" title="越狱环境使用"></a>越狱环境使用</h2><p>越狱环境的使用需要以下三个步骤</p>
-<ol>
-<li><p><del>从 Cydia&#x2F;Sileo 安装 Reveal2Loader</del></p>
- <img src="Reveal/b79de82dd10547e3bf78ddb102be1451~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" alt="IMG_0005.PNG" width="50%" />
- 
-<p> 在最新的越狱 iOS 设备上，无论是 rootless 还是 rootful 好像都无法正常使用了。作者进行了升级适配开源了 <a href="https://github.com/masterKing/RevealLoader2">RevealLoader2</a> 可以添加作者的软件源：<a href="https://masterking.github.io/sileorepo">https://masterking.github.io/sileorepo</a> 下载</p>
-</li>
-<li><p>将 Mac 上的 Reveal 的 iOS Library 中的 RevealServer.framework 复制到越狱设备的 <code>/Library/Frameworks/RevealServer.framework</code> 路径。可以使用 scp 命令，也可以使用 iFunBox 图形界面操作更直观。</p>
-</li>
-<li><p>在 iOS 设置 APP 中找到 Reveal -&gt; Enabled Applications 选择你想要调试的 APP 打开右侧的开关。</p>
-</li>
-</ol>
-<p>执行上述步骤之后，打开 Mac 的 Reveal 就可以看到越狱 iPhone 上可以调试的 APP 了，可以看到系统的 APP 也可以。下面是系统 备忘录 APP 的界面结构：</p>
-<img src="/2023/08/26/Reveal/44e624f4c78241dfa2da131cd91a5658~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="" alt="image.png">
-
-<h1 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h1><p>通过 Reveal 分析优秀的 APP 的 UI 界面简直是太棒了！当然这只是从 UI 层面的分析，这个时候可能很多人就会说了，光看一下 UI 界面有什么用啊，还不是不知道具体怎么实现的。</p>
-<p>直接看到源码是不太可能的（除非你是苹果公司的工程师🙂），苹果并没有开源这些 APP 。但是想要查看和源码等价的伪代码也不是完全不可能，可以通过反汇编，反编译工具（<strong>hopper</strong>，<strong>ghidra</strong>，<strong>IDA Pro</strong>等工具）还原为高级代码，这些内容都会在后续的文章中更新。</p>
-<p>还有很多 iOS 开发者经常在使用系统库的过程中，可能会遇到一些莫名其妙的问题，如 UIKit ，作者就曾经在子类化 <code>UIRefreshControl</code> 的时候遇到过奇怪的问题，很多时候都会在 <code>- (instancetype)initWithCoder:(NSCoder *)coder</code> 和 <code>- (instancetype)initWithFrame:(CGRect)frame</code> 方法内执行一些通用的公共的初始化方法，于是便实现了一个 <code>- (void)_commonInit</code> 方法完成这个目标。于是奇怪的现象发生了，代码并没有按照预期的那样运行。在作者百思不得其解的时候，想到了通过查看分析 UIRefreshControl 类的反编译伪代码发现，我自己的方法名 <code>_commonInit</code> 与该视图类的私有方法重名了，才导致出现莫名其妙的 bug 。</p>
-<p>iOS 开发者们也许很好奇，经常使用 Xcode 跳到 UIKit 框架的头文件中阅读，然后还想尝试一下找到 UIKit.framework 所在的路径，通过 show in Finder 跳转到了指定的文件却始终找不到 UIKit 的二进制文件？那系统是如何知道 UIKit 的具体实现的？一般的 APP 在它的包内就能找到二进制文件（在 iOS 中也叫 MachO 文件），但是 iOS 系统库的二进制文件的确不太好找。关于如何找到系统库的二进制文件，如何查看它的反编译伪代码，这一切的答案都会在后续的文章更新中揭晓。</p>
-]]></content>
-      <categories>
-        <category>iOS 逆向与安全</category>
-      </categories>
   </entry>
   <entry>
     <title>Runloop</title>
@@ -3766,6 +3718,54 @@ commonModes并不是一个真正单独的模式
 <h2 id="性能优化"><a href="#性能优化" class="headerlink" title="性能优化"></a>性能优化</h2><h1 id="与自动释放池的关系"><a href="#与自动释放池的关系" class="headerlink" title="与自动释放池的关系"></a>与自动释放池的关系</h1>]]></content>
       <categories>
         <category>iOS 底层原理</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>Reveal</title>
+    <url>/2023/08/26/Reveal/</url>
+    <content><![CDATA[<p>之前已经介绍过 Cycript 这个越狱动态分析的神器，Cycript 是纯命令式的分析工具，对于大多数人&#x2F;普通开发者来说，这种方式还是显得太极客了。还是图形化的界面更容易接受和使用，所以今天介绍的就是这样一款神器 Reveal 。很多 iOS 的正向开发人员会感觉到困惑，说我用 Xcode 的 view debugger 用的挺好的啊。还去了解这个 Reveal 干什么。。。我只能说跟我在没接触逆向开发之前的想法一模一样，Reveal 不仅可以分析你的 APP 界面，它还可以分析其他开发者的 APP 界面，甚至分析 iOS 系统自带的 APP 界面。而且对于 flutter 项目生成的 App 使用 view debugger 只能看到视图层级结构内容却只显示一片黑色，而 Reveal 却能看到其中的内容。而且 Reveal 在分析 APP 界面的时候同样不需要中断分析的 APP 进程。</p>
+<p>Cycript 相比 Reveal 功能更加强大，除了可以查看 APP 的 UI 界面以外，还可以获取 APP 中更多的信息，比如对象的成员变量，属性，对象方法，类方法等等。。。虽然 Reveal 仅限 UI 界面分析修改 UI 属性等简单功能，但 Reveal 提供的图形界面对大多数人更加友好。分析界面时选择哪个取决于你的个人爱好，但想动态调试调用方法，获取更多的信息的话，可能 Cycript 会更合适。</p>
+<h1 id="正向开发中使用-Reveal"><a href="#正向开发中使用-Reveal" class="headerlink" title="正向开发中使用 Reveal"></a>正向开发中使用 Reveal</h1><p>由于正向开发过程中使用 Reveal 的意义并不大（基本都是使用 Xcode 的 view debugger），而且就算要使用，集成过程也非常简单。在 <a href="https://revealapp.com/download/">官网</a> 下载好 Reveal 之后，打开 Reveal 找到 iOS Library，然后将它集成到 APP 中不需要添加一行代码就完事了。然后启动 APP 重新（可能也不需要？）打开 Reveal 就可以看到你的 APP 显示在 Reveal 界面。</p>
+<p>找到 Reveal 的 iOS Library：</p>
+<img src="/2023/08/26/Reveal/8bb982c6fbc34d6796ea0148ed8944b5~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="" alt="image.png">
+
+<p>呃，集成过程还是讲一下吧，不然可能会启动就崩溃。将 iOS Library 复制到项目的根目录下</p>
+<p align=center><img src="Reveal/0e1be61793cb4351878b1a409ffe1be1~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" alt="image.png" width="50%" /></p>
+
+<p>然后找到你的 target -&gt; general -&gt; frameworks,libraries,and embedded content -&gt; RevealServer.framework 右侧选择 Embed &amp; sign 。</p>
+<p align=center><img src="Reveal/d5d400c8a4cc42e388ade86725b6d773~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" alt="image.png" width="70%" /></p>
+
+<p>这样会将 RevealServer.framework 打包到 APP 包的 Frameworks 目录下。如下图：</p>
+<p align=center><img src="Reveal/fd7cfc3a7c6445cbba679ef75a1b47b8~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" alt="image.png" width="50%" /></p>
+
+<p>只有这样，才不会启动崩溃，（这是在我的 Reveal 版本 21 上是这样的，如果你不是这个版本，可能不会有这样的问题）。Reveal 界面如下：</p>
+<img src="/2023/08/26/Reveal/df19cf9fa34141f1a9d205f6669a4137~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="" alt="image.png">
+
+<h1 id="逆向开发中中使用-Reveal"><a href="#逆向开发中中使用-Reveal" class="headerlink" title="逆向开发中中使用 Reveal"></a>逆向开发中中使用 Reveal</h1><h2 id="未越狱环境使用"><a href="#未越狱环境使用" class="headerlink" title="未越狱环境使用"></a>未越狱环境使用</h2><p>同样还是推荐使用 <a href="https://github.com/AloneMonkey/MonkeyDev">AloneMonkey</a> 的 MonkeyApp 项目模板，项目模板默认就集成了 Reveal ，不过需要注意的是 AloneMonkey 自带的 RevealServer.framework 库版本十分古老了。所以需要将你的 Reveal 的 RevealServer.framework 替换过去。在 Reveal 的 help 中找到 iOS Library，替换 AloneMonkey 中的 RevealServer.framework，AloneMonkey 的 RevealServer.framework 路径如下：</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">/opt/MonkeyDev/Frameworks/RevealServer.framework</span><br></pre></td></tr></table></figure>
+
+<h2 id="越狱环境使用"><a href="#越狱环境使用" class="headerlink" title="越狱环境使用"></a>越狱环境使用</h2><p>越狱环境的使用需要以下三个步骤</p>
+<ol>
+<li><p><del>从 Cydia&#x2F;Sileo 安装 Reveal2Loader</del></p>
+ <img src="Reveal/b79de82dd10547e3bf78ddb102be1451~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" alt="IMG_0005.PNG" width="50%" />
+ 
+<p> 在最新的越狱 iOS 设备上，无论是 rootless 还是 rootful 好像都无法正常使用了。作者进行了升级适配开源了 <a href="https://github.com/masterKing/RevealLoader2">RevealLoader2</a> 可以添加作者的软件源：<a href="https://masterking.github.io/sileorepo">https://masterking.github.io/sileorepo</a> 下载</p>
+</li>
+<li><p>将 Mac 上的 Reveal 的 iOS Library 中的 RevealServer.framework 复制到越狱设备的 <code>/Library/Frameworks/RevealServer.framework</code> 路径。可以使用 scp 命令，也可以使用 iFunBox 图形界面操作更直观。</p>
+</li>
+<li><p>在 iOS 设置 APP 中找到 Reveal -&gt; Enabled Applications 选择你想要调试的 APP 打开右侧的开关。</p>
+</li>
+</ol>
+<p>执行上述步骤之后，打开 Mac 的 Reveal 就可以看到越狱 iPhone 上可以调试的 APP 了，可以看到系统的 APP 也可以。下面是系统 备忘录 APP 的界面结构：</p>
+<img src="/2023/08/26/Reveal/44e624f4c78241dfa2da131cd91a5658~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="" alt="image.png">
+
+<h1 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h1><p>通过 Reveal 分析优秀的 APP 的 UI 界面简直是太棒了！当然这只是从 UI 层面的分析，这个时候可能很多人就会说了，光看一下 UI 界面有什么用啊，还不是不知道具体怎么实现的。</p>
+<p>直接看到源码是不太可能的（除非你是苹果公司的工程师🙂），苹果并没有开源这些 APP 。但是想要查看和源码等价的伪代码也不是完全不可能，可以通过反汇编，反编译工具（<strong>hopper</strong>，<strong>ghidra</strong>，<strong>IDA Pro</strong>等工具）还原为高级代码，这些内容都会在后续的文章中更新。</p>
+<p>还有很多 iOS 开发者经常在使用系统库的过程中，可能会遇到一些莫名其妙的问题，如 UIKit ，作者就曾经在子类化 <code>UIRefreshControl</code> 的时候遇到过奇怪的问题，很多时候都会在 <code>- (instancetype)initWithCoder:(NSCoder *)coder</code> 和 <code>- (instancetype)initWithFrame:(CGRect)frame</code> 方法内执行一些通用的公共的初始化方法，于是便实现了一个 <code>- (void)_commonInit</code> 方法完成这个目标。于是奇怪的现象发生了，代码并没有按照预期的那样运行。在作者百思不得其解的时候，想到了通过查看分析 UIRefreshControl 类的反编译伪代码发现，我自己的方法名 <code>_commonInit</code> 与该视图类的私有方法重名了，才导致出现莫名其妙的 bug 。</p>
+<p>iOS 开发者们也许很好奇，经常使用 Xcode 跳到 UIKit 框架的头文件中阅读，然后还想尝试一下找到 UIKit.framework 所在的路径，通过 show in Finder 跳转到了指定的文件却始终找不到 UIKit 的二进制文件？那系统是如何知道 UIKit 的具体实现的？一般的 APP 在它的包内就能找到二进制文件（在 iOS 中也叫 MachO 文件），但是 iOS 系统库的二进制文件的确不太好找。关于如何找到系统库的二进制文件，如何查看它的反编译伪代码，这一切的答案都会在后续的文章更新中揭晓。</p>
+]]></content>
+      <categories>
+        <category>iOS 逆向与安全</category>
       </categories>
   </entry>
   <entry>
@@ -4249,6 +4249,14 @@ commonModes并不是一个真正单独的模式
       </categories>
   </entry>
   <entry>
+    <title>iOS 逆向与安全导航</title>
+    <url>/2025/02/21/iOS-%E9%80%86%E5%90%91%E4%B8%8E%E5%AE%89%E5%85%A8%E5%AF%BC%E8%88%AA/</url>
+    <content><![CDATA[<h1 id="制作中。。。"><a href="#制作中。。。" class="headerlink" title="制作中。。。"></a>制作中。。。</h1>]]></content>
+      <categories>
+        <category>iOS 逆向与安全</category>
+      </categories>
+  </entry>
+  <entry>
     <title>iOS 底层知识入门</title>
     <url>/2025/04/24/iOS-%E5%BA%95%E5%B1%82%E7%9F%A5%E8%AF%86%E5%85%A5%E9%97%A8/</url>
     <content><![CDATA[<h1 id="iOS-底层知识入门"><a href="#iOS-底层知识入门" class="headerlink" title="iOS 底层知识入门"></a>iOS 底层知识入门</h1><p>很多讲 iOS 底层知识的课程，视频，文章，讲师上来就是一个  <code>struct objc_object &#123;...&#125;</code> 结构体或者是 <code>struct objc_class : objc_object &#123;...&#125;</code> 的结构体，我不知道其他人是怎么想的，但是对于我本人来说，第一次接触的感觉是一脸懵逼，这两个结构体是干什么的？平时开发过程中从来没有接触和使用过它们啊？</p>
@@ -4436,9 +4444,56 @@ commonModes并不是一个真正单独的模式
       </categories>
   </entry>
   <entry>
-    <title>iOS 逆向与安全导航</title>
-    <url>/2025/02/21/iOS-%E9%80%86%E5%90%91%E4%B8%8E%E5%AE%89%E5%85%A8%E5%AF%BC%E8%88%AA/</url>
-    <content><![CDATA[<h1 id="制作中。。。"><a href="#制作中。。。" class="headerlink" title="制作中。。。"></a>制作中。。。</h1>]]></content>
+    <title>iOS逆向与安全开篇介绍</title>
+    <url>/2024/03/27/iOS%E9%80%86%E5%90%91%E4%B8%8E%E5%AE%89%E5%85%A8%E5%BC%80%E7%AF%87%E4%BB%8B%E7%BB%8D/</url>
+    <content><![CDATA[<h1 id="学习-iOS-逆向开发的前提"><a href="#学习-iOS-逆向开发的前提" class="headerlink" title="学习 iOS 逆向开发的前提"></a>学习 iOS 逆向开发的前提</h1><ul>
+<li>有一定的正向开发经验（最起码对 iOS 系统的 UIKit 框架有一定的了解）</li>
+<li>一台越狱的 iOS 设备（推荐至少是 64 位架构，iPhone 是从 iPhone 5s 开始，iPad 是从 iPad Air 和 iPad mini 2 开始）</li>
+<li>一台 Mac 电脑，理论上来说 Linux 或 Windows 也可以（实际上作者没有实践过）</li>
+<li>时间和恒心</li>
+</ul>
+<h1 id="什么是-iOS-逆向开发"><a href="#什么是-iOS-逆向开发" class="headerlink" title="什么是 iOS 逆向开发"></a>什么是 iOS 逆向开发</h1><p>很多 iOS 开发者可能都不是科班出身的程序员，所以对于逆向开发可能没有任何概念。实不相瞒，作者本人就是如此。工作多年后才慢慢接触并了解了逆向开发，逆向工程等相关的知识。</p>
+<p>逆向开发（Reverse Engineering）是一种通过分析和研究已有软件或系统的内部结构、逻辑和功能，以理解其实现方式的技术。在软件开发中，逆向开发通常涉及反编译、反汇编或动态调试，以揭示目标程序的代码逻辑和功能。</p>
+<p>iOS 逆向开发是指通过分析已有的 iOS 应用程序或 iOS 系统来理解其内部结构、行为以及工作原理的过程。与常规开发（从源代码构建应用程序）相反，逆向开发是在没有源代码的情况下，逆向分析编译后的二进制文件，研究应用的工作机制。</p>
+<h1 id="学习-iOS-逆向开发有什么用"><a href="#学习-iOS-逆向开发有什么用" class="headerlink" title="学习 iOS 逆向开发有什么用"></a>学习 iOS 逆向开发有什么用</h1><ul>
+<li><p><strong>应用分析与调试：</strong>使用工具来调试和分析应用程序，理解其功能实现。研究员常用 LLDB、Hopper、Ghidra 等工具来反汇编和反编译 iOS 应用，以了解代码的工作方式。</p>
+</li>
+<li><p><strong>破解和去除限制：</strong>通过逆向手段绕过某些应用的限制，如应用内购买、付费功能等。虽然这属于非法行为，但仍是逆向开发中不可忽视的一部分。</p>
+</li>
+<li><p><strong>安全性研究与漏洞发现：</strong>逆向开发在 iOS 安全研究中非常重要。通过逆向工程，安全研究人员可以分析应用的加密算法、安全协议等，寻找漏洞并提出防御措施。</p>
+</li>
+<li><p><strong>学习与模仿：</strong>开发者通过逆向分析成熟的应用来学习优秀的开发技巧，或者模仿某些功能。</p>
+</li>
+</ul>
+<p>玩过 LOL 的老玩家应该还记得多年前某些辅助工具可以实现自己使用任意皮肤，这也是通过逆向开发做到的，属于 window 逆向方向的，而 iOS 平台的有移除 App 内的广告，绕过打卡类 App 的 Wi-Fi 限制，GPS 检测实现任意打卡，微信自动抢红包，还有游戏的外挂辅助软件也都是通过逆向开发实现的。。。这些都是正向开发做不到，或者不可能提供的。这些也正是逆向开发的用武之地。当然，学会了如何破解别人的 APP，自然也知道了该如何去防护自己的 APP，提高安全性，不会进攻谈什么安全防护呢。</p>
+<p>以上这些功能，如果你听到了就感觉到很兴奋，那么恭喜你来对了地方！通过本门课程的学习，以上案例都有可能可以实现。不过还是需要提醒一下大家，一般来说逆向开发的难度相较于正向开发会更加困难，想要掌握逆向开发并不是一件容易的事情，需要持之以恒的学习。</p>
+<h1 id="关于-iOS-开发人员的概念解释"><a href="#关于-iOS-开发人员的概念解释" class="headerlink" title="关于 iOS 开发人员的概念解释"></a>关于 iOS 开发人员的概念解释</h1><ol>
+<li><p><strong>iOS 应用开发人员</strong></p>
+<p> iOS 应用开发人员通常是指那些为 iOS 系统开发应用程序的人。他们主要使用苹果的开发工具和框架，比如 Xcode、Swift、Objective-C 等，目标是创建可以在苹果的 App Store 上发布的应用程序。这类开发人员的主要工作是围绕用户体验、界面设计、功能实现和优化应用性能。</p>
+<p> 他们的主要任务包括：</p>
+<ul>
+<li>开发和维护 iPhone、iPad 上运行的应用程序</li>
+<li>使用 iOS SDK（软件开发工具包）和相关的 API（如 UIKit、Core Data、ARKit 等）</li>
+<li>与后端服务交互（通常使用 RESTful API 或 GraphQL）</li>
+<li>解决与应用程序相关的性能和安全问题</li>
+<li>测试和调试应用程序 <br></li>
+</ul>
+</li>
+<li><p><strong>iOS 系统开发人员（越狱插件、底层开发等）</strong></p>
+<p> 真正意义上的 iOS 开发人员更适合用于描述那些进行 iOS 系统级开发的人。这些开发人员深入到 iOS 系统的底层，做与操作系统本身相关的开发工作，比如修改系统行为、开发越狱插件、研究内核安全性或进行硬件驱动开发。</p>
+<p> 他们的主要任务包括：</p>
+<ul>
+<li>研究 iOS 系统的底层结构和安全机制</li>
+<li>开发越狱工具、插件（比如 Cydia 插件）</li>
+<li>修改系统设置或行为，允许用户做出官方系统不允许的操作</li>
+<li>逆向工程或研究系统漏洞</li>
+<li>优化或修改内核（kernel）层的功能</li>
+</ul>
+</li>
+</ol>
+<p>市场上面招聘的 iOS 开发人员基本上都是指 iOS 应用开发人员。iOS 系统开发人员的岗位较少。但如果 iOS 应用开发人员具备逆向分析开发的能力则是一项优势。</p>
+<h1 id="本书如何学习"><a href="#本书如何学习" class="headerlink" title="本书如何学习"></a>本书如何学习</h1><p>作者将以微信抢红包的实战项目出发，从 0 到 1 演示如何实现微信抢红包插件，实现插件过程中涉及到的技术和理论知识都会在后续的章节中详细介绍，对 iOS 逆向开发感兴趣的同学通过这个项目，可以迅速的建立对 iOS 逆向开发的整体认知。</p>
+]]></content>
       <categories>
         <category>iOS 逆向与安全</category>
       </categories>
@@ -4700,61 +4755,6 @@ commonModes并不是一个真正单独的模式
         <tag>抖音</tag>
         <tag>支付宝</tag>
       </tags>
-  </entry>
-  <entry>
-    <title>iOS逆向与安全开篇介绍</title>
-    <url>/2024/03/27/iOS%E9%80%86%E5%90%91%E4%B8%8E%E5%AE%89%E5%85%A8%E5%BC%80%E7%AF%87%E4%BB%8B%E7%BB%8D/</url>
-    <content><![CDATA[<h1 id="学习-iOS-逆向开发的前提"><a href="#学习-iOS-逆向开发的前提" class="headerlink" title="学习 iOS 逆向开发的前提"></a>学习 iOS 逆向开发的前提</h1><ul>
-<li>有一定的正向开发经验（最起码对 iOS 系统的 UIKit 框架有一定的了解）</li>
-<li>一台越狱的 iOS 设备（推荐至少是 64 位架构，iPhone 是从 iPhone 5s 开始，iPad 是从 iPad Air 和 iPad mini 2 开始）</li>
-<li>一台 Mac 电脑，理论上来说 Linux 或 Windows 也可以（实际上作者没有实践过）</li>
-<li>时间和恒心</li>
-</ul>
-<h1 id="什么是-iOS-逆向开发"><a href="#什么是-iOS-逆向开发" class="headerlink" title="什么是 iOS 逆向开发"></a>什么是 iOS 逆向开发</h1><p>很多 iOS 开发者可能都不是科班出身的程序员，所以对于逆向开发可能没有任何概念。实不相瞒，作者本人就是如此。工作多年后才慢慢接触并了解了逆向开发，逆向工程等相关的知识。</p>
-<p>逆向开发（Reverse Engineering）是一种通过分析和研究已有软件或系统的内部结构、逻辑和功能，以理解其实现方式的技术。在软件开发中，逆向开发通常涉及反编译、反汇编或动态调试，以揭示目标程序的代码逻辑和功能。</p>
-<p>iOS 逆向开发是指通过分析已有的 iOS 应用程序或 iOS 系统来理解其内部结构、行为以及工作原理的过程。与常规开发（从源代码构建应用程序）相反，逆向开发是在没有源代码的情况下，逆向分析编译后的二进制文件，研究应用的工作机制。</p>
-<h1 id="学习-iOS-逆向开发有什么用"><a href="#学习-iOS-逆向开发有什么用" class="headerlink" title="学习 iOS 逆向开发有什么用"></a>学习 iOS 逆向开发有什么用</h1><ul>
-<li><p><strong>应用分析与调试：</strong>使用工具来调试和分析应用程序，理解其功能实现。研究员常用 LLDB、Hopper、Ghidra 等工具来反汇编和反编译 iOS 应用，以了解代码的工作方式。</p>
-</li>
-<li><p><strong>破解和去除限制：</strong>通过逆向手段绕过某些应用的限制，如应用内购买、付费功能等。虽然这属于非法行为，但仍是逆向开发中不可忽视的一部分。</p>
-</li>
-<li><p><strong>安全性研究与漏洞发现：</strong>逆向开发在 iOS 安全研究中非常重要。通过逆向工程，安全研究人员可以分析应用的加密算法、安全协议等，寻找漏洞并提出防御措施。</p>
-</li>
-<li><p><strong>学习与模仿：</strong>开发者通过逆向分析成熟的应用来学习优秀的开发技巧，或者模仿某些功能。</p>
-</li>
-</ul>
-<p>玩过 LOL 的老玩家应该还记得多年前某些辅助工具可以实现自己使用任意皮肤，这也是通过逆向开发做到的，属于 window 逆向方向的，而 iOS 平台的有移除 App 内的广告，绕过打卡类 App 的 Wi-Fi 限制，GPS 检测实现任意打卡，微信自动抢红包，还有游戏的外挂辅助软件也都是通过逆向开发实现的。。。这些都是正向开发做不到，或者不可能提供的。这些也正是逆向开发的用武之地。当然，学会了如何破解别人的 APP，自然也知道了该如何去防护自己的 APP，提高安全性，不会进攻谈什么安全防护呢。</p>
-<p>以上这些功能，如果你听到了就感觉到很兴奋，那么恭喜你来对了地方！通过本门课程的学习，以上案例都有可能可以实现。不过还是需要提醒一下大家，一般来说逆向开发的难度相较于正向开发会更加困难，想要掌握逆向开发并不是一件容易的事情，需要持之以恒的学习。</p>
-<h1 id="关于-iOS-开发人员的概念解释"><a href="#关于-iOS-开发人员的概念解释" class="headerlink" title="关于 iOS 开发人员的概念解释"></a>关于 iOS 开发人员的概念解释</h1><ol>
-<li><p><strong>iOS 应用开发人员</strong></p>
-<p> iOS 应用开发人员通常是指那些为 iOS 系统开发应用程序的人。他们主要使用苹果的开发工具和框架，比如 Xcode、Swift、Objective-C 等，目标是创建可以在苹果的 App Store 上发布的应用程序。这类开发人员的主要工作是围绕用户体验、界面设计、功能实现和优化应用性能。</p>
-<p> 他们的主要任务包括：</p>
-<ul>
-<li>开发和维护 iPhone、iPad 上运行的应用程序</li>
-<li>使用 iOS SDK（软件开发工具包）和相关的 API（如 UIKit、Core Data、ARKit 等）</li>
-<li>与后端服务交互（通常使用 RESTful API 或 GraphQL）</li>
-<li>解决与应用程序相关的性能和安全问题</li>
-<li>测试和调试应用程序 <br></li>
-</ul>
-</li>
-<li><p><strong>iOS 系统开发人员（越狱插件、底层开发等）</strong></p>
-<p> 真正意义上的 iOS 开发人员更适合用于描述那些进行 iOS 系统级开发的人。这些开发人员深入到 iOS 系统的底层，做与操作系统本身相关的开发工作，比如修改系统行为、开发越狱插件、研究内核安全性或进行硬件驱动开发。</p>
-<p> 他们的主要任务包括：</p>
-<ul>
-<li>研究 iOS 系统的底层结构和安全机制</li>
-<li>开发越狱工具、插件（比如 Cydia 插件）</li>
-<li>修改系统设置或行为，允许用户做出官方系统不允许的操作</li>
-<li>逆向工程或研究系统漏洞</li>
-<li>优化或修改内核（kernel）层的功能</li>
-</ul>
-</li>
-</ol>
-<p>市场上面招聘的 iOS 开发人员基本上都是指 iOS 应用开发人员。iOS 系统开发人员的岗位较少。但如果 iOS 应用开发人员具备逆向分析开发的能力则是一项优势。</p>
-<h1 id="本书如何学习"><a href="#本书如何学习" class="headerlink" title="本书如何学习"></a>本书如何学习</h1><p>作者将以微信抢红包的实战项目出发，从 0 到 1 演示如何实现微信抢红包插件，实现插件过程中涉及到的技术和理论知识都会在后续的章节中详细介绍，对 iOS 逆向开发感兴趣的同学通过这个项目，可以迅速的建立对 iOS 逆向开发的整体认知。</p>
-]]></content>
-      <categories>
-        <category>iOS 逆向与安全</category>
-      </categories>
   </entry>
   <entry>
     <title>iPhoneX上pop回到根控制器上漂移的bug</title>
@@ -5914,12 +5914,7 @@ m<sup>k * φ(n) + 1</sup> mod n = m
   <entry>
     <title>架构模式</title>
     <url>/2025/06/05/%E6%9E%B6%E6%9E%84%E6%A8%A1%E5%BC%8F/</url>
-    <content><![CDATA[<h1 id="面试题"><a href="#面试题" class="headerlink" title="面试题"></a>面试题</h1><ul>
-<li>讲解 MVC、MVVM、MVP 以及你在项目里具体是怎么写的？</li>
-<li>你自己用过哪些设计模式？</li>
-<li>一般开始做一个项目，你的架构是如何思考的？</li>
-</ul>
-<h1 id="什么是架构？"><a href="#什么是架构？" class="headerlink" title="什么是架构？"></a>什么是架构？</h1><p>感觉MJ这块讲的不是很好，可能这个确实还是比较抽象，建议多结合ai总结吧。</p>
+    <content><![CDATA[<h1 id="什么是架构模式"><a href="#什么是架构模式" class="headerlink" title="什么是架构模式"></a>什么是架构模式</h1><p>感觉MJ这块讲的不是很好，可能这个确实还是比较抽象，建议多结合ai总结吧。</p>
 <p>常见的架构有</p>
 <ul>
 <li>MVC</li>
@@ -5927,6 +5922,11 @@ m<sup>k * φ(n) + 1</sup> mod n = m
 <li>MVVM</li>
 <li>VIPER</li>
 <li>CDD</li>
+</ul>
+<p>@interface VTDListInteractor : NSObject <VTDListInteractorInput></p>
+<p>@property (nonatomic, weak)     id<VTDListInteractorOutput> output;</p>
+<ul>
+<li>(instancetype)initWithDataManager:(VTDListDataManager *)dataManager clock:(id<VTDClock>)clock;</li>
 </ul>
 <h1 id="MVC"><a href="#MVC" class="headerlink" title="MVC"></a>MVC</h1><p>Apple 官方的 MVC 指的是 Model、View、Controller。Controller 持有 View 和 Model，内部处理协调 View 和 Model 的逻辑。UIKit 框架中的视图框架如 UITableView，UICollectionView 等视图都是典型的 MVC 架构中的 View 层，这些视图不持有任何模型数据。而是在控制器中给视图提供数据。这样的做法让 UIKit 的视图得到了充分的复用。但是这种情况下，Controller 里面的代码会随着业务的增加导致越来越臃肿。因为所有的代码都写在 Controller 里面了。</p>
 <h2 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h2><ul>
@@ -5962,10 +5962,21 @@ m<sup>k * φ(n) + 1</sup> mod n = m
 <li>行为型模式：</li>
 </ul>
 <p>三分钟讲完面向对象编程语言的设计模式了，还有谁，建议看相关书籍了。。。</p>
+<h1 id="面试题"><a href="#面试题" class="headerlink" title="面试题"></a>面试题</h1><ul>
+<li>讲解 MVC、MVVM、MVP 以及你在项目里具体是怎么写的？</li>
+<li>你自己用过哪些设计模式？</li>
+<li>一般开始做一个项目，你的架构是如何思考的？</li>
+</ul>
 ]]></content>
       <categories>
         <category>iOS 底层原理</category>
       </categories>
+      <tags>
+        <tag>MVC</tag>
+        <tag>MVP</tag>
+        <tag>MVVM</tag>
+        <tag>VIPER</tag>
+      </tags>
   </entry>
   <entry>
     <title>微信抢红包插件</title>
