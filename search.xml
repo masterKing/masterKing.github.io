@@ -35,6 +35,28 @@
       </tags>
   </entry>
   <entry>
+    <title>OC与iOS混编</title>
+    <url>/2019/04/12/2019-04-12-OC%E4%B8%8EiOS%E6%B7%B7%E7%BC%96/</url>
+    <content><![CDATA[<h1 id="记录一下-OC-和-Swift-混编的问题"><a href="#记录一下-OC-和-Swift-混编的问题" class="headerlink" title="记录一下,OC 和 Swift 混编的问题"></a>记录一下,OC 和 Swift 混编的问题</h1><p>在OC项目中,需要使用 Swift 的时候,一般情况下,在你的 OC 项目中新建一个 Swift 文件的时候,系统会自动提示你是否需要配置一个 Objective-C 桥接头文件,如下图:</p>
+<img src="/2019/04/12/2019-04-12-OC%E4%B8%8EiOS%E6%B7%B7%E7%BC%96/Snip20190412_4.png" class="">
+
+<p>点击最右侧的创建桥接头文件,系统就会帮你配置创建并配置好一个桥接头文件…这个桥接头文件的作用是,让你可以在 Swift 代码中使用 OC 中的类;只需要将你需要在 Swift 代码中使用的类的头文件在桥接头文件中导入一下就可以使用了;如果一不小心点击了 Don’t Create 按钮,那就需要你自己再手动创建一个头文件,将它配置成桥接头文件,才可以使用.配置步骤如下:</p>
+<ol>
+<li>创建一个头文件 <img src="/2019/04/12/2019-04-12-OC%E4%B8%8EiOS%E6%B7%B7%E7%BC%96/Snip20190412_5.png" class="">
+ <img src="/2019/04/12/2019-04-12-OC%E4%B8%8EiOS%E6%B7%B7%E7%BC%96/Snip20190412_6.png" class=""></li>
+<li>配置成为OC桥接头文件  <img src="/2019/04/12/2019-04-12-OC%E4%B8%8EiOS%E6%B7%B7%E7%BC%96/Snip20190412_7.png" class=""></li>
+</ol>
+<p>在里面导入 OC 的头文件,就可以在 Swift 代码中使用了</p>
+<p>如果是想要在 OC 的代码中使用 Swift 的类的话,这个就更加简单了,只需要导入一个系统自动生成的头文件就可以访问了,这个头文件在项目目录中看不到;但是在上图标记 ③ 的框框下面你可以看到它的名字,直接导入这个头文件就可以使用了,需要注意的是系统并不会自动补全这个头文件…没有提示,需要你自己一个一个字母敲进去</p>
+<hr/>
+
+<p>再来说一下,在 Swift 项目中,想要使用 OC 代码;跟上面的步骤是一样的,第一次在 Swift 项目中创建 OC 类的时候,系统就会提示你是否创建 Objective-C 桥接头文件;这个头文件的作用跟上是一样的,让你可以在 Swift 代码中使用 OC 的类,只需在这个头文件导入 OC 类就行了…在 OC 代码中想要使用 Swift 类也跟上面一样,导入系统自动生成的那个头文件就可以使用了</p>
+]]></content>
+      <tags>
+        <tag>iOS</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>记录一个报错</title>
     <url>/2019/04/25/2019-04-25-%E8%AE%B0%E5%BD%95%E4%B8%80%E4%B8%AA%E6%8A%A5%E9%94%99/</url>
     <content><![CDATA[<h1 id="Undefined-symbols-for-architecture-arm64"><a href="#Undefined-symbols-for-architecture-arm64" class="headerlink" title="Undefined symbols for architecture arm64"></a>Undefined symbols for architecture arm64</h1><img src="/2019/04/25/2019-04-25-%E8%AE%B0%E5%BD%95%E4%B8%80%E4%B8%AA%E6%8A%A5%E9%94%99/Snip20190425_23.png" class="">
@@ -61,28 +83,6 @@
 <p>知道了错误产生的原因之后,再解决问题就很容易了…去 viewController.m 文件中把相关的代码全删了就好了…</p>
 <p>只是有点儿疑惑为什么 xcode 不报找不到头文件 Director 或 ConcreteBuild 错误,而报这个 Undefined symbols for architecture arm64: 错误…一脸懵</p>
 ]]></content>
-  </entry>
-  <entry>
-    <title>OC与iOS混编</title>
-    <url>/2019/04/12/2019-04-12-OC%E4%B8%8EiOS%E6%B7%B7%E7%BC%96/</url>
-    <content><![CDATA[<h1 id="记录一下-OC-和-Swift-混编的问题"><a href="#记录一下-OC-和-Swift-混编的问题" class="headerlink" title="记录一下,OC 和 Swift 混编的问题"></a>记录一下,OC 和 Swift 混编的问题</h1><p>在OC项目中,需要使用 Swift 的时候,一般情况下,在你的 OC 项目中新建一个 Swift 文件的时候,系统会自动提示你是否需要配置一个 Objective-C 桥接头文件,如下图:</p>
-<img src="/2019/04/12/2019-04-12-OC%E4%B8%8EiOS%E6%B7%B7%E7%BC%96/Snip20190412_4.png" class="">
-
-<p>点击最右侧的创建桥接头文件,系统就会帮你配置创建并配置好一个桥接头文件…这个桥接头文件的作用是,让你可以在 Swift 代码中使用 OC 中的类;只需要将你需要在 Swift 代码中使用的类的头文件在桥接头文件中导入一下就可以使用了;如果一不小心点击了 Don’t Create 按钮,那就需要你自己再手动创建一个头文件,将它配置成桥接头文件,才可以使用.配置步骤如下:</p>
-<ol>
-<li>创建一个头文件 <img src="/2019/04/12/2019-04-12-OC%E4%B8%8EiOS%E6%B7%B7%E7%BC%96/Snip20190412_5.png" class="">
- <img src="/2019/04/12/2019-04-12-OC%E4%B8%8EiOS%E6%B7%B7%E7%BC%96/Snip20190412_6.png" class=""></li>
-<li>配置成为OC桥接头文件  <img src="/2019/04/12/2019-04-12-OC%E4%B8%8EiOS%E6%B7%B7%E7%BC%96/Snip20190412_7.png" class=""></li>
-</ol>
-<p>在里面导入 OC 的头文件,就可以在 Swift 代码中使用了</p>
-<p>如果是想要在 OC 的代码中使用 Swift 的类的话,这个就更加简单了,只需要导入一个系统自动生成的头文件就可以访问了,这个头文件在项目目录中看不到;但是在上图标记 ③ 的框框下面你可以看到它的名字,直接导入这个头文件就可以使用了,需要注意的是系统并不会自动补全这个头文件…没有提示,需要你自己一个一个字母敲进去</p>
-<hr/>
-
-<p>再来说一下,在 Swift 项目中,想要使用 OC 代码;跟上面的步骤是一样的,第一次在 Swift 项目中创建 OC 类的时候,系统就会提示你是否创建 Objective-C 桥接头文件;这个头文件的作用跟上是一样的,让你可以在 Swift 代码中使用 OC 的类,只需在这个头文件导入 OC 类就行了…在 OC 代码中想要使用 Swift 类也跟上面一样,导入系统自动生成的那个头文件就可以使用了</p>
-]]></content>
-      <tags>
-        <tag>iOS</tag>
-      </tags>
   </entry>
   <entry>
     <title>MBProgressHUD源码解析</title>
@@ -4444,61 +4444,6 @@ commonModes并不是一个真正单独的模式
       </categories>
   </entry>
   <entry>
-    <title>iOS逆向与安全开篇介绍</title>
-    <url>/2024/03/27/iOS%E9%80%86%E5%90%91%E4%B8%8E%E5%AE%89%E5%85%A8%E5%BC%80%E7%AF%87%E4%BB%8B%E7%BB%8D/</url>
-    <content><![CDATA[<h1 id="学习-iOS-逆向开发的前提"><a href="#学习-iOS-逆向开发的前提" class="headerlink" title="学习 iOS 逆向开发的前提"></a>学习 iOS 逆向开发的前提</h1><ul>
-<li>有一定的正向开发经验（最起码对 iOS 系统的 UIKit 框架有一定的了解）</li>
-<li>一台越狱的 iOS 设备（推荐至少是 64 位架构，iPhone 是从 iPhone 5s 开始，iPad 是从 iPad Air 和 iPad mini 2 开始）</li>
-<li>一台 Mac 电脑，理论上来说 Linux 或 Windows 也可以（实际上作者没有实践过）</li>
-<li>时间和恒心</li>
-</ul>
-<h1 id="什么是-iOS-逆向开发"><a href="#什么是-iOS-逆向开发" class="headerlink" title="什么是 iOS 逆向开发"></a>什么是 iOS 逆向开发</h1><p>很多 iOS 开发者可能都不是科班出身的程序员，所以对于逆向开发可能没有任何概念。实不相瞒，作者本人就是如此。工作多年后才慢慢接触并了解了逆向开发，逆向工程等相关的知识。</p>
-<p>逆向开发（Reverse Engineering）是一种通过分析和研究已有软件或系统的内部结构、逻辑和功能，以理解其实现方式的技术。在软件开发中，逆向开发通常涉及反编译、反汇编或动态调试，以揭示目标程序的代码逻辑和功能。</p>
-<p>iOS 逆向开发是指通过分析已有的 iOS 应用程序或 iOS 系统来理解其内部结构、行为以及工作原理的过程。与常规开发（从源代码构建应用程序）相反，逆向开发是在没有源代码的情况下，逆向分析编译后的二进制文件，研究应用的工作机制。</p>
-<h1 id="学习-iOS-逆向开发有什么用"><a href="#学习-iOS-逆向开发有什么用" class="headerlink" title="学习 iOS 逆向开发有什么用"></a>学习 iOS 逆向开发有什么用</h1><ul>
-<li><p><strong>应用分析与调试：</strong>使用工具来调试和分析应用程序，理解其功能实现。研究员常用 LLDB、Hopper、Ghidra 等工具来反汇编和反编译 iOS 应用，以了解代码的工作方式。</p>
-</li>
-<li><p><strong>破解和去除限制：</strong>通过逆向手段绕过某些应用的限制，如应用内购买、付费功能等。虽然这属于非法行为，但仍是逆向开发中不可忽视的一部分。</p>
-</li>
-<li><p><strong>安全性研究与漏洞发现：</strong>逆向开发在 iOS 安全研究中非常重要。通过逆向工程，安全研究人员可以分析应用的加密算法、安全协议等，寻找漏洞并提出防御措施。</p>
-</li>
-<li><p><strong>学习与模仿：</strong>开发者通过逆向分析成熟的应用来学习优秀的开发技巧，或者模仿某些功能。</p>
-</li>
-</ul>
-<p>玩过 LOL 的老玩家应该还记得多年前某些辅助工具可以实现自己使用任意皮肤，这也是通过逆向开发做到的，属于 window 逆向方向的，而 iOS 平台的有移除 App 内的广告，绕过打卡类 App 的 Wi-Fi 限制，GPS 检测实现任意打卡，微信自动抢红包，还有游戏的外挂辅助软件也都是通过逆向开发实现的。。。这些都是正向开发做不到，或者不可能提供的。这些也正是逆向开发的用武之地。当然，学会了如何破解别人的 APP，自然也知道了该如何去防护自己的 APP，提高安全性，不会进攻谈什么安全防护呢。</p>
-<p>以上这些功能，如果你听到了就感觉到很兴奋，那么恭喜你来对了地方！通过本门课程的学习，以上案例都有可能可以实现。不过还是需要提醒一下大家，一般来说逆向开发的难度相较于正向开发会更加困难，想要掌握逆向开发并不是一件容易的事情，需要持之以恒的学习。</p>
-<h1 id="关于-iOS-开发人员的概念解释"><a href="#关于-iOS-开发人员的概念解释" class="headerlink" title="关于 iOS 开发人员的概念解释"></a>关于 iOS 开发人员的概念解释</h1><ol>
-<li><p><strong>iOS 应用开发人员</strong></p>
-<p> iOS 应用开发人员通常是指那些为 iOS 系统开发应用程序的人。他们主要使用苹果的开发工具和框架，比如 Xcode、Swift、Objective-C 等，目标是创建可以在苹果的 App Store 上发布的应用程序。这类开发人员的主要工作是围绕用户体验、界面设计、功能实现和优化应用性能。</p>
-<p> 他们的主要任务包括：</p>
-<ul>
-<li>开发和维护 iPhone、iPad 上运行的应用程序</li>
-<li>使用 iOS SDK（软件开发工具包）和相关的 API（如 UIKit、Core Data、ARKit 等）</li>
-<li>与后端服务交互（通常使用 RESTful API 或 GraphQL）</li>
-<li>解决与应用程序相关的性能和安全问题</li>
-<li>测试和调试应用程序 <br></li>
-</ul>
-</li>
-<li><p><strong>iOS 系统开发人员（越狱插件、底层开发等）</strong></p>
-<p> 真正意义上的 iOS 开发人员更适合用于描述那些进行 iOS 系统级开发的人。这些开发人员深入到 iOS 系统的底层，做与操作系统本身相关的开发工作，比如修改系统行为、开发越狱插件、研究内核安全性或进行硬件驱动开发。</p>
-<p> 他们的主要任务包括：</p>
-<ul>
-<li>研究 iOS 系统的底层结构和安全机制</li>
-<li>开发越狱工具、插件（比如 Cydia 插件）</li>
-<li>修改系统设置或行为，允许用户做出官方系统不允许的操作</li>
-<li>逆向工程或研究系统漏洞</li>
-<li>优化或修改内核（kernel）层的功能</li>
-</ul>
-</li>
-</ol>
-<p>市场上面招聘的 iOS 开发人员基本上都是指 iOS 应用开发人员。iOS 系统开发人员的岗位较少。但如果 iOS 应用开发人员具备逆向分析开发的能力则是一项优势。</p>
-<h1 id="本书如何学习"><a href="#本书如何学习" class="headerlink" title="本书如何学习"></a>本书如何学习</h1><p>作者将以微信抢红包的实战项目出发，从 0 到 1 演示如何实现微信抢红包插件，实现插件过程中涉及到的技术和理论知识都会在后续的章节中详细介绍，对 iOS 逆向开发感兴趣的同学通过这个项目，可以迅速的建立对 iOS 逆向开发的整体认知。</p>
-]]></content>
-      <categories>
-        <category>iOS 逆向与安全</category>
-      </categories>
-  </entry>
-  <entry>
     <title>iOS反调试与反反调试</title>
     <url>/2025/06/19/iOS%E5%8F%8D%E8%B0%83%E8%AF%95%E4%B8%8E%E5%8F%8D%E5%8F%8D%E8%B0%83%E8%AF%95/</url>
     <content><![CDATA[<h1 id="反调试原理"><a href="#反调试原理" class="headerlink" title="反调试原理"></a>反调试原理</h1><h2 id="ptrace"><a href="#ptrace" class="headerlink" title="ptrace"></a>ptrace</h2><p>​​ptrace (Process Trace)​​ 是 Linux（以及其他一些类 Unix 系统，如 macOS）提供的一个极其强大且底层的​​系统调用​​。它的核心功能是​​允许一个进程（称为 tracer）观察和控制另一个进程（称为 tracee）的执行，并能检查和修改该进程的内存和寄存器。​​</p>
@@ -4755,6 +4700,61 @@ commonModes并不是一个真正单独的模式
         <tag>抖音</tag>
         <tag>支付宝</tag>
       </tags>
+  </entry>
+  <entry>
+    <title>iOS逆向与安全开篇介绍</title>
+    <url>/2024/03/27/iOS%E9%80%86%E5%90%91%E4%B8%8E%E5%AE%89%E5%85%A8%E5%BC%80%E7%AF%87%E4%BB%8B%E7%BB%8D/</url>
+    <content><![CDATA[<h1 id="学习-iOS-逆向开发的前提"><a href="#学习-iOS-逆向开发的前提" class="headerlink" title="学习 iOS 逆向开发的前提"></a>学习 iOS 逆向开发的前提</h1><ul>
+<li>有一定的正向开发经验（最起码对 iOS 系统的 UIKit 框架有一定的了解）</li>
+<li>一台越狱的 iOS 设备（推荐至少是 64 位架构，iPhone 是从 iPhone 5s 开始，iPad 是从 iPad Air 和 iPad mini 2 开始）</li>
+<li>一台 Mac 电脑，理论上来说 Linux 或 Windows 也可以（实际上作者没有实践过）</li>
+<li>时间和恒心</li>
+</ul>
+<h1 id="什么是-iOS-逆向开发"><a href="#什么是-iOS-逆向开发" class="headerlink" title="什么是 iOS 逆向开发"></a>什么是 iOS 逆向开发</h1><p>很多 iOS 开发者可能都不是科班出身的程序员，所以对于逆向开发可能没有任何概念。实不相瞒，作者本人就是如此。工作多年后才慢慢接触并了解了逆向开发，逆向工程等相关的知识。</p>
+<p>逆向开发（Reverse Engineering）是一种通过分析和研究已有软件或系统的内部结构、逻辑和功能，以理解其实现方式的技术。在软件开发中，逆向开发通常涉及反编译、反汇编或动态调试，以揭示目标程序的代码逻辑和功能。</p>
+<p>iOS 逆向开发是指通过分析已有的 iOS 应用程序或 iOS 系统来理解其内部结构、行为以及工作原理的过程。与常规开发（从源代码构建应用程序）相反，逆向开发是在没有源代码的情况下，逆向分析编译后的二进制文件，研究应用的工作机制。</p>
+<h1 id="学习-iOS-逆向开发有什么用"><a href="#学习-iOS-逆向开发有什么用" class="headerlink" title="学习 iOS 逆向开发有什么用"></a>学习 iOS 逆向开发有什么用</h1><ul>
+<li><p><strong>应用分析与调试：</strong>使用工具来调试和分析应用程序，理解其功能实现。研究员常用 LLDB、Hopper、Ghidra 等工具来反汇编和反编译 iOS 应用，以了解代码的工作方式。</p>
+</li>
+<li><p><strong>破解和去除限制：</strong>通过逆向手段绕过某些应用的限制，如应用内购买、付费功能等。虽然这属于非法行为，但仍是逆向开发中不可忽视的一部分。</p>
+</li>
+<li><p><strong>安全性研究与漏洞发现：</strong>逆向开发在 iOS 安全研究中非常重要。通过逆向工程，安全研究人员可以分析应用的加密算法、安全协议等，寻找漏洞并提出防御措施。</p>
+</li>
+<li><p><strong>学习与模仿：</strong>开发者通过逆向分析成熟的应用来学习优秀的开发技巧，或者模仿某些功能。</p>
+</li>
+</ul>
+<p>玩过 LOL 的老玩家应该还记得多年前某些辅助工具可以实现自己使用任意皮肤，这也是通过逆向开发做到的，属于 window 逆向方向的，而 iOS 平台的有移除 App 内的广告，绕过打卡类 App 的 Wi-Fi 限制，GPS 检测实现任意打卡，微信自动抢红包，还有游戏的外挂辅助软件也都是通过逆向开发实现的。。。这些都是正向开发做不到，或者不可能提供的。这些也正是逆向开发的用武之地。当然，学会了如何破解别人的 APP，自然也知道了该如何去防护自己的 APP，提高安全性，不会进攻谈什么安全防护呢。</p>
+<p>以上这些功能，如果你听到了就感觉到很兴奋，那么恭喜你来对了地方！通过本门课程的学习，以上案例都有可能可以实现。不过还是需要提醒一下大家，一般来说逆向开发的难度相较于正向开发会更加困难，想要掌握逆向开发并不是一件容易的事情，需要持之以恒的学习。</p>
+<h1 id="关于-iOS-开发人员的概念解释"><a href="#关于-iOS-开发人员的概念解释" class="headerlink" title="关于 iOS 开发人员的概念解释"></a>关于 iOS 开发人员的概念解释</h1><ol>
+<li><p><strong>iOS 应用开发人员</strong></p>
+<p> iOS 应用开发人员通常是指那些为 iOS 系统开发应用程序的人。他们主要使用苹果的开发工具和框架，比如 Xcode、Swift、Objective-C 等，目标是创建可以在苹果的 App Store 上发布的应用程序。这类开发人员的主要工作是围绕用户体验、界面设计、功能实现和优化应用性能。</p>
+<p> 他们的主要任务包括：</p>
+<ul>
+<li>开发和维护 iPhone、iPad 上运行的应用程序</li>
+<li>使用 iOS SDK（软件开发工具包）和相关的 API（如 UIKit、Core Data、ARKit 等）</li>
+<li>与后端服务交互（通常使用 RESTful API 或 GraphQL）</li>
+<li>解决与应用程序相关的性能和安全问题</li>
+<li>测试和调试应用程序 <br></li>
+</ul>
+</li>
+<li><p><strong>iOS 系统开发人员（越狱插件、底层开发等）</strong></p>
+<p> 真正意义上的 iOS 开发人员更适合用于描述那些进行 iOS 系统级开发的人。这些开发人员深入到 iOS 系统的底层，做与操作系统本身相关的开发工作，比如修改系统行为、开发越狱插件、研究内核安全性或进行硬件驱动开发。</p>
+<p> 他们的主要任务包括：</p>
+<ul>
+<li>研究 iOS 系统的底层结构和安全机制</li>
+<li>开发越狱工具、插件（比如 Cydia 插件）</li>
+<li>修改系统设置或行为，允许用户做出官方系统不允许的操作</li>
+<li>逆向工程或研究系统漏洞</li>
+<li>优化或修改内核（kernel）层的功能</li>
+</ul>
+</li>
+</ol>
+<p>市场上面招聘的 iOS 开发人员基本上都是指 iOS 应用开发人员。iOS 系统开发人员的岗位较少。但如果 iOS 应用开发人员具备逆向分析开发的能力则是一项优势。</p>
+<h1 id="本书如何学习"><a href="#本书如何学习" class="headerlink" title="本书如何学习"></a>本书如何学习</h1><p>作者将以微信抢红包的实战项目出发，从 0 到 1 演示如何实现微信抢红包插件，实现插件过程中涉及到的技术和理论知识都会在后续的章节中详细介绍，对 iOS 逆向开发感兴趣的同学通过这个项目，可以迅速的建立对 iOS 逆向开发的整体认知。</p>
+]]></content>
+      <categories>
+        <category>iOS 逆向与安全</category>
+      </categories>
   </entry>
   <entry>
     <title>iPhoneX上pop回到根控制器上漂移的bug</title>
@@ -6343,6 +6343,16 @@ m<sup>k * φ(n) + 1</sup> mod n = m
       </tags>
   </entry>
   <entry>
+    <title>深入理解 iOS 对象模型</title>
+    <url>/2025/04/25/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3-iOS-%E5%AF%B9%E8%B1%A1%E6%A8%A1%E5%9E%8B/</url>
+    <content><![CDATA[<p>001:<br>讲了 Objective-C 对象的底层是 C 结构体</p>
+<h1 id="Objective-C-实例对象"><a href="#Objective-C-实例对象" class="headerlink" title="Objective-C 实例对象"></a>Objective-C 实例对象</h1><p>在日常使用 Objective-C 开发过程中，我们经常会使用 <code>[[NSObject alloc] init]</code> 这样的方式创建一个实例对象，并调用初始化方法。当然实际的情况中可能不是使用 NSObject 类，而是 UIKit 框架中的类，或者是你自定义的子类。实例对象对于我们来说简直是再熟悉不过了，但是各位有没有思考过，对于 <code>NSObject</code> 来说，<code>alloc</code> 方法分配内存，究竟分配了多大的内存空间，分配的内存中存放的又是什么东西，<code>init</code> 方法又究竟初始化了什么东西？如果不是 <code>NSObject</code> 类，而是其他系统框架类，或者我们自定义的类呢？我们先以 <code>NSObject</code> 类为例，分析 <code>alloc</code> 方法究竟是如何分配内存的，分配了多少内存空间，内存中又放的一些什么东西？</p>
+<h2 id="NSObject-的实例"><a href="#NSObject-的实例" class="headerlink" title="NSObject 的实例"></a>NSObject 的实例</h2>]]></content>
+      <categories>
+        <category>iOS 底层原理</category>
+      </categories>
+  </entry>
+  <entry>
     <title>架构模式</title>
     <url>/2025/06/05/%E6%9E%B6%E6%9E%84%E6%A8%A1%E5%BC%8F/</url>
     <content><![CDATA[<h1 id="关于架构模式"><a href="#关于架构模式" class="headerlink" title="关于架构模式"></a>关于架构模式</h1><h2 id="什么是架构模式"><a href="#什么是架构模式" class="headerlink" title="什么是架构模式"></a>什么是架构模式</h2><p>标准的定义：软件架构模式（Architectural Pattern） 是一种在软件系统中对模块进行职责划分、依赖管理与协作约束的设计思想，用来帮助开发者在复杂系统中保持结构清晰、逻辑解耦和可维护性。</p>
@@ -6355,12 +6365,12 @@ m<sup>k * φ(n) + 1</sup> mod n = m
 <li>依赖关系应该朝哪个方向流动</li>
 </ul>
 <p>很多新人刚学习写代码的时候，只知道在哪个地方写什么代码，后来稍微懂了一点之后发现代码好像写在哪里都可以成功运行，不影响最终结果。只有在接触了架构模式之后才真正能理解代码应该写在哪里，为什么要写在那里，某个类应该做什么，不应该做什么。</p>
-<h3 id="为什么要给对象分门别类呢？"><a href="#为什么要给对象分门别类呢？" class="headerlink" title="为什么要给对象分门别类呢？"></a>为什么要给对象分门别类呢？</h3><p>不分类不行吗？严格来说不分类也没有任何问题。但在实际的项目开发过程中，你的公司会给项目不停的新增需求，如果不使用架构模式进行管理，或者架构模式选择的不合适，使用的不正确，就会自然而然的导致</p>
+<h2 id="为什么要给对象分门别类呢？"><a href="#为什么要给对象分门别类呢？" class="headerlink" title="为什么要给对象分门别类呢？"></a>为什么要给对象分门别类呢？</h2><p>不分类不行吗？严格来说不分类也没有任何问题。但在实际的项目开发过程中，你的公司会给项目不停的新增需求，如果不使用架构模式进行管理，或者架构模式选择的不合适，使用的不正确，就会自然而然的导致</p>
 <ol>
 <li>代码维护困难，</li>
 <li>新增功能麻烦，</li>
 <li>无法对新增功能进行单元测试，</li>
-<li>修改 bug 时，按下葫芦起了瓢，</li>
+<li>修改 bug 时，按下葫芦起了瓢，完全搞不明白 bug 产生的原因</li>
 </ol>
 <h2 id="架构模式解决了什么问题"><a href="#架构模式解决了什么问题" class="headerlink" title="架构模式解决了什么问题"></a>架构模式解决了什么问题</h2><p>解决了软件开发过程中，不断新增的需求导致项目越来越难以开发新功能，新需求，测试，维护的问题。</p>
 <p>更简单点来说解决了复杂软件项目的管理问题？</p>
@@ -6371,6 +6381,7 @@ m<sup>k * φ(n) + 1</sup> mod n = m
 <li>MVP</li>
 <li>MVVM</li>
 <li>VIPER</li>
+<li>MVI</li>
 </ul>
 </li>
 <li>前端知名的架构模式：<ul>
@@ -6390,7 +6401,7 @@ m<sup>k * φ(n) + 1</sup> mod n = m
 </ul>
 </li>
 </ul>
-<p>应该说架构模式是一种思想，它并不局限于在什么端，不论是前端后端还是移动端都存在 MVC 架构模式，以及基于或者不基于 MVC 思想的其他架构模式。</p>
+<p>应该说架构模式是一种思想，它并不局限于在什么端，不论是前端后端还是移动端都存在 MVC 架构模式，以及基于或者不基于 MVC 思想的其他架构模式。而移动端和前端最核心的最需要解决的问题是用户输入和视图展示之间的复杂映射。可以将带用户界面的架构模式归为一类如移动端和前端中常见的架构模式，而不带用户界面的架构模式如后端服务、命令行工具归为一类。</p>
 <h2 id="架构模式会不会带来新的问题"><a href="#架构模式会不会带来新的问题" class="headerlink" title="架构模式会不会带来新的问题"></a>架构模式会不会带来新的问题</h2><p>会的，架构演进过程中的核心矛盾就是：</p>
 <p>方便性（短期开发效率） vs 可维护性（长期扩展能力）</p>
 <p>以移动端常见的架构模式为例：</p>
@@ -6427,13 +6438,232 @@ m<sup>k * φ(n) + 1</sup> mod n = m
 <li><strong>缺乏“痛点”体验：</strong> 很多架构模式是为了解决大规模、高并发或复杂业务带来的混乱。如果你只写过简单的 Demo，你可能根本感受不到这些模式存在的必要性，因此觉得它们是“为了复杂而复杂”。</li>
 </ul>
 <h2 id="好的架构模式代码就一定很少吗"><a href="#好的架构模式代码就一定很少吗" class="headerlink" title="好的架构模式代码就一定很少吗"></a>好的架构模式代码就一定很少吗</h2><p>首先，架构模式并没有好坏之分，只有适合与不适合当前项目规模之分。其次，我把好的架构模式理解成复杂的架构模式如 VIPER 和简单的架构模式如 MVC，这么来说的话。复杂的架构模式并不能保证代码量就一定少，甚至在大部分情况下可能代码量要更多。架构模式和代码量之间并没有必然的关联性。</p>
-<h2 id="历史、发展、现状"><a href="#历史、发展、现状" class="headerlink" title="历史、发展、现状"></a>历史、发展、现状</h2><p>这个问题就问的太大了。。。前端后端移动端的架构模式历史、发展、现状。。。这些都放在后面每个模式中介绍吧。</p>
+<h1 id="移动端常见软件架构模式深度对比：MVC-MVP-MVVM-MVI-VIPER"><a href="#移动端常见软件架构模式深度对比：MVC-MVP-MVVM-MVI-VIPER" class="headerlink" title="移动端常见软件架构模式深度对比：MVC, MVP, MVVM, MVI, VIPER"></a><strong>移动端常见软件架构模式深度对比：MVC, MVP, MVVM, MVI, VIPER</strong></h1><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>MVC, MVP, MVVM, MVI, VIPER 这些架构模式是专门为 UI 驱动（Event-Driven）的应用设计的。 它们存在的核心价值是处理“用户输入（Input）”与“视图展示（Output）”之间的复杂映射。</p>
+<p>对于没有 UI 界面的程序（如后端服务、命令行工具、嵌入式逻辑库、数据处理引擎），通常不会使用这些模式，而是遵循另一套架构准则。</p>
+<p>为什么无 UI 程序不用这些架构？</p>
+<ul>
+<li>没有 View：架构缩写里的 V 根本就不存在。</li>
+<li>没有 Data Binding 需求：不需要实时同步内存中模型的状态到屏幕，因此 MVVM 的 VM 失去了意义。</li>
+<li>触发机制不同：无 UI 程序通常是“请求-响应”模式（RPC&#x2F;API）或“流处理”模式，而不是基于用户点击事件的。</li>
+</ul>
+<h2 id="一、模型-视图-控制器-Model-View-Controller-MVC"><a href="#一、模型-视图-控制器-Model-View-Controller-MVC" class="headerlink" title="一、模型-视图-控制器 (Model-View-Controller, MVC)"></a><strong>一、模型-视图-控制器 (Model-View-Controller, MVC)</strong></h2><h3 id="诞生历史与发展"><a href="#诞生历史与发展" class="headerlink" title="诞生历史与发展"></a><strong>诞生历史与发展</strong></h3><table>
+<thead>
+<tr>
+<th align="left">组件</th>
+<th align="left">角色</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>Model (模型)</strong></td>
+<td align="left">负责管理数据和业务逻辑。与持久化存储交互，并通知 View 或 Controller 数据变化。</td>
+</tr>
+<tr>
+<td align="left"><strong>View (视图)</strong></td>
+<td align="left">负责显示用户界面 (UI)。通常是“笨”组件，不包含任何业务逻辑。</td>
+</tr>
+<tr>
+<td align="left"><strong>Controller (控制器)</strong></td>
+<td align="left">接收用户输入，选择 Model 来处理请求，并决定哪个 View 来显示结果。是 View 和 Model 之间的协调者。</td>
+</tr>
+</tbody></table>
+<ul>
+<li><strong>诞生:</strong> MVC 是最早的架构模式之一，由 Trygve Reenskaug 在 20 世纪 70 年代末首次提出，并于 1988 年在 Smalltalk-80 中首次被正式描述和实现。  </li>
+<li><strong>发展:</strong> 它迅速成为桌面 GUI 应用的主流模式。在 Web 时代，它被 Ruby on Rails、Django 等框架广泛采纳。在早期 iOS (Cocoa Touch) 中，MVC 是主要的范式，但其在移动端的使用带来了 <strong>“Massive View Controller”（庞大的视图控制器）</strong> 的问题。</li>
+</ul>
+<h3 id="现状与挑战"><a href="#现状与挑战" class="headerlink" title="现状与挑战"></a><strong>现状与挑战</strong></h3><ul>
+<li><strong>现状:</strong> 依然是 Web 后端框架的主流。在移动端（尤其是 iOS），由于 View Controller 承担了太多责任（生命周期、网络请求、数据处理等），它更多被视为一种基础思想，并被更现代的模式所取代。  </li>
+<li><strong>挑战:</strong> <strong>紧密耦合</strong>是最大的问题。View 和 Controller 经常直接互相引用，导致 View Controller 变得臃肿，难以单元测试。</li>
+</ul>
+<h2 id="二、模型-视图-展示器-Model-View-Presenter-MVP"><a href="#二、模型-视图-展示器-Model-View-Presenter-MVP" class="headerlink" title="二、模型-视图-展示器 (Model-View-Presenter, MVP)"></a><strong>二、模型-视图-展示器 (Model-View-Presenter, MVP)</strong></h2><h3 id="诞生历史与发展-1"><a href="#诞生历史与发展-1" class="headerlink" title="诞生历史与发展"></a><strong>诞生历史与发展</strong></h3><table>
+<thead>
+<tr>
+<th align="left">组件</th>
+<th align="left">角色</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>Model (模型)</strong></td>
+<td align="left">同 MVC，负责数据和业务逻辑。</td>
+</tr>
+<tr>
+<td align="left"><strong>View (视图)</strong></td>
+<td align="left">负责显示 UI 并将用户操作转发给 Presenter。View 包含一个 Presenter 的引用。</td>
+</tr>
+<tr>
+<td align="left"><strong>Presenter (展示器)</strong></td>
+<td align="left">接收 View 的事件，处理逻辑，从 Model 获取数据，然后通过 View 接口直接命令 View 更新 UI。Presenter 包含一个 View 接口的引用。</td>
+</tr>
+</tbody></table>
+<ul>
+<li><strong>诞生:</strong> MVP 诞生于 20 世纪 90 年代初的 IBM，作为 MVC 的变体，旨在解决在某些框架（如 Smalltalk&#x2F;VisualWorks）中 Controller 过于依赖 View 的问题。它在 2000 年代初期随着微软的 .NET WinForms 社区再次流行。  </li>
+<li><strong>发展:</strong> 在 Android 早期开发中广受欢迎，因为它通过引入 Presenter 隔断了 View 和 Model 的直接联系，有效解决了 Android 中 View（Activity&#x2F;Fragment）难以测试的问题。</li>
+</ul>
+<h3 id="现状与挑战-1"><a href="#现状与挑战-1" class="headerlink" title="现状与挑战"></a><strong>现状与挑战</strong></h3><ul>
+<li><strong>现状:</strong> 在 Android 开发中，仍然有许多遗留项目或特定团队使用。但随着 MVVM 和 Jetpack 的兴起，其使用量有所下降。  </li>
+<li><strong>挑战:</strong> <strong>View 和 Presenter 之间的双向接口引用</strong>是其主要缺点（尽管这保证了高测试性）。需要编写大量的接口代码（Protocol），代码量增加，且 Presenter 仍然通过命令式地调用 View 的方法（如 view.showData(data)）来更新 UI，属于<strong>命令式编程</strong>。</li>
+</ul>
+<h2 id="三、模型-视图-视图模型-Model-View-ViewModel-MVVM"><a href="#三、模型-视图-视图模型-Model-View-ViewModel-MVVM" class="headerlink" title="三、模型-视图-视图模型 (Model-View-ViewModel, MVVM)"></a><strong>三、模型-视图-视图模型 (Model-View-ViewModel, MVVM)</strong></h2><h3 id="诞生历史与发展-2"><a href="#诞生历史与发展-2" class="headerlink" title="诞生历史与发展"></a><strong>诞生历史与发展</strong></h3><table>
+<thead>
+<tr>
+<th align="left">组件</th>
+<th align="left">角色</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>Model (模型)</strong></td>
+<td align="left">同上，负责数据和业务逻辑。</td>
+</tr>
+<tr>
+<td align="left"><strong>View (视图)</strong></td>
+<td align="left">负责显示 UI。它不再直接持有 ViewModel 的引用，而是通过<strong>数据绑定 (Data Binding)</strong> 来观察 ViewModel 的变化。</td>
+</tr>
+<tr>
+<td align="left"><strong>ViewModel (视图模型)</strong></td>
+<td align="left">封装了 View 所需的所有状态和操作。它从 Model 获取数据，并以 View 容易消费的方式暴露出去。<strong>它不持有 View 的引用</strong>。</td>
+</tr>
+</tbody></table>
+<ul>
+<li><strong>诞生:</strong> MVVM 由微软架构师 John Gossman 于 2005 年为 WPF (Windows Presentation Foundation) 和 Silverlight 平台设计，是 MVP 的进一步优化。  </li>
+<li><strong>发展:</strong> 它的核心思想是<strong>数据绑定</strong>。View 和 ViewModel 之间的通信是通过<strong>响应式&#x2F;声明式</strong>的数据流（如 LiveData, StateFlow, Combine, RxJS）实现的。它彻底改变了 View 的更新方式。在 Android (Google 官方推荐)、iOS (SwiftUI&#x2F;Combine) 和前端 (React&#x2F;Vue&#x2F;Angular) 中成为最流行的模式。</li>
+</ul>
+<h3 id="现状与优势"><a href="#现状与优势" class="headerlink" title="现状与优势"></a><strong>现状与优势</strong></h3><ul>
+<li><strong>现状:</strong> <strong>移动端和前端应用的主流架构。</strong> Android 的 Jetpack&#x2F;LiveData&#x2F;ViewModel 体系是其完美实现；iOS 的 SwiftUI 和 Combine 也是基于 MVVM&#x2F;Combine 的响应式范式。  </li>
+<li><strong>优势:</strong> <strong>低耦合</strong>，因为 ViewModel 对 View 一无所知（没有 View 的引用）。<strong>高测试性</strong>，只需测试 ViewModel 中的业务逻辑。View 的更新是声明式的，减少了命令式代码。</li>
+</ul>
+<h2 id="四、模型-视图-意图-Model-View-Intent-MVI"><a href="#四、模型-视图-意图-Model-View-Intent-MVI" class="headerlink" title="四、模型-视图-意图 (Model-View-Intent, MVI)"></a><strong>四、模型-视图-意图 (Model-View-Intent, MVI)</strong></h2><h3 id="诞生历史与发展-3"><a href="#诞生历史与发展-3" class="headerlink" title="诞生历史与发展"></a><strong>诞生历史与发展</strong></h3><table>
+<thead>
+<tr>
+<th align="left">组件</th>
+<th align="left">角色</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>Intent (意图)</strong></td>
+<td align="left">用户操作的抽象（如：LoadDataIntent, ClickButtonIntent）。是单向数据流的起点。</td>
+</tr>
+<tr>
+<td align="left"><strong>Model (模型)</strong></td>
+<td align="left">实际上指的是**状态 (State)**，是应用在某一时刻的单一、不可变的状态对象。</td>
+</tr>
+<tr>
+<td align="left"><strong>View (视图)</strong></td>
+<td align="left">负责渲染当前的状态，并将用户输入转化为 Intent 传递给处理层。</td>
+</tr>
+</tbody></table>
+<ul>
+<li><strong>诞生:</strong> MVI 模式从 Web 端的<strong>Flux&#x2F;Redux</strong>和函数式响应式编程 (FRP) 中获得灵感，由 Cycle.js 推广，并在 2010 年代中后期被 Android 社区（如 Mosby 框架的作者 Hannes Dorfmann）引入。  </li>
+<li><strong>发展:</strong> 它强制使用<strong>单向数据流 (Unidirectional Data Flow, UDF)</strong> 和 <strong>不可变状态 (Immutable State)</strong> 。所有用户操作都封装为 Intent，经过处理后产生一个新的状态，View 仅负责渲染这个新状态。</li>
+</ul>
+<h3 id="现状与特点"><a href="#现状与特点" class="headerlink" title="现状与特点"></a><strong>现状与特点</strong></h3><ul>
+<li><strong>现状:</strong> 在强调状态管理的现代框架中越来越受欢迎，尤其是在 Kotlin&#x2F;Compose 和 SwiftUI 社区。它提供极高的一致性和可预测性。  </li>
+<li><strong>特点:</strong>  <ul>
+<li><strong>单一数据源 (Single Source of Truth):</strong> 只有一个不可变的状态对象。  </li>
+<li><strong>可预测性高:</strong> 因为数据流是严格单向的，调试和重现 Bug 变得非常容易。  </li>
+<li><strong>代码量高:</strong> 由于 Intent 和 State 的封装，通常会比 MVVM 增加更多的样板代码（Boilerplate）。</li>
+</ul>
+</li>
+</ul>
+<h2 id="五、视图-交互器-展示器-实体-路由-View-Interactor-Presenter-Entity-Router-VIPER"><a href="#五、视图-交互器-展示器-实体-路由-View-Interactor-Presenter-Entity-Router-VIPER" class="headerlink" title="五、视图-交互器-展示器-实体-路由 (View-Interactor-Presenter-Entity-Router, VIPER)"></a><strong>五、视图-交互器-展示器-实体-路由 (View-Interactor-Presenter-Entity-Router, VIPER)</strong></h2><h3 id="诞生历史与发展-4"><a href="#诞生历史与发展-4" class="headerlink" title="诞生历史与发展"></a><strong>诞生历史与发展</strong></h3><table>
+<thead>
+<tr>
+<th align="left">组件</th>
+<th align="left">角色</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>View (视图)</strong></td>
+<td align="left">接收用户输入，并将其传递给 Presenter。由 Presenter 负责更新。</td>
+</tr>
+<tr>
+<td align="left"><strong>Interactor (交互器)</strong></td>
+<td align="left"><strong>包含所有业务逻辑。</strong> 与 Entity 和网络&#x2F;数据库服务交互。</td>
+</tr>
+<tr>
+<td align="left"><strong>Presenter (展示器)</strong></td>
+<td align="left">介于 View 和 Interactor 之间，处理 View 的事件，调用 Interactor，并将 Interactor 返回的数据格式化后传递给 View。</td>
+</tr>
+<tr>
+<td align="left"><strong>Entity (实体)</strong></td>
+<td align="left">纯粹的数据对象&#x2F;模型。</td>
+</tr>
+<tr>
+<td align="left"><strong>Router (路由)</strong></td>
+<td align="left">负责处理导航逻辑（从一个屏幕跳转到另一个屏幕）。</td>
+</tr>
+</tbody></table>
+<ul>
+<li><strong>诞生:</strong> VIPER 诞生于 2014 年左右，由 Clean Architecture（“清洁架构”）思想驱动，并被 Mutual Mobile 推广，旨在解决大型 iOS 应用中 MVC 导致的庞大 View Controller 问题。  </li>
+<li><strong>发展:</strong> 它将 MVP 的 Presenter 进一步拆分，把业务逻辑移入 Interactor，把导航逻辑移入 Router。它追求<strong>极致的解耦</strong>。</li>
+</ul>
+<h3 id="现状与特点-1"><a href="#现状与特点-1" class="headerlink" title="现状与特点"></a><strong>现状与特点</strong></h3><ul>
+<li><strong>现状:</strong> 主要在大型、复杂的 iOS 应用程序中流行，这些应用需要严格控制模块间的依赖。由于其高复杂度和大量的接口，不适合小型项目。  </li>
+<li><strong>特点:</strong> <strong>极高解耦</strong>，每个组件都只与相邻的组件通信，且通信通常通过接口完成。这带来了<strong>极高的可测试性</strong>，但代价是<strong>极高的复杂性</strong>和大量的样板代码。</li>
+</ul>
+<h2 id="六、五大架构模式对比总结"><a href="#六、五大架构模式对比总结" class="headerlink" title="六、五大架构模式对比总结"></a><strong>六、五大架构模式对比总结</strong></h2><p>下图清晰地展示了这些模式的核心差异和数据流向。</p>
+<table>
+<thead>
+<tr>
+<th align="left">特性 &#x2F; 模式</th>
+<th align="left">MVC</th>
+<th align="left">MVP (Passive View)</th>
+<th align="left">MVVM (Data Binding)</th>
+<th align="left">MVI (State&#x2F;Intent)</th>
+<th align="left">VIPER (Clean Arch)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>耦合度</strong></td>
+<td align="left">高 (View &lt;-&gt; Controller)</td>
+<td align="left">中 (View &lt;-&gt; Presenter 接口)</td>
+<td align="left">低 (View &lt;-&gt; ViewModel 绑定)</td>
+<td align="left">低 (单向数据流)</td>
+<td align="left">极低 (职责划分细致)</td>
+</tr>
+<tr>
+<td align="left"><strong>可测试性</strong></td>
+<td align="left">低 (Controller 包含 UI 依赖)</td>
+<td align="left">高 (Presenter 独立于 UI)</td>
+<td align="left">高 (ViewModel 独立于 UI)</td>
+<td align="left">极高 (状态机可预测)</td>
+<td align="left">极高 (所有组件可独立测试)</td>
+</tr>
+<tr>
+<td align="left"><strong>复杂性</strong></td>
+<td align="left">低 (结构简单)</td>
+<td align="left">中 (需要编写接口)</td>
+<td align="left">中 (需要响应式框架)</td>
+<td align="left">中高 (需要处理 Intent&#x2F;State)</td>
+<td align="left">极高 (组件数量多)</td>
+</tr>
+<tr>
+<td align="left"><strong>通信方式</strong></td>
+<td align="left">View&#x2F;Controller 直接调用</td>
+<td align="left">Presenter 命令 View</td>
+<td align="left">声明式数据绑定&#x2F;响应式</td>
+<td align="left">单向数据流 (UDF)</td>
+<td align="left">接口&#x2F;协议调用</td>
+</tr>
+<tr>
+<td align="left"><strong>典型平台</strong></td>
+<td align="left">Web 框架 (Rails, Django), 早期 iOS</td>
+<td align="left">Android (早期&#x2F;特定项目)</td>
+<td align="left">Android, iOS, Vue, React, Angular</td>
+<td align="left">Android Compose, SwiftUI, Redux&#x2F;Flux</td>
+<td align="left">大型 iOS 应用</td>
+</tr>
+</tbody></table>
+<p><strong>总结:</strong></p>
+<ul>
+<li>如果你正在开发一个<strong>大型、复杂的、需要长期维护和严格测试</strong>的 iOS 项目，<strong>VIPER</strong> 值得考虑。  </li>
+<li>如果你正在开发一个现代的、<strong>状态驱动的</strong>、需要高可预测性的应用，<strong>MVVM 或 MVI</strong> 是最佳选择。MVVM 在 Android 和现代 Web 中是最流行的。  </li>
+<li><strong>MVC</strong> 和 <strong>MVP</strong> 仍是理解其他模式的基础，但对于现代移动应用开发而言，它们通常被视为不够理想的实践。</li>
+</ul>
 <h1 id="MVC"><a href="#MVC" class="headerlink" title="MVC"></a>MVC</h1><p>Apple 官方的 MVC 指的是 Model、View、Controller。ViewController 持有 View 和 Model，内部处理协调 View 和 Model 的逻辑。Apple 的 UIKit 框架就是典型的基于 MVC 架构思想开发出来的，UIKit 框架中的视图框架如 UITableView，UICollectionView 等视图都是典型的 MVC 架构中的 View 层，这些视图不持有任何模型数据。而是在视图控制器 UIViewController 中给视图提供数据。这样的做法让 UIKit 的视图得到了充分的复用。但是这种情况下，ViewController 里面的代码会随着业务的增加导致越来越臃肿。因为所有的代码都写在 ViewController 里面了。</p>
 <p>MVC 中的 Controller 不是只有 ViewController，也可以有 ModelController。Controller 可以有通用的，也可以有专用的。总之 MVC 并不是一定会导致 ViewController 的臃肿，ViewController 臃肿的根本原因不是 MVC 架构，而是初学者根本不知道如何避免 ViewController 的臃肿。MVC 最大的问题在于，它仅把对象分为三类，实际项目开发中的对象所属的类应该说远不止这三种，这就导致了职责不清晰。然后很多人把只要不是 Model，View 的代码都写在了 ViewController 中才导致臃肿的 ViewController。</p>
 <p>比如说，业务逻辑写在哪里？网络请求写在哪里？数据存储写在哪里？页面交互写在哪里？MVC 并没有明确规定，那么业务逻辑，网络请求，数据存储，页面交互这些看起来很明显即不是视图，也不算模型，那么自然而然的就都写到了视图控制器中去了。</p>
 <h2 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h2><ul>
 <li>View 和 Model 的可重用性高。</li>
-<li>适合小项目，或者项目发展初期追求速度快速开发出第一个可以运行的项目，暂时不考虑，可扩展，可维护性的时候使用。</li>
+<li>适合个人或者小团队的小项目，或者项目发展初期追求速度快速开发出第一个可以运行的项目，暂时不考虑，可扩展，可维护性的时候使用。</li>
 </ul>
 <h2 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h2><ul>
 <li>如果没有刻意的维护，Controller 内的代码会不知不觉的越来越多。</li>
@@ -6443,54 +6673,208 @@ m<sup>k * φ(n) + 1</sup> mod n = m
 <p>在 VIPER 架构的 Demo 中，文件组织的其实非常好，我们新的 MVC 架构项目可以沿用。MVC 版本的项目整体文件夹结构如下：</p>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"> ~/MVC-TODO/MVC-TODO/Classes/ [main+*] tree</span><br><span class="line">.</span><br><span class="line">├── AppDelegate.h</span><br><span class="line">├── AppDelegate.m</span><br><span class="line">├── Common</span><br><span class="line">│   ├── Categories</span><br><span class="line">│   │   ├── NSArray+HOM.h</span><br><span class="line">│   │   ├── NSArray+HOM.m</span><br><span class="line">│   │   ├── NSCalendar+CalendarAdditions.h</span><br><span class="line">│   │   ├── NSCalendar+CalendarAdditions.m</span><br><span class="line">│   │   ├── UIImage+ImageEffects.h</span><br><span class="line">│   │   └── UIImage+ImageEffects.m</span><br><span class="line">│   ├── Model</span><br><span class="line">│   │   └── VTDNearTermDateRelation.h</span><br><span class="line">│   └── Store</span><br><span class="line">│       ├── VTDCoreDataStore.h</span><br><span class="line">│       ├── VTDCoreDataStore.m</span><br><span class="line">│       ├── VTDManagedTodoItem.h</span><br><span class="line">│       └── VTDManagedTodoItem.m</span><br><span class="line">├── Modules</span><br><span class="line">│   ├── Add</span><br><span class="line">│   │   ├── Controller</span><br><span class="line">│   │   │   ├── VTDAddViewController.h</span><br><span class="line">│   │   │   └── VTDAddViewController.m</span><br><span class="line">│   │   ├── Transition</span><br><span class="line">│   │   │   ├── VTDAddDismissalTransition.h</span><br><span class="line">│   │   │   ├── VTDAddDismissalTransition.m</span><br><span class="line">│   │   │   ├── VTDAddPresentationTransition.h</span><br><span class="line">│   │   │   └── VTDAddPresentationTransition.m</span><br><span class="line">│   │   └── View</span><br><span class="line">│   │       └── VTDAddViewInterface.h</span><br><span class="line">│   └── List</span><br><span class="line">│       ├── Controller</span><br><span class="line">│       │   ├── VTDListViewController.h</span><br><span class="line">│       │   └── VTDListViewController.m</span><br><span class="line">│       └── Model</span><br><span class="line">│           ├── VTDUpcomingDisplayData.h</span><br><span class="line">│           ├── VTDUpcomingDisplayData.m</span><br><span class="line">│           ├── VTDUpcomingDisplayItem.h</span><br><span class="line">│           ├── VTDUpcomingDisplayItem.m</span><br><span class="line">│           ├── VTDUpcomingDisplaySection.h</span><br><span class="line">│           └── VTDUpcomingDisplaySection.m</span><br><span class="line">├── SceneDelegate.h</span><br><span class="line">└── SceneDelegate.m</span><br><span class="line"></span><br><span class="line">15 directories, 30 files</span><br></pre></td></tr></table></figure>
 
-<p>其中 Common 文件夹部分，移除掉了一些不是必要的的文件，最终只保留了必要的 Categories、Model、Store 下的文件。Modules 文件夹很清晰的分为两个部分，Add 添加代办事件模块和 List 代办事项列表模块。同样都只保留的必要的部分文件，从文件数量上来说明显比 VIPER 清爽不少，但也很难说这种清爽到底是好还是不好。</p>
-<h2 id="根控制器的显示"><a href="#根控制器的显示" class="headerlink" title="根控制器的显示"></a>根控制器的显示</h2><p>VIPER 架构中的 <code>VTDAppDependencies</code> 类是用来给 VIPER 架构中的各个类之间建立依赖关系的，在 MVC 中我也给去掉了，很难说这一步是不是必要的，但是我认为直接在 <code>AppDelegate</code> 或者 <code>SceneDelegate</code> 中设置应用的根控制器是绝大多数 iOS 开发者更加容易接受，更常见到的做法。我将这一部分写到了 <code>SceneDelegate</code> 中，代码如下：</p>
+<p>其中 Common 文件夹部分，移除掉了一些不是必要的的文件，最终只保留了必要的 Categories、Model、Store 下的文件。Modules 文件夹很清晰的分为两个部分，Add 添加待办事件模块和 List 待办事项列表模块。同样都只保留的必要的部分文件，从文件数量上来说明显比 VIPER 清爽不少，但也很难说这种清爽到底是好还是不好。</p>
+<h3 id="根控制器的显示"><a href="#根控制器的显示" class="headerlink" title="根控制器的显示"></a>根控制器的显示</h3><p>VIPER 架构中的 <code>VTDAppDependencies</code> 类是用来给 VIPER 架构中的各个类之间建立依赖关系的，在 MVC 中我也给去掉了，很难说这一步是不是必要的，但是我认为直接在 <code>AppDelegate</code> 或者 <code>SceneDelegate</code> 中设置应用的根控制器是绝大多数 iOS 开发者更加容易接受，更常见到的做法。我将这一部分写到了 <code>SceneDelegate</code> 中，代码如下：</p>
 <figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="meta">#import <span class="string">&quot;SceneDelegate.h&quot;</span></span></span><br><span class="line"><span class="meta">#import <span class="string">&quot;AppDelegate.h&quot;</span></span></span><br><span class="line"><span class="meta">#import <span class="string">&quot;VTDListViewController.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">SceneDelegate</span> ()</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">SceneDelegate</span></span></span><br><span class="line"></span><br><span class="line">- (<span class="type">void</span>)scene:(<span class="built_in">UIScene</span> *)scene willConnectToSession:(<span class="built_in">UISceneSession</span> *)session options:(<span class="built_in">UISceneConnectionOptions</span> *)connectionOptions &#123;    </span><br><span class="line">    <span class="built_in">UIStoryboard</span> *storyboard = [<span class="built_in">UIStoryboard</span> storyboardWithName:<span class="string">@&quot;Main&quot;</span> bundle:[<span class="built_in">NSBundle</span> mainBundle]];</span><br><span class="line">    VTDListViewController *listVC = [storyboard instantiateViewControllerWithIdentifier:ListViewControllerIdentifier];</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">UINavigationController</span> *navigationController = [storyboard instantiateInitialViewController];</span><br><span class="line">    navigationController.viewControllers = @[listVC];</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">UIWindowScene</span> *ws = (<span class="built_in">UIWindowScene</span> *)scene;</span><br><span class="line">    <span class="keyword">self</span>.window = [[<span class="built_in">UIWindow</span> alloc] initWithWindowScene:ws];</span><br><span class="line">    <span class="keyword">self</span>.window.rootViewController = navigationController;</span><br><span class="line">    [<span class="keyword">self</span>.window makeKeyAndVisible];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
 
-<h2 id="VTDListViewController-的修改"><a href="#VTDListViewController-的修改" class="headerlink" title="VTDListViewController 的修改"></a>VTDListViewController 的修改</h2><p>接下来就到了由 VIPER 架构改为 MVC 架构过程中改动最大的部分：<code>VTDListViewController</code> 类。头文件部分还好，它持有的协议对象，和它需要实现的协议都被注释掉了，在我们的 MVC 中暂时还不需要这些协议。在 VIPER 架构中经常能看到这种用法，就是类不持有一个具体类的实例而是持有一个特定协议的实例，同时这个遵守协议的实例它也不持有具体类的实例，同样持有一个遵守协议的实例。</p>
+<h3 id="VTDListViewController-的修改"><a href="#VTDListViewController-的修改" class="headerlink" title="VTDListViewController 的修改"></a>VTDListViewController 的修改</h3><p>接下来就到了由 VIPER 架构改为 MVC 架构过程中改动最大的部分：<code>VTDListViewController</code> 类。头文件部分还好，它持有的协议对象，和它需要实现的协议都被注释掉了，在我们的 MVC 中暂时还不需要这些协议。在 VIPER 架构中经常能看到这种用法，就是类不持有一个具体类的实例而是持有一个特定协议的实例，同时这个遵守协议的实例它也不持有具体类的实例，同样持有一个遵守协议的实例。</p>
 <p>如：</p>
 <ol>
-<li>类 <code>VTDListViewController</code> 自己实现了 <code>VTDListViewInterface</code> 协议，它持有 <code>id&lt;VTDListModuleInterface&gt; eventHandler</code>，这样任何一个具体类的实例只要实现了 <code>VTDListModuleInterface</code> 协议就能成为 <code>VTDListViewController</code> 的 <code>eventHandler</code>。</li>
-<li>类 <code>VTDListPresenter</code> 自己实现了 <code>VTDListModuleInterface</code> 协议，所以能成为 <code>VTDListViewController</code> 的 <code>eventHandler</code>。它持有 <code>UIViewController&lt;VTDListViewInterface&gt; *userInterface</code>，这样就不需要依赖任何一个具体的视图控制器，任何实现了 <code>VTDListViewInterface</code> 协议的视图控制器都能成为 <code>userInterface</code>。</li>
+<li>类 <code>VTDListViewController</code> 自己实现了 <code>VTDListViewInterface</code> 协议，它持有 <code>id&lt;VTDListModuleInterface&gt; eventHandler</code>，这样任何一个类只要实现了 <code>VTDListModuleInterface</code> 协议就能成为 <code>VTDListViewController</code> 的 <code>eventHandler</code>。</li>
+<li>类 <code>VTDListPresenter</code> 实现了 <code>VTDListModuleInterface</code> 协议，所以能成为 <code>VTDListViewController</code> 的 <code>eventHandler</code>。它持有 <code>UIViewController&lt;VTDListViewInterface&gt; *userInterface</code>，这样就不需要依赖任何一个具体的视图控制器，任何实现了 <code>VTDListViewInterface</code> 协议的视图控制器都能成为 <code>userInterface</code>。呃 <code>VTDListViewController</code> 类显然已经实现了 <code>VTDListViewInterface</code> 协议。</li>
 </ol>
 <p>这样的做法实现了两个类之间的解耦合，UI 相关的类 <code>VTDListViewController</code> 不依赖具体的事件处理者类 <code>VTDListPresenter</code>，事件处理者类也不依赖具体的 UI 类是什么。这种通过协议进行解耦合的方法才是架构模式的本质。可能很多读者不能理解什么叫不依赖，可以简单的理解为不需要导入头文件，比如 <code>VTDListViewController</code> 可以看到它根本不需要导入太多的头文件。<code>VTDListViewController.h</code> 只导入了两个协议，一个是它需要实现的协议，一个是它持有的对象需要的协议。<code>VTDListViewController.m</code> 它只需要导入必要的头文件，比如它用到的组模型，行模型，结合组模型和行模型的 DisplayData 模型就完全足够了，这个 <code>VTDListViewController</code> 就是低耦合的典范。</p>
 <p>这种写法应该叫面向接口编程，就是类的功能实现不依赖具体的类，而是依赖接口。在 Objective-C 中实现面向接口编程的方式有蛮多种，但最推荐的就是协议。语言级接口，最自然的“面向接口”方式。可以声明必须&#x2F;可选方法，容易 mock 和单元测试，配合 id<Protocol> 使用。</p>
-<p>然后就是 <code>VTDListViewController.m</code> 文件的改动了。在 VIPER 架构中 <code>VTDListViewController.m</code> 看着确实非常清爽，整个 <code>VTDListViewController.m</code> 中只存在与 UI 相关的代码。这也正是视图控制器的职责所在，就是说只做自己应该做的事情，保持低耦合高内聚。一些 UI 相关的事件，如点击添加代办事项按钮，页面将要显示，的确会触发视图控制器的某些代码，如 <code>viewWillAppear:</code>、<code>didTapAddButton:</code> 但实际查看这些方法的实现就知道，视图控制器并没有真正响应和处理这些事件，而是转交给 <code>id&lt;VTDListModuleInterface&gt; eventHandler</code> 去处理了。 </p>
+<p>然后就是 <code>VTDListViewController.m</code> 文件的改动了。在 VIPER 架构中 <code>VTDListViewController.m</code> 看着确实非常清爽，整个 <code>VTDListViewController.m</code> 中只存在与 UI 相关的代码。这也正是视图控制器的职责所在，就是说只做自己应该做的事情，保持低耦合高内聚。一些 UI 相关的事件，如点击添加待办事项按钮，页面将要显示，的确会触发视图控制器的某些代码，如 <code>viewWillAppear:</code>、<code>didTapAddButton:</code> 但实际查看这些方法的实现就知道，视图控制器并没有真正处理这些事件，而是转交给 <code>id&lt;VTDListModuleInterface&gt; eventHandler</code> 去处理了。</p>
 <img src="/2025/06/05/%E6%9E%B6%E6%9E%84%E6%A8%A1%E5%BC%8F/Snipaste_2025-12-02_07-39-08.png" class="">
 
-<p>回到我们的 MVC 架构版本中。</p>
-<h1 id="MVP"><a href="#MVP" class="headerlink" title="MVP"></a>MVP</h1><ul>
-<li>Model 模型</li>
-<li>View 视图</li>
-<li>Presenter 主持者，主持人</li>
-</ul>
-<p>这里应该贴代码了。。。控制器持有 Presenter。Presenter 也持有控制器，但是是弱引用的。</p>
-<p>感觉就是把控制器的一些逻辑移动到 Presenter 里面去了啊。相当于是 Controller 持有 Presenter，而 Presenter 代替 Controller 成为了 View 和 Model 的交流中心。</p>
-<h1 id="VIPER"><a href="#VIPER" class="headerlink" title="VIPER"></a>VIPER</h1><p>是对 MVP 的进一步细化。</p>
-<h1 id="MVVM"><a href="#MVVM" class="headerlink" title="MVVM"></a>MVVM</h1><p>看着跟 MVP 一样啊。Presenter 换了个名字而已。。。ViewModel。MJ 说什么双向绑定。。。属性监听？</p>
-<p>AppView 持有 ViewModel，ViewModel 然后。。。看不懂</p>
-<p>什么 RAC 太重了？又是 KVO 怎么麻烦了？结果直接使用 FBKVOController？</p>
-<p>在 AppView 的 ViewModel setter 方法里面，监听 ViewModel 的属性，但是 ViewModel 属性发送变化时，更新 AppView 的视图。</p>
-<p>感觉讲的真的还是很勉强。。。最后说什么 VIPER、CDD 都是前面的变种。。。</p>
-<h1 id="分层架构"><a href="#分层架构" class="headerlink" title="分层架构"></a>分层架构</h1><ul>
-<li>界面层</li>
-<li>业务层</li>
-<li>数据层</li>
-</ul>
-<p>这个讲的更抽象。。。呃，感觉是为了赶紧结课，匆匆了事</p>
-<p>NewsService 类提供一个 API 加载数据，内部实现是使用 DBTool 加载本地数据，如果没有本地数据，使用 HPPTTool 加载网络数据。。。这个逻辑也太简单了，到处都是漏洞，首先如果没有本地数据就加载网络数据，那么如果一直没有本地数据就永远加载网络数据去了，这一点可能你会说加载网络数据之后就保存到本地啊，但是保存到本地之后，下次及以后就永远都是使用本地数据不去走网络请求了啊。。。搞不明白，搞这么多层是想干什么</p>
-<h1 id="设计模式"><a href="#设计模式" class="headerlink" title="设计模式"></a>设计模式</h1><p>这个就是面向对象语言的设计模式了，跟架构模式不相干。。。十分简单的介绍了一下，并没有讲到位。完全没有必要放在这里，而且面向对象语言的设计模式完全可以单开一门课程的。<br>面向对象语言的设计模式，其实是一些特定问题的经过验证的解决方案，经验总结：<br>可以分为三大类</p>
+<p>回到我们的 MVC 架构版本中。会看到很多熟悉的方法回来了，比如 <code>loadData</code>，多了很多与 UI 无关的代码，如：</p>
 <ul>
-<li>创建型模式：</li>
-<li>结构型模式：</li>
-<li>行为型模式：</li>
+<li>本地存储和数据处理：<code>loadData</code> 方法中直接使用使用 CoreData 查询待办事项数据，并对数据进行处理转成当前列表视图需要的数据。</li>
+<li>页面跳转：如在 <code>didTapAddButton:</code> 方法中直接创建 <code>VTDAddViewController</code> 并进行了跳转。</li>
 </ul>
-<p>三分钟讲完面向对象编程语言的设计模式了，还有谁，建议看相关书籍了。。。</p>
-<h1 id="面试题"><a href="#面试题" class="headerlink" title="面试题"></a>面试题</h1><ul>
-<li>讲解 MVC、MVVM、MVP 以及你在项目里具体是怎么写的？</li>
-<li>你自己用过哪些设计模式？</li>
-<li>一般开始做一个项目，你的架构是如何思考的？</li>
+<img src="/2025/06/05/%E6%9E%B6%E6%9E%84%E6%A8%A1%E5%BC%8F/Snipaste_2025-12-03_20-00-49.png" class="">
+
+<p>具体的代码如下：</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="meta">#import <span class="string">&quot;VTDListViewController.h&quot;</span></span></span><br><span class="line"><span class="meta">#import <span class="string">&quot;VTDUpcomingDisplayData.h&quot;</span></span></span><br><span class="line"><span class="meta">#import <span class="string">&quot;VTDUpcomingDisplaySection.h&quot;</span></span></span><br><span class="line"><span class="meta">#import <span class="string">&quot;VTDUpcomingDisplayItem.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">#import <span class="string">&quot;VTDCoreDataStore.h&quot;</span></span></span><br><span class="line"><span class="meta">#import <span class="string">&quot;VTDManagedTodoItem.h&quot;</span></span></span><br><span class="line"><span class="meta">#import <span class="string">&quot;VTDAddViewController.h&quot;</span></span></span><br><span class="line"><span class="meta">#import <span class="string">&quot;VTDAddDismissalTransition.h&quot;</span></span></span><br><span class="line"><span class="meta">#import <span class="string">&quot;VTDAddPresentationTransition.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">static</span> <span class="built_in">NSString</span>* <span class="keyword">const</span> VTDListEntryCellIdentifier = <span class="string">@&quot;VTDListEntryCell&quot;</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">VTDListViewController</span> () &lt;<span class="title">UIViewControllerTransitioningDelegate</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>)   VTDUpcomingDisplayData* data;</span><br><span class="line"></span><br><span class="line"><span class="comment">// The view controller seems to have a weak reference to the table view.</span></span><br><span class="line"><span class="comment">// We need to keep a strong reference to the table view for times when we remove the table view from the view controller</span></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>)   <span class="built_in">UITableView</span>*            strongTableView;</span><br><span class="line"></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>)   <span class="built_in">NSDateFormatter</span> *dayFormatter;</span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">VTDListViewController</span></span></span><br><span class="line"></span><br><span class="line">- (<span class="type">void</span>)viewDidLoad</span><br><span class="line">&#123;</span><br><span class="line">    [<span class="variable language_">super</span> viewDidLoad];</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">self</span>.strongTableView = <span class="keyword">self</span>.tableView;</span><br><span class="line">    <span class="keyword">self</span>.navigationItem.title = <span class="string">@&quot;MVC TODO&quot;</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">UIBarButtonItem</span> *addItem = [[<span class="built_in">UIBarButtonItem</span> alloc] initWithBarButtonSystemItem:<span class="built_in">UIBarButtonSystemItemAdd</span></span><br><span class="line">                                                                             target:<span class="keyword">self</span></span><br><span class="line">                                                                             action:<span class="keyword">@selector</span>(didTapAddButton:)];</span><br><span class="line">    <span class="keyword">self</span>.navigationItem.rightBarButtonItem = addItem;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="type">void</span>)viewWillAppear:(<span class="type">BOOL</span>)animated</span><br><span class="line">&#123;</span><br><span class="line">    [<span class="variable language_">super</span> viewWillAppear:animated];</span><br><span class="line">    [<span class="keyword">self</span> loadData];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">static</span> <span class="built_in">NSString</span> *AddViewControllerIdentifier = <span class="string">@&quot;VTDAddViewController&quot;</span>;</span><br><span class="line"></span><br><span class="line">- (<span class="type">void</span>)didTapAddButton:(<span class="type">id</span>)sender</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">UIStoryboard</span> *storyboard = [<span class="built_in">UIStoryboard</span> storyboardWithName:<span class="string">@&quot;Main&quot;</span> bundle:[<span class="built_in">NSBundle</span> mainBundle]];</span><br><span class="line">    VTDAddViewController *addViewController = [storyboard instantiateViewControllerWithIdentifier:AddViewControllerIdentifier];</span><br><span class="line">    addViewController.modalPresentationStyle = <span class="built_in">UIModalPresentationCustom</span>;</span><br><span class="line">    addViewController.transitioningDelegate = <span class="keyword">self</span>;</span><br><span class="line">    [addViewController setMinimumDueDate:[<span class="built_in">NSDate</span> date]];</span><br><span class="line">    __<span class="keyword">weak</span> <span class="keyword">typeof</span>(<span class="keyword">self</span>) welf = <span class="keyword">self</span>;</span><br><span class="line">    addViewController.didSaveItemBlock = ^&#123;</span><br><span class="line">        [welf loadData];</span><br><span class="line">    &#125;;</span><br><span class="line">    [<span class="keyword">self</span> presentViewController:addViewController animated:<span class="literal">YES</span> completion:<span class="literal">nil</span>];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="type">void</span>)loadData &#123;</span><br><span class="line">    <span class="built_in">NSCalendar</span> *calendar = [<span class="built_in">NSCalendar</span> autoupdatingCurrentCalendar];</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">NSDate</span> *startDate = [<span class="built_in">NSDate</span> date];</span><br><span class="line">    <span class="built_in">NSDate</span> *endDate = [calendar dateForEndOfFollowingWeekWithDate:startDate];</span><br><span class="line"></span><br><span class="line">    <span class="built_in">NSPredicate</span> *predicate = [<span class="built_in">NSPredicate</span> predicateWithFormat:<span class="string">@&quot;(date &gt;= %@) AND (date &lt;= %@)&quot;</span>, [calendar dateForBeginningOfDay:startDate], [calendar dateForEndOfDay:endDate]];</span><br><span class="line">    <span class="built_in">NSArray</span> *sortDescriptors = @[];</span><br><span class="line">    </span><br><span class="line">    __<span class="keyword">weak</span> <span class="keyword">typeof</span>(<span class="keyword">self</span>) welf = <span class="keyword">self</span>;</span><br><span class="line">    [VTDCoreDataStore.sharedStore fetchEntriesWithPredicate:predicate sortDescriptors:sortDescriptors completionBlock:^(<span class="built_in">NSArray</span>&lt;VTDManagedTodoItem *&gt; *entries) &#123;</span><br><span class="line">        <span class="keyword">if</span> (entries.count == <span class="number">0</span>) &#123;</span><br><span class="line">            [welf showNoContentMessage];</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// VIPER 中搞了一堆的类本质上就以下这么些代码，</span></span><br><span class="line">        	  <span class="comment">// 在 VIPER 架构中你要想知道数据是如何拼装成最终 UITableView 所需要的得来来回回不断跳转到各个不同的类中去才能看明白</span></span><br><span class="line">        	  <span class="comment">// 而在当前这样的 MVC 架构中就能明明白白非常清晰的看到数据处理拼接的过程了。</span></span><br><span class="line">        	  <span class="comment">// 从这一点上来说，MVC 肯定是要比 VIPER 看起来清晰明了多了。</span></span><br><span class="line">        <span class="built_in">NSMutableDictionary</span> *dictionary = [<span class="built_in">NSMutableDictionary</span> dictionary];</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; entries.count; i++) &#123;</span><br><span class="line">            VTDManagedTodoItem *item = entries[i];</span><br><span class="line"></span><br><span class="line">            VTDNearTermDateRelation dateRelation = [calendar nearTermRelationForDate:item.date relativeToToday:startDate];</span><br><span class="line">            <span class="built_in">NSString</span> *dueDay = (dateRelation != VTDNearTermDateRelationToday) ? [<span class="keyword">self</span>.dayFormatter stringFromDate:item.date] : <span class="string">@&quot;&quot;</span>;</span><br><span class="line">            VTDUpcomingDisplayItem *rowModel = [VTDUpcomingDisplayItem upcomingDisplayItemWithTitle:item.name dueDay:dueDay];</span><br><span class="line">            rowModel.managedModel = item;</span><br><span class="line">            </span><br><span class="line">            <span class="keyword">if</span> (dictionary[@(dateRelation)] == <span class="literal">nil</span>) &#123;</span><br><span class="line">                dictionary[@(dateRelation)] = [<span class="built_in">NSMutableArray</span> array];</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="built_in">NSMutableArray</span> *array = dictionary[@(dateRelation)];</span><br><span class="line">            [array addObject:rowModel];</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">NSArray</span> *sortedKeys = [[dictionary allKeys] sortedArrayUsingSelector:<span class="keyword">@selector</span>(compare:)];</span><br><span class="line">        <span class="built_in">NSArray</span> *sections = [sortedKeys arrayFromObjectsCollectedWithBlock:^<span class="type">id</span>(<span class="built_in">NSNumber</span> *sectionKey) &#123;</span><br><span class="line">            VTDNearTermDateRelation dateRelation = [sectionKey unsignedIntegerValue];</span><br><span class="line">            <span class="built_in">NSString</span> *sectionTitle = [<span class="keyword">self</span> sectionTitleForDateRelation:dateRelation];</span><br><span class="line">            <span class="built_in">NSString</span> *imageName = [<span class="keyword">self</span> sectionImageNameForDateRelation:dateRelation];</span><br><span class="line">            </span><br><span class="line">            <span class="keyword">return</span> [VTDUpcomingDisplaySection upcomingDisplaySectionWithName:sectionTitle</span><br><span class="line">                                                                   imageName:imageName</span><br><span class="line">                                                                       items:dictionary[sectionKey]];</span><br><span class="line">        &#125;];</span><br><span class="line">        </span><br><span class="line">        VTDUpcomingDisplayData *displayData = [VTDUpcomingDisplayData upcomingDisplayDataWithSections:sections];</span><br><span class="line">        [welf showUpcomingDisplayData:displayData];</span><br><span class="line">    &#125;];</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="built_in">NSDateFormatter</span> *)dayFormatter</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> (_dayFormatter == <span class="literal">nil</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        _dayFormatter = [[<span class="built_in">NSDateFormatter</span> alloc] init];</span><br><span class="line">        [_dayFormatter setDateFormat:[<span class="built_in">NSDateFormatter</span> dateFormatFromTemplate:<span class="string">@&quot;EEEE&quot;</span> options:<span class="number">0</span> locale:[<span class="built_in">NSLocale</span> autoupdatingCurrentLocale]]];</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> _dayFormatter;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="built_in">NSString</span> *)sectionImageNameForDateRelation:(VTDNearTermDateRelation)dateRelation</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">switch</span> (dateRelation)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">case</span> VTDNearTermDateRelationToday:</span><br><span class="line">            <span class="keyword">return</span> <span class="string">@&quot;check&quot;</span>;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">            </span><br><span class="line">        <span class="keyword">case</span> VTDNearTermDateRelationTomorrow:</span><br><span class="line">            <span class="keyword">return</span> <span class="string">@&quot;alarm&quot;</span>;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">            </span><br><span class="line">        <span class="keyword">case</span> VTDNearTermDateRelationLaterThisWeek:</span><br><span class="line">            <span class="keyword">return</span> <span class="string">@&quot;circle&quot;</span>;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">            </span><br><span class="line">        <span class="keyword">case</span> VTDNearTermDateRelationNextWeek:</span><br><span class="line">            <span class="keyword">return</span> <span class="string">@&quot;calendar&quot;</span>;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">            </span><br><span class="line">        <span class="keyword">case</span> VTDNearTermDateRelationOutOfRange:</span><br><span class="line">            <span class="keyword">return</span> <span class="string">@&quot;paper&quot;</span>;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">- (<span class="built_in">NSString</span> *)sectionTitleForDateRelation:(VTDNearTermDateRelation)dateRelation</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">switch</span> (dateRelation)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">case</span> VTDNearTermDateRelationToday:</span><br><span class="line">            <span class="keyword">return</span> <span class="string">@&quot;Today&quot;</span>;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">case</span> VTDNearTermDateRelationTomorrow:</span><br><span class="line">            <span class="keyword">return</span> <span class="string">@&quot;Tomorrow&quot;</span>;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">            </span><br><span class="line">        <span class="keyword">case</span> VTDNearTermDateRelationLaterThisWeek:</span><br><span class="line">            <span class="keyword">return</span> <span class="string">@&quot;Later This Week&quot;</span>;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">            </span><br><span class="line">        <span class="keyword">case</span> VTDNearTermDateRelationNextWeek:</span><br><span class="line">            <span class="keyword">return</span> <span class="string">@&quot;Next Week&quot;</span>;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">            </span><br><span class="line">        <span class="keyword">case</span> VTDNearTermDateRelationOutOfRange:</span><br><span class="line">            <span class="keyword">return</span> <span class="string">@&quot;Unknown&quot;</span>;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">pragma</span> mark - UIViewControllerTransitioningDelegate Methods</span></span><br><span class="line"></span><br><span class="line">- (<span class="type">id</span>&lt;<span class="built_in">UIViewControllerAnimatedTransitioning</span>&gt;)animationControllerForDismissedController:(<span class="built_in">UIViewController</span> *)dismissed</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> [[VTDAddDismissalTransition alloc] init];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">- (<span class="type">id</span>&lt;<span class="built_in">UIViewControllerAnimatedTransitioning</span>&gt;)animationControllerForPresentedController:(<span class="built_in">UIViewController</span> *)presented</span><br><span class="line">                                                                  presentingController:(<span class="built_in">UIViewController</span> *)presenting</span><br><span class="line">                                                                      sourceController:(<span class="built_in">UIViewController</span> *)source</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> [[VTDAddPresentationTransition alloc] init];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">pragma</span> mark - VTDListViewInterface</span></span><br><span class="line"></span><br><span class="line">- (<span class="type">void</span>)showNoContentMessage</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">self</span>.view = <span class="keyword">self</span>.noContentView;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">- (<span class="type">void</span>)showUpcomingDisplayData:(VTDUpcomingDisplayData *)data</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">self</span>.view = <span class="keyword">self</span>.strongTableView;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">self</span>.data = data;</span><br><span class="line">    [<span class="keyword">self</span> reloadEntries];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">- (<span class="type">void</span>)reloadEntries</span><br><span class="line">&#123;</span><br><span class="line">    [<span class="keyword">self</span>.tableView reloadData];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">pragma</span> mark - UITableViewDelegate and DataSource Methods</span></span><br><span class="line"></span><br><span class="line">- (<span class="built_in">NSInteger</span>)numberOfSectionsInTableView:(<span class="built_in">UITableView</span> *)tableView</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> [<span class="keyword">self</span>.data.sections count];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">- (<span class="built_in">NSInteger</span>)tableView:(<span class="built_in">UITableView</span> *)tableView numberOfRowsInSection:(<span class="built_in">NSInteger</span>)section</span><br><span class="line">&#123;</span><br><span class="line">    VTDUpcomingDisplaySection *upcomingSection = <span class="keyword">self</span>.data.sections[section];</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> [upcomingSection.items count];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">- (<span class="built_in">NSString</span> *)tableView:(<span class="built_in">UITableView</span> *)tableView titleForHeaderInSection:(<span class="built_in">NSInteger</span>)section</span><br><span class="line">&#123;</span><br><span class="line">    VTDUpcomingDisplaySection *upcomingSection = <span class="keyword">self</span>.data.sections[section];</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> upcomingSection.name;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">- (<span class="built_in">UITableViewCell</span> *)tableView:(<span class="built_in">UITableView</span> *)tableView cellForRowAtIndexPath:(<span class="built_in">NSIndexPath</span> *)indexPath</span><br><span class="line">&#123;</span><br><span class="line">    VTDUpcomingDisplaySection *section = <span class="keyword">self</span>.data.sections[indexPath.section];</span><br><span class="line">    VTDUpcomingDisplayItem *item = section.items[indexPath.row];</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">UITableViewCell</span> *cell = [<span class="keyword">self</span>.tableView dequeueReusableCellWithIdentifier:VTDListEntryCellIdentifier forIndexPath:indexPath];</span><br><span class="line">    </span><br><span class="line">    cell.textLabel.text = item.title;</span><br><span class="line">    cell.detailTextLabel.text = item.dueDay;</span><br><span class="line">    cell.imageView.image = [<span class="built_in">UIImage</span> imageNamed:section.imageName];</span><br><span class="line">    cell.selectionStyle = <span class="built_in">UITableViewCellSelectionStyleNone</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> cell;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这都是在现实的 iOS 项目中经常遇到的 MVC 写法，但是经常遇到这么做，大家都这么写并不能说明这就是正确的，这只能说明大部分程序员并没有架构思想。。。UIViewController 它是视图控制器，它应该只处理与视图相关的逻辑，而不应该将任何与视图无关的代码都写在视图控制器中。</p>
+<p>很多人用 MVC 写成巨大怪物，是因为：</p>
+<p>❌ 他们把所有业务塞进 ViewController 然后再怪 MVC 不好。再去尝试其它各种架构，但是使用或者领悟不到位，其他架构也越写越不像样。。。</p>
+<p>当然也不是说，MVC 这么写就一定不行，其实对于目前这个 Demo 项目的规模来说就写成这样也没太大的毛病。一个人的小项目不必要追求什么可维护性，可扩展性，可重用性的。当然，如果你对架构设计有追求，想要让视图控制器里保持干净，那么可以先试试接下来的 MVP 架构。</p>
+<p>为什么不直接使用 VIPER 架构呢？一步步来嘛，从架构的细分层度上来说，MVC 是分的最粗糙的只有 Model，View，Controller。VIPER 是分的最细的 View&#x2F;ViewController，Interactor，Presenter，Entity，Router。而 MVP 在中间，Model，View&#x2F;ViewController，Presenter。</p>
+<p>对于我们这个待办事项 APP 来说，MVP 可能是最合适的架构，不至于像 VIPER 分的过于仔细，也不像 MVC 这样所有代码都写在 VIewController 内。</p>
+<h1 id="MVP"><a href="#MVP" class="headerlink" title="MVP"></a>MVP</h1><p>一句话总结：MVP 就是给胖 UIViewController 找个“助手（Presenter）”，把与 UI 无关的代码挪过去，UIViewController 专心管 UI。虽然说起来一句话很简单，看起来架构也很简单，但是如果你从未实现过一次这样的改动的话，第一次让你动手实现时会感觉无从下手，不知道从哪里开始。别担心，这是一个非常常见且正常的困惑！</p>
+<p>我们继续使用前面的 MVC 架构的待办事项项目，并着手对其中最复杂的 <code>VTDListViewController</code> 进行改造，使其能像在 VIPER 架构中那样的清爽。</p>
+<h2 id="1-创建-Presenter-类并转移逻辑"><a href="#1-创建-Presenter-类并转移逻辑" class="headerlink" title="1.创建 Presenter 类并转移逻辑"></a>1.创建 Presenter 类并转移逻辑</h2><p>这是第一步，先不考虑协议，把代码挪过去。</p>
+<ul>
+<li><p>新建 Presenter 类。为你的 UIViewController 创建一个对应的 Presenter 类，在这里为 <code>VTDListViewController</code> 创建一个 <code>VTDListPresenter</code> 类。</p>
+</li>
+<li><p>转移 <code>VTDListViewController</code> 中非 UI 逻辑：</p>
+<ul>
+<li>将所有的数据处理、业务逻辑（数据获取、计算、排序、格式化等）的方法和属性从视图控制器剪切然后粘贴到 Presenter 类中。</li>
+<li>例如：网络请求方法，加载本地数据库方法 <code>loadData</code>，处理按钮点击后的数据更新逻辑、决定数据模型（Model）状态的属性等。</li>
 </ul>
+</li>
+<li><p>建立连接：</p>
+<ul>
+<li>在视图控制器中添加一个属性来持有 Presenter 类的实例</li>
+</ul>
+  <figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">VTDListViewController</span> () &lt;<span class="title">UIViewControllerTransitioningDelegate</span>&gt;</span></span><br><span class="line"><span class="comment">// ...</span></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>) VTDListPresenter *listPresenter;</span><br><span class="line"><span class="comment">// ...</span></span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">VTDListViewController</span></span></span><br><span class="line">/ ...</span><br><span class="line">- (VTDListPresenter *)listPresenter &#123;</span><br><span class="line">    <span class="keyword">if</span> (_listPresenter == <span class="literal">nil</span>) &#123;</span><br><span class="line">        _listPresenter = [[VTDListPresenter alloc] init];</span><br><span class="line">        _listPresenter.userInterface = <span class="keyword">self</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> _listPresenter;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// ...</span></span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="2-设计-View-协议"><a href="#2-设计-View-协议" class="headerlink" title="2.设计 View 协议"></a>2.设计 View 协议</h2><p>现在开始解决如何在 Presenter 中通知 View&#x2F;ViewController 更新 UI 的问题。</p>
+<ul>
+<li><p>定义协议（Protocol）：创建一个协议，通常命名为 <code>XXXViewProtocol</code> 例如：<code>VTDListViewProtocol</code> 或者 <code>VTDListViewInterface</code></p>
+</li>
+<li><p>谁来实现？谁来持有？</p>
+<ul>
+<li>实现者（Implementer）：顾名思义既然是视图协议，当然是让 View&#x2F;ViewController 来实现这个协议。因为 Presenter 需要通过协议对象来更新 UI。</li>
+<li>持有者（Holder）：Presenter 持有一个该协议类型的弱引用（Weak Reference）属性。</li>
+</ul>
+</li>
+<li><p>协议内容：协议中只包含纯粹的 UI 更新方法。这些方法应该是 Presenter 向 View&#x2F;ViewController 发出的命令，告诉它你该现实什么，而不是你应该做什么。</p>
+<ul>
+<li>例如：</li>
+</ul>
+  <figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@class</span> <span class="title">VTDUpcomingDisplayData</span>;</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@protocol</span> <span class="title">VTDListViewInterface</span> &lt;<span class="title">NSObject</span>&gt;</span></span><br><span class="line"></span><br><span class="line">- (<span class="type">void</span>)showNoContentMessage;</span><br><span class="line">- (<span class="type">void</span>)showUpcomingDisplayData:(VTDUpcomingDisplayData *)data;</span><br><span class="line">- (<span class="type">void</span>)reloadEntries;</span><br><span class="line">- (<span class="type">void</span>)presentViewControllerWithMinDate:(<span class="built_in">NSDate</span> *)minDate;</span><br><span class="line"></span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="3-实现-View-协议并建立连接"><a href="#3-实现-View-协议并建立连接" class="headerlink" title="3.实现 View 协议并建立连接"></a>3.实现 View 协议并建立连接</h2><ul>
+<li><p>在 View&#x2F;VIewController 中实现刚刚创建的协议：</p>
+  <figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">pragma</span> mark - VTDListViewInterface</span></span><br><span class="line"></span><br><span class="line">- (<span class="type">void</span>)showNoContentMessage</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">self</span>.view = <span class="keyword">self</span>.noContentView;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="type">void</span>)showUpcomingDisplayData:(VTDUpcomingDisplayData *)data</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">self</span>.view = <span class="keyword">self</span>.strongTableView;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">self</span>.data = data;</span><br><span class="line">    [<span class="keyword">self</span> reloadEntries];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">- (<span class="type">void</span>)reloadEntries</span><br><span class="line">&#123;</span><br><span class="line">    [<span class="keyword">self</span>.tableView reloadData];</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>让 Presenter 持有一个协议对象：</p>
+  <figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@protocol</span> <span class="title">VTDListViewInterface</span>;</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">VTDListPresenter</span> : <span class="title">NSObject</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">weak</span>) <span class="type">id</span>&lt;VTDListViewInterface&gt; userInterface;</span><br><span class="line"></span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+<p>  现在，就可以在 Presenter 中在需要的时候让 View&#x2F;ViewController 更新 UI 了。</p>
+  <figure class="highlight objc"><table><tr><td class="code"><pre><span class="line">[VTDCoreDataStore.sharedStore fetchEntriesWithPredicate:predicate sortDescriptors:sortDescriptors completionBlock:^(<span class="built_in">NSArray</span>&lt;VTDManagedTodoItem *&gt; *entries) &#123;</span><br><span class="line">	<span class="comment">// ...</span></span><br><span class="line">	<span class="keyword">if</span> (entries.count == <span class="number">0</span>) &#123;</span><br><span class="line">	    [welf.userInterface showNoContentMessage];</span><br><span class="line">	    <span class="keyword">return</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 数据处理...</span></span><br><span class="line">	[welf.userInterface showUpcomingDisplayData:displayData];</span><br><span class="line">	<span class="comment">// ...</span></span><br><span class="line">&#125;];</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="4-设计-Presenter-协议"><a href="#4-设计-Presenter-协议" class="headerlink" title="4.设计 Presenter 协议"></a>4.设计 Presenter 协议</h2><p>这一步是可选的，因为此时在 View&#x2F;ViewController 中对 Presenter 的持有还是显示依赖的，就是在 View&#x2F;ViewController 中显示创建了 Presenter 实例。</p>
+<p>为了进一步解耦 ViewController 对特定 Presenter 类的依赖，使单元测试（Unit Test）更容易。</p>
+<ul>
+<li>定义 Presenter 协议：创建一个协议，通常可以命名为 <code>XXXPresenrterProtocol</code> 或者，这个例子中的 <code>VTDListModuleInterface</code> 表示列表模块接口</li>
+<li>谁来实现？谁来持有？<ul>
+<li>实现者：Presenter 类实现这个协议</li>
+<li>持有者：View&#x2F;ViewController 持有一个该协议类型的属性，通常命名为 <code>presenter</code>，或者 <code>eventHandler</code> 等。。。</li>
+</ul>
+</li>
+<li>协议内容：包含所有 View&#x2F;ViewController 需要调用 Presenter 的方法。</li>
+</ul>
+<p>例如：</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="meta">#import <span class="string">&lt;UIKit/UIKit.h&gt;</span></span></span><br><span class="line"><span class="meta">#import <span class="string">&quot;VTDListViewInterface.h&quot;</span></span></span><br><span class="line"><span class="meta">#import <span class="string">&quot;VTDListModuleInterface.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">VTDListViewController</span> : <span class="title">UITableViewController</span> &lt;<span class="title">VTDListViewInterface</span>&gt;</span></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>) <span class="type">id</span>&lt;VTDListModuleInterface&gt; eventHandler;</span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">VTDListViewController</span></span></span><br><span class="line">- (<span class="type">void</span>)viewWillAppear:(<span class="type">BOOL</span>)animated</span><br><span class="line">&#123;</span><br><span class="line">    [<span class="variable language_">super</span> viewWillAppear:animated];</span><br><span class="line">    [<span class="keyword">self</span>.eventHandler updateView];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="type">void</span>)didTapAddButton:(<span class="type">id</span>)sender</span><br><span class="line">&#123;</span><br><span class="line">    [<span class="keyword">self</span>.eventHandler addNewItem];</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+
+<p>这样 <code>VTDListViewController</code> 中最终呈现的效果就比 MVC 中干净简洁不少，但跟 VIPER 比起来还差一点点。主要是 视图控制器 的路由跳转部分并没有挪到专门的模块中去。在 MVP 中来说也并不是必须得。</p>
+<p><code>VTDListViewController</code> 最终代码如下：</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="meta">#import <span class="string">&quot;VTDListViewController.h&quot;</span></span></span><br><span class="line"><span class="meta">#import <span class="string">&quot;VTDUpcomingDisplayData.h&quot;</span></span></span><br><span class="line"><span class="meta">#import <span class="string">&quot;VTDUpcomingDisplaySection.h&quot;</span></span></span><br><span class="line"><span class="meta">#import <span class="string">&quot;VTDUpcomingDisplayItem.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#import <span class="string">&quot;VTDAddViewController.h&quot;</span></span></span><br><span class="line"><span class="meta">#import <span class="string">&quot;VTDAddDismissalTransition.h&quot;</span></span></span><br><span class="line"><span class="meta">#import <span class="string">&quot;VTDAddPresentationTransition.h&quot;</span></span></span><br><span class="line"><span class="meta">#import <span class="string">&quot;VTDAddPresenter.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">static</span> <span class="built_in">NSString</span>* <span class="keyword">const</span> VTDListEntryCellIdentifier = <span class="string">@&quot;VTDListEntryCell&quot;</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">VTDListViewController</span> () &lt;<span class="title">UIViewControllerTransitioningDelegate</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>)   VTDUpcomingDisplayData* data;</span><br><span class="line"></span><br><span class="line"><span class="comment">// The view controller seems to have a weak reference to the table view.</span></span><br><span class="line"><span class="comment">// We need to keep a strong reference to the table view for times when we remove the table view from the view controller</span></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>)   <span class="built_in">UITableView</span>*            strongTableView;</span><br><span class="line"></span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">VTDListViewController</span></span></span><br><span class="line"></span><br><span class="line">- (<span class="type">void</span>)viewDidLoad</span><br><span class="line">&#123;</span><br><span class="line">    [<span class="variable language_">super</span> viewDidLoad];</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">self</span>.strongTableView = <span class="keyword">self</span>.tableView;</span><br><span class="line">    <span class="keyword">self</span>.navigationItem.title = <span class="string">@&quot;MVP TODO&quot;</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">UIBarButtonItem</span> *addItem = [[<span class="built_in">UIBarButtonItem</span> alloc] initWithBarButtonSystemItem:<span class="built_in">UIBarButtonSystemItemAdd</span></span><br><span class="line">                                                                             target:<span class="keyword">self</span></span><br><span class="line">                                                                             action:<span class="keyword">@selector</span>(didTapAddButton:)];</span><br><span class="line">    <span class="keyword">self</span>.navigationItem.rightBarButtonItem = addItem;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="type">void</span>)viewWillAppear:(<span class="type">BOOL</span>)animated</span><br><span class="line">&#123;</span><br><span class="line">    [<span class="variable language_">super</span> viewWillAppear:animated];</span><br><span class="line">    [<span class="keyword">self</span>.eventHandler updateView];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="type">void</span>)didTapAddButton:(<span class="type">id</span>)sender</span><br><span class="line">&#123;</span><br><span class="line">    [<span class="keyword">self</span>.eventHandler addNewItem];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">pragma</span> mark - VTDListViewInterface</span></span><br><span class="line"></span><br><span class="line">- (<span class="type">void</span>)showNoContentMessage</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">self</span>.view = <span class="keyword">self</span>.noContentView;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="type">void</span>)showUpcomingDisplayData:(VTDUpcomingDisplayData *)data</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">self</span>.view = <span class="keyword">self</span>.strongTableView;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">self</span>.data = data;</span><br><span class="line">    [<span class="keyword">self</span> reloadEntries];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">- (<span class="type">void</span>)reloadEntries</span><br><span class="line">&#123;</span><br><span class="line">    [<span class="keyword">self</span>.tableView reloadData];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="type">void</span>)presentViewControllerWithMinDate:(<span class="built_in">NSDate</span> *)minDate &#123;</span><br><span class="line">    VTDAddPresenter *addPresenter = [[VTDAddPresenter alloc] init];</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">UIStoryboard</span> *storyboard = [<span class="built_in">UIStoryboard</span> storyboardWithName:<span class="string">@&quot;Main&quot;</span> bundle:[<span class="built_in">NSBundle</span> mainBundle]];</span><br><span class="line">    VTDAddViewController *addViewController = [storyboard instantiateViewControllerWithIdentifier:AddViewControllerIdentifier];</span><br><span class="line">    addViewController.modalPresentationStyle = <span class="built_in">UIModalPresentationCustom</span>;</span><br><span class="line">    addViewController.transitioningDelegate = <span class="keyword">self</span>;</span><br><span class="line">    [addViewController setMinimumDueDate:minDate];</span><br><span class="line">    </span><br><span class="line">    addViewController.eventHandler = addPresenter;</span><br><span class="line">    addPresenter.userInterface = addViewController;</span><br><span class="line">    addPresenter.addModuleDelegate = (<span class="type">id</span>&lt;VTDAddModuleDelegate&gt;)<span class="keyword">self</span>.eventHandler;</span><br><span class="line">    </span><br><span class="line">    [<span class="keyword">self</span> presentViewController:addViewController animated:<span class="literal">YES</span> completion:<span class="literal">nil</span>];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">pragma</span> mark - UIViewControllerTransitioningDelegate Methods</span></span><br><span class="line"></span><br><span class="line">- (<span class="type">id</span>&lt;<span class="built_in">UIViewControllerAnimatedTransitioning</span>&gt;)animationControllerForDismissedController:(<span class="built_in">UIViewController</span> *)dismissed</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> [[VTDAddDismissalTransition alloc] init];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">- (<span class="type">id</span>&lt;<span class="built_in">UIViewControllerAnimatedTransitioning</span>&gt;)animationControllerForPresentedController:(<span class="built_in">UIViewController</span> *)presented</span><br><span class="line">                                                                  presentingController:(<span class="built_in">UIViewController</span> *)presenting</span><br><span class="line">                                                                      sourceController:(<span class="built_in">UIViewController</span> *)source</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> [[VTDAddPresentationTransition alloc] init];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">pragma</span> mark - UITableViewDelegate and DataSource Methods</span></span><br><span class="line"></span><br><span class="line">- (<span class="built_in">NSInteger</span>)numberOfSectionsInTableView:(<span class="built_in">UITableView</span> *)tableView</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> [<span class="keyword">self</span>.data.sections count];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">- (<span class="built_in">NSInteger</span>)tableView:(<span class="built_in">UITableView</span> *)tableView numberOfRowsInSection:(<span class="built_in">NSInteger</span>)section</span><br><span class="line">&#123;</span><br><span class="line">    VTDUpcomingDisplaySection *upcomingSection = <span class="keyword">self</span>.data.sections[section];</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> [upcomingSection.items count];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">- (<span class="built_in">NSString</span> *)tableView:(<span class="built_in">UITableView</span> *)tableView titleForHeaderInSection:(<span class="built_in">NSInteger</span>)section</span><br><span class="line">&#123;</span><br><span class="line">    VTDUpcomingDisplaySection *upcomingSection = <span class="keyword">self</span>.data.sections[section];</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> upcomingSection.name;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">- (<span class="built_in">UITableViewCell</span> *)tableView:(<span class="built_in">UITableView</span> *)tableView cellForRowAtIndexPath:(<span class="built_in">NSIndexPath</span> *)indexPath</span><br><span class="line">&#123;</span><br><span class="line">    VTDUpcomingDisplaySection *section = <span class="keyword">self</span>.data.sections[indexPath.section];</span><br><span class="line">    VTDUpcomingDisplayItem *item = section.items[indexPath.row];</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">UITableViewCell</span> *cell = [<span class="keyword">self</span>.tableView dequeueReusableCellWithIdentifier:VTDListEntryCellIdentifier forIndexPath:indexPath];</span><br><span class="line">    </span><br><span class="line">    cell.textLabel.text = item.title;</span><br><span class="line">    cell.detailTextLabel.text = item.dueDay;</span><br><span class="line">    cell.imageView.image = [<span class="built_in">UIImage</span> imageNamed:section.imageName];</span><br><span class="line">    cell.selectionStyle = <span class="built_in">UITableViewCellSelectionStyleNone</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> cell;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="MVP-小结"><a href="#MVP-小结" class="headerlink" title="MVP 小结"></a>MVP 小结</h2><p><strong>View 持有 Presenter 协议；Presenter 持有 View 协议。</strong></p>
+<h1 id="VIPER"><a href="#VIPER" class="headerlink" title="VIPER"></a>VIPER</h1><p>关于 VIPER 的部分，推荐直接阅读以下链接文章。</p>
+<p><a href="https://www.objc.io/issues/13-architecture/viper/">https://www.objc.io/issues/13-architecture/viper/</a> 这是对 VIPER 的介绍非常详细和全面的文章</p>
+<p>是对 MVP 的进一步细化。</p>
+<h1 id="MVVM"><a href="#MVVM" class="headerlink" title="MVVM"></a>MVVM</h1><p>关于 MVVM 的部分，推荐直接阅读以下链接文章。</p>
+<p><a href="https://www.objc.io/issues/13-architecture/mvvm/">https://www.objc.io/issues/13-architecture/mvvm/</a> 这个对 MVVM 介绍的文章</p>
+<h1 id="架构模式总结"><a href="#架构模式总结" class="headerlink" title="架构模式总结"></a>架构模式总结</h1><p>架构名字是“虚名”，解耦能力才是本质。架构模式（MVC、MVVM、VIPER、MVP、Clean Architecture 等）都是组织代码的“模板”，</p>
+<p>但真正决定你代码质量的是：</p>
+<ul>
+<li>你对模块之间的边界如何划分？</li>
+<li>你如何做到解耦？</li>
+<li>你如何做到可替换、可测试、可维护？</li>
+</ul>
+<p>架构名称只是“如何组织解耦的最佳实践示例”。</p>
+<h2 id="1-MVC-中也可以面向接口编程（protocol、抽象类、组合、DI-全都可以用）"><a href="#1-MVC-中也可以面向接口编程（protocol、抽象类、组合、DI-全都可以用）" class="headerlink" title="1. MVC 中也可以面向接口编程（protocol、抽象类、组合、DI 全都可以用）"></a>1. MVC 中也可以面向接口编程（protocol、抽象类、组合、DI 全都可以用）</h2><p>很多人用 MVC 写成巨大怪物，是因为：</p>
+<p>❌ 他们把所有业务塞进 ViewController，然后再怪 MVC 不好。</p>
+<p>但：</p>
+<blockquote>
+<p>完全可以写出高度解耦的 MVC<br>完全可以在 MVC 中使用 protocol + DI<br>完全可以把网络、业务逻辑、数据层抽离出去</p>
+</blockquote>
+<p>甚至苹果自己的 UIKit 官方示例 MVC 都不是“胖 VC”，都大量使用 delegate、dataSource、protocol 等机制。</p>
+<p>举例 MVC 也可以这样写：</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line">ViewController —-&gt; (protocol) BusinessLogic  </span><br><span class="line">                 ---&gt; (protocol) Router  </span><br><span class="line">                 ---&gt; (protocol) Presenter</span><br></pre></td></tr></table></figure>
+
+<p>这看起来像 VIPER，对吧？<br>但你依然可以叫它 MVC，因为命名并不重要。</p>
+<h2 id="2-架构名称（MVC、MVP、VIPER）本质是“关注点分离指导方针”"><a href="#2-架构名称（MVC、MVP、VIPER）本质是“关注点分离指导方针”" class="headerlink" title="2. 架构名称（MVC、MVP、VIPER）本质是“关注点分离指导方针”"></a>2. 架构名称（MVC、MVP、VIPER）本质是“关注点分离指导方针”</h2><p>本质其实只有两个字：</p>
+<p>⭐ “分层”<br>⭐ “解耦”</p>
+<p>架构模式做的事只有：</p>
+<table>
+<thead>
+<tr>
+<th><strong>架构名</strong></th>
+<th><strong>目的</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>MVC</td>
+<td>把 UI 与 Model 分开</td>
+</tr>
+<tr>
+<td>MVP</td>
+<td>把 UI 与业务 Presenter 分开</td>
+</tr>
+<tr>
+<td>MVVM</td>
+<td>把 UI 与状态转换逻辑分开</td>
+</tr>
+<tr>
+<td>VIPER</td>
+<td>把 UI、业务、路由、存储强制分离</td>
+</tr>
+<tr>
+<td>Clean Architecture</td>
+<td>强调依赖规则（高层不依赖低层）</td>
+</tr>
+</tbody></table>
+<p>都在解决一个问题：</p>
+<blockquote>
+<p>如何降低耦合，让系统更易维护？</p>
+</blockquote>
+<h2 id="3-真正核心技能："><a href="#3-真正核心技能：" class="headerlink" title="3. 真正核心技能："></a>3. 真正核心技能：</h2><p>⭐ 面向接口编程（Protocol-Oriented Programming + DI）</p>
+<p>这才是：</p>
+<ul>
+<li>可测试性</li>
+<li>可替换性</li>
+<li>可维护性</li>
+<li>可扩展性</li>
+</ul>
+<p>的根源</p>
+<p>所有现代架构都是围绕它展开的。</p>
+<h2 id="4-所以真正高级工程师不会执着于“我在用-VIPER-MVVM-MVP…”"><a href="#4-所以真正高级工程师不会执着于“我在用-VIPER-MVVM-MVP…”" class="headerlink" title="4. 所以真正高级工程师不会执着于“我在用 VIPER&#x2F;MVVM&#x2F;MVP…”"></a>4. 所以真正高级工程师不会执着于“我在用 VIPER&#x2F;MVVM&#x2F;MVP…”</h2><p>高级工程师关心的是：</p>
+<p>✔ 分层是否清晰？<br>✔ 依赖反转是否做到？<br>✔ 模块之间是否通过 protocol 通信？<br>✔ 代码是否可替换？可测试？<br>✔ 业务逻辑是否与 UI 隔离？<br>✔ 一处修改是否不会引发连锁 bug？</p>
+<p>架构名称只是形式，架构思想才是核心。</p>
+<p>你完全可以写出这样的 MVC：</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line">ViewController</span><br><span class="line">  ├── <span class="type">id</span>&lt;LoginUseCase&gt;</span><br><span class="line">  ├── <span class="type">id</span>&lt;UserRepository&gt;</span><br><span class="line">  ├── <span class="type">id</span>&lt;LoginPresenter&gt;</span><br><span class="line">  └── <span class="type">id</span>&lt;LoginRouter&gt;</span><br></pre></td></tr></table></figure>
+
+<p>这是经典的可扩展架构，但你仍然可以说它是“MVC 风味”。</p>
+<h2 id="5-最终结论"><a href="#5-最终结论" class="headerlink" title="5. 最终结论"></a>5. 最终结论</h2><blockquote>
+<p>✔ 架构名称不重要<br>✔ 分层+解耦才是关键<br>✔ 协议（接口）才是 Objective-C 和 Swift 解耦的核心武器<br>✔ 任何架构模式都能写得很糟，也能写得很好<br>✔ 你可以用 MVC 写出可测试、可维护、可扩展的大型应用<br>✔ 真正的专业能力不是“会 VIPER”，而是“会解耦”</p>
+</blockquote>
+<!--
+# 分层架构
+
+- 界面层
+- 业务层
+- 数据层
+
+这个讲的更抽象。。。呃，感觉是为了赶紧结课，匆匆了事
+
+NewsService 类提供一个 API 加载数据，内部实现是使用 DBTool 加载本地数据，如果没有本地数据，使用 HPPTTool 加载网络数据。。。这个逻辑也太简单了，到处都是漏洞，首先如果没有本地数据就加载网络数据，那么如果一直没有本地数据就永远加载网络数据去了，这一点可能你会说加载网络数据之后就保存到本地啊，但是保存到本地之后，下次及以后就永远都是使用本地数据不去走网络请求了啊。。。搞不明白，搞这么多层是想干什么
+
+# 设计模式
+
+这个就是面向对象语言的设计模式了，跟架构模式不相干。。。十分简单的介绍了一下，并没有讲到位。完全没有必要放在这里，而且面向对象语言的设计模式完全可以单开一门课程的。
+面向对象语言的设计模式，其实是一些特定问题的经过验证的解决方案，经验总结：
+可以分为三大类
+
+- 创建型模式：
+- 结构型模式：
+- 行为型模式：
+
+三分钟讲完面向对象编程语言的设计模式了，还有谁，建议看相关书籍了。。。
+
+# 面试题
+
+- 讲解 MVC、MVVM、MVP 以及你在项目里具体是怎么写的？
+- 你自己用过哪些设计模式？
+- 一般开始做一个项目，你的架构是如何思考的？
+
+-->
 ]]></content>
       <categories>
         <category>iOS 底层原理</category>
@@ -6501,16 +6885,6 @@ m<sup>k * φ(n) + 1</sup> mod n = m
         <tag>MVVM</tag>
         <tag>VIPER</tag>
       </tags>
-  </entry>
-  <entry>
-    <title>深入理解 iOS 对象模型</title>
-    <url>/2025/04/25/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3-iOS-%E5%AF%B9%E8%B1%A1%E6%A8%A1%E5%9E%8B/</url>
-    <content><![CDATA[<p>001:<br>讲了 Objective-C 对象的底层是 C 结构体</p>
-<h1 id="Objective-C-实例对象"><a href="#Objective-C-实例对象" class="headerlink" title="Objective-C 实例对象"></a>Objective-C 实例对象</h1><p>在日常使用 Objective-C 开发过程中，我们经常会使用 <code>[[NSObject alloc] init]</code> 这样的方式创建一个实例对象，并调用初始化方法。当然实际的情况中可能不是使用 NSObject 类，而是 UIKit 框架中的类，或者是你自定义的子类。实例对象对于我们来说简直是再熟悉不过了，但是各位有没有思考过，对于 <code>NSObject</code> 来说，<code>alloc</code> 方法分配内存，究竟分配了多大的内存空间，分配的内存中存放的又是什么东西，<code>init</code> 方法又究竟初始化了什么东西？如果不是 <code>NSObject</code> 类，而是其他系统框架类，或者我们自定义的类呢？我们先以 <code>NSObject</code> 类为例，分析 <code>alloc</code> 方法究竟是如何分配内存的，分配了多少内存空间，内存中又放的一些什么东西？</p>
-<h2 id="NSObject-的实例"><a href="#NSObject-的实例" class="headerlink" title="NSObject 的实例"></a>NSObject 的实例</h2>]]></content>
-      <categories>
-        <category>iOS 底层原理</category>
-      </categories>
   </entry>
   <entry>
     <title>解决git clone速度慢的问题</title>
