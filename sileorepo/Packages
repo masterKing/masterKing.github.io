@@ -137,32 +137,32 @@ Author: masterking
 Name: mugua
 
 Package: com.masterking.revealloader2
-Version: 0.0.2
+Version: 0.0.3
 Architecture: iphoneos-arm
 Maintainer: masterKing <masterking1012@gmail.com>
-Installed-Size: 1668
+Installed-Size: 5604
 Depends: mobilesubstrate (>= 0.9.5000), com.opa334.altlist, preferenceloader
-Filename: debs/com.masterking.revealloader2_0.0.2_iphoneos-arm.deb
-Size: 281704
-MD5sum: da8a42a795317b380c4076db86dd078e
-SHA1: 5b16c293d51ec7f8524dc944922b5d6d7d729a0b
-SHA256: a0a404efa39cd1a151609b6c9272d32916d25ab1552e48881231f56b7d7b5518
+Filename: debs/com.masterking.revealloader2_0.0.3_iphoneos-arm.deb
+Size: 1323658
+MD5sum: eed092cb127dc6069cd19d4e588e590a
+SHA1: a7bf9a76418410740d8c90d89fe4c57540d9e8f2
+SHA256: 0e50cbca758c3fd192066adc12eaf019c5cd51cd78a4e128e70e151bc02f94b0
 Section: Tweaks
 Description: Dynamically loads RevealServer.framework into iOS applications.
 Author: masterKing <masterking1012@gmail.com>
 Name: RevealLoader2
 
 Package: com.masterking.revealloader2
-Version: 0.0.2
+Version: 0.0.3
 Architecture: iphoneos-arm64
 Maintainer: masterKing <masterking1012@gmail.com>
-Installed-Size: 1604
+Installed-Size: 5540
 Depends: mobilesubstrate (>= 0.9.5000), com.opa334.altlist, preferenceloader
-Filename: debs/com.masterking.revealloader2_0.0.2_iphoneos-arm64.deb
-Size: 278204
-MD5sum: cf4eca6f6828af75e770fefb2cef5e77
-SHA1: 3036328253393c431fb8cc4e336f4904821e0260
-SHA256: d9a19a2272ed930014f7a7617692ab599b20b30fa9f4fca5d22419b5cd53c516
+Filename: debs/com.masterking.revealloader2_0.0.3_iphoneos-arm64.deb
+Size: 1320016
+MD5sum: 986ff4753da90f2aac7ed1394cddcb08
+SHA1: c78d4d13dadcb966a5c0aaabb7690aaa8abe3711
+SHA256: 502865197f15b8d2e5691c4b009ba03b30a327f496fe6af9c82b27200aa6ce23
 Section: Tweaks
 Description: Dynamically loads RevealServer.framework into iOS applications.
 Author: masterKing <masterking1012@gmail.com>
