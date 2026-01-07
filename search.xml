@@ -4093,6 +4093,47 @@ commonModes并不是一个真正单独的模式
       </categories>
   </entry>
   <entry>
+    <title>iOS 底层原理导图</title>
+    <url>/2025/04/25/iOS-%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86%E5%AF%BC%E5%9B%BE/</url>
+    <content><![CDATA[<h1 id="iOS-底层原理导图"><a href="#iOS-底层原理导图" class="headerlink" title="iOS 底层原理导图"></a>iOS 底层原理导图</h1><ul>
+<li><p>iOS 底层知识入门</p>
+</li>
+<li><p>KVC </p>
+</li>
+<li><p>KVO </p>
+</li>
+<li><p>Category</p>
+</li>
+<li><p>关联对象</p>
+</li>
+<li><p>Block</p>
+</li>
+<li><p>Runtime</p>
+<ul>
+<li>深入理解iOS对象模型（一）：实例对象的内存探秘</li>
+<li>Objective-C 类对象</li>
+</ul>
+</li>
+<li><p>Runloop</p>
+</li>
+<li><p>多线程</p>
+<ul>
+<li>线程同步方案（锁、串行队列）</li>
+</ul>
+</li>
+<li><p>内存管理</p>
+</li>
+<li><p>性能优化</p>
+</li>
+<li><p>架构设计</p>
+</li>
+</ul>
+]]></content>
+      <categories>
+        <category>iOS 底层原理</category>
+      </categories>
+  </entry>
+  <entry>
     <title>iOS 应用重签名</title>
     <url>/2021/06/20/iOS-%E5%BA%94%E7%94%A8%E9%87%8D%E7%AD%BE%E5%90%8D/</url>
     <content><![CDATA[<p>上一篇文章作者讲解了 iOS 应用签名的原理。理解了签名的流程之后，我们知道签名保证的是自签名之后原始数据没有被其他人篡改，我们的 App 在调试过程中每次安装到设备上都会签名，假设我们使用自己的配置文件和证书对他人的 App 进行签名，是不是就能冒充是我们自己开发的 APP 了？</p>
@@ -4205,47 +4246,6 @@ commonModes并不是一个真正单独的模式
 ]]></content>
       <categories>
         <category>iOS 逆向与安全</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>iOS 底层原理导图</title>
-    <url>/2025/04/25/iOS-%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86%E5%AF%BC%E5%9B%BE/</url>
-    <content><![CDATA[<h1 id="iOS-底层原理导图"><a href="#iOS-底层原理导图" class="headerlink" title="iOS 底层原理导图"></a>iOS 底层原理导图</h1><ul>
-<li><p>iOS 底层知识入门</p>
-</li>
-<li><p>KVC </p>
-</li>
-<li><p>KVO </p>
-</li>
-<li><p>Category</p>
-</li>
-<li><p>关联对象</p>
-</li>
-<li><p>Block</p>
-</li>
-<li><p>Runtime</p>
-<ul>
-<li>深入理解iOS对象模型（一）：实例对象的内存探秘</li>
-<li>Objective-C 类对象</li>
-</ul>
-</li>
-<li><p>Runloop</p>
-</li>
-<li><p>多线程</p>
-<ul>
-<li>线程同步方案（锁、串行队列）</li>
-</ul>
-</li>
-<li><p>内存管理</p>
-</li>
-<li><p>性能优化</p>
-</li>
-<li><p>架构设计</p>
-</li>
-</ul>
-]]></content>
-      <categories>
-        <category>iOS 底层原理</category>
       </categories>
   </entry>
   <entry>
@@ -5705,73 +5705,250 @@ commonModes并不是一个真正单独的模式
 <li>Apple 不信任开发者手写并发</li>
 </ul>
 <p>这三点共同作用下的必然产物。</p>
-<h2 id="GCD-提供了什么能力？"><a href="#GCD-提供了什么能力？" class="headerlink" title="GCD 提供了什么能力？"></a>GCD 提供了什么能力？</h2><p>我们已经知道，GCD 是一个系统级别的库、或者说底层的并发编程框架，那么查看它的头文件就能知道它都提供了什么功能。需要注意的一点是 GCD 并不是应用层的库，所以它提供的某些 API 其实对于日常的 iOS 应用开发来说是永远都用不到的。所以并不需要，不要求将 GCD 的所有头文件的作用都研究透彻。</p>
+<h2 id="GCD-提供了什么能力？"><a href="#GCD-提供了什么能力？" class="headerlink" title="GCD 提供了什么能力？"></a>GCD 提供了什么能力？</h2><p>我们已经知道，GCD 是一个系统级别的库、或者说底层的并发编程框架，那么查看它的头文件就能知道它都提供了什么功能。对于 iOS 应用开发者而言，理解 GCD 的底层机制和头文件结构至关重要，但这并不意味着需要掌握其提供的所有 API。由于 GCD 是一个系统级框架，其头文件中包含了大量用于系统内部、驱动程序或高级调试的接口。本指南将基于最新的 libdispatch 公开头文件列表（共 15 个），明确区分应用开发者<strong>必须掌握</strong>的核心 API 和<strong>无需掌握</strong>的底层&#x2F;系统级 API。</p>
 <p>可以在 Xcode 里通过 Command + 鼠标左键 点击 <code>dispatch_async</code> 函数或者 GCD 有关的其他函数，就能跳转到它的头文件里去了。。。这个应该都知道吧。。。或者使用 Command + Shift + O 然后输入 GCD 的相关函数 API 如 <code>dispatch_async</code> 同样可以进入。。。既然都看这种文章了，相信这些 Xcode 小技巧应该都知道了吧。。。</p>
 <p>可以看到 dispatch 的头文件不多，仅 15 个。其中还有部分几乎没有任何 API 都是宏定义以及 dispatch.h 集合所有的头文件。</p>
 <img src="/2025/05/23/%E5%A4%9A%E7%BA%BF%E7%A8%8B/Snipaste_2025-12-26_22-21-44.png" class="">
 
-<p>但是头文件都是一些 C 语言的函数，如果没有人指导，没有文档肯定是不知道如何使用，或者如何正确使用这些 API 的。都提供了哪些功能的。</p>
-<ul>
-<li>base.h 全是宏定义。不需要了解</li>
-<li>block.h 提供了 7 个 block 相关的 API。看了一下是从 iOS8.0 开始的，而 GCD 的核心功能是在 iOS4.0 就提供了。所以不太明白提供这个头文件的意义，实际项目中我们也并不会使用这个头文件提供的创建 block 能力，而是直接创建 Objective-C 的 block。</li>
-<li>data.h 提供了几个 dispatch_data 相关的 API。日常 iOS 开发从未使用过，不太清楚具体的作用是什么。。。</li>
-<li>dispatch_swift_shims.h 提供了 2 个 xxx4swift 的 API 猜测是为 Swift 提供的，但是作者日常 iOS 开发中也从未使用过。</li>
-<li>dispatch.h 头文件的集中点，将 dispatch 中的其他头文件都集中在一起，方便我们使用时导入。</li>
-<li>group.h 调度组相关的 API。这个在日常的 iOS 开发中使用的还是蛮频繁的。是个需要掌握的重点。</li>
-<li>introspection.h 看名字是自省，结合 API 的 hook 好像是用来 hook 的？不太明白，日常 iOS 开发从未使用过。</li>
-<li>io.h 用于读写本地文件的 API。不过作者从未使用过。。。</li>
-<li>object.h 用于管理 GCD 里所有对象的 API，日常 iOS 开发应该是用不到的。</li>
-<li>once.h 这个可太日常了，提供的 dispatch_once 函数做过 iOS 开发的没有没见过的吧。</li>
-<li>queue.h GCD 的核心功能了。最常用的 API 了，同步函数，异步函数，各种队列等等。</li>
-<li>semaphore.h 信号量。这个在日常 iOS 开发中也比较常见到。</li>
-<li>source.h 这个作者只知道可以实现基于 GCD 的定时器，比基于 NSRunLoop 的 NSTimer 定时器要更准确。</li>
-<li>time.h GCD 中用到的 dispatch_time 相关的 API。</li>
-<li>workloop.h 这个作者从来未曾听说过，也未曾见过，使用过。。。</li>
-</ul>
-<h3 id="基本使用"><a href="#基本使用" class="headerlink" title="基本使用"></a>基本使用</h3><p>GCD 的核心理念是：将任务（Block）添加到队列（Queues）中。</p>
-<ul>
-<li><p>GCD 中有 2 个用来执行任务的函数</p>
-<ul>
-<li>用同步的方式执行任务。同步函数会阻塞当前线程，知道 block 中的任务执行完成。  <figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="built_in">dispatch_sync</span>(<span class="built_in">dispatch_queue_t</span> queue, dispatch_block_t block);</span><br></pre></td></tr></table></figure></li>
-<li>用异步的方式执行任务。异步函数会在新线程或者线程池中的空闲线程执行，不会阻塞当前线程立即返回。  <figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="built_in">dispatch_async</span>(<span class="built_in">dispatch_queue_t</span> queue, dispatch_block_t block);</span><br></pre></td></tr></table></figure></li>
-</ul>
-</li>
-<li><p>GCD 的队列有两种</p>
-<ul>
-<li>串行队列：跟烤串一样，串行队列里的任务就像是烤串上一块一块的羊肉，执行时一个接着一个。</li>
-<li>并发队列：不止一根烤串了，多根烤串同时执行任务。并发队列里的任务被调度的时候不再是一个接一个的。</li>
-</ul>
-</li>
-</ul>
-<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 获取全局并发队列</span></span><br><span class="line"><span class="built_in">dispatch_queue_t</span> queue = dispatch_get_global_queue(<span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line"><span class="comment">// 调用异步函数执行任务</span></span><br><span class="line"><span class="built_in">dispatch_async</span>(queue, ^&#123;</span><br><span class="line">	<span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务，线程：%@&quot;</span>, [<span class="built_in">NSThread</span> currentThread]);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-
-
-
+<h3 id="GCD-头文件结构与-API-分类（15-个公开头文件）"><a href="#GCD-头文件结构与-API-分类（15-个公开头文件）" class="headerlink" title="GCD 头文件结构与 API 分类（15 个公开头文件）"></a>GCD 头文件结构与 API 分类（15 个公开头文件）</h3><p>GCD 的公共头文件位于 <code>&lt;dispatch/</code> 目录下，它们共同定义了 GCD 的全部功能。通过分析这些头文件，我们可以将 GCD 的 API 划分为三个主要类别：核心应用层 API、进阶应用层 API 和系统级底层 API。</p>
 <table>
 <thead>
 <tr>
-<th>队列类型</th>
-<th>并发队列</th>
-<th>手动创建的串行队列</th>
-<th>主队列</th>
+<th align="left">头文件</th>
+<th align="left">核心功能描述</th>
+<th align="left">开发者重要性</th>
+<th align="left">建议掌握程度</th>
 </tr>
 </thead>
 <tbody><tr>
-<td>同步函数 sync</td>
-<td>* 不开新线程<br>* 任务串行</td>
-<td>* 不开新线程<br>* 任务串行</td>
-<td>* 不开新线程<br>* 任务串行</td>
+<td align="left"><code>dispatch.h</code></td>
+<td align="left">总头文件，包含所有其他公共头文件。</td>
+<td align="left">极高</td>
+<td align="left">了解（通过它引入所有 API）</td>
 </tr>
 <tr>
-<td>异步函数 async</td>
-<td>* 开新线程<br>* 任务并发</td>
-<td>* 开新线程<br>* 任务串行</td>
-<td>* 不开新线程<br>* 任务串行</td>
+<td align="left"><code>queue.h</code></td>
+<td align="left">队列创建、任务派发（同步&#x2F;异步）、主队列、全局队列。</td>
+<td align="left"><strong>极高</strong></td>
+<td align="left"><strong>必须掌握</strong></td>
+</tr>
+<tr>
+<td align="left"><code>group.h</code></td>
+<td align="left">任务组管理、等待、完成通知。</td>
+<td align="left"><strong>极高</strong></td>
+<td align="left"><strong>必须掌握</strong></td>
+</tr>
+<tr>
+<td align="left"><code>semaphore.h</code></td>
+<td align="left">信号量，用于资源访问控制和线程同步。</td>
+<td align="left"><strong>高</strong></td>
+<td align="left"><strong>必须掌握</strong></td>
+</tr>
+<tr>
+<td align="left"><code>time.h</code></td>
+<td align="left">时间常量和计算，用于延迟执行和超时设置。</td>
+<td align="left">高</td>
+<td align="left">必须掌握（配合 <code>queue.h</code> 和 <code>group.h</code>）</td>
+</tr>
+<tr>
+<td align="left"><code>block.h</code></td>
+<td align="left">Block 相关的 API，如任务取消、等待。</td>
+<td align="left">中</td>
+<td align="left">推荐掌握</td>
+</tr>
+<tr>
+<td align="left"><code>source.h</code></td>
+<td align="left">调度源，用于处理系统事件（定时器、文件、信号等）。</td>
+<td align="left">中</td>
+<td align="left">进阶学习</td>
+</tr>
+<tr>
+<td align="left"><code>once.h</code></td>
+<td align="left"><code>dispatch_once</code>，用于单例模式。</td>
+<td align="left">中</td>
+<td align="left">Obj-C 项目中掌握</td>
+</tr>
+<tr>
+<td align="left"><code>workloop.h</code></td>
+<td align="left"><code>dispatch_workloop_t</code>，优先级排序的特殊队列。</td>
+<td align="left">低</td>
+<td align="left">极少使用</td>
+</tr>
+<tr>
+<td align="left"><code>data.h</code></td>
+<td align="left"><code>dispatch_data_t</code>，用于高效处理内存块。</td>
+<td align="left">低</td>
+<td align="left">无需掌握</td>
+</tr>
+<tr>
+<td align="left"><code>io.h</code></td>
+<td align="left"><code>dispatch_io_t</code>，异步文件 I&#x2F;O。</td>
+<td align="left">低</td>
+<td align="left">无需掌握</td>
+</tr>
+<tr>
+<td align="left"><code>introspection.h</code></td>
+<td align="left">运行时内省和调试工具 API。</td>
+<td align="left">低</td>
+<td align="left">无需掌握</td>
+</tr>
+<tr>
+<td align="left"><code>object.h</code></td>
+<td align="left">GCD 对象的引用计数和底层管理。</td>
+<td align="left">低</td>
+<td align="left">无需掌握</td>
+</tr>
+<tr>
+<td align="left"><code>base.h</code></td>
+<td align="left">基础宏定义、类型定义。</td>
+<td align="left">低</td>
+<td align="left">无需掌握</td>
+</tr>
+<tr>
+<td align="left"><code>dispatch_swift_shims.h</code></td>
+<td align="left">Swift 语言桥接层。</td>
+<td align="left">极低</td>
+<td align="left">无需掌握</td>
 </tr>
 </tbody></table>
-<h3 id="调度组"><a href="#调度组" class="headerlink" title="调度组"></a>调度组</h3><h3 id="延时执行"><a href="#延时执行" class="headerlink" title="延时执行"></a>延时执行</h3><h3 id="只执行一次"><a href="#只执行一次" class="headerlink" title="只执行一次"></a>只执行一次</h3><h3 id="基于GCD的定时器"><a href="#基于GCD的定时器" class="headerlink" title="基于GCD的定时器"></a>基于GCD的定时器</h3><p>162：<br>死锁？<br>什么是死锁？<br>什么情况下产生死锁？</p>
+<p>日常的 iOS 应用开发基本只需要了解以下 6 个头文件提供的功能就足够了。</p>
+<h3 id="queue-h"><a href="#queue-h" class="headerlink" title="queue.h"></a>queue.h</h3><p>这是 GCD 的核心。队列是任务的容器，任务派发决定了任务的执行方式（同步或异步）。</p>
+<table>
+<thead>
+<tr>
+<th align="left">API</th>
+<th align="left">描述</th>
+<th align="left">关键用途</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><code>dispatch_queue_create</code></td>
+<td align="left">创建自定义队列（串行或并发）。</td>
+<td align="left">实现线程安全（串行队列）或并发执行（并发队列）。</td>
+</tr>
+<tr>
+<td align="left"><code>dispatch_get_global_queue</code></td>
+<td align="left">获取系统提供的全局并发队列。</td>
+<td align="left">执行后台任务，如网络请求、数据处理。</td>
+</tr>
+<tr>
+<td align="left"><code>dispatch_get_main_queue</code></td>
+<td align="left">获取主队列（串行），绑定到主线程。</td>
+<td align="left">更新 UI，确保 UI 操作在主线程执行。</td>
+</tr>
+<tr>
+<td align="left"><code>dispatch_async</code></td>
+<td align="left"><strong>异步</strong>派发任务到指定队列，立即返回。</td>
+<td align="left">启动后台任务，保持主线程响应。</td>
+</tr>
+<tr>
+<td align="left"><code>dispatch_sync</code></td>
+<td align="left"><strong>同步</strong>派发任务到指定队列，阻塞当前线程直到任务完成。</td>
+<td align="left">线程间数据同步，等待结果。<strong>（注意：避免在主队列同步派发，否则会导致死锁）</strong></td>
+</tr>
+<tr>
+<td align="left"><code>dispatch_barrier_async</code></td>
+<td align="left">异步派发一个屏障任务到并发队列。</td>
+<td align="left">实现高效的“多读单写”模式，保证数据安全。</td>
+</tr>
+</tbody></table>
+<p>异步函数只能保证任务的执行和提交不在同一个函数调用栈内，并不能保证一定会在不同的线程，这一点很多人可能不理解或者误解了异步。如：</p>
+<blockquote>
+<p>异步主队列时，任务的提交和执行都是在主线程，但是提交任务时的函数调用栈并不会立即执行任务，这个任务的执行要依赖主线程的运行循环（RunLoop）的下一个循环周期。</p>
+</blockquote>
+<p>同步函数看似没有作用，但其实在多线程环境中，用来实现线程同步是非常合适的解决方案。</p>
+<h4 id="最常用的场景"><a href="#最常用的场景" class="headerlink" title="最常用的场景"></a>最常用的场景</h4><figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="built_in">dispatch_queue_t</span> queue = dispatch_get_global_queue(<span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line"><span class="built_in">dispatch_async</span>(queue, ^&#123;</span><br><span class="line">	<span class="built_in">NSLog</span>(<span class="string">@&quot;异步执行任务，当前线程:%@&quot;</span>, [<span class="built_in">NSThread</span> currentThread]);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h4 id="需要注意的问题"><a href="#需要注意的问题" class="headerlink" title="需要注意的问题"></a>需要注意的问题</h4><h4 id="底层实现原理"><a href="#底层实现原理" class="headerlink" title="底层实现原理"></a>底层实现原理</h4><h3 id="group-h"><a href="#group-h" class="headerlink" title="group.h"></a>group.h</h3><p>任务组用于监控一组任务的完成状态，是实现多个异步任务完成后执行统一回调的关键。</p>
+<table>
+<thead>
+<tr>
+<th align="left">API</th>
+<th align="left">描述</th>
+<th align="left">关键用途</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><code>dispatch_group_create</code></td>
+<td align="left">创建一个新的任务组。</td>
+<td align="left">组织一组相关的异步任务。</td>
+</tr>
+<tr>
+<td align="left"><code>dispatch_group_async</code></td>
+<td align="left">将任务与队列、任务组关联并异步派发。</td>
+<td align="left">启动任务并自动将其计入任务组。</td>
+</tr>
+<tr>
+<td align="left"><code>dispatch_group_enter</code> &#x2F; <code>dispatch_group_leave</code></td>
+<td align="left">手动增加&#x2F;减少任务组中的未完成任务计数。</td>
+<td align="left">用于非 <code>dispatch_group_async</code> 方式启动的任务，实现手动计数。</td>
+</tr>
+<tr>
+<td align="left"><code>dispatch_group_notify</code></td>
+<td align="left">注册一个回调，在任务组中所有任务完成后执行。</td>
+<td align="left">统一处理多个异步任务的结果，常用于回到主线程更新 UI。</td>
+</tr>
+<tr>
+<td align="left"><code>dispatch_group_wait</code></td>
+<td align="left">同步等待任务组完成，可设置超时时间。</td>
+<td align="left">阻塞当前线程，直到所有任务完成或超时。</td>
+</tr>
+</tbody></table>
+<h3 id="semaphore-h"><a href="#semaphore-h" class="headerlink" title="semaphore.h"></a>semaphore.h</h3><p>信号量是一种低级同步机制，用于控制对有限资源的并发访问数量。</p>
+<table>
+<thead>
+<tr>
+<th align="left">API</th>
+<th align="left">描述</th>
+<th align="left">关键用途</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><code>dispatch_semaphore_create</code></td>
+<td align="left">创建信号量，并设置初始计数值。</td>
+<td align="left">限制并发数（如并发下载数）或实现线程同步。</td>
+</tr>
+<tr>
+<td align="left"><code>dispatch_semaphore_wait</code></td>
+<td align="left">信号量减 1，如果结果小于 0 则阻塞当前线程。</td>
+<td align="left">尝试获取资源，如果资源不足则等待。</td>
+</tr>
+<tr>
+<td align="left"><code>dispatch_semaphore_signal</code></td>
+<td align="left">信号量加 1，如果有等待的线程则唤醒一个。</td>
+<td align="left">释放资源。</td>
+</tr>
+</tbody></table>
+<h3 id="time-h"><a href="#time-h" class="headerlink" title="time.h"></a>time.h</h3><p>时间 API 主要用于计算相对时间或绝对时间，常与 <code>dispatch_after</code> 或 <code>dispatch_group_wait</code> 配合使用。</p>
+<table>
+<thead>
+<tr>
+<th align="left">API</th>
+<th align="left">描述</th>
+<th align="left">关键用途</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><code>dispatch_time</code></td>
+<td align="left">创建一个相对时间（基于当前时间或参考时间）。</td>
+<td align="left">计算延迟时间，如 <code>dispatch_time(DISPATCH_TIME_NOW, delayInNanoseconds)</code>。</td>
+</tr>
+<tr>
+<td align="left"><code>DISPATCH_TIME_NOW</code> &#x2F; <code>DISPATCH_TIME_FOREVER</code></td>
+<td align="left">时间常量。</td>
+<td align="left">表示当前时间或无限期等待。</td>
+</tr>
+</tbody></table>
+<h3 id="source-h"><a href="#source-h" class="headerlink" title="source.h"></a>source.h</h3><p>调度源允许开发者监听系统底层事件，如文件描述符、Mach 端口、信号、定时器等。对于应用开发者，最常用的是<strong>定时器</strong> (<code>DISPATCH_SOURCE_TYPE_TIMER</code>)。</p>
+<p>还有 <code>dispatch_after()</code>，虽然 <code>dispatch_after()</code> 的函数声明是写在 <code>queue.h</code> 文件中的，但是它的实现却是在 <code>source.c</code> 中的，而且使用的正是 dispatch_source。</p>
+<h3 id="once-h"><a href="#once-h" class="headerlink" title="once.h"></a>once.h</h3><p><code>dispatch_once</code> 确保一个代码块在应用程序的生命周期内只被执行一次，常用于实现线程安全的单例模式。</p>
+<blockquote>
+<p><strong>注意：</strong> 在 <strong>Swift</strong> 中，由于语言特性（如静态属性的延迟初始化），<code>dispatch_once</code> 已经<strong>废弃</strong>，不再需要手动调用。但在维护旧的 <strong>Objective-C</strong> 代码时，它仍然是实现单例的标准方式。</p>
+</blockquote>
+<p>162：<br>死锁？<br>什么是死锁？<br>什么情况下产生死锁？</p>
 <figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="built_in">dispatch_queue_t</span> queue = dispatch_get_main_queue();</span><br><span class="line"><span class="built_in">dispatch_sync</span>(queue, ^&#123;</span><br><span class="line">	<span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务&quot;</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-<p>以上代码如果是在主线程执行就产生了死锁。如果不在主线程执行不会产生死锁。</p>
+
+<p>以上代码如果是在主线程执行就会死锁。如果不在主线程执行不会产生死锁。</p>
 <figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="built_in">dispatch_queue_t</span> queue = dispatch_get_main_queue();</span><br><span class="line"><span class="built_in">dispatch_async</span>(queue, ^&#123;</span><br><span class="line">	<span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务&quot;</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
 
 <p>以上代码不会产生死锁，异步主队列是在主线程上执行任务。很经典的场景。</p>
@@ -5787,7 +5964,7 @@ commonModes并不是一个真正单独的模式
 <figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务1&quot;</span>);</span><br><span class="line"><span class="built_in">dispatch_queue_t</span> queue = dispatch_queue_create(<span class="string">&quot;custom_queue&quot;</span>, DISPATCH_QUEUE_CONCURRENT);</span><br><span class="line"><span class="built_in">dispatch_async</span>(queue, ^&#123;</span><br><span class="line">	<span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务2&quot;</span>);</span><br><span class="line">	<span class="built_in">dispatch_sync</span>(queue, ^&#123;</span><br><span class="line">		<span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务3&quot;</span>);</span><br><span class="line">	&#125;);</span><br><span class="line">	<span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务4&quot;</span>);</span><br><span class="line">&#125;);</span><br><span class="line"><span class="built_in">NSLog</span>(<span class="string">@&quot;执行任务5&quot;</span>);</span><br></pre></td></tr></table></figure>
 
 <p>以上代码也不会产生死锁，并发队列</p>
-<p><strong>使用同步函数 sync 往当前的串行队列再次添加任务就会产生死锁</strong></p>
+<p><strong>使用同步函数 sync 往当前的串行队列再次添加任务就会产生死锁</strong><br><strong>往当前串行队列同步派发任务就导致死锁</strong><br><strong>如果当前队列是串行队列，同步派发任务到当前这个队列会导致死锁</strong></p>
 <p>165：<br>面试题<br>以下代码的打印结果是什么：</p>
 <figure class="highlight objc"><table><tr><td class="code"><pre><span class="line">- (<span class="type">void</span>)touchesBegan:(<span class="built_in">NSSet</span>&lt;<span class="built_in">UITouch</span> *&gt; *)touches withEvent:(<span class="built_in">UIEvent</span> *)event &#123;</span><br><span class="line">    <span class="built_in">dispatch_queue_t</span> queue = dispatch_get_global_queue(<span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line">    <span class="built_in">dispatch_async</span>(queue, ^&#123;</span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@&quot;1&quot;</span>);</span><br><span class="line">        [<span class="keyword">self</span> performSelector:<span class="keyword">@selector</span>(test) withObject:<span class="literal">nil</span> afterDelay:<span class="number">.0</span>];</span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@&quot;3&quot;</span>);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="type">void</span>)test &#123;</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@&quot;2&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
@@ -5800,6 +5977,10 @@ commonModes并不是一个真正单独的模式
 <p>打印结果是 1，然后程序崩溃，打印完 1 之后线程退出了，没办法执行 test 了，要保活子线程就得开启 RunLoop，强引用也解决不了。</p>
 <p>168：<br>调度组的使用<br>实现功能：发送多个网络请求，所有网络请求都完成的时候处理事情？<br>正是调度组的典型使用场景</p>
 <figure class="highlight objc"><table><tr><td class="code"><pre><span class="line">dispatch_group_t group = dispatch_group_create();</span><br><span class="line"><span class="built_in">dispatch_queue_t</span> queue = dispatch_queue_create(<span class="string">&quot;custom_queue&quot;</span>, DISPATCH_QUEUE_CONCURRENT);</span><br><span class="line">dispatch_group_async(group, queue, ^&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; i++) &#123;</span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@&quot;任务1，线程：%@&quot;</span>, [<span class="built_in">NSThread</span> currentThread]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br><span class="line">dispatch_group_async(group, queue, ^&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; i++) &#123;</span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@&quot;任务2，线程：%@&quot;</span>, [<span class="built_in">NSThread</span> currentThread]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br><span class="line">dispatch_group_notify(group, dispatch_get_main_queue(), ^&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; i++) &#123;</span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@&quot;任务3，线程：%@&quot;</span>, [<span class="built_in">NSThread</span> currentThread]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+
+
+
 
 <h1 id="线程同步方案"><a href="#线程同步方案" class="headerlink" title="线程同步方案"></a>线程同步方案</h1><p>169:<br>多线程存在的问题？同时做多件事情提高了效率，但是存在线程安全问题<br>资源共享问题：<br>    多个线程访问和使用同一个资源</p>
 <p>案例：<br>存钱取钱。<br>卖票案例。</p>
@@ -6063,88 +6244,6 @@ m<sup>k * φ(n) + 1</sup> mod n = m
         <tag>RSA</tag>
         <tag>DES</tag>
         <tag>AES</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>揭开神秘的iOS布局</title>
-    <url>/2018/03/26/%E6%8F%AD%E7%A7%98iOS%E5%B8%83%E5%B1%80/</url>
-    <content><![CDATA[<p>翻译自: <a href="http://tech.gc.com/demystifying-ios-layout/">Demystifying iOS Layout</a></p>
-<p>在你刚开始开发iOS应用时,最难避免或者说最难调试的是处理视图的布局和内容;通常这些事情的发生是因为对 <strong>视图更新</strong> 真实发生存在误解;了解 <strong>视图更新</strong> 的方式和时间需要更深入地了解iOS应用程序的主运行循环,以及它如何与<code>UIView</code>提供的某些方法关联;这篇博文将解释这些互动,希望澄清如何使用<code>UIView</code>的方法来获得你想要的行为;</p>
-<h2 id="iOS应用程序的主运行循环"><a href="#iOS应用程序的主运行循环" class="headerlink" title="iOS应用程序的主运行循环"></a>iOS应用程序的主运行循环</h2><p>iOS应用程序的主运行循环用来处理所有用户输入事件并在您的应用程序中触发适当的响应;任何与应用程序的用户交互都会被添加到事件队列中;应用程序对象(如下图所示)将事件队列中的事件取出,并将它们分派给应用程序中的其他对象;<strong>它本质上是通过解释来自用户的输入事件并在应用程序的核心对象中为该输入调用相应的处理程序来执行运行循环</strong>;这些处理程序调用应用程序开发人员编写的代码;一旦这些方法调用返回,控制回到主运行循环并且开始更新周期;更新周期负责布局和重绘视图(在下一节中介绍);下面是应用程序如何与设备进行通信并处理用户输入的插图</p>
-<p>538</p>
-<p><em><a href="https://developer.apple.com/library/content/documentation/General/Conceptual/Devpedia-CocoaApp/MainEventLoop.html">https://developer.apple.com/library/content/documentation/General/Conceptual/Devpedia-CocoaApp/MainEventLoop.html</a></em></p>
-<h2 id="更新周期-Update-Cycle"><a href="#更新周期-Update-Cycle" class="headerlink" title="更新周期(Update Cycle)"></a>更新周期(Update Cycle)</h2><p>更新周期是应用程序完成运行所有事件处理代码后,控制权返回到主运行循环的点;就是在这个点,系统开始更新布局,显示和约束;如果您要求改变视图而它正在执行事件处理程序,系统会将此视图标记为需要重绘;在下一次更新周期,系统将执行这些视图上所有的变化;用户交互和布局更新之间的时间间隔对用户来说应该是感觉不到的;iOS应用程序通常以60fps动画,这意味着一个刷新周期只需要1&#x2F;60秒;由于这种情况发生的速度很快,用户不会注意到她与设备上的应用程序进行交互和看到内容和布局更新之间的UI的滞后;但是,由于事件被执行的时间和相应视图的重绘时间之间存在时间间隔,所以在运行循环过程中,视图可能不会按照您希望的方式更新;如果您有任何计算依赖视图最新的内容或布局,您有可能操作的是该视图的旧的内容或布局而不是最新的;了解运行循环,更新周期和某些的<code>UIView</code>方法能够帮助避免或者调试这类问题;</p>
-<p>您可以在下图中看到更新周期在运行循环结束时如何发生<br>1185</p>
-<h2 id="布局"><a href="#布局" class="headerlink" title="布局"></a>布局</h2><p>视图的布局指的是它在屏幕上的大小和位置;每一个视图都有一个<code>frame</code>属性来描述它在父视图坐标系统中的位置以及它的大小;<code>UIView</code>提供了一些方法,可以让你通知系统一个视图的布局已经改变,同时为你提供了可以重写的方法,以便在重新计算视图的布局后定义要执行的操作</p>
-<h3 id="layoutSubviews"><a href="#layoutSubviews" class="headerlink" title="layoutSubviews()"></a>layoutSubviews()</h3><p>这个<code>UIView</code>方法调整视图及其所有子视图的大小和位置;它给出当前视图和每个子视图的位置和大小;此方法很昂贵,因为它对视图的所有子视图起作用并调用其相应的<code>layoutSubviews</code>方法;系统会在任何需要重新计算视图的 frame 属性时调用此方法,因此当您想要设置 frame 属性指定视图位置和大小的时候您应该重写此方法;但是,当您的视图层次结构需要布局刷新时,您绝不应该显示的调用它;相反,在运行循环期间,您可以使用多种机制在不同点触发<code>layoutSubviews</code>调用,这比直接调用<code>layoutSubviews</code>方法要便宜的多;</p>
-<p>当<code>layoutSubviews</code>方法完成时,将在拥有该视图的视图控制器中触发对<code>viewDidLayoutSubviews</code>的调用;<strong>由于<code>layoutSubviews</code>是更新视图布局后可靠调用的唯一方法,因此应该将任何取决于布局和大小的逻辑代码方法<code>viewDidLayoutSubviews</code>中,而不是放在<code>viewDidLoad</code>或<code>viewDidAppear</code>中</strong>;这是避免使用过时的布局或者位置变量的唯一方法。</p>
-<h2 id="自动刷新触发器"><a href="#自动刷新触发器" class="headerlink" title="自动刷新触发器"></a>自动刷新触发器</h2><p>有多个事件会自动地将视图标记为布局已经改变,所以该视图的<code>layoutSubviews</code>方法将在下一次更新周期时被系统调用,不需要开发人员手动执行这个方法;</p>
-<p>这些自动将视图标记为布局已经改变的方式有以下几种:</p>
-<ul>
-<li>改变视图的大小</li>
-<li>添加子视图</li>
-<li>用户滚动<code>UIScrollView</code>(<code>layoutSubviews</code>方法会被<code>UIScrollView</code>以及它的父视图调用)</li>
-<li>用户旋转设备</li>
-<li>更新视图的约束</li>
-</ul>
-<p>以上这些方式都告诉系统,视图的位置需要重新计算并且会自动导致最终的<code>layoutSubviews</code>方法的调用;当然,也有直接触发<code>layoutSubviews</code>方法调用的办法;</p>
-<h3 id="setNeedsLayout"><a href="#setNeedsLayout" class="headerlink" title="setNeedsLayout()"></a>setNeedsLayout()</h3><p>触发<code>layoutSubviews</code>调用最省资源的方式就是在您的视图上调用<code>setNeedsLayout</code>方法;这将指示系统这个视图的布局需要重新计算;<code>setNeedsLayout</code>执行并立即返回,并且在返回之前并不实际更新视图;相反,视图将会在下一个更新周期(系统调用这些视图以及后续所有子视图的<code>layoutSubviews</code>方法)实际更新视图的布局;即使从<code>setNeedsLayout</code>返回后到视图被重新绘制布局之间有一段任意的时间间隔,但是这个延迟不会对用户造成影响,因为永远不会长到对界面造成卡顿;</p>
-<h3 id="layoutIfNeeded"><a href="#layoutIfNeeded" class="headerlink" title="layoutIfNeeded()"></a>layoutIfNeeded()</h3><p><code>layoutIfNeeded</code>是<code>UIView</code>的另一个将会在不久后触发<code>layoutSubviews</code>调用的方法;与<code>setNeedsLayout</code>会让视图在下一个周期调用<code>layoutSubviews</code>更新视图不同,<code>layoutIfNeeded</code>会立即触发<code>layoutSubviews</code>方法调用,如果视图需要布局更新的话;如果你在调用<code>setNeedsLayout</code>方法或者触发上面描述的自动刷新触发器之后调用了<code>layoutIfNeeded</code>方法,<code>layoutSubviews</code>将会在视图上被调用;然而,如果你调用<code>layoutIfNeeded</code>之后没有动作指示系统视图需要重新刷新视图,那么<code>layoutSubviews</code>方法将不会被调用;<br>在一次运行循环中,两次调用视图的<code>layoutIfNeeded</code>方法之间,视图的布局并没有变化的话,那么第二次调用将不会触发<code>layoutSubviews</code>的调用;</p>
-<p>与<code>setNeedsLayout</code>方法不同,使用<code>layoutIfNeeded</code>方法,布局和重绘会在函数返回之前立即发生改变(除非有正在运行中的动画);这个方法在你需要依赖新的布局而又无法等待视图的下次更新周期到来的时候特别有用;然而,除了这种情况外,你还是应该调用<code>setNeedsLayout</code>然后等待下次更新周期的到来,这样在每次运行循环中都只会更新一次布局;</p>
-<p>动画更改约束时,此方法特别有用;您应该在动画的 block 开始之前调用一次<code>layoutIfNeeded</code>,以确保在动画开始之前通知所有的布局更新;配置新的约束,然后在动画 block 内,再次调用<code>layoutIfNeeded</code>以动画到最新的状态;</p>
-<h2 id="显示"><a href="#显示" class="headerlink" title="显示"></a>显示</h2><p>视图的显示包含颜色,文本,图片和Core Graphics绘制等视图属性,但不包含它和它的子视图的大小和位置;和布局的方法类似,显示也有触发更新的方法,它们由系统在检测到更新时被自动调用,或者我们可以手动调用直接触发更新;</p>
-<h3 id="draw"><a href="#draw" class="headerlink" title="draw(_:)"></a>draw(_:)</h3><p><code>UIView</code>的<code>draw</code>方法(Objective-C中的<code>drawRect</code>)对视图的显示内容的作用	就像 <code>layoutSubviews</code>方法对视图的位置和尺寸的作用;同<code>layoutSubviews</code>一样,你不应该在代码中直接调用<code>draw</code>方法,而应该在运行循环的不同点调用能触发<code>draw</code>方法调用的方法;然而,与<code>layoutSubviews</code>方法不同的是,<code>draw</code>方法不会触发后续子视图的调用;</p>
-<h3 id="setNeedsDisplay"><a href="#setNeedsDisplay" class="headerlink" title="setNeedsDisplay()"></a>setNeedsDisplay()</h3><p>这个方法类似布局中的<code>setNeedsLayout</code>;它会给有显示内容更新的视图设置一个内部的标记之后返回,并不会真正的视图重绘;而是在接下来的更新周期中,系统会遍历所有已被标记的视图,调用它们的<code>draw</code>方法;如果你只想在下次更新时重绘部分的视图,你可以调用<code>setNeedsDisplay(_:)</code>(Objective-C中的<code>setNeedsDisplayInRect:</code>)方法,并把希望重绘的矩形部分传入参数;</p>
-<p>大部分时候,在视图中更新任何 UI 组件都会通过自动设置内部的”显示内容更新”标记将视图标记为”dirty”的;导致在下一次更新周期中视图的内容就会重绘而不需要直接显示调用<code>setNeedsDisplay</code>;然而如果你有一个属性没有绑定到UI控件,但需要在属性值每次更新重绘视图,那么你可以实现该属性的<code>didSet</code>方法,并在里面调用<code>setNeedsDisplay</code>方法来触发视图的更新;</p>
-<p>有时设置一个属性要求自定义绘制,这种情况下你需要重写<code>draw</code>方法;在下面的例子中,设置<code>numberOfPoints</code>会触发系统根据具体点数绘制不同的视图;在这个例子中,你需要在<code>draw</code>方法中实现自定义绘制,并在<code>numberOfPoints</code>的property observer里调用<code>setNeedsDisplay</code>;</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Class MyView: UIView &#123;</span><br><span class="line">	var numberOfPoints = 0 &#123;</span><br><span class="line">		didSet &#123;</span><br><span class="line">			setNeedsDisplay()</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	override func draw(_ rect: CGRect) &#123;</span><br><span class="line">		switch numberOfPoints &#123;</span><br><span class="line">		case 0: </span><br><span class="line">			return</span><br><span class="line">		case 1: </span><br><span class="line">			drawPoint(rect)</span><br><span class="line">		case 2:</span><br><span class="line">			drawLine(rect)</span><br><span class="line">		case 3: </span><br><span class="line">			drawTriangle(rect)</span><br><span class="line">		case 4:</span><br><span class="line">			drawRectangle(rect)</span><br><span class="line">		case 5: </span><br><span class="line">			drawPentagon(rect)</span><br><span class="line">		default:</span><br><span class="line">			drawEllipse(rect)</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>视图的显示方法里没有类似布局中的<code>layoutIfNeeded</code>这样可以触发立即更新的方法;通常情况下等到下一个更新周期再重新绘制视图也无所谓;</p>
-<h2 id="约束"><a href="#约束" class="headerlink" title="约束"></a>约束</h2><p>在自动布局技术中布局和重绘视图有三个步骤;第一步是更新约束,系统计算并设置视图上所有必需的约束条件;第二步是布局阶段,布局引擎计算视图和子视图的 frame 并且将它们布局;最后一步完成这一循环的是显示阶段;第三步完成此次循环的是显示阶段,如果有必要,那么通过调用视图的<code>draw</code>方法重绘视图的内容;</p>
-<h3 id="updateConstraints"><a href="#updateConstraints" class="headerlink" title="updateConstraints()"></a>updateConstraints()</h3><p>这个方法用在自动布局中动态的改变视图的约束;和布局中的<code>layoutSubviews</code>方法和显示内容中的<code>draw</code>方法类似,<code>updateConstraints</code>只应该被重写,而不应该在你的代码中直接调用;一般来说,您应该在<code>updateConstraints</code>方法中仅仅实现必须要更新的约束;静态的约束应该设置在interface builder,视图的初始化方法(initializer)或者控制器的<code>viewDidLoad</code>中;</p>
-<p>通常情况下,开启或者关闭约束,更改约束的优先级或者常量值,或者从视图层级中移除一个视图时都会设置一个内部的标记,这个标记将会在下一次更新周期触发<code>updateConstraints</code>方法调用;当然啦,也有手动的给视图打上需要更新约束的标记的方法,如下:</p>
-<h3 id="setNeedsUpdateConstraints"><a href="#setNeedsUpdateConstraints" class="headerlink" title="setNeedsUpdateConstraints()"></a>setNeedsUpdateConstraints()</h3><p>调用<code>setNeedsUpdateConstraints</code>会保证在下一次的更新周期中更新约束;它通过标记视图的约束已更新来触发<code>updateConstraints</code>调用;这个方法和<code>setNeedsDisplay</code>,<code>setNeedsLayout</code>方法的工作机制类似;</p>
-<h3 id="updateConstraintsIfNeeded"><a href="#updateConstraintsIfNeeded" class="headerlink" title="updateConstraintsIfNeeded()"></a>updateConstraintsIfNeeded()</h3><p>这个方法就等同于使用了自动布局的视图中的<code>layoutIfNeeded</code>方法;它会检查视图约束是否更新的标记(能够被自动设置,或者通过<code>setNeedsUpdateConstraints</code>设置,或者通过<code>invalidateInstrinsicContentSize</code>设置),如果它表明约束需要更新,它将立刻触发<code>updateConstraints</code>方法的调用而不需要等到运行循环的结束;</p>
-<h3 id="invalidateIntrinsicContentSize"><a href="#invalidateIntrinsicContentSize" class="headerlink" title="invalidateIntrinsicContentSize()"></a>invalidateIntrinsicContentSize()</h3><p>一些使用自动布局的视图中会有一个<code>intrinsicContentSize</code>的属性,这是视图根据它的内容得到的自然尺寸;一个视图的<code>intrinsicContentSize</code>属性通常由所包含的元素的约束来决定,但是也可以通过重写来提供自定义的行为;调用<code>invalidateIntrinsicContentSize</code>会设置一个标记表示这个视图的<code>intrinsicContentSize</code>已经过期,需要在下一个布局阶段重新计算;</p>
-<h2 id="它们是如何连接的"><a href="#它们是如何连接的" class="headerlink" title="它们是如何连接的"></a>它们是如何连接的</h2><p>视图的布局,显示以及约束都遵循着相似的模式,例如它们更新的方式以及如何在运行循环的不同点上强制更新;任意组件都有一个实际去更新的方法(<code>layoutSubviews</code>,<code>draw</code>,以及<code>updateConstraints</code>),你可以重写来手动操作视图,但是任何情况下都不要在你的代码中直接调用;这些方法仅仅在视图有标记,告诉系统视图的某些组件需要更新了,在主运行循环的后面被调用;有些操作会自动设置这个标志,也有一些方法能够让您手动的设置它;对于布局和约束的更新,如果您无法等到更新周期的到来(因为有些操作依赖最新的布局),有这么一些方法可以让你立即更新,并保证布局需要更新标记被正确标记;下面的表格列出了任意组件会怎样更新及其对应方法;</p>
-<table>
-<thead>
-<tr>
-<th>Method purposes</th>
-<th>Layout</th>
-<th>Display</th>
-<th>Constraints</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>Implement updates(override,don’t call explicitly)</td>
-<td><code>layoutSubviews</code></td>
-<td><code>draw</code></td>
-<td><code>updateConstraints</code></td>
-</tr>
-<tr>
-<td>Explicitly mark view as needing update on next update cycle</td>
-<td><code>setNeedsLayout</code></td>
-<td><code>setNeedsDisplay</code></td>
-<td><code>setNeedsUpdateConstraints</code> <code>invalidateIntrinsicContentSize</code></td>
-</tr>
-<tr>
-<td>Update iimmediately if view is marked as ‘dirty’</td>
-<td><code>layoutIfNeeded</code></td>
-<td></td>
-<td><code>updateConstraintsIfNeeded</code></td>
-</tr>
-<tr>
-<td>Actions that implicitly cause views to be updated</td>
-<td><code>addSubview</code><br> Resizing视图,通过<code>setFrame</code>改变视图的<code>bounds</code>(不只是translation)<br>用户滑动UIScrollView<br>用户旋转设备</td>
-<td>改变视图的<code>bounds</code></td>
-<td>激活&#x2F;禁用约束<br>更改约束的值或者优先级<br>从视图层次结构中移除视图</td>
-</tr>
-</tbody></table>
-<p>下面的流程图总结了<strong>更新周期</strong>和<strong>事件循环</strong>之间的交互,并指出了上文提到的方法在<strong>运行循环</strong>期间的位置;你可以在运行循环中的任意一点直接的调用<code>layoutIfNeeded</code>或者<code>updateConstraintsIfNeeded</code>,需要记住,这开销会很大;在循环的主运行循环的后面是更新周期,如果视图被设置特定的”需要更新约束”,”需要更新布局”或者”需要更新显示”的标记,在这个节点会进行更新约束,更新布局以及更新显示内容;一旦这些更新结束,主运行循环会重新开始;</p>
-<p>8831<em><a href="https://i.stack.imgur.com/i9YuN.png">https://i.stack.imgur.com/i9YuN.png</a></em></p>
-]]></content>
-      <tags>
-        <tag>iOS</tag>
       </tags>
   </entry>
   <entry>
@@ -6579,14 +6678,86 @@ m<sup>k * φ(n) + 1</sup> mod n = m
       </tags>
   </entry>
   <entry>
-    <title>深入理解 iOS 对象模型</title>
-    <url>/2025/04/25/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3-iOS-%E5%AF%B9%E8%B1%A1%E6%A8%A1%E5%9E%8B/</url>
-    <content><![CDATA[<p>001:<br>讲了 Objective-C 对象的底层是 C 结构体</p>
-<h1 id="Objective-C-实例对象"><a href="#Objective-C-实例对象" class="headerlink" title="Objective-C 实例对象"></a>Objective-C 实例对象</h1><p>在日常使用 Objective-C 开发过程中，我们经常会使用 <code>[[NSObject alloc] init]</code> 这样的方式创建一个实例对象，并调用初始化方法。当然实际的情况中可能不是使用 NSObject 类，而是 UIKit 框架中的类，或者是你自定义的子类。实例对象对于我们来说简直是再熟悉不过了，但是各位有没有思考过，对于 <code>NSObject</code> 来说，<code>alloc</code> 方法分配内存，究竟分配了多大的内存空间，分配的内存中存放的又是什么东西，<code>init</code> 方法又究竟初始化了什么东西？如果不是 <code>NSObject</code> 类，而是其他系统框架类，或者我们自定义的类呢？我们先以 <code>NSObject</code> 类为例，分析 <code>alloc</code> 方法究竟是如何分配内存的，分配了多少内存空间，内存中又放的一些什么东西？</p>
-<h2 id="NSObject-的实例"><a href="#NSObject-的实例" class="headerlink" title="NSObject 的实例"></a>NSObject 的实例</h2>]]></content>
-      <categories>
-        <category>iOS 底层原理</category>
-      </categories>
+    <title>揭开神秘的iOS布局</title>
+    <url>/2018/03/26/%E6%8F%AD%E7%A7%98iOS%E5%B8%83%E5%B1%80/</url>
+    <content><![CDATA[<p>翻译自: <a href="http://tech.gc.com/demystifying-ios-layout/">Demystifying iOS Layout</a></p>
+<p>在你刚开始开发iOS应用时,最难避免或者说最难调试的是处理视图的布局和内容;通常这些事情的发生是因为对 <strong>视图更新</strong> 真实发生存在误解;了解 <strong>视图更新</strong> 的方式和时间需要更深入地了解iOS应用程序的主运行循环,以及它如何与<code>UIView</code>提供的某些方法关联;这篇博文将解释这些互动,希望澄清如何使用<code>UIView</code>的方法来获得你想要的行为;</p>
+<h2 id="iOS应用程序的主运行循环"><a href="#iOS应用程序的主运行循环" class="headerlink" title="iOS应用程序的主运行循环"></a>iOS应用程序的主运行循环</h2><p>iOS应用程序的主运行循环用来处理所有用户输入事件并在您的应用程序中触发适当的响应;任何与应用程序的用户交互都会被添加到事件队列中;应用程序对象(如下图所示)将事件队列中的事件取出,并将它们分派给应用程序中的其他对象;<strong>它本质上是通过解释来自用户的输入事件并在应用程序的核心对象中为该输入调用相应的处理程序来执行运行循环</strong>;这些处理程序调用应用程序开发人员编写的代码;一旦这些方法调用返回,控制回到主运行循环并且开始更新周期;更新周期负责布局和重绘视图(在下一节中介绍);下面是应用程序如何与设备进行通信并处理用户输入的插图</p>
+<p>538</p>
+<p><em><a href="https://developer.apple.com/library/content/documentation/General/Conceptual/Devpedia-CocoaApp/MainEventLoop.html">https://developer.apple.com/library/content/documentation/General/Conceptual/Devpedia-CocoaApp/MainEventLoop.html</a></em></p>
+<h2 id="更新周期-Update-Cycle"><a href="#更新周期-Update-Cycle" class="headerlink" title="更新周期(Update Cycle)"></a>更新周期(Update Cycle)</h2><p>更新周期是应用程序完成运行所有事件处理代码后,控制权返回到主运行循环的点;就是在这个点,系统开始更新布局,显示和约束;如果您要求改变视图而它正在执行事件处理程序,系统会将此视图标记为需要重绘;在下一次更新周期,系统将执行这些视图上所有的变化;用户交互和布局更新之间的时间间隔对用户来说应该是感觉不到的;iOS应用程序通常以60fps动画,这意味着一个刷新周期只需要1&#x2F;60秒;由于这种情况发生的速度很快,用户不会注意到她与设备上的应用程序进行交互和看到内容和布局更新之间的UI的滞后;但是,由于事件被执行的时间和相应视图的重绘时间之间存在时间间隔,所以在运行循环过程中,视图可能不会按照您希望的方式更新;如果您有任何计算依赖视图最新的内容或布局,您有可能操作的是该视图的旧的内容或布局而不是最新的;了解运行循环,更新周期和某些的<code>UIView</code>方法能够帮助避免或者调试这类问题;</p>
+<p>您可以在下图中看到更新周期在运行循环结束时如何发生<br>1185</p>
+<h2 id="布局"><a href="#布局" class="headerlink" title="布局"></a>布局</h2><p>视图的布局指的是它在屏幕上的大小和位置;每一个视图都有一个<code>frame</code>属性来描述它在父视图坐标系统中的位置以及它的大小;<code>UIView</code>提供了一些方法,可以让你通知系统一个视图的布局已经改变,同时为你提供了可以重写的方法,以便在重新计算视图的布局后定义要执行的操作</p>
+<h3 id="layoutSubviews"><a href="#layoutSubviews" class="headerlink" title="layoutSubviews()"></a>layoutSubviews()</h3><p>这个<code>UIView</code>方法调整视图及其所有子视图的大小和位置;它给出当前视图和每个子视图的位置和大小;此方法很昂贵,因为它对视图的所有子视图起作用并调用其相应的<code>layoutSubviews</code>方法;系统会在任何需要重新计算视图的 frame 属性时调用此方法,因此当您想要设置 frame 属性指定视图位置和大小的时候您应该重写此方法;但是,当您的视图层次结构需要布局刷新时,您绝不应该显示的调用它;相反,在运行循环期间,您可以使用多种机制在不同点触发<code>layoutSubviews</code>调用,这比直接调用<code>layoutSubviews</code>方法要便宜的多;</p>
+<p>当<code>layoutSubviews</code>方法完成时,将在拥有该视图的视图控制器中触发对<code>viewDidLayoutSubviews</code>的调用;<strong>由于<code>layoutSubviews</code>是更新视图布局后可靠调用的唯一方法,因此应该将任何取决于布局和大小的逻辑代码方法<code>viewDidLayoutSubviews</code>中,而不是放在<code>viewDidLoad</code>或<code>viewDidAppear</code>中</strong>;这是避免使用过时的布局或者位置变量的唯一方法。</p>
+<h2 id="自动刷新触发器"><a href="#自动刷新触发器" class="headerlink" title="自动刷新触发器"></a>自动刷新触发器</h2><p>有多个事件会自动地将视图标记为布局已经改变,所以该视图的<code>layoutSubviews</code>方法将在下一次更新周期时被系统调用,不需要开发人员手动执行这个方法;</p>
+<p>这些自动将视图标记为布局已经改变的方式有以下几种:</p>
+<ul>
+<li>改变视图的大小</li>
+<li>添加子视图</li>
+<li>用户滚动<code>UIScrollView</code>(<code>layoutSubviews</code>方法会被<code>UIScrollView</code>以及它的父视图调用)</li>
+<li>用户旋转设备</li>
+<li>更新视图的约束</li>
+</ul>
+<p>以上这些方式都告诉系统,视图的位置需要重新计算并且会自动导致最终的<code>layoutSubviews</code>方法的调用;当然,也有直接触发<code>layoutSubviews</code>方法调用的办法;</p>
+<h3 id="setNeedsLayout"><a href="#setNeedsLayout" class="headerlink" title="setNeedsLayout()"></a>setNeedsLayout()</h3><p>触发<code>layoutSubviews</code>调用最省资源的方式就是在您的视图上调用<code>setNeedsLayout</code>方法;这将指示系统这个视图的布局需要重新计算;<code>setNeedsLayout</code>执行并立即返回,并且在返回之前并不实际更新视图;相反,视图将会在下一个更新周期(系统调用这些视图以及后续所有子视图的<code>layoutSubviews</code>方法)实际更新视图的布局;即使从<code>setNeedsLayout</code>返回后到视图被重新绘制布局之间有一段任意的时间间隔,但是这个延迟不会对用户造成影响,因为永远不会长到对界面造成卡顿;</p>
+<h3 id="layoutIfNeeded"><a href="#layoutIfNeeded" class="headerlink" title="layoutIfNeeded()"></a>layoutIfNeeded()</h3><p><code>layoutIfNeeded</code>是<code>UIView</code>的另一个将会在不久后触发<code>layoutSubviews</code>调用的方法;与<code>setNeedsLayout</code>会让视图在下一个周期调用<code>layoutSubviews</code>更新视图不同,<code>layoutIfNeeded</code>会立即触发<code>layoutSubviews</code>方法调用,如果视图需要布局更新的话;如果你在调用<code>setNeedsLayout</code>方法或者触发上面描述的自动刷新触发器之后调用了<code>layoutIfNeeded</code>方法,<code>layoutSubviews</code>将会在视图上被调用;然而,如果你调用<code>layoutIfNeeded</code>之后没有动作指示系统视图需要重新刷新视图,那么<code>layoutSubviews</code>方法将不会被调用;<br>在一次运行循环中,两次调用视图的<code>layoutIfNeeded</code>方法之间,视图的布局并没有变化的话,那么第二次调用将不会触发<code>layoutSubviews</code>的调用;</p>
+<p>与<code>setNeedsLayout</code>方法不同,使用<code>layoutIfNeeded</code>方法,布局和重绘会在函数返回之前立即发生改变(除非有正在运行中的动画);这个方法在你需要依赖新的布局而又无法等待视图的下次更新周期到来的时候特别有用;然而,除了这种情况外,你还是应该调用<code>setNeedsLayout</code>然后等待下次更新周期的到来,这样在每次运行循环中都只会更新一次布局;</p>
+<p>动画更改约束时,此方法特别有用;您应该在动画的 block 开始之前调用一次<code>layoutIfNeeded</code>,以确保在动画开始之前通知所有的布局更新;配置新的约束,然后在动画 block 内,再次调用<code>layoutIfNeeded</code>以动画到最新的状态;</p>
+<h2 id="显示"><a href="#显示" class="headerlink" title="显示"></a>显示</h2><p>视图的显示包含颜色,文本,图片和Core Graphics绘制等视图属性,但不包含它和它的子视图的大小和位置;和布局的方法类似,显示也有触发更新的方法,它们由系统在检测到更新时被自动调用,或者我们可以手动调用直接触发更新;</p>
+<h3 id="draw"><a href="#draw" class="headerlink" title="draw(_:)"></a>draw(_:)</h3><p><code>UIView</code>的<code>draw</code>方法(Objective-C中的<code>drawRect</code>)对视图的显示内容的作用	就像 <code>layoutSubviews</code>方法对视图的位置和尺寸的作用;同<code>layoutSubviews</code>一样,你不应该在代码中直接调用<code>draw</code>方法,而应该在运行循环的不同点调用能触发<code>draw</code>方法调用的方法;然而,与<code>layoutSubviews</code>方法不同的是,<code>draw</code>方法不会触发后续子视图的调用;</p>
+<h3 id="setNeedsDisplay"><a href="#setNeedsDisplay" class="headerlink" title="setNeedsDisplay()"></a>setNeedsDisplay()</h3><p>这个方法类似布局中的<code>setNeedsLayout</code>;它会给有显示内容更新的视图设置一个内部的标记之后返回,并不会真正的视图重绘;而是在接下来的更新周期中,系统会遍历所有已被标记的视图,调用它们的<code>draw</code>方法;如果你只想在下次更新时重绘部分的视图,你可以调用<code>setNeedsDisplay(_:)</code>(Objective-C中的<code>setNeedsDisplayInRect:</code>)方法,并把希望重绘的矩形部分传入参数;</p>
+<p>大部分时候,在视图中更新任何 UI 组件都会通过自动设置内部的”显示内容更新”标记将视图标记为”dirty”的;导致在下一次更新周期中视图的内容就会重绘而不需要直接显示调用<code>setNeedsDisplay</code>;然而如果你有一个属性没有绑定到UI控件,但需要在属性值每次更新重绘视图,那么你可以实现该属性的<code>didSet</code>方法,并在里面调用<code>setNeedsDisplay</code>方法来触发视图的更新;</p>
+<p>有时设置一个属性要求自定义绘制,这种情况下你需要重写<code>draw</code>方法;在下面的例子中,设置<code>numberOfPoints</code>会触发系统根据具体点数绘制不同的视图;在这个例子中,你需要在<code>draw</code>方法中实现自定义绘制,并在<code>numberOfPoints</code>的property observer里调用<code>setNeedsDisplay</code>;</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Class MyView: UIView &#123;</span><br><span class="line">	var numberOfPoints = 0 &#123;</span><br><span class="line">		didSet &#123;</span><br><span class="line">			setNeedsDisplay()</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	override func draw(_ rect: CGRect) &#123;</span><br><span class="line">		switch numberOfPoints &#123;</span><br><span class="line">		case 0: </span><br><span class="line">			return</span><br><span class="line">		case 1: </span><br><span class="line">			drawPoint(rect)</span><br><span class="line">		case 2:</span><br><span class="line">			drawLine(rect)</span><br><span class="line">		case 3: </span><br><span class="line">			drawTriangle(rect)</span><br><span class="line">		case 4:</span><br><span class="line">			drawRectangle(rect)</span><br><span class="line">		case 5: </span><br><span class="line">			drawPentagon(rect)</span><br><span class="line">		default:</span><br><span class="line">			drawEllipse(rect)</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>视图的显示方法里没有类似布局中的<code>layoutIfNeeded</code>这样可以触发立即更新的方法;通常情况下等到下一个更新周期再重新绘制视图也无所谓;</p>
+<h2 id="约束"><a href="#约束" class="headerlink" title="约束"></a>约束</h2><p>在自动布局技术中布局和重绘视图有三个步骤;第一步是更新约束,系统计算并设置视图上所有必需的约束条件;第二步是布局阶段,布局引擎计算视图和子视图的 frame 并且将它们布局;最后一步完成这一循环的是显示阶段;第三步完成此次循环的是显示阶段,如果有必要,那么通过调用视图的<code>draw</code>方法重绘视图的内容;</p>
+<h3 id="updateConstraints"><a href="#updateConstraints" class="headerlink" title="updateConstraints()"></a>updateConstraints()</h3><p>这个方法用在自动布局中动态的改变视图的约束;和布局中的<code>layoutSubviews</code>方法和显示内容中的<code>draw</code>方法类似,<code>updateConstraints</code>只应该被重写,而不应该在你的代码中直接调用;一般来说,您应该在<code>updateConstraints</code>方法中仅仅实现必须要更新的约束;静态的约束应该设置在interface builder,视图的初始化方法(initializer)或者控制器的<code>viewDidLoad</code>中;</p>
+<p>通常情况下,开启或者关闭约束,更改约束的优先级或者常量值,或者从视图层级中移除一个视图时都会设置一个内部的标记,这个标记将会在下一次更新周期触发<code>updateConstraints</code>方法调用;当然啦,也有手动的给视图打上需要更新约束的标记的方法,如下:</p>
+<h3 id="setNeedsUpdateConstraints"><a href="#setNeedsUpdateConstraints" class="headerlink" title="setNeedsUpdateConstraints()"></a>setNeedsUpdateConstraints()</h3><p>调用<code>setNeedsUpdateConstraints</code>会保证在下一次的更新周期中更新约束;它通过标记视图的约束已更新来触发<code>updateConstraints</code>调用;这个方法和<code>setNeedsDisplay</code>,<code>setNeedsLayout</code>方法的工作机制类似;</p>
+<h3 id="updateConstraintsIfNeeded"><a href="#updateConstraintsIfNeeded" class="headerlink" title="updateConstraintsIfNeeded()"></a>updateConstraintsIfNeeded()</h3><p>这个方法就等同于使用了自动布局的视图中的<code>layoutIfNeeded</code>方法;它会检查视图约束是否更新的标记(能够被自动设置,或者通过<code>setNeedsUpdateConstraints</code>设置,或者通过<code>invalidateInstrinsicContentSize</code>设置),如果它表明约束需要更新,它将立刻触发<code>updateConstraints</code>方法的调用而不需要等到运行循环的结束;</p>
+<h3 id="invalidateIntrinsicContentSize"><a href="#invalidateIntrinsicContentSize" class="headerlink" title="invalidateIntrinsicContentSize()"></a>invalidateIntrinsicContentSize()</h3><p>一些使用自动布局的视图中会有一个<code>intrinsicContentSize</code>的属性,这是视图根据它的内容得到的自然尺寸;一个视图的<code>intrinsicContentSize</code>属性通常由所包含的元素的约束来决定,但是也可以通过重写来提供自定义的行为;调用<code>invalidateIntrinsicContentSize</code>会设置一个标记表示这个视图的<code>intrinsicContentSize</code>已经过期,需要在下一个布局阶段重新计算;</p>
+<h2 id="它们是如何连接的"><a href="#它们是如何连接的" class="headerlink" title="它们是如何连接的"></a>它们是如何连接的</h2><p>视图的布局,显示以及约束都遵循着相似的模式,例如它们更新的方式以及如何在运行循环的不同点上强制更新;任意组件都有一个实际去更新的方法(<code>layoutSubviews</code>,<code>draw</code>,以及<code>updateConstraints</code>),你可以重写来手动操作视图,但是任何情况下都不要在你的代码中直接调用;这些方法仅仅在视图有标记,告诉系统视图的某些组件需要更新了,在主运行循环的后面被调用;有些操作会自动设置这个标志,也有一些方法能够让您手动的设置它;对于布局和约束的更新,如果您无法等到更新周期的到来(因为有些操作依赖最新的布局),有这么一些方法可以让你立即更新,并保证布局需要更新标记被正确标记;下面的表格列出了任意组件会怎样更新及其对应方法;</p>
+<table>
+<thead>
+<tr>
+<th>Method purposes</th>
+<th>Layout</th>
+<th>Display</th>
+<th>Constraints</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Implement updates(override,don’t call explicitly)</td>
+<td><code>layoutSubviews</code></td>
+<td><code>draw</code></td>
+<td><code>updateConstraints</code></td>
+</tr>
+<tr>
+<td>Explicitly mark view as needing update on next update cycle</td>
+<td><code>setNeedsLayout</code></td>
+<td><code>setNeedsDisplay</code></td>
+<td><code>setNeedsUpdateConstraints</code> <code>invalidateIntrinsicContentSize</code></td>
+</tr>
+<tr>
+<td>Update iimmediately if view is marked as ‘dirty’</td>
+<td><code>layoutIfNeeded</code></td>
+<td></td>
+<td><code>updateConstraintsIfNeeded</code></td>
+</tr>
+<tr>
+<td>Actions that implicitly cause views to be updated</td>
+<td><code>addSubview</code><br> Resizing视图,通过<code>setFrame</code>改变视图的<code>bounds</code>(不只是translation)<br>用户滑动UIScrollView<br>用户旋转设备</td>
+<td>改变视图的<code>bounds</code></td>
+<td>激活&#x2F;禁用约束<br>更改约束的值或者优先级<br>从视图层次结构中移除视图</td>
+</tr>
+</tbody></table>
+<p>下面的流程图总结了<strong>更新周期</strong>和<strong>事件循环</strong>之间的交互,并指出了上文提到的方法在<strong>运行循环</strong>期间的位置;你可以在运行循环中的任意一点直接的调用<code>layoutIfNeeded</code>或者<code>updateConstraintsIfNeeded</code>,需要记住,这开销会很大;在循环的主运行循环的后面是更新周期,如果视图被设置特定的”需要更新约束”,”需要更新布局”或者”需要更新显示”的标记,在这个节点会进行更新约束,更新布局以及更新显示内容;一旦这些更新结束,主运行循环会重新开始;</p>
+<p>8831<em><a href="https://i.stack.imgur.com/i9YuN.png">https://i.stack.imgur.com/i9YuN.png</a></em></p>
+]]></content>
+      <tags>
+        <tag>iOS</tag>
+      </tags>
   </entry>
   <entry>
     <title>架构模式</title>
@@ -7126,6 +7297,16 @@ NewsService 类提供一个 API 加载数据，内部实现是使用 DBTool 加�
         <tag>MVVM</tag>
         <tag>VIPER</tag>
       </tags>
+  </entry>
+  <entry>
+    <title>深入理解 iOS 对象模型</title>
+    <url>/2025/04/25/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3-iOS-%E5%AF%B9%E8%B1%A1%E6%A8%A1%E5%9E%8B/</url>
+    <content><![CDATA[<p>001:<br>讲了 Objective-C 对象的底层是 C 结构体</p>
+<h1 id="Objective-C-实例对象"><a href="#Objective-C-实例对象" class="headerlink" title="Objective-C 实例对象"></a>Objective-C 实例对象</h1><p>在日常使用 Objective-C 开发过程中，我们经常会使用 <code>[[NSObject alloc] init]</code> 这样的方式创建一个实例对象，并调用初始化方法。当然实际的情况中可能不是使用 NSObject 类，而是 UIKit 框架中的类，或者是你自定义的子类。实例对象对于我们来说简直是再熟悉不过了，但是各位有没有思考过，对于 <code>NSObject</code> 来说，<code>alloc</code> 方法分配内存，究竟分配了多大的内存空间，分配的内存中存放的又是什么东西，<code>init</code> 方法又究竟初始化了什么东西？如果不是 <code>NSObject</code> 类，而是其他系统框架类，或者我们自定义的类呢？我们先以 <code>NSObject</code> 类为例，分析 <code>alloc</code> 方法究竟是如何分配内存的，分配了多少内存空间，内存中又放的一些什么东西？</p>
+<h2 id="NSObject-的实例"><a href="#NSObject-的实例" class="headerlink" title="NSObject 的实例"></a>NSObject 的实例</h2>]]></content>
+      <categories>
+        <category>iOS 底层原理</category>
+      </categories>
   </entry>
   <entry>
     <title>解决git clone速度慢的问题</title>

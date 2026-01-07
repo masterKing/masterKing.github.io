@@ -73,32 +73,32 @@ Author: masterking
 Name: applist
 
 Package: com.masterking.lookinloader2
-Version: 0.0.2
+Version: 0.0.3
 Architecture: iphoneos-arm64
 Maintainer: masterKing <masterking1012@gmail.com>
-Installed-Size: 1632
+Installed-Size: 1612
 Depends: mobilesubstrate (>= 0.9.5000), com.opa334.altlist, preferenceloader
-Filename: debs/com.masterking.lookinloader2_0.0.2_iphoneos-arm64.deb
-Size: 238374
-MD5sum: 39752269bb4a175dd8a975fbbc155f1d
-SHA1: 586f529c7a7160f7a81066cf1f8ed1ca350959e9
-SHA256: 013aa196b4df72f00de4cf1c8836c3f21d8fb4469bb4f77fd8ebb1e349ea1adf
+Filename: debs/com.masterking.lookinloader2_0.0.3_iphoneos-arm64.deb
+Size: 235468
+MD5sum: be4a11c86f99e5074ac10d8e5c97c946
+SHA1: 39f1d48d46f1206ec8bb4583983322e36857b6b3
+SHA256: d4a3836f983e84357743989084bd4c03b79f031a7d8337e3b3c211c72f11353e
 Section: Tweaks
 Description: Dynamically loads LookinServer.framework into iOS applications.
 Author: masterKing <masterking1012@gmail.com>
 Name: LookinLoader2
 
 Package: com.masterking.lookinloader2
-Version: 0.0.2
+Version: 0.0.3
 Architecture: iphoneos-arm
 Maintainer: masterKing <masterking1012@gmail.com>
-Installed-Size: 1696
+Installed-Size: 1676
 Depends: mobilesubstrate (>= 0.9.5000), com.opa334.altlist, preferenceloader
-Filename: debs/com.masterking.lookinloader2_0.0.2_iphoneos-arm.deb
-Size: 243550
-MD5sum: e050a5df1e63451f19b8901beaf081bf
-SHA1: 7aa1b6a515e2d5d2177572a7b1c9cccae4d6abd5
-SHA256: 0beb2fcd2672bc6e4c44270bfb4ae754f7f077f2ac3ca9f9e26d50ec456b3a60
+Filename: debs/com.masterking.lookinloader2_0.0.3_iphoneos-arm.deb
+Size: 240152
+MD5sum: 7892a73c42dae3e2ab32d1b4373c8f12
+SHA1: 0c84631a8613e04d3b0d4beaec9aa935e05a5ffe
+SHA256: 3f29d694958a98679240b204b7f509bd33a81681c4385f9655177da7ad8dcab6
 Section: Tweaks
 Description: Dynamically loads LookinServer.framework into iOS applications.
 Author: masterKing <masterking1012@gmail.com>
