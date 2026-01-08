@@ -4603,7 +4603,7 @@ commonModes并不是一个真正单独的模式
 <p>库的先后顺序能影响检测的结果。<br>使用函数指针保存 ptrace，sysctl 地址，使用函数指针调用函数。<br>修改 MachO</p>
 <h1 id="实战"><a href="#实战" class="headerlink" title="实战"></a>实战</h1><p>作者的实战环境是 Mac Pro（macOS 15.3.1），iPhone 8 Plus（iOS 16.7.10）使用 palera1n 的 rootful 越狱。</p>
 <h2 id="动态绕过反调试"><a href="#动态绕过反调试" class="headerlink" title="动态绕过反调试"></a>动态绕过反调试</h2><p>这里介绍一个 lldb 插件 <a href="https://github.com/4ch12dy/xia0LLDB">xia0LLDB</a>。提供了一个 debugme 命令可以 hook ptrace 和 inlinehook svc 来绕过反调试。但是在我的环境 iPhone8Plus iOS16.7.10 中想要成功利用 debugme 绕过 iOS 端最新版小红书还是没那么简单，出了点问题，我们来分析一下为什么。</p>
-<h3 id="小红书"><a href="#小红书" class="headerlink" title="小红书"></a>小红书</h3><p>这里以作者编写本文时的 iOS 端小红书最新版本(8.88)为例。我们都知道，小红书是做了 lldb 反调试的。直接启动 APP，然后使用 debugserver 附加调试，肯定是附加不成功的。以下为演示：</p>
+<h3 id="小红书"><a href="#小红书" class="headerlink" title="小红书"></a>小红书</h3><p>这里以作者编写本文时的 iOS 端小红书最新版本(8.88)为例。已经在2026年01月08日的最新版9.16.1验证同样可以绕过反调试防护。我们都知道，小红书是做了 lldb 反调试的。直接启动 APP，然后使用 debugserver 附加调试，肯定是附加不成功的。以下为演示：</p>
 <p>APP 在前台时尝试附加：</p>
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">iPhone8plus:~ root# debugserver localhost:3333 --attach=discover</span><br><span class="line">debugserver-@(#)PROGRAM:LLDB  PROJECT:lldb-16.0.0</span><br><span class="line"> <span class="keyword">for</span> arm64.</span><br><span class="line">Attaching to process discover...</span><br><span class="line">zsh: segmentation fault  debugserver localhost:3333 --attach=discover</span><br></pre></td></tr></table></figure>
 
@@ -4643,7 +4643,7 @@ commonModes并不是一个真正单独的模式
 <p>从打印的结果来看，小红书的根控制器层次结构还是有点奇怪的，导航控制器嵌入了 TabbarController，然后 TabbarController 的每个子控制器又是导航控制器。。。</p>
 <p>这种方式属于通过 lldb 进行汇编级别的动态 hook 绕过反调试。这种动态的方式无法随时在需要的时候附加到目标进程，因为目标进程的反调试代码已经执行了。优点是不需要对 APP MachO 文件进行修改，不需要重新签名打包安装。后面的抖音反反调试是通过静态修改 MachO 文件内容进行的。</p>
 <h3 id="支付宝"><a href="#支付宝" class="headerlink" title="支付宝"></a>支付宝</h3><p>支付宝最新版 10.7.50 直接使用 xia0LLDB 的 debugme 就可以绕过了，甚至连 svc 指令都没有，但是的确做了反调试。就不多说了。</p>
-<h2 id="静态绕过反调试"><a href="#静态绕过反调试" class="headerlink" title="静态绕过反调试"></a>静态绕过反调试</h2><h3 id="抖音"><a href="#抖音" class="headerlink" title="抖音"></a>抖音</h3><p>这里同样以作者写作时的抖音最新版本 34.7.0 为例。如果继续使用 xia0LLDB 对抖音进行反调试绕过的话，首先会发现 xia0LLDB 无法读取到 Aweme 和 AwemeCore 两个 MachO 的代码段地址，扫描结果都是 0 到 0。如下：</p>
+<h2 id="静态绕过反调试"><a href="#静态绕过反调试" class="headerlink" title="静态绕过反调试"></a>静态绕过反调试</h2><h3 id="抖音"><a href="#抖音" class="headerlink" title="抖音"></a>抖音</h3><p>这里同样以作者写作时的抖音最新版本 <del>34.7.0</del> 为例，已经在 2026年01月08日 的最新版 37.3.0 中验证依旧可绕过反调试防护。如果继续使用 xia0LLDB 对抖音进行反调试绕过的话，首先会发现 xia0LLDB 无法读取到 Aweme 和 AwemeCore 两个 MachO 的代码段地址，扫描结果都是 0 到 0。如下：</p>
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">(lldb) debugme</span><br><span class="line">[*] start patch ptrace funtion to bypass anti debug</span><br><span class="line">[+] ptrace funtion patach <span class="keyword">done</span></span><br><span class="line">[*] start patch svc ins to bypass anti debug</span><br><span class="line">[+] use <span class="string">&quot;target list&quot;</span> to get main module:/private/var/containers/Bundle/Application/4D2A141E-A8E7-429D-AF16-47DEBE3E01C1/Aweme.app/Aweme</span><br><span class="line">[*] app <span class="built_in">dir</span>:/var/containers/Bundle/Application/4D2A141E-A8E7-429D-AF16-47DEBE3E01C1/Aweme.app</span><br><span class="line">[*] search svc from:/private/var/containers/Bundle/Application/4D2A141E-A8E7-429D-AF16-47DEBE3E01C1/Aweme.app/Aweme</span><br><span class="line">[*] text start:0x0000000000000000 end:0x0000000000000000</span><br><span class="line">------&gt; &lt;object returned empty description&gt;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[*] not found svc ins, so don<span class="string">&#x27;t need patch</span></span><br><span class="line"><span class="string">[*] search svc from:/private/var/containers/Bundle/Application/4D2A141E-A8E7-429D-AF16-47DEBE3E01C1/Aweme.app/Frameworks/AwemeCore.framework/AwemeCore</span></span><br><span class="line"><span class="string">[*] text start:0x0000000000000000 end:0x0000000000000000</span></span><br><span class="line"><span class="string">------&gt; &lt;object returned empty description&gt;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">[*] not found svc ins, so don&#x27;</span>t need patch</span><br><span class="line">[*] search svc from:/private/var/containers/Bundle/Application/4D2A141E-A8E7-429D-AF16-47DEBE3E01C1/Aweme.app/Frameworks/BDLRepairer.framework/BDLRepairer</span><br><span class="line">[*] text start:0x0000000105323e68 end:0x0000000105323ef0</span><br><span class="line">------&gt; &lt;object returned empty description&gt;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[*] not found svc ins, so don<span class="string">&#x27;t need patch</span></span><br><span class="line"><span class="string">[*] search svc from:/private/var/containers/Bundle/Application/4D2A141E-A8E7-429D-AF16-47DEBE3E01C1/Aweme.app/Frameworks/ByteRTCNICOExtension.framework/ByteRTCNICOExtension</span></span><br><span class="line"><span class="string">[*] text start:0x00000001053d0000 end:0x0000000105445f74</span></span><br><span class="line"><span class="string">------&gt; &lt;object returned empty description&gt;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">[*] not found svc ins, so don&#x27;</span>t need patch</span><br><span class="line">......</span><br></pre></td></tr></table></figure>
 
 <p>这就非常奇怪了，那么先开始分析 MachO 文件，这里可以使用 MachOView 查看 MachO 的 Load Command 发现，要么是不存在 __TEXT,__text 段，要么就是即便存在，但是 size 为 0。这就导致 debugme 根本无法扫描到代码段内存地址范围。但是会发现存在一个额外的 __BD_TEXT,__text 段，这个段里面都是汇编代码，看来抖音是在这里做了一定的防护。首先是 Aweme 的分析</p>
@@ -4680,7 +4680,7 @@ commonModes并不是一个真正单独的模式
 <p>入口函数就是一个反调试，那么我们就先干掉这个反调试试试看。使用 nop 指令替换 svc 指令，使用方法是选择 svc 指令所在的行，右键 patch instruction 输入 nop 就完成了，如下：</p>
 <img src="/2025/06/19/iOS%E5%8F%8D%E8%B0%83%E8%AF%95%E4%B8%8E%E5%8F%8D%E5%8F%8D%E8%B0%83%E8%AF%95/Snip20250625_9.png" class="">
 
-<p>完成替换之后，我们重新导出可执行文件，步骤是 File -&gt; Export Program。格式选择 original file，记得勾选 Export User Byte Modifications 不然修改没有保存。保存之后我们替换 iPhone 上的 AwemeCore，可以备份一下原始的 AwemeCore。</p>
+<p>完成替换之后，我们重新导出可执行文件，步骤是 File -&gt; Export Program。格式选择 original file，记得勾选 Export User Byte Modifications 不然修改没有保存。保存之后我们替换 iPhone 上的 AwemeCore，可以备份一下原始的 AwemeCore。还需要注意查看一下修改后的 AwemeCore 的文件权限，Ghidra 保存文件的时候可能是 540 的权限，使用 <code>chmod 755 AwemeCore</code> 提升一下文件权限，否则无法正常启动抖音，启动闪退。</p>
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">iPhone8plus:/private/var/containers/Bundle/Application/4D2A141E-A8E7-429D-AF16-47DEBE3E01C1/Aweme.app/Frameworks/AwemeCore.framework root# <span class="built_in">ls</span></span><br><span class="line">AwemeCore  AwemeCoreBackup  Info.plist  SC_Info/  _CodeSignature/</span><br></pre></td></tr></table></figure>
 
 <p>这个时候我们可以重启手机一下 iPhone，因为有可能 APP 的 Framework 会被缓存下来，导致没有使用我们修改后的 AwemeCore 文件。重启之后，再次使用 debugserver+lldb 远程调试会发现可以成功附加调试了~~~</p>
@@ -6329,16 +6329,6 @@ m<sup>k * φ(n) + 1</sup> mod n = m
       </tags>
   </entry>
   <entry>
-    <title>深入理解 iOS 对象模型</title>
-    <url>/2025/04/25/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3-iOS-%E5%AF%B9%E8%B1%A1%E6%A8%A1%E5%9E%8B/</url>
-    <content><![CDATA[<p>001:<br>讲了 Objective-C 对象的底层是 C 结构体</p>
-<h1 id="Objective-C-实例对象"><a href="#Objective-C-实例对象" class="headerlink" title="Objective-C 实例对象"></a>Objective-C 实例对象</h1><p>在日常使用 Objective-C 开发过程中，我们经常会使用 <code>[[NSObject alloc] init]</code> 这样的方式创建一个实例对象，并调用初始化方法。当然实际的情况中可能不是使用 NSObject 类，而是 UIKit 框架中的类，或者是你自定义的子类。实例对象对于我们来说简直是再熟悉不过了，但是各位有没有思考过，对于 <code>NSObject</code> 来说，<code>alloc</code> 方法分配内存，究竟分配了多大的内存空间，分配的内存中存放的又是什么东西，<code>init</code> 方法又究竟初始化了什么东西？如果不是 <code>NSObject</code> 类，而是其他系统框架类，或者我们自定义的类呢？我们先以 <code>NSObject</code> 类为例，分析 <code>alloc</code> 方法究竟是如何分配内存的，分配了多少内存空间，内存中又放的一些什么东西？</p>
-<h2 id="NSObject-的实例"><a href="#NSObject-的实例" class="headerlink" title="NSObject 的实例"></a>NSObject 的实例</h2>]]></content>
-      <categories>
-        <category>iOS 底层原理</category>
-      </categories>
-  </entry>
-  <entry>
     <title>微信抢红包插件</title>
     <url>/2024/04/10/%E5%BE%AE%E4%BF%A1%E6%8A%A2%E7%BA%A2%E5%8C%85%E6%8F%92%E4%BB%B6/</url>
     <content><![CDATA[<p>本篇文章将介绍如何从 0 到 1 一步步实现微信抢红包插件功能，需要用到</p>
@@ -6770,16 +6760,14 @@ m<sup>k * φ(n) + 1</sup> mod n = m
       </tags>
   </entry>
   <entry>
-    <title>解决git clone速度慢的问题</title>
-    <url>/2018/10/26/%E8%A7%A3%E5%86%B3git-clone%E9%80%9F%E5%BA%A6%E6%85%A2%E7%9A%84%E9%97%AE%E9%A2%98/</url>
-    <content><![CDATA[<p>之前一直以为是公司对网络的封锁,导致git clone速度慢,后来网上查找这个问题的时候得知不能怪公司,是因为咱们在这个局域网内…<br>扯多了,回到正题,解决问题,由于我的是Mac电脑,我说的只针对Mac电脑</p>
-<h5 id="1-进入终端命令行模式-输入"><a href="#1-进入终端命令行模式-输入" class="headerlink" title="1. 进入终端命令行模式,输入"></a>1. 进入终端命令行模式,输入</h5><p><code>sudo vim /etc/hosts</code></p>
-<h5 id="2-输入i进入编辑模式-移动到最后一行准备输入"><a href="#2-输入i进入编辑模式-移动到最后一行准备输入" class="headerlink" title="2. 输入i进入编辑模式,移动到最后一行准备输入"></a>2. 输入i进入编辑模式,移动到最后一行准备输入</h5><h5 id="3-用浏览器访问-http-tool-chinaz-com-使用-IP查询-工具获得github-com和github-global-ssl-fastly-net的ip地址"><a href="#3-用浏览器访问-http-tool-chinaz-com-使用-IP查询-工具获得github-com和github-global-ssl-fastly-net的ip地址" class="headerlink" title="3. 用浏览器访问 http://tool.chinaz.com 使用 IP查询 工具获得github.com和github.global.ssl.fastly.net的ip地址"></a>3. 用浏览器访问 <a href="http://tool.chinaz.com/">http://tool.chinaz.com</a> 使用 IP查询 工具获得github.com和github.global.ssl.fastly.net的ip地址</h5><h5 id="4-回到第2步中按如下格式输入"><a href="#4-回到第2步中按如下格式输入" class="headerlink" title="4. 回到第2步中按如下格式输入:"></a>4. 回到第2步中按如下格式输入:</h5><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">192.30.253.112 github.com</span><br><span class="line">151.101.44.249 github.global.ssl.fastly.net</span><br></pre></td></tr></table></figure>
-<h5 id="5-按-esc-键-然后输入-wq-保存文件并退出vim编辑模式-到此hosts文件修改结束"><a href="#5-按-esc-键-然后输入-wq-保存文件并退出vim编辑模式-到此hosts文件修改结束" class="headerlink" title="5. 按 esc 键,然后输入 :wq 保存文件并退出vim编辑模式,到此hosts文件修改结束"></a>5. 按 esc 键,然后输入 :wq 保存文件并退出vim编辑模式,到此hosts文件修改结束</h5><h5 id="6-更新DNS缓存-输入"><a href="#6-更新DNS缓存-输入" class="headerlink" title="6. 更新DNS缓存,输入"></a>6. 更新DNS缓存,输入</h5><p><code>sudo dscacheutil -flushcache </code></p>
-]]></content>
-      <tags>
-        <tag>git</tag>
-      </tags>
+    <title>深入理解 iOS 对象模型</title>
+    <url>/2025/04/25/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3-iOS-%E5%AF%B9%E8%B1%A1%E6%A8%A1%E5%9E%8B/</url>
+    <content><![CDATA[<p>001:<br>讲了 Objective-C 对象的底层是 C 结构体</p>
+<h1 id="Objective-C-实例对象"><a href="#Objective-C-实例对象" class="headerlink" title="Objective-C 实例对象"></a>Objective-C 实例对象</h1><p>在日常使用 Objective-C 开发过程中，我们经常会使用 <code>[[NSObject alloc] init]</code> 这样的方式创建一个实例对象，并调用初始化方法。当然实际的情况中可能不是使用 NSObject 类，而是 UIKit 框架中的类，或者是你自定义的子类。实例对象对于我们来说简直是再熟悉不过了，但是各位有没有思考过，对于 <code>NSObject</code> 来说，<code>alloc</code> 方法分配内存，究竟分配了多大的内存空间，分配的内存中存放的又是什么东西，<code>init</code> 方法又究竟初始化了什么东西？如果不是 <code>NSObject</code> 类，而是其他系统框架类，或者我们自定义的类呢？我们先以 <code>NSObject</code> 类为例，分析 <code>alloc</code> 方法究竟是如何分配内存的，分配了多少内存空间，内存中又放的一些什么东西？</p>
+<h2 id="NSObject-的实例"><a href="#NSObject-的实例" class="headerlink" title="NSObject 的实例"></a>NSObject 的实例</h2>]]></content>
+      <categories>
+        <category>iOS 底层原理</category>
+      </categories>
   </entry>
   <entry>
     <title>架构模式</title>
@@ -7318,6 +7306,18 @@ NewsService 类提供一个 API 加载数据，内部实现是使用 DBTool 加�
         <tag>MVP</tag>
         <tag>MVVM</tag>
         <tag>VIPER</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>解决git clone速度慢的问题</title>
+    <url>/2018/10/26/%E8%A7%A3%E5%86%B3git-clone%E9%80%9F%E5%BA%A6%E6%85%A2%E7%9A%84%E9%97%AE%E9%A2%98/</url>
+    <content><![CDATA[<p>之前一直以为是公司对网络的封锁,导致git clone速度慢,后来网上查找这个问题的时候得知不能怪公司,是因为咱们在这个局域网内…<br>扯多了,回到正题,解决问题,由于我的是Mac电脑,我说的只针对Mac电脑</p>
+<h5 id="1-进入终端命令行模式-输入"><a href="#1-进入终端命令行模式-输入" class="headerlink" title="1. 进入终端命令行模式,输入"></a>1. 进入终端命令行模式,输入</h5><p><code>sudo vim /etc/hosts</code></p>
+<h5 id="2-输入i进入编辑模式-移动到最后一行准备输入"><a href="#2-输入i进入编辑模式-移动到最后一行准备输入" class="headerlink" title="2. 输入i进入编辑模式,移动到最后一行准备输入"></a>2. 输入i进入编辑模式,移动到最后一行准备输入</h5><h5 id="3-用浏览器访问-http-tool-chinaz-com-使用-IP查询-工具获得github-com和github-global-ssl-fastly-net的ip地址"><a href="#3-用浏览器访问-http-tool-chinaz-com-使用-IP查询-工具获得github-com和github-global-ssl-fastly-net的ip地址" class="headerlink" title="3. 用浏览器访问 http://tool.chinaz.com 使用 IP查询 工具获得github.com和github.global.ssl.fastly.net的ip地址"></a>3. 用浏览器访问 <a href="http://tool.chinaz.com/">http://tool.chinaz.com</a> 使用 IP查询 工具获得github.com和github.global.ssl.fastly.net的ip地址</h5><h5 id="4-回到第2步中按如下格式输入"><a href="#4-回到第2步中按如下格式输入" class="headerlink" title="4. 回到第2步中按如下格式输入:"></a>4. 回到第2步中按如下格式输入:</h5><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">192.30.253.112 github.com</span><br><span class="line">151.101.44.249 github.global.ssl.fastly.net</span><br></pre></td></tr></table></figure>
+<h5 id="5-按-esc-键-然后输入-wq-保存文件并退出vim编辑模式-到此hosts文件修改结束"><a href="#5-按-esc-键-然后输入-wq-保存文件并退出vim编辑模式-到此hosts文件修改结束" class="headerlink" title="5. 按 esc 键,然后输入 :wq 保存文件并退出vim编辑模式,到此hosts文件修改结束"></a>5. 按 esc 键,然后输入 :wq 保存文件并退出vim编辑模式,到此hosts文件修改结束</h5><h5 id="6-更新DNS缓存-输入"><a href="#6-更新DNS缓存-输入" class="headerlink" title="6. 更新DNS缓存,输入"></a>6. 更新DNS缓存,输入</h5><p><code>sudo dscacheutil -flushcache </code></p>
+]]></content>
+      <tags>
+        <tag>git</tag>
       </tags>
   </entry>
   <entry>
