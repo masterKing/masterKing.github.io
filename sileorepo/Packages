@@ -136,6 +136,38 @@ Description: 木瓜直播付费观看绕过插件，开始付费直播后点击�
 Author: masterking
 Name: mugua
 
+Package: com.masterking.openapp
+Version: 0.0.1
+Architecture: iphoneos-arm
+Maintainer: franky
+Installed-Size: 260
+Filename: debs/com.masterking.openapp_0.0.1_iphoneos-arm.deb
+Size: 4896
+MD5sum: ef699959cecfa7171f7c60705aa2f0c1
+SHA1: 17236f3925d9329b68330fd6922cb3329c82ec35
+SHA256: 94da31999c4457dea805247280ab4a91a8bfd109c4d6da110c922b84faed2950
+Section: System
+Description: 一个启动 APP 的命令行工具
+Tag: role::hacker
+Author: franky
+Name: openapp
+
+Package: com.masterking.openapp
+Version: 0.0.1
+Architecture: iphoneos-arm64
+Maintainer: franky
+Installed-Size: 164
+Filename: debs/com.masterking.openapp_0.0.1_iphoneos-arm64.deb
+Size: 3706
+MD5sum: 8cc9325e3647c0cc738a68b117953cc0
+SHA1: 24a9564848134b3d2d92c8e053a51455fcc74ca8
+SHA256: f62c9ebcdc575b307d95439a1244e0ca6743946e44b12d81e0809cad89e828c0
+Section: System
+Description: 一个启动 APP 的命令行工具
+Tag: role::hacker
+Author: franky
+Name: openapp
+
 Package: com.masterking.revealloader2
 Version: 0.0.3
 Architecture: iphoneos-arm
