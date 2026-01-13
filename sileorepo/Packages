@@ -137,35 +137,35 @@ Author: masterking
 Name: mugua
 
 Package: com.masterking.openapp
-Version: 0.0.1
-Architecture: iphoneos-arm
-Maintainer: franky
-Installed-Size: 260
-Filename: debs/com.masterking.openapp_0.0.1_iphoneos-arm.deb
-Size: 4896
-MD5sum: ef699959cecfa7171f7c60705aa2f0c1
-SHA1: 17236f3925d9329b68330fd6922cb3329c82ec35
-SHA256: 94da31999c4457dea805247280ab4a91a8bfd109c4d6da110c922b84faed2950
+Version: 0.0.2
+Architecture: iphoneos-arm64
+Maintainer: masterking
+Installed-Size: 164
+Filename: debs/com.masterking.openapp_0.0.2_iphoneos-arm64.deb
+Size: 3766
+MD5sum: ed1f0ff6cf3a9ab24a577054890e6708
+SHA1: e2a1f59116bdf1d653345b776bb42047aa4cea2e
+SHA256: 7b776b0bad62a053d8ca15edf9afa63ee81bc4b4c3d8313737c563ed550705f6
 Section: System
 Description: 一个启动 APP 的命令行工具
 Tag: role::hacker
-Author: franky
+Author: masterking
 Name: openapp
 
 Package: com.masterking.openapp
-Version: 0.0.1
-Architecture: iphoneos-arm64
-Maintainer: franky
-Installed-Size: 164
-Filename: debs/com.masterking.openapp_0.0.1_iphoneos-arm64.deb
-Size: 3706
-MD5sum: 8cc9325e3647c0cc738a68b117953cc0
-SHA1: 24a9564848134b3d2d92c8e053a51455fcc74ca8
-SHA256: f62c9ebcdc575b307d95439a1244e0ca6743946e44b12d81e0809cad89e828c0
+Version: 0.0.2
+Architecture: iphoneos-arm
+Maintainer: masterking
+Installed-Size: 260
+Filename: debs/com.masterking.openapp_0.0.2_iphoneos-arm.deb
+Size: 4992
+MD5sum: 46b55f772b6ffab0f696905533217c9a
+SHA1: 59671d77ac594679ac3f16534ae66e0c612e161a
+SHA256: 545d09fcab678eff0860fc99104367e4098fed5464f33b8d6444d9a5d9469e4c
 Section: System
 Description: 一个启动 APP 的命令行工具
 Tag: role::hacker
-Author: franky
+Author: masterking
 Name: openapp
 
 Package: com.masterking.revealloader2
