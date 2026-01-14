@@ -889,6 +889,118 @@
       </tags>
   </entry>
   <entry>
+    <title>8天让iOS开发者上手Flutter之五</title>
+    <url>/2021/08/01/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%BA%94/</url>
+    <content><![CDATA[<p>上篇文章，我们已经完成了通讯录的列表。这篇文章介绍完成通讯录右侧的索引条的功能。</p>
+<h1 id="显示索引条"><a href="#显示索引条" class="headerlink" title="显示索引条"></a>显示索引条</h1><p>之前我们已经做过了我的页面的布局，我的页面上有一个列表和一个拍照按钮，和我们今天要实现的索引条布局十分类似。我的页面的布局如下：</p>
+<img src="/2021/08/01/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%BA%94/81053ec975144322af3bc1ef5f9e08e4~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>通讯录界面的布局，和我的页面的布局都是使用一个 Stack 包含列表和其他子视图来实现。索引条是紧贴屏幕右侧，然后里面的子视图是由上至下的。所以自然的会想到使用一个 Positioned 包含 Column 来实现。Positioned 和 Stack 的组合我们之前讲过，这两个组合起来使用，就和我们 iOS 的约束布局类似，可以设置上左宽高等等。Column 就更不用多说，我们已经使用过很多次了。所以代码如下图所示：</p>
+<img src="/2021/08/01/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%BA%94/3b62754a2a31422a9416c79e94759829~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<div align=center>
+<img src="8天让iOS开发者上手Flutter之五/be45a58d597a4a35b0d5ec97d96c445f~tplv-k3u1fbpfcp-watermark.png"/>
+</div>
+
+<p>然后优化一下索引条的位置，高度我们设置为屏幕高度的一半，那么上下的间距就不能设置为 0 了，设置距离上间距为屏幕的 1&#x2F;8 看起来比较合适。</p>
+<img src="/2021/08/01/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%BA%94/d72de44cc3ed45c4b43280c52b1a59ee~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<div align=center>
+<img src="8天让iOS开发者上手Flutter之五/7351193b625b4e5195471735a66581fa~tplv-k3u1fbpfcp-watermark.png"/>
+</div>
+
+<h1 id="抽取-IndexBar"><a href="#抽取-IndexBar" class="headerlink" title="抽取 IndexBar"></a>抽取 IndexBar</h1><p>写到这里我们会发现，这个索引条还有很多的功能需要我们来实现，还是有点复杂的，如果代码都写在 friends_page.dart 里会有点冗余，我们完全可以将这个索引条作为一个独立的 Widget 来实现。新建 index_bar.dart 文件，代码如下：</p>
+<img src="/2021/08/01/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%BA%94/fe9068395cd1451fa340e6dace011a17~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+
+<h1 id="实现-IndexBar-的点击切换状态"><a href="#实现-IndexBar-的点击切换状态" class="headerlink" title="实现 IndexBar 的点击切换状态"></a>实现 IndexBar 的点击切换状态</h1><p>当没有触摸到 IndexBar 的时候，默认是不展示背景色的，文字也是黑色的。当我们开始点击 IndexBar 的时候，显示出背景色，然后文字也变成了白色。</p>
+<p>实现这个功能，主要是要对 <code>GestureDetector</code> 的两个方法有所了解。<code>onVerticalDragDown</code> 方法会在手指触摸 IndexBar 的时候就会被调用，<code>onVerticalDragEnd</code> 会在手指松开屏幕的时候调用。利用这两个方法就可以实现需求。代码如下：</p>
+<img src="/2021/08/01/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%BA%94/133c4a566110476b8405e347c313840d~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>因为要对文字的颜色进行修改，所以初始化 Text 的时候，就需要使用变量 _textColor;</p>
+<img src="/2021/08/01/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%BA%94/beaa4c3ca6ee489892a049625fe25a99~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<h1 id="获取当前选中的下标"><a href="#获取当前选中的下标" class="headerlink" title="获取当前选中的下标"></a>获取当前选中的下标</h1><p>同样是对 <code>GestureDetector</code> 的一个手势方法的使用，<code>onVerticalDragUpdate</code> 这个方法的调用时机，在手指移动的时候会不停的调用这个方法。这个方法有一个 <code>DragUpdateDetails</code> 参数，它包含了手指所在的坐标信息。不过是相对于整个屏幕的坐标，可以将它转化为相对于 IndexBar 的坐标，然后通过计算可以得到我们当前选中的是哪个下标。代码如下：</p>
+<img src="/2021/08/01/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%BA%94/c1faac2e10e9496396883d1cba5a80b8~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>方法中的 ~&#x2F; 是 flutter 特有的运算符，意思是除后取整。而 clamp() 是对边界情况的处理，意思调用该函数的结果在它的两个参数之间。</p>
+<h1 id="回调选中的下标"><a href="#回调选中的下标" class="headerlink" title="回调选中的下标"></a>回调选中的下标</h1><p>这里的回调，和 OC 里面的 block，Swift 里面的闭包都是一个意思。flutter 里面带有下划线的变量是私有的，外部无法访问的。所以对外暴露的参数，不能写在 <code>_IndexBarState</code> 类里面，需要写在 IndexBar 类里面。声明一个闭包(或者叫 block)属性,作为必传参数在初始化的时候传入。</p>
+<img src="/2021/08/01/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%BA%94/55fdb39036574be89074b99011841ad8~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>这样，在 <code>friends_page.dart</code> 文件中初始化 <code>IndexBar</code> 的时候，就需要传入一个闭包。然后 <code>IndexBar</code> 内部在 <code>onVerticalDragUpdate</code> 的时候，调用这个闭包，就可以将当前选中的下标回调给外部了。</p>
+<img src="/2021/08/01/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%BA%94/922919210c40483a945f4d0944f05ce0~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<img src="/2021/08/01/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%BA%94/634b70d14d9c4b81b022321f39ed69cb~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>这个时候，会发现一个小问题，就是点击 IndexBar 的时候，回调没有执行，只有在点击并手指挪动的时候才会执行。所以需要在 <code>onVerticalDragDown</code> 方法里面也调用一次闭包。这时候如果直接将 <code>onVerticalDragUpdate</code> 方法里面的代码复制到 <code>onVerticalDragDown</code> 方法里面确实没有问题，但是会明显的看到重复的代码太多了。</p>
+<img src="/2021/08/01/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%BA%94/ae4eaba1a6884716969cfe2105ad5033~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>所以可以抽取一个方法，将重复的代码放到一块。</p>
+<img src="/2021/08/01/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%BA%94/f935783fe0b24caab0e4d75cde2f5f05~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>然后调用的时候就简单多了。</p>
+<img src="/2021/08/01/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%BA%94/e1f72d6a90154eb38166c935be8e34dd~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<h1 id="优化回调执行的频率"><a href="#优化回调执行的频率" class="headerlink" title="优化回调执行的频率"></a>优化回调执行的频率</h1><p>已经成功的实现了回调，但是从打印的结果来看，会发现同样一个下标会被回调许多次。这样我们滚动好友列表的时候会造成不必要的性能消耗。明明只需要滚动一次，结果却滚动了无数次到同一个位置。所以这里我们需要优化一下，一个很自然的想法就是记录一个 <code>_currentIndexLetter</code>，每次执行回调的时候，判断回调的首字母是否和 <code>_currentIndexLetter</code> 是否不同，如果是一样的就没有必要回调了，只有不同的时候，才执行回调。</p>
+<img src="/2021/08/01/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%BA%94/eb0ec5918762440885e3bc19d5023c29~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>代码如下：</p>
+<img src="/2021/08/01/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%BA%94/a6d2588d71ee4c8680b4bc2116ea8e61~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<img src="/2021/08/01/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%BA%94/493df27362e642b49c63fcad4be40d12~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>这样回调的频率就正常了。</p>
+<h1 id="滚动好友列表-ListView"><a href="#滚动好友列表-ListView" class="headerlink" title="滚动好友列表 ListView"></a>滚动好友列表 ListView</h1><p>可滚动的 widget 都有一个 controller 属性，用于控制滚动条的行为。controller 属性是一个 <code>ScrollController</code> 对象。可以使用它来实现指定滚动到某个位置，实现回到顶部等功能。</p>
+<p>滚动好友列表需要一个新的对象 <code>ScrollController</code> 实例，将它设置给 ListView 的 <code>controller</code> 属性，然后就可以通过使用 <code>ScrollController</code> 实例来操作 ListView 的滚动。</p>
+<img src="/2021/08/01/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%BA%94/d6867385dc2d4dda98559f16f69f40a2~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<img src="/2021/08/01/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%BA%94/87bb89f0fc6d41ac9bfdc63a78aaebce~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>这里暂时先将滚动的偏移设置为固定值 250，试试看效果。可以看到当我们点击 IndexBar 的时候，ListView 就会滚动到偏移为 250 的地方。接下来就是处理滚动的实际偏移值了。</p>
+<p>滚动的实际偏移，是根据我们的数据源来计算的。因为我们的 cell 的高度是确定的，不显示组头的 cell 高度是 54，有组头的 cell 高度是 54 + 30 &#x3D; 84。使用首字母作为 key，计算出对应的偏移为 offset，然后使用 Map(类似 iOS 中字典)记录下来。由于第一个是不是字母，而是搜索符号，而它对应的偏移也是固定的 0。所以可以在初始化 Map 的时候就指定好。而其他的高度我们在 initState 方法中计算。代码如下：</p>
+<img src="/2021/08/01/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%BA%94/a1486026da394231ae187a6eb56f462f~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>有了这个 Map 之后，我们在 IndexBar 的回调方法中，就可以根据 IndexBar 回调给我们的首字母得到对应的偏移值了。代码如下：</p>
+<img src="/2021/08/01/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%BA%94/1a12df0544684482ad25772040aa4c27~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>到这里，我们的 IndexBar 基本上就实现了滚动 ListView 的功能。但是滚动几次之后就会发现一个小问题。。。滚动到底部的几个组头的时候，会出现 ListView 先将组头滚动到指定位置，然后又滚回底部的情况。原因很好理解，后面的组头内容不够显示一整个屏幕了。所以我们这里需要做下处理。这里主要是对 ListView 的滚动的监听，如果是在 iOS 中我们会想去获取滚动视图的 contentSize 然后减去 UITableView 的高度，就是 UITableView 的最大的滚动范围。而在 Flutter 中，这些都不需要我们计算了。</p>
+<p>如果需要获取到 ListView 的一些滚动相关的信息，可以将它包裹在 <code>NotificationListener</code> 里面，它有一个 <code>onNotification</code> 属性，是一个闭包，可以回调给我们一些滚动的相关信息。包含在闭包参数 <code>ScrollNotification note</code> 里面。准确来讲滚动相关的信息包含在 <code>ScrollNotification</code> 的属性 <code>metrics</code> 里面。它包含当前滚动偏移值，能滚动的最大范围(这就是我们 iOS 中 contentSize 的高减去 UITableView 的高)等等信息。完整代码如下：</p>
+<img src="/2021/08/01/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%BA%94/150c3f3be83546c1b47a17038928298e~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>将 <code>_maxScrollExtent</code> 定义为一个属性就好了。需要注意的是并不能给初始值为 0，否则没有滚动 ListView 之前，使用 IndexBar 就无法滚动 ListView 了。</p>
+<img src="/2021/08/01/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%BA%94/f77a46cc161b4f6297011476a258d27a~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>至此，IndexBar 滚动 ListView 的功能就实现了。</p>
+<h1 id="显示指示器"><a href="#显示指示器" class="headerlink" title="显示指示器"></a>显示指示器</h1><p>终于来到了最后一步，显示我们 IndexBar 的指示器。首先考虑的就是布局。最初的 IndexBar 只有右侧的下标一列。现在我们左侧需要一块容器用来显示我们的指示器，所以 IndexBar 的根视图应该考虑改为 Row。指示器背景的不规则图形可以使用一张图片展示，图片已经准备好了。中间的文字，使用 Text 就够了。先看下大概布局代码：</p>
+<img src="/2021/08/01/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%BA%94/a2c4ca445a8a4024a1b85f47e888bd1d~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<div align=center>
+<img src="8天让iOS开发者上手Flutter之五/83d6f7a7ffeb4010bd9f134a42b4c358~tplv-k3u1fbpfcp-watermark.png"/>
+</div>
+
+<p>如果觉得位置不是很合适，可以修改一下各自的宽度。然后是对指示器的显示与隐藏做控制，指示器的显示与隐藏的控制，应该说跟背景色的显示隐藏是类似的。都是在手势的那两个方法里面实现控制。使用一个 bool 变量来控制指示器的显示与隐藏，在手势的触摸方法和离开方法里面操作这个 bool 变量，然后 setState() 就可以实现了指示器的显示与隐藏了。</p>
+<p>然后是关于指示器的显示文本的。这个文本就是我们的 <code>_currentIndexLetter</code>，直接使用就好了。最后是关于如何控制整个 IndexBar 的上下位移的。通过对 Alignment 的使用，发现可以控制 IndexBar 的上下位移。通过不断的修改 Alignment 的 y 值会找到一个合适的 y 值指向第一个放大镜，那么 -y 就指向最后一个字母 Z。我这里试了几次发现 y&#x3D;-1.13 的时候，指示器刚刚好指向第一个放大镜的位置。那么现在的问题就是将 1.13 * 2 &#x3D; 2.26 分成<code>_index_words.length - 1</code>份，然后根据选择的下标，取得对应的Alignment 的 y 值。当我们选择第一个的时候下标为 0，y 值应该为 -1.13,当我们选择最后一个的时候下标为 <code>_index_words.length - 1</code>,y 值应该为 1.13。根据这些信息就可以找到计算 y 值的公式。最终的代码如下：<br></p>
+<p>新增两个变量<code>_showIndicator</code>和<code>_indicatorAlignmentY</code>。</p>
+<img src="/2021/08/01/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%BA%94/353987e4193a4460984edca74d16588b~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>使用这两个变量还有<code>_currentIndexLetter</code></p>
+<img src="/2021/08/01/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%BA%94/6fd8c7c981f64b62b76c35b4592ac324~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>到这里，我们就终于实现了通讯录的 IndexBar 的封装。下一节会介绍一些网络请求了…</p>
+<div align=center>
+<img src="8天让iOS开发者上手Flutter之五/ca2cca992d764871abe3a7e8163c2d85~tplv-k3u1fbpfcp-watermark.png"/>
+</div>
+
+
+]]></content>
+      <categories>
+        <category>flutter</category>
+      </categories>
+      <tags>
+        <tag>flutter</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>8天让iOS开发者上手Flutter之八</title>
     <url>/2021/08/29/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AB/</url>
     <content><![CDATA[<h1 id="介绍四种-Flutter-Project"><a href="#介绍四种-Flutter-Project" class="headerlink" title="介绍四种 Flutter Project"></a>介绍四种 Flutter Project</h1><p>先介绍一下这四个的差别和使用的场景。</p>
@@ -995,118 +1107,6 @@
 <img src="/2021/08/29/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E5%85%AB/992500b07cb845a8afe0039b21cc9384~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
 
 <h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>本来还想写一个混合开发的实际案例的，但是鉴于本人目前的重点并不是 flutter，而且网上也有较多的介绍这种混合开发的实际案例，所以这里篇文章就写到这里了。这 8 篇文章的内容应该说只是一个 iOSer 入门 flutter 的教程，只是些皮毛东西，离掌握 flutter，Dart 还差的很远。而 flutter 的出现也并不是说会完全取代 Android 和 iOS 开发者，flutter 只能用来搭建一套各平台统一的 UI，而各个平台相关的功能，和硬件相关的需求，都依然需要各个平台的开发者去实现。</p>
-]]></content>
-      <categories>
-        <category>flutter</category>
-      </categories>
-      <tags>
-        <tag>flutter</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>8天让iOS开发者上手Flutter之五</title>
-    <url>/2021/08/01/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%BA%94/</url>
-    <content><![CDATA[<p>上篇文章，我们已经完成了通讯录的列表。这篇文章介绍完成通讯录右侧的索引条的功能。</p>
-<h1 id="显示索引条"><a href="#显示索引条" class="headerlink" title="显示索引条"></a>显示索引条</h1><p>之前我们已经做过了我的页面的布局，我的页面上有一个列表和一个拍照按钮，和我们今天要实现的索引条布局十分类似。我的页面的布局如下：</p>
-<img src="/2021/08/01/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%BA%94/81053ec975144322af3bc1ef5f9e08e4~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>通讯录界面的布局，和我的页面的布局都是使用一个 Stack 包含列表和其他子视图来实现。索引条是紧贴屏幕右侧，然后里面的子视图是由上至下的。所以自然的会想到使用一个 Positioned 包含 Column 来实现。Positioned 和 Stack 的组合我们之前讲过，这两个组合起来使用，就和我们 iOS 的约束布局类似，可以设置上左宽高等等。Column 就更不用多说，我们已经使用过很多次了。所以代码如下图所示：</p>
-<img src="/2021/08/01/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%BA%94/3b62754a2a31422a9416c79e94759829~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<div align=center>
-<img src="8天让iOS开发者上手Flutter之五/be45a58d597a4a35b0d5ec97d96c445f~tplv-k3u1fbpfcp-watermark.png"/>
-</div>
-
-<p>然后优化一下索引条的位置，高度我们设置为屏幕高度的一半，那么上下的间距就不能设置为 0 了，设置距离上间距为屏幕的 1&#x2F;8 看起来比较合适。</p>
-<img src="/2021/08/01/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%BA%94/d72de44cc3ed45c4b43280c52b1a59ee~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<div align=center>
-<img src="8天让iOS开发者上手Flutter之五/7351193b625b4e5195471735a66581fa~tplv-k3u1fbpfcp-watermark.png"/>
-</div>
-
-<h1 id="抽取-IndexBar"><a href="#抽取-IndexBar" class="headerlink" title="抽取 IndexBar"></a>抽取 IndexBar</h1><p>写到这里我们会发现，这个索引条还有很多的功能需要我们来实现，还是有点复杂的，如果代码都写在 friends_page.dart 里会有点冗余，我们完全可以将这个索引条作为一个独立的 Widget 来实现。新建 index_bar.dart 文件，代码如下：</p>
-<img src="/2021/08/01/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%BA%94/fe9068395cd1451fa340e6dace011a17~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-
-<h1 id="实现-IndexBar-的点击切换状态"><a href="#实现-IndexBar-的点击切换状态" class="headerlink" title="实现 IndexBar 的点击切换状态"></a>实现 IndexBar 的点击切换状态</h1><p>当没有触摸到 IndexBar 的时候，默认是不展示背景色的，文字也是黑色的。当我们开始点击 IndexBar 的时候，显示出背景色，然后文字也变成了白色。</p>
-<p>实现这个功能，主要是要对 <code>GestureDetector</code> 的两个方法有所了解。<code>onVerticalDragDown</code> 方法会在手指触摸 IndexBar 的时候就会被调用，<code>onVerticalDragEnd</code> 会在手指松开屏幕的时候调用。利用这两个方法就可以实现需求。代码如下：</p>
-<img src="/2021/08/01/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%BA%94/133c4a566110476b8405e347c313840d~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>因为要对文字的颜色进行修改，所以初始化 Text 的时候，就需要使用变量 _textColor;</p>
-<img src="/2021/08/01/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%BA%94/beaa4c3ca6ee489892a049625fe25a99~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<h1 id="获取当前选中的下标"><a href="#获取当前选中的下标" class="headerlink" title="获取当前选中的下标"></a>获取当前选中的下标</h1><p>同样是对 <code>GestureDetector</code> 的一个手势方法的使用，<code>onVerticalDragUpdate</code> 这个方法的调用时机，在手指移动的时候会不停的调用这个方法。这个方法有一个 <code>DragUpdateDetails</code> 参数，它包含了手指所在的坐标信息。不过是相对于整个屏幕的坐标，可以将它转化为相对于 IndexBar 的坐标，然后通过计算可以得到我们当前选中的是哪个下标。代码如下：</p>
-<img src="/2021/08/01/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%BA%94/c1faac2e10e9496396883d1cba5a80b8~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>方法中的 ~&#x2F; 是 flutter 特有的运算符，意思是除后取整。而 clamp() 是对边界情况的处理，意思调用该函数的结果在它的两个参数之间。</p>
-<h1 id="回调选中的下标"><a href="#回调选中的下标" class="headerlink" title="回调选中的下标"></a>回调选中的下标</h1><p>这里的回调，和 OC 里面的 block，Swift 里面的闭包都是一个意思。flutter 里面带有下划线的变量是私有的，外部无法访问的。所以对外暴露的参数，不能写在 <code>_IndexBarState</code> 类里面，需要写在 IndexBar 类里面。声明一个闭包(或者叫 block)属性,作为必传参数在初始化的时候传入。</p>
-<img src="/2021/08/01/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%BA%94/55fdb39036574be89074b99011841ad8~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>这样，在 <code>friends_page.dart</code> 文件中初始化 <code>IndexBar</code> 的时候，就需要传入一个闭包。然后 <code>IndexBar</code> 内部在 <code>onVerticalDragUpdate</code> 的时候，调用这个闭包，就可以将当前选中的下标回调给外部了。</p>
-<img src="/2021/08/01/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%BA%94/922919210c40483a945f4d0944f05ce0~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<img src="/2021/08/01/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%BA%94/634b70d14d9c4b81b022321f39ed69cb~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>这个时候，会发现一个小问题，就是点击 IndexBar 的时候，回调没有执行，只有在点击并手指挪动的时候才会执行。所以需要在 <code>onVerticalDragDown</code> 方法里面也调用一次闭包。这时候如果直接将 <code>onVerticalDragUpdate</code> 方法里面的代码复制到 <code>onVerticalDragDown</code> 方法里面确实没有问题，但是会明显的看到重复的代码太多了。</p>
-<img src="/2021/08/01/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%BA%94/ae4eaba1a6884716969cfe2105ad5033~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>所以可以抽取一个方法，将重复的代码放到一块。</p>
-<img src="/2021/08/01/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%BA%94/f935783fe0b24caab0e4d75cde2f5f05~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>然后调用的时候就简单多了。</p>
-<img src="/2021/08/01/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%BA%94/e1f72d6a90154eb38166c935be8e34dd~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<h1 id="优化回调执行的频率"><a href="#优化回调执行的频率" class="headerlink" title="优化回调执行的频率"></a>优化回调执行的频率</h1><p>已经成功的实现了回调，但是从打印的结果来看，会发现同样一个下标会被回调许多次。这样我们滚动好友列表的时候会造成不必要的性能消耗。明明只需要滚动一次，结果却滚动了无数次到同一个位置。所以这里我们需要优化一下，一个很自然的想法就是记录一个 <code>_currentIndexLetter</code>，每次执行回调的时候，判断回调的首字母是否和 <code>_currentIndexLetter</code> 是否不同，如果是一样的就没有必要回调了，只有不同的时候，才执行回调。</p>
-<img src="/2021/08/01/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%BA%94/eb0ec5918762440885e3bc19d5023c29~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>代码如下：</p>
-<img src="/2021/08/01/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%BA%94/a6d2588d71ee4c8680b4bc2116ea8e61~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<img src="/2021/08/01/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%BA%94/493df27362e642b49c63fcad4be40d12~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>这样回调的频率就正常了。</p>
-<h1 id="滚动好友列表-ListView"><a href="#滚动好友列表-ListView" class="headerlink" title="滚动好友列表 ListView"></a>滚动好友列表 ListView</h1><p>可滚动的 widget 都有一个 controller 属性，用于控制滚动条的行为。controller 属性是一个 <code>ScrollController</code> 对象。可以使用它来实现指定滚动到某个位置，实现回到顶部等功能。</p>
-<p>滚动好友列表需要一个新的对象 <code>ScrollController</code> 实例，将它设置给 ListView 的 <code>controller</code> 属性，然后就可以通过使用 <code>ScrollController</code> 实例来操作 ListView 的滚动。</p>
-<img src="/2021/08/01/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%BA%94/d6867385dc2d4dda98559f16f69f40a2~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<img src="/2021/08/01/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%BA%94/87bb89f0fc6d41ac9bfdc63a78aaebce~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>这里暂时先将滚动的偏移设置为固定值 250，试试看效果。可以看到当我们点击 IndexBar 的时候，ListView 就会滚动到偏移为 250 的地方。接下来就是处理滚动的实际偏移值了。</p>
-<p>滚动的实际偏移，是根据我们的数据源来计算的。因为我们的 cell 的高度是确定的，不显示组头的 cell 高度是 54，有组头的 cell 高度是 54 + 30 &#x3D; 84。使用首字母作为 key，计算出对应的偏移为 offset，然后使用 Map(类似 iOS 中字典)记录下来。由于第一个是不是字母，而是搜索符号，而它对应的偏移也是固定的 0。所以可以在初始化 Map 的时候就指定好。而其他的高度我们在 initState 方法中计算。代码如下：</p>
-<img src="/2021/08/01/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%BA%94/a1486026da394231ae187a6eb56f462f~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>有了这个 Map 之后，我们在 IndexBar 的回调方法中，就可以根据 IndexBar 回调给我们的首字母得到对应的偏移值了。代码如下：</p>
-<img src="/2021/08/01/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%BA%94/1a12df0544684482ad25772040aa4c27~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>到这里，我们的 IndexBar 基本上就实现了滚动 ListView 的功能。但是滚动几次之后就会发现一个小问题。。。滚动到底部的几个组头的时候，会出现 ListView 先将组头滚动到指定位置，然后又滚回底部的情况。原因很好理解，后面的组头内容不够显示一整个屏幕了。所以我们这里需要做下处理。这里主要是对 ListView 的滚动的监听，如果是在 iOS 中我们会想去获取滚动视图的 contentSize 然后减去 UITableView 的高度，就是 UITableView 的最大的滚动范围。而在 Flutter 中，这些都不需要我们计算了。</p>
-<p>如果需要获取到 ListView 的一些滚动相关的信息，可以将它包裹在 <code>NotificationListener</code> 里面，它有一个 <code>onNotification</code> 属性，是一个闭包，可以回调给我们一些滚动的相关信息。包含在闭包参数 <code>ScrollNotification note</code> 里面。准确来讲滚动相关的信息包含在 <code>ScrollNotification</code> 的属性 <code>metrics</code> 里面。它包含当前滚动偏移值，能滚动的最大范围(这就是我们 iOS 中 contentSize 的高减去 UITableView 的高)等等信息。完整代码如下：</p>
-<img src="/2021/08/01/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%BA%94/150c3f3be83546c1b47a17038928298e~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>将 <code>_maxScrollExtent</code> 定义为一个属性就好了。需要注意的是并不能给初始值为 0，否则没有滚动 ListView 之前，使用 IndexBar 就无法滚动 ListView 了。</p>
-<img src="/2021/08/01/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%BA%94/f77a46cc161b4f6297011476a258d27a~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>至此，IndexBar 滚动 ListView 的功能就实现了。</p>
-<h1 id="显示指示器"><a href="#显示指示器" class="headerlink" title="显示指示器"></a>显示指示器</h1><p>终于来到了最后一步，显示我们 IndexBar 的指示器。首先考虑的就是布局。最初的 IndexBar 只有右侧的下标一列。现在我们左侧需要一块容器用来显示我们的指示器，所以 IndexBar 的根视图应该考虑改为 Row。指示器背景的不规则图形可以使用一张图片展示，图片已经准备好了。中间的文字，使用 Text 就够了。先看下大概布局代码：</p>
-<img src="/2021/08/01/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%BA%94/a2c4ca445a8a4024a1b85f47e888bd1d~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<div align=center>
-<img src="8天让iOS开发者上手Flutter之五/83d6f7a7ffeb4010bd9f134a42b4c358~tplv-k3u1fbpfcp-watermark.png"/>
-</div>
-
-<p>如果觉得位置不是很合适，可以修改一下各自的宽度。然后是对指示器的显示与隐藏做控制，指示器的显示与隐藏的控制，应该说跟背景色的显示隐藏是类似的。都是在手势的那两个方法里面实现控制。使用一个 bool 变量来控制指示器的显示与隐藏，在手势的触摸方法和离开方法里面操作这个 bool 变量，然后 setState() 就可以实现了指示器的显示与隐藏了。</p>
-<p>然后是关于指示器的显示文本的。这个文本就是我们的 <code>_currentIndexLetter</code>，直接使用就好了。最后是关于如何控制整个 IndexBar 的上下位移的。通过对 Alignment 的使用，发现可以控制 IndexBar 的上下位移。通过不断的修改 Alignment 的 y 值会找到一个合适的 y 值指向第一个放大镜，那么 -y 就指向最后一个字母 Z。我这里试了几次发现 y&#x3D;-1.13 的时候，指示器刚刚好指向第一个放大镜的位置。那么现在的问题就是将 1.13 * 2 &#x3D; 2.26 分成<code>_index_words.length - 1</code>份，然后根据选择的下标，取得对应的Alignment 的 y 值。当我们选择第一个的时候下标为 0，y 值应该为 -1.13,当我们选择最后一个的时候下标为 <code>_index_words.length - 1</code>,y 值应该为 1.13。根据这些信息就可以找到计算 y 值的公式。最终的代码如下：<br></p>
-<p>新增两个变量<code>_showIndicator</code>和<code>_indicatorAlignmentY</code>。</p>
-<img src="/2021/08/01/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%BA%94/353987e4193a4460984edca74d16588b~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>使用这两个变量还有<code>_currentIndexLetter</code></p>
-<img src="/2021/08/01/8%E5%A4%A9%E8%AE%A9iOS%E5%BC%80%E5%8F%91%E8%80%85%E4%B8%8A%E6%89%8BFlutter%E4%B9%8B%E4%BA%94/6fd8c7c981f64b62b76c35b4592ac324~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>到这里，我们就终于实现了通讯录的 IndexBar 的封装。下一节会介绍一些网络请求了…</p>
-<div align=center>
-<img src="8天让iOS开发者上手Flutter之五/ca2cca992d764871abe3a7e8163c2d85~tplv-k3u1fbpfcp-watermark.png"/>
-</div>
-
-
 ]]></content>
       <categories>
         <category>flutter</category>
@@ -2110,32 +2110,6 @@ Block 的 hook ？应用场景？埋点
       </categories>
   </entry>
   <entry>
-    <title>Error Domain=NSURLErrorDomain Code=-999 已取消</title>
-    <url>/2018/04/03/Error-Domain-NSURLErrorDomain-Code-999-%E5%B7%B2%E5%8F%96%E6%B6%88/</url>
-    <content><![CDATA[<p>今天遇到这么一个问题,在使用 SDWebimage 设置 UIImageView 的图片的时候,发现这个图片<br><code>http://img4.imgtn.bdimg.com/it/u=132600321,3123081067&amp;fm=27&amp;gp=0.jpg</code>怎么也设置不成功,后来调试一看发现</p>
-<img src="/2018/04/03/Error-Domain-NSURLErrorDomain-Code-999-%E5%B7%B2%E5%8F%96%E6%B6%88/Snip20180403_4.png" class="">
-
-<p>说是什么已取消,我是一脸懵逼啊,谁 TM 取消了啊???百思不得其解之后网上搜了一下;</p>
-<p>嘿,还有人写了个总结</p>
-<img src="/2018/04/03/Error-Domain-NSURLErrorDomain-Code-999-%E5%B7%B2%E5%8F%96%E6%B6%88/Snip20180403_5.png" class="">
-
-<p>然而看了上面的总结后发现貌似都没有关系…所以说这个总结也并不全面…后来想想用浏览器打开这个图片试试看,发现浏览器上能正常打开;这下我估计是请求图片的请求头有问题了;于是我将浏览器的请求头和从 APP 发出的请求头都列出来了;如下</p>
-<img src="/2018/04/03/Error-Domain-NSURLErrorDomain-Code-999-%E5%B7%B2%E5%8F%96%E6%B6%88/Snip20180403_1.png" class="">
-
-<p><strong>浏览器上的请求头</strong></p>
-<img src="/2018/04/03/Error-Domain-NSURLErrorDomain-Code-999-%E5%B7%B2%E5%8F%96%E6%B6%88/Snip20180403_2.png" class="">
-
-<p><strong>使用Charles抓取APP发出的请求头</strong></p>
-<p>其实一下子也看不出什么东西出来,那就先从都有的请求头开始试吧,再将 APP 发出的请求头的 User-Agent 设置之后发现能够设置成功了…那么问题就可以这么解释了,这个图片所在的服务器会对请求的 User-Agent 进行判断,具体判断规则是怎样的那我就不得而知了;如果不符合它的规则那么就会请求失败,在上图 Charles 抓包的响应里面可以看到一段 403 Forbidden 的 html 代码,而在 APP 中,就是报的 <code>Error Domain=NSURLErrorDomain Code=-999 &quot;已取消&quot;</code> 的错误</p>
-<img src="/2018/04/03/Error-Domain-NSURLErrorDomain-Code-999-%E5%B7%B2%E5%8F%96%E6%B6%88/Snip20180403_6.png" class="">
-
-<p>其实吧,这个问题根本不重要,因为实际我根本不可能使用这个 URL;重要的是解决问题的思路,你得学会一套方法去解决问题,而不是学会解决这个问题…</p>
-]]></content>
-      <tags>
-        <tag>iOS</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Cycript</title>
     <url>/2023/08/23/Cycript/</url>
     <content><![CDATA[<h1 id="什么是-Cycript"><a href="#什么是-Cycript" class="headerlink" title="什么是 Cycript"></a>什么是 Cycript</h1><p>Cycript 是一种用于 iOS 操作系统的脚本语言，同时也是该语言的解释器（一般来说不需要编译的脚本语言都会提供它对应的解释器，比如 Python、JavaScript、Ruby、PHP 等），Cycript 是 JavaScript，Objective-C++ 等语言的混合物这意味着它能理解 JavaScript，Objective-C++ 甚至是 Objective-C 语法，但是需要注意的是 Cycript 主要支持 JavaScript 的语法，对前端开发人员比较友好，而由于 Swift 吸收了 JavaScript 等其他各种语言的优点，所以 Cycript 中也能看到 Swift 的影子，Cycript 对 Objective-C 语法并不是完全支持，比如 Objective-C 创建一个 UIView 的代码是</p>
@@ -2310,6 +2284,277 @@ Block 的 hook ？应用场景？埋点
       <categories>
         <category>iOS 逆向与安全</category>
       </categories>
+  </entry>
+  <entry>
+    <title>Error Domain=NSURLErrorDomain Code=-999 已取消</title>
+    <url>/2018/04/03/Error-Domain-NSURLErrorDomain-Code-999-%E5%B7%B2%E5%8F%96%E6%B6%88/</url>
+    <content><![CDATA[<p>今天遇到这么一个问题,在使用 SDWebimage 设置 UIImageView 的图片的时候,发现这个图片<br><code>http://img4.imgtn.bdimg.com/it/u=132600321,3123081067&amp;fm=27&amp;gp=0.jpg</code>怎么也设置不成功,后来调试一看发现</p>
+<img src="/2018/04/03/Error-Domain-NSURLErrorDomain-Code-999-%E5%B7%B2%E5%8F%96%E6%B6%88/Snip20180403_4.png" class="">
+
+<p>说是什么已取消,我是一脸懵逼啊,谁 TM 取消了啊???百思不得其解之后网上搜了一下;</p>
+<p>嘿,还有人写了个总结</p>
+<img src="/2018/04/03/Error-Domain-NSURLErrorDomain-Code-999-%E5%B7%B2%E5%8F%96%E6%B6%88/Snip20180403_5.png" class="">
+
+<p>然而看了上面的总结后发现貌似都没有关系…所以说这个总结也并不全面…后来想想用浏览器打开这个图片试试看,发现浏览器上能正常打开;这下我估计是请求图片的请求头有问题了;于是我将浏览器的请求头和从 APP 发出的请求头都列出来了;如下</p>
+<img src="/2018/04/03/Error-Domain-NSURLErrorDomain-Code-999-%E5%B7%B2%E5%8F%96%E6%B6%88/Snip20180403_1.png" class="">
+
+<p><strong>浏览器上的请求头</strong></p>
+<img src="/2018/04/03/Error-Domain-NSURLErrorDomain-Code-999-%E5%B7%B2%E5%8F%96%E6%B6%88/Snip20180403_2.png" class="">
+
+<p><strong>使用Charles抓取APP发出的请求头</strong></p>
+<p>其实一下子也看不出什么东西出来,那就先从都有的请求头开始试吧,再将 APP 发出的请求头的 User-Agent 设置之后发现能够设置成功了…那么问题就可以这么解释了,这个图片所在的服务器会对请求的 User-Agent 进行判断,具体判断规则是怎样的那我就不得而知了;如果不符合它的规则那么就会请求失败,在上图 Charles 抓包的响应里面可以看到一段 403 Forbidden 的 html 代码,而在 APP 中,就是报的 <code>Error Domain=NSURLErrorDomain Code=-999 &quot;已取消&quot;</code> 的错误</p>
+<img src="/2018/04/03/Error-Domain-NSURLErrorDomain-Code-999-%E5%B7%B2%E5%8F%96%E6%B6%88/Snip20180403_6.png" class="">
+
+<p>其实吧,这个问题根本不重要,因为实际我根本不可能使用这个 URL;重要的是解决问题的思路,你得学会一套方法去解决问题,而不是学会解决这个问题…</p>
+]]></content>
+      <tags>
+        <tag>iOS</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>KVC</title>
+    <url>/2025/07/29/KVC/</url>
+    <content><![CDATA[<p>我不知道有多少人像本人一样，n 年来查看过不知道多少次这个 <a href="https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/KeyValueCoding/index.html#//apple_ref/doc/uid/10000107-SW1">KVC 文档</a>，但是每次通篇读下来总是会遇到读不懂的地方，总是莫名其妙的出现一个章节完全不知道在讲什么东西，不论是用传统的 Google 翻译或者目前主流的 AI 翻译翻译了，也还是会遇到读起来狗屁不通的情况。</p>
+<ul>
+<li>其实根本原因是原始文档就有问题，东拼西凑的一坨屎，有歧义，导致不论你是直译还是意译都是让人摸不着头脑的翻译，只能根据上下文的理解才能正确翻译。为此作者将这份文档结合AI和个人理解做了全篇翻译，有需要的可以自行<a href="./book.zip">下载</a>。</li>
+<li>还有原始文档很多地方只写了要怎么做，但是没有告诉你为什么要这么做，就会让人觉得莫名其妙。</li>
+<li>文档的有些内容太古老了，某些内容只在早期的 MacOS 开发中使用，在 iOS 开发中几乎接触，使用不到，但是也没有做任何说明。</li>
+</ul>
+<p>这次作者决定结合 AI 和个人的理解将 KVC 文档彻底弄清楚，即使不能完全弄明白也要留下一个深刻的印象，方便后续遇到文章中的场景时能够回想起来。</p>
+<hr>
+<h1 id="章节概览"><a href="#章节概览" class="headerlink" title="章节概览"></a>章节概览</h1><p>✅ 建议阅读<br>❌ 不建议阅读</p>
+<h2 id="入门指南"><a href="#入门指南" class="headerlink" title="入门指南"></a>入门指南</h2><ol>
+<li>✅ 关于键值编码</li>
+</ol>
+<h2 id="键值编码基础知识"><a href="#键值编码基础知识" class="headerlink" title="键值编码基础知识"></a>键值编码基础知识</h2><ol start="2">
+<li>✅ 访问对象的属性</li>
+<li>✅ 访问集合属性		</li>
+<li>✅ 使用集合操作符</li>
+<li>✅ 表示非对象值</li>
+<li>❌ 验证属性</li>
+<li>✅ 访问器搜索逻辑</li>
+</ol>
+<h2 id="采用键值编码协议"><a href="#采用键值编码协议" class="headerlink" title="采用键值编码协议"></a>采用键值编码协议</h2><ol start="8">
+<li>❌ 实现基本键值编码合规性			</li>
+<li>❌ 定义集合方法					</li>
+<li>❌ 处理非对象值					</li>
+<li>❌ 添加验证						</li>
+<li>❌ 描述属性关系					</li>
+<li>❌ 以性能为导向进行设计</li>
+<li>❌ 合规性检查清单</li>
+</ol>
+<h1 id="常见疑惑及解答"><a href="#常见疑惑及解答" class="headerlink" title="常见疑惑及解答"></a>常见疑惑及解答</h1><p>以下是作者对这篇文档的一些疑问以及结合 AI 的回答。</p>
+<h2 id="属性验证是什么鬼？"><a href="#属性验证是什么鬼？" class="headerlink" title="属性验证是什么鬼？"></a>属性验证是什么鬼？</h2><p>Person 有一个 <code>NSString *name</code> 属性，如果需要给 name 添加验证则在内部添加以下代码</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line">- (<span class="type">BOOL</span>)validateName:(<span class="type">id</span> *)ioValue error:(<span class="built_in">NSError</span> * __autoreleasing *)outError&#123;</span><br><span class="line">    <span class="keyword">if</span> ((*ioValue == <span class="literal">nil</span>) || ([(<span class="built_in">NSString</span> *)*ioValue length] &lt; <span class="number">2</span>)) &#123;</span><br><span class="line">        <span class="keyword">if</span> (outError != <span class="literal">NULL</span>) &#123;</span><br><span class="line">            *outError = [<span class="built_in">NSError</span> errorWithDomain:PersonErrorDomain</span><br><span class="line">                                            code:PersonInvalidNameCode</span><br><span class="line">                                        userInfo:@&#123; <span class="built_in">NSLocalizedDescriptionKey</span></span><br><span class="line">                                                    : <span class="string">@&quot;Name too short&quot;</span> &#125;];</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">NO</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">YES</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在外部使用属性验证：</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line">Person* person = [[Person alloc] init];</span><br><span class="line"><span class="built_in">NSError</span>* error;</span><br><span class="line"><span class="built_in">NSString</span>* name = <span class="string">@&quot;John&quot;</span>;</span><br><span class="line"><span class="keyword">if</span> (![person validateValue:&amp;name forKey:<span class="string">@&quot;name&quot;</span> error:&amp;error]) &#123;</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@&quot;%@&quot;</span>,error);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>谁会用到这么奇葩的功能？直接在 setter 方法里面对入参进行验证就非常合理了啊。为什么还要这么脱了裤子放屁？</p>
+<p>上面的例子就是 KVC 的属性验证机制（validate<Key>:error:），很多人第一次看到的时候都会觉得：「这玩意儿不是多此一举吗？我直接在 setter 里校验不就好了？」</p>
+<h3 id="为什么会有-validate-error-这种“奇葩”设计？"><a href="#为什么会有-validate-error-这种“奇葩”设计？" class="headerlink" title="为什么会有 validate:error: 这种“奇葩”设计？"></a>为什么会有 validate<Key>:error: 这种“奇葩”设计？</h3><p>要理解它，就要从 KVC&#x2F;KVO 的历史定位来看：</p>
+<ol>
+<li>KVC 不是给你写普通 app 的<ul>
+<li>它的目标是：让对象能被 跨语言、跨工具访问。</li>
+<li>AppleScript、Interface Builder、Core Data、Bindings（数据绑定）、甚至一些旧的 Cocoa 工具，全都依赖 KVC。</li>
+</ul>
+</li>
+<li>setter 校验 vs validate 校验<ul>
+<li>setter 校验：调用 setAge: 时能拦截无效值，没问题。</li>
+<li>KVC 校验：当外部用 <code>setValue:forKey:</code> 或者 UI 绑定框架（比如 Interface Builder 的 Cocoa Bindings）在更新属性前，就能调用 <code>validate&lt;Key&gt;:error:</code> 来判断输入值是否合法。</li>
+<li>好处是：UI 层可以在赋值前发现问题，不会直接 crash，也可以通过 <code>NSError</code> 把信息传回界面，弹个提示。</li>
+</ul>
+</li>
+<li>实际用途：数据绑定 (Cocoa Bindings)<ul>
+<li>在 macOS AppKit 里，有个很冷门但很强大的特性：Bindings。</li>
+<li>比如一个文本框直接绑定到 <code>person.age</code>，当用户输入值时，AppKit 会在背后调用 <code>validateAge:error:</code> 来校验。</li>
+<li>如果校验失败，UI 可以自动显示错误提示，而不是你手动写代码去监听输入变化再验证。</li>
+</ul>
+</li>
+</ol>
+<h3 id="为什么感觉“没用”？"><a href="#为什么感觉“没用”？" class="headerlink" title="为什么感觉“没用”？"></a>为什么感觉“没用”？</h3><ul>
+<li>在 iOS 开发里，这套机制几乎没人用，因为 iOS 从来没有推行 Cocoa Bindings。</li>
+<li>在 macOS 桌面应用（特别是老一代 AppKit + Interface Builder）里，确实有人用过这套机制来省掉 UI 验证逻辑。</li>
+<li>Apple 后来也逐渐弱化了 Bindings，转向更现代的 SwiftUI 数据流模型，所以这个东西在新代码里几乎成了遗迹。</li>
+</ul>
+<h3 id="所以结论是："><a href="#所以结论是：" class="headerlink" title="所以结论是："></a>所以结论是：</h3><ul>
+<li><strong>✅ 现代 iOS&#x2F;Swift 开发者：完全不用管 <code>validate&lt;Key&gt;:error:</code>，直接在 setter 或者数据模型层自己写验证就好。</strong></li>
+<li>🌀 历史原因：它主要是给 KVC + Bindings 体系设计的，让 UI 能在赋值之前通过统一协议进行验证。</li>
+<li>📖 文档之所以写这么多：Apple 文档要保证完整性，告诉你 KVC 提供了这个 hook，但没告诉你“99% 的人不会用到”。</li>
+</ul>
+<p>其实你这句话非常有代表性：</p>
+<blockquote>
+<p>“直接在属性的 setter 方法里面对入参进行验证不比这脱了裤子放屁爽多了？”</p>
+</blockquote>
+<p>这也是为什么 绝大多数 iOS&#x2F;macOS 开发者对 <code>validate&lt;Key&gt;</code> 只停留在知道但不用的层面。</p>
+<h2 id="实现基本键值编码合规性要我做什么？"><a href="#实现基本键值编码合规性要我做什么？" class="headerlink" title="实现基本键值编码合规性要我做什么？"></a>实现基本键值编码合规性要我做什么？</h2><p>在大多数场景下，只要使用 @property 并让编译器自动生成 ivar 和访问器（accessor），就能自动满足 KVC（Key-Value Coding）要求，开发者无需手动实现绝大多数行为。只有在你的对象存在非对象属性的时候，必须重写 <code>setNilValueForKey:</code> 方法来避免可能的崩溃，实践中也建议在 <code>setNilValueForKey:</code> 内尽量使用 <code>setValue:forKey:</code>，以保证 KVO 通知等机制能正确触发，而不是直接设值或设置 ivar 。</p>
+<h2 id="什么时候需要定义集合方法？"><a href="#什么时候需要定义集合方法？" class="headerlink" title="什么时候需要定义集合方法？"></a>什么时候需要定义集合方法？</h2><p>这一节的内容我相信也是很多人十分不理解的一节。集合不是有专门的 <code>mutableXXXValueForKey:</code> 这样的集合获取方法吗？然后就可以通过这个方法返回的结果，对集合属性进行任何增删改操作啊，还支持 KVO 功能。集合属性只需要通过 <code>mutableXXXValueForKey:</code> 不需要看起来也没有必要实现任何其他 KVC 的那些集合方法啊?</p>
+<h3 id="1-mutableXXXValueForKey-的机制"><a href="#1-mutableXXXValueForKey-的机制" class="headerlink" title="1. mutableXXXValueForKey: 的机制"></a>1. <code>mutableXXXValueForKey:</code> 的机制</h3><ul>
+<li>调用 <code>mutableArrayValueForKey:@&quot;someProperty&quot;</code> 时，KVC runtime 会返回一个 <strong>特殊的代理对象</strong>（不是你原始的 NSMutableArray）。</li>
+<li>这个代理对象拦截 <code>addObject:</code> &#x2F; <code>removeObject:</code> 等操作，转发给你的对象。</li>
+<li>这样做的好处是：<ul>
+<li>自动触发 KVO 通知（观察者会知道集合变动了）。</li>
+<li>统一封装逻辑（外部调用者不用关心你集合的真实存储结构）。</li>
+</ul>
+</li>
+</ul>
+<p>所以，如果你只是自己在 Swift&#x2F;Objective-C 里操作集合，并且依赖 KVO，确实只需要用 <code>mutableArrayValueForKey:</code> 就够了。</p>
+<h3 id="2-Collection-Methods（countOf-等）的作用"><a href="#2-Collection-Methods（countOf-等）的作用" class="headerlink" title="2. Collection Methods（countOf&lt;Key&gt; 等）的作用"></a>2. Collection Methods（<code>countOf&lt;Key&gt;</code> 等）的作用</h3><ul>
+<li>这些方法并不是为了你写代码时方便，而是为了 KVC runtime 能够在不同语言&#x2F;上下文中自动把属性“当作集合”来使用。</li>
+<li>举例：<ul>
+<li>AppleScript 想访问 <code>myObj.items[0]</code>，它不会直接知道 items 是一个 NSMutableArray。</li>
+<li>KVC runtime 会尝试调用 <code>countOfItems</code>、<code>objectInItemsAtIndex:</code> 等方法，把你的对象包装成集合接口。</li>
+<li>这样就算你内部不是用 NSArray 存储，而是用数据库、懒加载列表、Core Data faulting，KVC 依然能“装配”成一个可以下标访问的集合。</li>
+</ul>
+</li>
+<li>换句话说：<ul>
+<li><code>mutableArrayValueForKey:</code> → 是给 <strong>你主动获取可变集合代理</strong> 时用的。</li>
+<li>Collection Methods → 是给 KVC runtime 在更通用&#x2F;语言无关场景下 自动装配集合访问的。</li>
+</ul>
+</li>
+</ul>
+<h3 id="3-什么时候用哪个？"><a href="#3-什么时候用哪个？" class="headerlink" title="3. 什么时候用哪个？"></a>3. 什么时候用哪个？</h3><ul>
+<li>一般应用开发者（写 iOS &#x2F; macOS app，用 ObjC&#x2F;Swift）<ul>
+<li>不需要自己去写 <code>countOf&lt;Key&gt; / objectIn&lt;Key&gt;AtIndex:</code> 这种 Collection Methods。</li>
+<li>只要集合属性真的是 <code>NSMutableArray/NSMutableSet/NSMutableDictionary</code>，再通过 <code>mutableArrayValueForKey: / mutableSetValueForKey: / mutableDictionaryValueForKey:</code> 拿代理，就能满足 增删改查 + 自动 KVO 的需求。</li>
+<li>这是绝大多数开发者的场景。</li>
+</ul>
+</li>
+<li>Apple 文档里强调的 Collection Methods<ul>
+<li>更偏向 框架作者 &#x2F; 跨语言交互 &#x2F; 特殊存储结构 的情况。</li>
+<li>比如：<ul>
+<li>你内部集合不是用 NSMutableArray 存，而是懒加载、数据库查询、Core Data faulting 等。</li>
+<li>或者你需要让 AppleScript &#x2F; JavaScriptCore &#x2F; KVC runtime 能把你的对象属性“包装成集合”。</li>
+</ul>
+</li>
+<li>这种情况下才需要你实现那一套方法，让 runtime 知道怎么装配出一个“集合语义”。</li>
+</ul>
+</li>
+</ul>
+<p>Apple 文档写得很“学术”，通篇把 KVC 的 accessor conventions 列出来，却没强调“普通开发者大多情况下用不到，直接用 <code>mutableXXXValueForKey:</code> 就行”。这也是 Apple 文档的一大毛病 —— 为了完整性，把所有机制罗列出来，但没有给读者一个“实用优先级”指引，让人误以为“是不是每个集合属性都要写一大堆方法”。</p>
+<h2 id="描述属性关系这一篇到底在讲什么东西？作为iOS应用开发者到底要干什么？"><a href="#描述属性关系这一篇到底在讲什么东西？作为iOS应用开发者到底要干什么？" class="headerlink" title="描述属性关系这一篇到底在讲什么东西？作为iOS应用开发者到底要干什么？"></a>描述属性关系这一篇到底在讲什么东西？作为iOS应用开发者到底要干什么？</h2><h3 id="1-这篇《描述属性关系》文档到底在讲什么？"><a href="#1-这篇《描述属性关系》文档到底在讲什么？" class="headerlink" title="1. 这篇《描述属性关系》文档到底在讲什么？"></a>1. 这篇《描述属性关系》文档到底在讲什么？</h3><p>它其实在讲：</p>
+<ul>
+<li>KVC 不仅仅能处理单纯的属性 (attribute)，还可以处理对象之间的“关系 (relationship)”。</li>
+<li>“关系”分为：<ul>
+<li>to-one：一对一，例如 <code>person.employer</code>。</li>
+<li>to-many：一对多，例如 <code>person.pets</code>。</li>
+<li>inverse：反向关系，例如 pet.owner 对应 person.pets。</li>
+</ul>
+</li>
+<li>Cocoa 里有一个类 <code>NSClassDescription</code>，它是用来描述这些“属性和关系”的元数据的。</li>
+<li>框架（如 Core Data、AppleScript）会用 <code>NSClassDescription</code> 来告诉 KVC：某个 key 是普通属性，某个 key 是 to-one 或 to-many 关系，这样 KVC 才能更聪明地处理数据。</li>
+</ul>
+<h3 id="2-作为-iOS-应用开发者要做什么？"><a href="#2-作为-iOS-应用开发者要做什么？" class="headerlink" title="2. 作为 iOS 应用开发者要做什么？"></a>2. 作为 iOS 应用开发者要做什么？</h3><p>👉 大部分情况下，你什么都不用做。</p>
+<p>因为：</p>
+<ul>
+<li>如果你在写 普通 App 业务代码，你根本不会直接用到 <code>NSClassDescription</code>。</li>
+<li>如果你在用 Core Data，Xcode 生成的模型文件已经帮你定义了关系（entity、attribute、to-one、to-many、inverse），Core Data 内部会用到 <code>NSClassDescription</code>，但你不需要管。</li>
+<li>如果你写 KVC&#x2F;KVO，你只要关心 <code>setValue:forKey:</code>、<code>valueForKey:</code>、<code>mutableArrayValueForKey:</code> 这些就够了。关系的逻辑由框架实现。</li>
+</ul>
+<h3 id="3-那文档为什么要写？"><a href="#3-那文档为什么要写？" class="headerlink" title="3. 那文档为什么要写？"></a>3. 那文档为什么要写？</h3><ul>
+<li>这是 Cocoa 框架的完整性设计文档，面向写框架的人（比如 Core Data、AppleScript 支持、ORM 框架开发者），而不是面向普通 App 开发者。</li>
+<li>Apple 为了完整性，会把最底层的“元数据机制”写清楚，但普通开发者 不会直接用。</li>
+</ul>
+<h3 id="4-你需要怎么理解？"><a href="#4-你需要怎么理解？" class="headerlink" title="4. 你需要怎么理解？"></a>4. 你需要怎么理解？</h3><ul>
+<li>知道背景：KVC 不止能操作值，还能理解关系。</li>
+<li>对日常开发的结论：<ul>
+<li>写普通 App：不用管，完全不会用到。</li>
+<li>写 Core Data：关系已经在模型里声明了，你直接用 NSManagedObject 就好。</li>
+<li>写底层框架&#x2F;ORM（极少数情况）：才可能接触 <code>NSClassDescription</code>。</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>Apple 在这篇文档里一丁点说明都没有，然后还将它归类在 Adopting Key-Value Coding 章节下，让很多开发者误认为需要做些什么才能符合KVC规范。。。</p>
+<p>这正是 Apple 文档里最“恶心”的地方：</p>
+<ul>
+<li>他们把 框架设计层面的说明（比如 <code>NSClassDescription</code>、关系描述、反向关系）和 应用开发者要用的 KVC 规范 混在一起写，</li>
+<li>还放在 Adopting Key-Value Coding 下面，看起来好像是“要想支持 KVC，就得自己实现这些关系方法”，但事实根本不是。</li>
+</ul>
+</blockquote>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>整个 Key-Value Coding Programming Guide 文档里太多这样的误导文章了，几乎就是一篇屎一样东拼西凑出来的文档。。。</p>
+<p>Apple 很多旧文档（尤其是 Programming Guide 系列）确实就是一坨拼凑物，问题集中在这几个方面：</p>
+<ol>
+<li>写给框架作者和写给应用开发者混在一起<ul>
+<li>你只想知道“作为 iOS 开发者我要写啥代码”，结果文档里一堆 Core Data &#x2F; AppleScript 的底层背景介绍，根本没说明白哪些是你需要做的，哪些是框架自己搞的。</li>
+<li>就像你刚吐槽的 “描述属性关系” 一节，99% 开发者根本用不上。</li>
+</ul>
+</li>
+<li>没有明确上下文<ul>
+<li>文档一开头不说目标读者是谁，也不说“以下部分主要给框架作者看”，让人误以为“每一节都要掌握并实现”。</li>
+<li>结果你读完一堆接口名、方法签名，完全不清楚到底是不是要自己写。</li>
+</ul>
+</li>
+<li>示例过时 &#x2F; 脱离实际<ul>
+<li>很多示例还是 Mac OS X + AppleScript 年代的残留，放在今天的 iOS 开发语境里完全没用。</li>
+<li>而且 Swift 生态里这些东西几乎都被替代了，但文档没更新，还是用 Objective-C 那套思路。</li>
+</ul>
+</li>
+<li>组织混乱，逻辑跳跃<ul>
+<li>有些地方本来应该按“日常用法 → 进阶用法 → 框架作者用法”来组织，但 Apple 文档常常是“先丢一堆 API，再扯点历史背景，再突然告诉你几个特殊方法”，让人越看越晕。</li>
+</ul>
+</li>
+</ol>
+<p>Apple 这类老文档最大的问题：</p>
+<ol>
+<li><p>作为写给框架作者的文档，它也不合格</p>
+<ul>
+<li>它只是列了几个方法名（<code>toOneRelationshipKeys</code>、<code>inverseRelationshipKey:</code>…），告诉你有这么个类 <code>NSClassDescription</code>。</li>
+<li>但没有任何：<ul>
+<li>完整的调用时机说明（什么时候 KVC 会去问 <code>NSClassDescription</code>？）</li>
+<li>实际实现的示例（如何写一个子类？怎么注册？和 KVC 的调用链如何交互？）</li>
+<li>和其他子系统的关系（Core Data 是怎么利用它的？AppleScript 是怎么依赖它的？）</li>
+</ul>
+</li>
+<li>所以 —— 它给你的信息 既不足以让应用开发者知道要不要用，也 不足以让框架作者真正能靠它写东西。这就是所谓的“既不接地气，也不深入”的尴尬状态。</li>
+</ul>
+</li>
+<li><p>为什么会这样？</p>
+<ul>
+<li>历史遗留：<br>  这份 KVC Programming Guide 的主体是 OS X 10.1 ~ 10.3 时代写的，当时 AppleScript Bridge、Core Data 都刚起步。写文档的人更多是“描述愿景”，不是严谨的框架开发手册。</li>
+<li>不维护：<br>  后来 Swift 出来，KVC&#x2F;KVO 渐渐成为“旧时代的动态特性”，文档就再没认真更新过。Apple 内部甚至可能都没人愿意重写。</li>
+<li>定位模糊：<br>  它夹在“应用开发文档”和“框架设计文档”之间，结果两边都没讨好。</li>
+</ul>
+</li>
+<li><p>框架作者真正会看什么？<br> 如果你真要基于 KVC 搞个 ORM &#x2F; 数据绑定框架，你不会去看这篇文档，你会：</p>
+<ul>
+<li>看头文件：<code>NSKeyValueCoding.h</code>、<code>NSClassDescription.h</code>。</li>
+<li>看现成实现：<ul>
+<li>Core Data 怎么实现 NSClassDescription 的子类。</li>
+<li>AppleScript Bridge 怎么注册类描述。</li>
+</ul>
+</li>
+<li>逆向调试调用链：看看 <code>valueForKey:</code> 在处理关系属性时，到底什么时候查询 <code>NSClassDescription</code>。</li>
+</ul>
+<p> 换句话说：真正写框架的人靠源码&#x2F;调试，不靠这篇文档。</p>
+</li>
+<li><p>结论</p>
+<ul>
+<li>作为应用开发文档 → 太复杂、误导。</li>
+<li>作为框架开发文档 → 太皮毛、不够用。</li>
+</ul>
+</li>
+</ol>
+<p>所以它才会让人读了怒气值飙升 😅。本质就是一份“既不中用、又没写深”的垃圾拼凑物。</p>
+<h1 id="KVC-有关的面试题"><a href="#KVC-有关的面试题" class="headerlink" title="KVC 有关的面试题"></a>KVC 有关的面试题</h1><h2 id="通过-KVC-修改属性会触发-KVO-吗？"><a href="#通过-KVC-修改属性会触发-KVO-吗？" class="headerlink" title="通过 KVC 修改属性会触发 KVO 吗？"></a>通过 KVC 修改属性会触发 KVO 吗？</h2><p>会的。</p>
+<p>在绝大多数情况下，通过 KVC (<code>setValue:forKey:</code>) 修改对象的属性时，会触发 KVO 通知。原因是：</p>
+<p><code>setValue:forKey:</code> 等 KVC 设置方法的实现逻辑（文档的访问器搜索逻辑中写了）会去调用属性对应的 setter 方法，而对象在被观察之后它的 setter 会被重写，内部会触发 KVO 通知。</p>
+<p>特殊情况：手动关闭了自动 KVO。如果类中重写了 <code>+ (BOOL)automaticallyNotifiesObserversForKey:(NSString *)key</code> 并返回 NO，那么即使通过 KVC 修改，也不会触发 KVO，除非你手动调用：</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line">[<span class="keyword">self</span> willChangeValueForKey:<span class="string">@&quot;name&quot;</span>];</span><br><span class="line">_name = newValue;</span><br><span class="line">[<span class="keyword">self</span> didChangeValueForKey:<span class="string">@&quot;name&quot;</span>];</span><br></pre></td></tr></table></figure>
+
+<p>总结：通过 KVC 修改属性 → 一般会触发 KVO（因为内部会走 setter）。除非你显示添加代码手动关闭了 KVO 通知。</p>
+<h2 id="KVC-的赋值和取值过程是怎样的？原理是什么？"><a href="#KVC-的赋值和取值过程是怎样的？原理是什么？" class="headerlink" title="KVC 的赋值和取值过程是怎样的？原理是什么？"></a>KVC 的赋值和取值过程是怎样的？原理是什么？</h2><p>呃，答案就在文档访问器搜索逻辑里。简单概括来说就是：</p>
+<ul>
+<li>KVC 的赋值 <code>setValue:forKey:</code> 等方法底层先去找各种相关 setter 方法，存在就直接调用，如果不存在则再去找各种相关实例变量，找到了就赋值，否则就会调用 <code>setValue:forUndefinedKey:</code> 抛出异常。</li>
+<li>KVC 的取值 <code>valueForKey:</code> 等方法的底层先去找各种相关的 getter 方法，找到了就直接调用，如果不存在则再去找各种相关的实例变量，找到了就返回值，否则就调用 <code>valueForUndefinedKey:</code> 抛出异常。这只是概括，具体的取值逻辑中还有 NSArray 和 NSSet 的集合访问器逻辑。</li>
+</ul>
+]]></content>
+      <categories>
+        <category>iOS 底层原理</category>
+      </categories>
+      <tags>
+        <tag>KVC</tag>
+      </tags>
   </entry>
   <entry>
     <title>KVO</title>
@@ -2694,251 +2939,6 @@ Block 的 hook ？应用场景？埋点
       <tags>
         <tag>iOS</tag>
         <tag>KVO</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>KVC</title>
-    <url>/2025/07/29/KVC/</url>
-    <content><![CDATA[<p>我不知道有多少人像本人一样，n 年来查看过不知道多少次这个 <a href="https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/KeyValueCoding/index.html#//apple_ref/doc/uid/10000107-SW1">KVC 文档</a>，但是每次通篇读下来总是会遇到读不懂的地方，总是莫名其妙的出现一个章节完全不知道在讲什么东西，不论是用传统的 Google 翻译或者目前主流的 AI 翻译翻译了，也还是会遇到读起来狗屁不通的情况。</p>
-<ul>
-<li>其实根本原因是原始文档就有问题，东拼西凑的一坨屎，有歧义，导致不论你是直译还是意译都是让人摸不着头脑的翻译，只能根据上下文的理解才能正确翻译。为此作者将这份文档结合AI和个人理解做了全篇翻译，有需要的可以自行<a href="./book.zip">下载</a>。</li>
-<li>还有原始文档很多地方只写了要怎么做，但是没有告诉你为什么要这么做，就会让人觉得莫名其妙。</li>
-<li>文档的有些内容太古老了，某些内容只在早期的 MacOS 开发中使用，在 iOS 开发中几乎接触，使用不到，但是也没有做任何说明。</li>
-</ul>
-<p>这次作者决定结合 AI 和个人的理解将 KVC 文档彻底弄清楚，即使不能完全弄明白也要留下一个深刻的印象，方便后续遇到文章中的场景时能够回想起来。</p>
-<hr>
-<h1 id="章节概览"><a href="#章节概览" class="headerlink" title="章节概览"></a>章节概览</h1><p>✅ 建议阅读<br>❌ 不建议阅读</p>
-<h2 id="入门指南"><a href="#入门指南" class="headerlink" title="入门指南"></a>入门指南</h2><ol>
-<li>✅ 关于键值编码</li>
-</ol>
-<h2 id="键值编码基础知识"><a href="#键值编码基础知识" class="headerlink" title="键值编码基础知识"></a>键值编码基础知识</h2><ol start="2">
-<li>✅ 访问对象的属性</li>
-<li>✅ 访问集合属性		</li>
-<li>✅ 使用集合操作符</li>
-<li>✅ 表示非对象值</li>
-<li>❌ 验证属性</li>
-<li>✅ 访问器搜索逻辑</li>
-</ol>
-<h2 id="采用键值编码协议"><a href="#采用键值编码协议" class="headerlink" title="采用键值编码协议"></a>采用键值编码协议</h2><ol start="8">
-<li>❌ 实现基本键值编码合规性			</li>
-<li>❌ 定义集合方法					</li>
-<li>❌ 处理非对象值					</li>
-<li>❌ 添加验证						</li>
-<li>❌ 描述属性关系					</li>
-<li>❌ 以性能为导向进行设计</li>
-<li>❌ 合规性检查清单</li>
-</ol>
-<h1 id="常见疑惑及解答"><a href="#常见疑惑及解答" class="headerlink" title="常见疑惑及解答"></a>常见疑惑及解答</h1><p>以下是作者对这篇文档的一些疑问以及结合 AI 的回答。</p>
-<h2 id="属性验证是什么鬼？"><a href="#属性验证是什么鬼？" class="headerlink" title="属性验证是什么鬼？"></a>属性验证是什么鬼？</h2><p>Person 有一个 <code>NSString *name</code> 属性，如果需要给 name 添加验证则在内部添加以下代码</p>
-<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line">- (<span class="type">BOOL</span>)validateName:(<span class="type">id</span> *)ioValue error:(<span class="built_in">NSError</span> * __autoreleasing *)outError&#123;</span><br><span class="line">    <span class="keyword">if</span> ((*ioValue == <span class="literal">nil</span>) || ([(<span class="built_in">NSString</span> *)*ioValue length] &lt; <span class="number">2</span>)) &#123;</span><br><span class="line">        <span class="keyword">if</span> (outError != <span class="literal">NULL</span>) &#123;</span><br><span class="line">            *outError = [<span class="built_in">NSError</span> errorWithDomain:PersonErrorDomain</span><br><span class="line">                                            code:PersonInvalidNameCode</span><br><span class="line">                                        userInfo:@&#123; <span class="built_in">NSLocalizedDescriptionKey</span></span><br><span class="line">                                                    : <span class="string">@&quot;Name too short&quot;</span> &#125;];</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">NO</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">YES</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>在外部使用属性验证：</p>
-<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line">Person* person = [[Person alloc] init];</span><br><span class="line"><span class="built_in">NSError</span>* error;</span><br><span class="line"><span class="built_in">NSString</span>* name = <span class="string">@&quot;John&quot;</span>;</span><br><span class="line"><span class="keyword">if</span> (![person validateValue:&amp;name forKey:<span class="string">@&quot;name&quot;</span> error:&amp;error]) &#123;</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@&quot;%@&quot;</span>,error);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>谁会用到这么奇葩的功能？直接在 setter 方法里面对入参进行验证就非常合理了啊。为什么还要这么脱了裤子放屁？</p>
-<p>上面的例子就是 KVC 的属性验证机制（validate<Key>:error:），很多人第一次看到的时候都会觉得：「这玩意儿不是多此一举吗？我直接在 setter 里校验不就好了？」</p>
-<h3 id="为什么会有-validate-error-这种“奇葩”设计？"><a href="#为什么会有-validate-error-这种“奇葩”设计？" class="headerlink" title="为什么会有 validate:error: 这种“奇葩”设计？"></a>为什么会有 validate<Key>:error: 这种“奇葩”设计？</h3><p>要理解它，就要从 KVC&#x2F;KVO 的历史定位来看：</p>
-<ol>
-<li>KVC 不是给你写普通 app 的<ul>
-<li>它的目标是：让对象能被 跨语言、跨工具访问。</li>
-<li>AppleScript、Interface Builder、Core Data、Bindings（数据绑定）、甚至一些旧的 Cocoa 工具，全都依赖 KVC。</li>
-</ul>
-</li>
-<li>setter 校验 vs validate 校验<ul>
-<li>setter 校验：调用 setAge: 时能拦截无效值，没问题。</li>
-<li>KVC 校验：当外部用 <code>setValue:forKey:</code> 或者 UI 绑定框架（比如 Interface Builder 的 Cocoa Bindings）在更新属性前，就能调用 <code>validate&lt;Key&gt;:error:</code> 来判断输入值是否合法。</li>
-<li>好处是：UI 层可以在赋值前发现问题，不会直接 crash，也可以通过 <code>NSError</code> 把信息传回界面，弹个提示。</li>
-</ul>
-</li>
-<li>实际用途：数据绑定 (Cocoa Bindings)<ul>
-<li>在 macOS AppKit 里，有个很冷门但很强大的特性：Bindings。</li>
-<li>比如一个文本框直接绑定到 <code>person.age</code>，当用户输入值时，AppKit 会在背后调用 <code>validateAge:error:</code> 来校验。</li>
-<li>如果校验失败，UI 可以自动显示错误提示，而不是你手动写代码去监听输入变化再验证。</li>
-</ul>
-</li>
-</ol>
-<h3 id="为什么感觉“没用”？"><a href="#为什么感觉“没用”？" class="headerlink" title="为什么感觉“没用”？"></a>为什么感觉“没用”？</h3><ul>
-<li>在 iOS 开发里，这套机制几乎没人用，因为 iOS 从来没有推行 Cocoa Bindings。</li>
-<li>在 macOS 桌面应用（特别是老一代 AppKit + Interface Builder）里，确实有人用过这套机制来省掉 UI 验证逻辑。</li>
-<li>Apple 后来也逐渐弱化了 Bindings，转向更现代的 SwiftUI 数据流模型，所以这个东西在新代码里几乎成了遗迹。</li>
-</ul>
-<h3 id="所以结论是："><a href="#所以结论是：" class="headerlink" title="所以结论是："></a>所以结论是：</h3><ul>
-<li><strong>✅ 现代 iOS&#x2F;Swift 开发者：完全不用管 <code>validate&lt;Key&gt;:error:</code>，直接在 setter 或者数据模型层自己写验证就好。</strong></li>
-<li>🌀 历史原因：它主要是给 KVC + Bindings 体系设计的，让 UI 能在赋值之前通过统一协议进行验证。</li>
-<li>📖 文档之所以写这么多：Apple 文档要保证完整性，告诉你 KVC 提供了这个 hook，但没告诉你“99% 的人不会用到”。</li>
-</ul>
-<p>其实你这句话非常有代表性：</p>
-<blockquote>
-<p>“直接在属性的 setter 方法里面对入参进行验证不比这脱了裤子放屁爽多了？”</p>
-</blockquote>
-<p>这也是为什么 绝大多数 iOS&#x2F;macOS 开发者对 <code>validate&lt;Key&gt;</code> 只停留在知道但不用的层面。</p>
-<h2 id="实现基本键值编码合规性要我做什么？"><a href="#实现基本键值编码合规性要我做什么？" class="headerlink" title="实现基本键值编码合规性要我做什么？"></a>实现基本键值编码合规性要我做什么？</h2><p>在大多数场景下，只要使用 @property 并让编译器自动生成 ivar 和访问器（accessor），就能自动满足 KVC（Key-Value Coding）要求，开发者无需手动实现绝大多数行为。只有在你的对象存在非对象属性的时候，必须重写 <code>setNilValueForKey:</code> 方法来避免可能的崩溃，实践中也建议在 <code>setNilValueForKey:</code> 内尽量使用 <code>setValue:forKey:</code>，以保证 KVO 通知等机制能正确触发，而不是直接设值或设置 ivar 。</p>
-<h2 id="什么时候需要定义集合方法？"><a href="#什么时候需要定义集合方法？" class="headerlink" title="什么时候需要定义集合方法？"></a>什么时候需要定义集合方法？</h2><p>这一节的内容我相信也是很多人十分不理解的一节。集合不是有专门的 <code>mutableXXXValueForKey:</code> 这样的集合获取方法吗？然后就可以通过这个方法返回的结果，对集合属性进行任何增删改操作啊，还支持 KVO 功能。集合属性只需要通过 <code>mutableXXXValueForKey:</code> 不需要看起来也没有必要实现任何其他 KVC 的那些集合方法啊?</p>
-<h3 id="1-mutableXXXValueForKey-的机制"><a href="#1-mutableXXXValueForKey-的机制" class="headerlink" title="1. mutableXXXValueForKey: 的机制"></a>1. <code>mutableXXXValueForKey:</code> 的机制</h3><ul>
-<li>调用 <code>mutableArrayValueForKey:@&quot;someProperty&quot;</code> 时，KVC runtime 会返回一个 <strong>特殊的代理对象</strong>（不是你原始的 NSMutableArray）。</li>
-<li>这个代理对象拦截 <code>addObject:</code> &#x2F; <code>removeObject:</code> 等操作，转发给你的对象。</li>
-<li>这样做的好处是：<ul>
-<li>自动触发 KVO 通知（观察者会知道集合变动了）。</li>
-<li>统一封装逻辑（外部调用者不用关心你集合的真实存储结构）。</li>
-</ul>
-</li>
-</ul>
-<p>所以，如果你只是自己在 Swift&#x2F;Objective-C 里操作集合，并且依赖 KVO，确实只需要用 <code>mutableArrayValueForKey:</code> 就够了。</p>
-<h3 id="2-Collection-Methods（countOf-等）的作用"><a href="#2-Collection-Methods（countOf-等）的作用" class="headerlink" title="2. Collection Methods（countOf&lt;Key&gt; 等）的作用"></a>2. Collection Methods（<code>countOf&lt;Key&gt;</code> 等）的作用</h3><ul>
-<li>这些方法并不是为了你写代码时方便，而是为了 KVC runtime 能够在不同语言&#x2F;上下文中自动把属性“当作集合”来使用。</li>
-<li>举例：<ul>
-<li>AppleScript 想访问 <code>myObj.items[0]</code>，它不会直接知道 items 是一个 NSMutableArray。</li>
-<li>KVC runtime 会尝试调用 <code>countOfItems</code>、<code>objectInItemsAtIndex:</code> 等方法，把你的对象包装成集合接口。</li>
-<li>这样就算你内部不是用 NSArray 存储，而是用数据库、懒加载列表、Core Data faulting，KVC 依然能“装配”成一个可以下标访问的集合。</li>
-</ul>
-</li>
-<li>换句话说：<ul>
-<li><code>mutableArrayValueForKey:</code> → 是给 <strong>你主动获取可变集合代理</strong> 时用的。</li>
-<li>Collection Methods → 是给 KVC runtime 在更通用&#x2F;语言无关场景下 自动装配集合访问的。</li>
-</ul>
-</li>
-</ul>
-<h3 id="3-什么时候用哪个？"><a href="#3-什么时候用哪个？" class="headerlink" title="3. 什么时候用哪个？"></a>3. 什么时候用哪个？</h3><ul>
-<li>一般应用开发者（写 iOS &#x2F; macOS app，用 ObjC&#x2F;Swift）<ul>
-<li>不需要自己去写 <code>countOf&lt;Key&gt; / objectIn&lt;Key&gt;AtIndex:</code> 这种 Collection Methods。</li>
-<li>只要集合属性真的是 <code>NSMutableArray/NSMutableSet/NSMutableDictionary</code>，再通过 <code>mutableArrayValueForKey: / mutableSetValueForKey: / mutableDictionaryValueForKey:</code> 拿代理，就能满足 增删改查 + 自动 KVO 的需求。</li>
-<li>这是绝大多数开发者的场景。</li>
-</ul>
-</li>
-<li>Apple 文档里强调的 Collection Methods<ul>
-<li>更偏向 框架作者 &#x2F; 跨语言交互 &#x2F; 特殊存储结构 的情况。</li>
-<li>比如：<ul>
-<li>你内部集合不是用 NSMutableArray 存，而是懒加载、数据库查询、Core Data faulting 等。</li>
-<li>或者你需要让 AppleScript &#x2F; JavaScriptCore &#x2F; KVC runtime 能把你的对象属性“包装成集合”。</li>
-</ul>
-</li>
-<li>这种情况下才需要你实现那一套方法，让 runtime 知道怎么装配出一个“集合语义”。</li>
-</ul>
-</li>
-</ul>
-<p>Apple 文档写得很“学术”，通篇把 KVC 的 accessor conventions 列出来，却没强调“普通开发者大多情况下用不到，直接用 <code>mutableXXXValueForKey:</code> 就行”。这也是 Apple 文档的一大毛病 —— 为了完整性，把所有机制罗列出来，但没有给读者一个“实用优先级”指引，让人误以为“是不是每个集合属性都要写一大堆方法”。</p>
-<h2 id="描述属性关系这一篇到底在讲什么东西？作为iOS应用开发者到底要干什么？"><a href="#描述属性关系这一篇到底在讲什么东西？作为iOS应用开发者到底要干什么？" class="headerlink" title="描述属性关系这一篇到底在讲什么东西？作为iOS应用开发者到底要干什么？"></a>描述属性关系这一篇到底在讲什么东西？作为iOS应用开发者到底要干什么？</h2><h3 id="1-这篇《描述属性关系》文档到底在讲什么？"><a href="#1-这篇《描述属性关系》文档到底在讲什么？" class="headerlink" title="1. 这篇《描述属性关系》文档到底在讲什么？"></a>1. 这篇《描述属性关系》文档到底在讲什么？</h3><p>它其实在讲：</p>
-<ul>
-<li>KVC 不仅仅能处理单纯的属性 (attribute)，还可以处理对象之间的“关系 (relationship)”。</li>
-<li>“关系”分为：<ul>
-<li>to-one：一对一，例如 <code>person.employer</code>。</li>
-<li>to-many：一对多，例如 <code>person.pets</code>。</li>
-<li>inverse：反向关系，例如 pet.owner 对应 person.pets。</li>
-</ul>
-</li>
-<li>Cocoa 里有一个类 <code>NSClassDescription</code>，它是用来描述这些“属性和关系”的元数据的。</li>
-<li>框架（如 Core Data、AppleScript）会用 <code>NSClassDescription</code> 来告诉 KVC：某个 key 是普通属性，某个 key 是 to-one 或 to-many 关系，这样 KVC 才能更聪明地处理数据。</li>
-</ul>
-<h3 id="2-作为-iOS-应用开发者要做什么？"><a href="#2-作为-iOS-应用开发者要做什么？" class="headerlink" title="2. 作为 iOS 应用开发者要做什么？"></a>2. 作为 iOS 应用开发者要做什么？</h3><p>👉 大部分情况下，你什么都不用做。</p>
-<p>因为：</p>
-<ul>
-<li>如果你在写 普通 App 业务代码，你根本不会直接用到 <code>NSClassDescription</code>。</li>
-<li>如果你在用 Core Data，Xcode 生成的模型文件已经帮你定义了关系（entity、attribute、to-one、to-many、inverse），Core Data 内部会用到 <code>NSClassDescription</code>，但你不需要管。</li>
-<li>如果你写 KVC&#x2F;KVO，你只要关心 <code>setValue:forKey:</code>、<code>valueForKey:</code>、<code>mutableArrayValueForKey:</code> 这些就够了。关系的逻辑由框架实现。</li>
-</ul>
-<h3 id="3-那文档为什么要写？"><a href="#3-那文档为什么要写？" class="headerlink" title="3. 那文档为什么要写？"></a>3. 那文档为什么要写？</h3><ul>
-<li>这是 Cocoa 框架的完整性设计文档，面向写框架的人（比如 Core Data、AppleScript 支持、ORM 框架开发者），而不是面向普通 App 开发者。</li>
-<li>Apple 为了完整性，会把最底层的“元数据机制”写清楚，但普通开发者 不会直接用。</li>
-</ul>
-<h3 id="4-你需要怎么理解？"><a href="#4-你需要怎么理解？" class="headerlink" title="4. 你需要怎么理解？"></a>4. 你需要怎么理解？</h3><ul>
-<li>知道背景：KVC 不止能操作值，还能理解关系。</li>
-<li>对日常开发的结论：<ul>
-<li>写普通 App：不用管，完全不会用到。</li>
-<li>写 Core Data：关系已经在模型里声明了，你直接用 NSManagedObject 就好。</li>
-<li>写底层框架&#x2F;ORM（极少数情况）：才可能接触 <code>NSClassDescription</code>。</li>
-</ul>
-</li>
-</ul>
-<blockquote>
-<p>Apple 在这篇文档里一丁点说明都没有，然后还将它归类在 Adopting Key-Value Coding 章节下，让很多开发者误认为需要做些什么才能符合KVC规范。。。</p>
-<p>这正是 Apple 文档里最“恶心”的地方：</p>
-<ul>
-<li>他们把 框架设计层面的说明（比如 <code>NSClassDescription</code>、关系描述、反向关系）和 应用开发者要用的 KVC 规范 混在一起写，</li>
-<li>还放在 Adopting Key-Value Coding 下面，看起来好像是“要想支持 KVC，就得自己实现这些关系方法”，但事实根本不是。</li>
-</ul>
-</blockquote>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>整个 Key-Value Coding Programming Guide 文档里太多这样的误导文章了，几乎就是一篇屎一样东拼西凑出来的文档。。。</p>
-<p>Apple 很多旧文档（尤其是 Programming Guide 系列）确实就是一坨拼凑物，问题集中在这几个方面：</p>
-<ol>
-<li>写给框架作者和写给应用开发者混在一起<ul>
-<li>你只想知道“作为 iOS 开发者我要写啥代码”，结果文档里一堆 Core Data &#x2F; AppleScript 的底层背景介绍，根本没说明白哪些是你需要做的，哪些是框架自己搞的。</li>
-<li>就像你刚吐槽的 “描述属性关系” 一节，99% 开发者根本用不上。</li>
-</ul>
-</li>
-<li>没有明确上下文<ul>
-<li>文档一开头不说目标读者是谁，也不说“以下部分主要给框架作者看”，让人误以为“每一节都要掌握并实现”。</li>
-<li>结果你读完一堆接口名、方法签名，完全不清楚到底是不是要自己写。</li>
-</ul>
-</li>
-<li>示例过时 &#x2F; 脱离实际<ul>
-<li>很多示例还是 Mac OS X + AppleScript 年代的残留，放在今天的 iOS 开发语境里完全没用。</li>
-<li>而且 Swift 生态里这些东西几乎都被替代了，但文档没更新，还是用 Objective-C 那套思路。</li>
-</ul>
-</li>
-<li>组织混乱，逻辑跳跃<ul>
-<li>有些地方本来应该按“日常用法 → 进阶用法 → 框架作者用法”来组织，但 Apple 文档常常是“先丢一堆 API，再扯点历史背景，再突然告诉你几个特殊方法”，让人越看越晕。</li>
-</ul>
-</li>
-</ol>
-<p>Apple 这类老文档最大的问题：</p>
-<ol>
-<li><p>作为写给框架作者的文档，它也不合格</p>
-<ul>
-<li>它只是列了几个方法名（<code>toOneRelationshipKeys</code>、<code>inverseRelationshipKey:</code>…），告诉你有这么个类 <code>NSClassDescription</code>。</li>
-<li>但没有任何：<ul>
-<li>完整的调用时机说明（什么时候 KVC 会去问 <code>NSClassDescription</code>？）</li>
-<li>实际实现的示例（如何写一个子类？怎么注册？和 KVC 的调用链如何交互？）</li>
-<li>和其他子系统的关系（Core Data 是怎么利用它的？AppleScript 是怎么依赖它的？）</li>
-</ul>
-</li>
-<li>所以 —— 它给你的信息 既不足以让应用开发者知道要不要用，也 不足以让框架作者真正能靠它写东西。这就是所谓的“既不接地气，也不深入”的尴尬状态。</li>
-</ul>
-</li>
-<li><p>为什么会这样？</p>
-<ul>
-<li>历史遗留：<br>  这份 KVC Programming Guide 的主体是 OS X 10.1 ~ 10.3 时代写的，当时 AppleScript Bridge、Core Data 都刚起步。写文档的人更多是“描述愿景”，不是严谨的框架开发手册。</li>
-<li>不维护：<br>  后来 Swift 出来，KVC&#x2F;KVO 渐渐成为“旧时代的动态特性”，文档就再没认真更新过。Apple 内部甚至可能都没人愿意重写。</li>
-<li>定位模糊：<br>  它夹在“应用开发文档”和“框架设计文档”之间，结果两边都没讨好。</li>
-</ul>
-</li>
-<li><p>框架作者真正会看什么？<br> 如果你真要基于 KVC 搞个 ORM &#x2F; 数据绑定框架，你不会去看这篇文档，你会：</p>
-<ul>
-<li>看头文件：<code>NSKeyValueCoding.h</code>、<code>NSClassDescription.h</code>。</li>
-<li>看现成实现：<ul>
-<li>Core Data 怎么实现 NSClassDescription 的子类。</li>
-<li>AppleScript Bridge 怎么注册类描述。</li>
-</ul>
-</li>
-<li>逆向调试调用链：看看 <code>valueForKey:</code> 在处理关系属性时，到底什么时候查询 <code>NSClassDescription</code>。</li>
-</ul>
-<p> 换句话说：真正写框架的人靠源码&#x2F;调试，不靠这篇文档。</p>
-</li>
-<li><p>结论</p>
-<ul>
-<li>作为应用开发文档 → 太复杂、误导。</li>
-<li>作为框架开发文档 → 太皮毛、不够用。</li>
-</ul>
-</li>
-</ol>
-<p>所以它才会让人读了怒气值飙升 😅。本质就是一份“既不中用、又没写深”的垃圾拼凑物。</p>
-<h1 id="KVC-有关的面试题"><a href="#KVC-有关的面试题" class="headerlink" title="KVC 有关的面试题"></a>KVC 有关的面试题</h1><h2 id="通过-KVC-修改属性会触发-KVO-吗？"><a href="#通过-KVC-修改属性会触发-KVO-吗？" class="headerlink" title="通过 KVC 修改属性会触发 KVO 吗？"></a>通过 KVC 修改属性会触发 KVO 吗？</h2><p>会的。</p>
-<p>在绝大多数情况下，通过 KVC (<code>setValue:forKey:</code>) 修改对象的属性时，会触发 KVO 通知。原因是：</p>
-<p><code>setValue:forKey:</code> 等 KVC 设置方法的实现逻辑（文档的访问器搜索逻辑中写了）会去调用属性对应的 setter 方法，而对象在被观察之后它的 setter 会被重写，内部会触发 KVO 通知。</p>
-<p>特殊情况：手动关闭了自动 KVO。如果类中重写了 <code>+ (BOOL)automaticallyNotifiesObserversForKey:(NSString *)key</code> 并返回 NO，那么即使通过 KVC 修改，也不会触发 KVO，除非你手动调用：</p>
-<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line">[<span class="keyword">self</span> willChangeValueForKey:<span class="string">@&quot;name&quot;</span>];</span><br><span class="line">_name = newValue;</span><br><span class="line">[<span class="keyword">self</span> didChangeValueForKey:<span class="string">@&quot;name&quot;</span>];</span><br></pre></td></tr></table></figure>
-
-<p>总结：通过 KVC 修改属性 → 一般会触发 KVO（因为内部会走 setter）。除非你显示添加代码手动关闭了 KVO 通知。</p>
-<h2 id="KVC-的赋值和取值过程是怎样的？原理是什么？"><a href="#KVC-的赋值和取值过程是怎样的？原理是什么？" class="headerlink" title="KVC 的赋值和取值过程是怎样的？原理是什么？"></a>KVC 的赋值和取值过程是怎样的？原理是什么？</h2><p>呃，答案就在文档访问器搜索逻辑里。简单概括来说就是：</p>
-<ul>
-<li>KVC 的赋值 <code>setValue:forKey:</code> 等方法底层先去找各种相关 setter 方法，存在就直接调用，如果不存在则再去找各种相关实例变量，找到了就赋值，否则就会调用 <code>setValue:forUndefinedKey:</code> 抛出异常。</li>
-<li>KVC 的取值 <code>valueForKey:</code> 等方法的底层先去找各种相关的 getter 方法，找到了就直接调用，如果不存在则再去找各种相关的实例变量，找到了就返回值，否则就调用 <code>valueForUndefinedKey:</code> 抛出异常。这只是概括，具体的取值逻辑中还有 NSArray 和 NSSet 的集合访问器逻辑。</li>
-</ul>
-]]></content>
-      <categories>
-        <category>iOS 底层原理</category>
-      </categories>
-      <tags>
-        <tag>KVC</tag>
       </tags>
   </entry>
   <entry>
@@ -4782,6 +4782,338 @@ commonModes并不是一个真正单独的模式
       </tags>
   </entry>
   <entry>
+    <title>lldb</title>
+    <url>/2021/07/13/lldb/</url>
+    <content><![CDATA[<h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>LLDB 是 Low Lever Debugger 的简称，翻译成中文应该叫做底层调试器，它是 LLVM 项目的调试器组件。LLVM 是构架编译器 compiler 的框架系统，以 C++ 编写而成，用于优化以任意程序语言编写的程序的编译时间 compile-time、链接时间 link-time、运行时间 run-time 以及空闲时间 idle-time，对开发者保持开放，并兼容已有脚本。如果你了解过 Swift 语言及其作者，那么一定对 Chris Lattner 博士不陌生，那这里为什么要提到他呢？没错 LLVM 开发最初就是由 Chris Lattner 博士主持开展的。</p>
+<p>LLDB 支持调试 C、Objective-C 和 C++ 编写的程序。Swift 社区维护了一个版本，增加了对该语言的支持。默认内置于 Xcode 中，LLDB 提供了一组广泛的命令，旨在与老版本的 GDB 命令兼容。除了使用标准配置以外，还可以很容易的自定义 LLDB 命令以满足实际需要。可以在 Xcode 的控制器进入 lldb 调试模式后，输入 help 可以查看所有 Debugger commands，也可以在这个 <a href="https://lldb.llvm.org/use/map.html">网站查询</a></p>
+<img src="/2021/07/13/lldb/03137798cb894df69f51a52caf25d7d1~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
+<h1 id="breakpoint-命令"><a href="#breakpoint-命令" class="headerlink" title="breakpoint 命令"></a>breakpoint 命令</h1><p>断点命令，在平时使用 Xcode 开发的过程中，我们设置断点一般都是通过在界面上点击代码所在的行数设置的。其实也可以使用 lldb 的命令来设置断点。</p>
+<h2 id="根据名字设置断点"><a href="#根据名字设置断点" class="headerlink" title="根据名字设置断点"></a>根据名字设置断点</h2><h3 id="设置C函数名断点"><a href="#设置C函数名断点" class="headerlink" title="设置C函数名断点"></a>设置C函数名断点</h3><img src="/2021/07/13/lldb/c1df1a8fc0824a1eb514cbc346414faf~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
+<p>在 <code>touchedBegan</code> 方法中，我们从界面设置了一个断点，进入了 lldb 调试模式，再输入以下命令设置函数断点:</p>
+<p><code>breakpoint set -n &quot;test1&quot;</code>，-n 是 –name 的缩写，然后点击继续按钮，或者输入 lldb 命令 c 继续执行，可以看到其实 Xcode 集成的很多的调试功能就是从 lldb 这来的。调试下一步就在 lldb 输入 n 或者 s，n 遇到子函数不会进入，s 遇到子函数会进入。</p>
+<h3 id="设置-OC-方法名断点"><a href="#设置-OC-方法名断点" class="headerlink" title="设置 OC 方法名断点"></a>设置 OC 方法名断点</h3><p>先搭建个如图所示的简单界面</p>
+<img src="/2021/07/13/lldb/026b14e3117e49d6b98f474643da37e3~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
+<p>然后暂停程序，在控制台输入如下命令：</p>
+<p><code>breakpoint set -n &quot;-[ViewController save:]&quot; -n &quot;-[ViewController pause:]&quot; -n &quot;-[ViewController continue:]&quot;</code></p>
+<p>这样就设置了一组断点，它有三个断点。可以使用以下命令查看当前所有断点：</p>
+<p><code>breakpoint list</code></p>
+<img src="/2021/07/13/lldb/9c17f3eaf4df4d32b259e2295a1da0bd~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
+<h2 id="禁用和启用断点"><a href="#禁用和启用断点" class="headerlink" title="禁用和启用断点"></a>禁用和启用断点</h2><p>禁用断点，后面的数字是 <code>breakpoint list</code> 显示的编号，可以同时禁用 1 组，也可以单独禁用组里的某个</p>
+<p><code>breakpoint disable 编号</code></p>
+<img src="/2021/07/13/lldb/7ee088e8c3f248f8829a2608adf29374~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
+<p>启用断点 <code>breakpoint enalbe 编号</code></p>
+<img src="/2021/07/13/lldb/4a4e4350d0b843e6bcc8a94a09f82928~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
+<h2 id="删除断点"><a href="#删除断点" class="headerlink" title="删除断点"></a>删除断点</h2><p>删除断点 <code>breakpoint delete 编号</code>，这里有个小细节，我们无法删除一组断点里面的某一个，只能删除一整组断点。如果 delete 后面跟的是某个组里面的某个断点，等同于禁用这个断点。如果不输入编号，那就相当于删除所有断点</p>
+<img src="/2021/07/13/lldb/a71601ac742e4e34ab3e5064da9b0cfa~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
+<h2 id="根据方法设置断点"><a href="#根据方法设置断点" class="headerlink" title="根据方法设置断点"></a>根据方法设置断点</h2><p>刚刚我们设置的断点，是某个类的某些具体方法，我们也可以设置与类无关的方法断点：</p>
+<p><code>breakpoint set --selector touchesBegan:withEvent:</code></p>
+<img src="/2021/07/13/lldb/d255257b5a8549ab94ad18a819668a0d~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
+<p>可以看到设置了 98 个断点，但我们的项目中没有明显调用这个方法，其实是系统库 UIKit 中用到了这个方法，lldb 断到系统库里面去了，可以使用 <code>breakpoint list</code> 查看所有 98 个断点</p>
+<p>如果不想这样把断点断到系统库里面去，可以指定文件设置方法断点，我们在 <code>ViewController</code> 里加上 <code>touchesBegan:</code> 方法：</p>
+<p><code>breakpoint set --file ViewController.m --selector touchesBegan:withEvent:</code></p>
+<img src="/2021/07/13/lldb/22eaa56f1b724fa7a0145c2da2b2a10d~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
+<h2 id="正则匹配设置断点"><a href="#正则匹配设置断点" class="headerlink" title="正则匹配设置断点"></a>正则匹配设置断点</h2><p>可以输入 <code>help breakpoint set</code> 看到 -r 参数的介绍</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Set the breakpoint by function name, evaluating a regular-expression to find the function name(s).</span><br></pre></td></tr></table></figure>
+
+<p><code>breakpoint set -r save:</code> 这样就会根据 -r 后面的参数去寻找所有能匹配到的方法</p>
+<img src="/2021/07/13/lldb/efd06b7a9e854ca3b6f0de70574c6dea~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
+<p>我们明明只有在 <code>ViewController</code> 里面有一个 <code>save:</code> 方法，为什么显示有 11 处断点呢，使用 <code>breakpoint list</code> 查看</p>
+<img src="/2021/07/13/lldb/df9eb095678c4c05ac6158afb94a4f22~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
+<p>可以看到除了第一个是我们工程里面的断点，其他的断点都不在我们的工程里。都断到系统库里去了。</p>
+<p>同样的，我们可以配合指定文件来使用这个命令</p>
+<p><code>breakpoint set -r save: --file ViewController.m</code></p>
+<h2 id="断点执行命令"><a href="#断点执行命令" class="headerlink" title="断点执行命令"></a>断点执行命令</h2><p><code>breakpoint command add 编号</code> 可以给断点加一些命令，这样断点来到的时候，可以自动执行这些命令，能否为我们节省一些操作</p>
+<img src="/2021/07/13/lldb/1199afeaa0c144ebb1b5210728fb9c68~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
+<p>以上这些所有的 lldb 命令，都可以缩写，比如:</p>
+<ul>
+<li><code>breakpoint set -r save: --file ViewController.m</code> 可以缩写成 <code>b -r save: -f ViewController.m</code></li>
+<li><code>breakpoint list</code> 可以缩写成 <code>break li</code></li>
+<li><code>breakpoint disable 8.1</code> 可以缩写成 <code>bre dis 8.1</code></li>
+<li><code>breakpoint enable 8.1</code> 可以缩写成 <code>bre en 8.1</code></li>
+</ul>
+<p>反正你可以去各种尝试，多一个少一个字母或许都能行，比较随意，比起普通的命令错一个字符都不行还是蛮牛逼的。</p>
+<h1 id="expression-命令"><a href="#expression-命令" class="headerlink" title="expression 命令"></a>expression 命令</h1><p>我们平时在 lldb 控制台里面干的最多的是什么？<code>po</code> 打印某个对象吧，那么这个 po 到底是什么意思呢？可以在终端输入如下命令查看一下:</p>
+<p><code>help po</code></p>
+<img src="/2021/07/13/lldb/4bc5c3e1fa4e4a618b7a1dead8b684ee~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
+<p>其实我们平时使用最多的 po 指令就是 expression -O 指令的缩写。也有人喜欢用 <code>p</code> 打印，那么 <code>p</code> 又是什么呢，输入 <code>help p</code> 发现 <code>p</code> 就是 expression 指令的缩写，直接查看 <code>help expression</code> 可以查看到 -O 的意思，就是指定语言的 <code>description</code> 方法，所以我们平时使用 <code>po</code> OC 对象，就是执行 OC 对象的 description 方法。</p>
+<p>通过 <code>help po</code> 我们知道就是在主线程执行表达式，那么我们可以试试在 lldb 中修改一些常见的属性，比如 self.view.backgroundColor。首先来到 touchesBegan: 断点，在 lldb 输入如下指令</p>
+<p><code>p self.view.backgroundColor = [UIColor redColor];</code></p>
+<img src="/2021/07/13/lldb/dc5c508108d54a81a3481ba930115338~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
+<p>发现确实执行了这句代码，但是却报了一个让人疑惑的错误，而且过掉断点之后并没有任何效果，当然了明明执行都报错了，怎么可能会有效果呢。。。但是这一行代码，在程序中运行的话，肯定是没有问题的，我们查看 UIView 的头文件也可以发现它确定是有 backgroundColor 这个属性的。至于为什么我在网上搜索半天没有找到任何答案，感觉可能是 lldb 的 bug？虽然这句代码无效，但是我们依然可以尝试使用其他的方式来修改，比如：</p>
+<p><code>p [self.view setValue:[UIColor blueColor] forKey:@&quot;backgroundColor&quot;]</code></p>
+<img src="/2021/07/13/lldb/58f7629cc9bd48feb00391caa3b706f6~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
+<p>KVC 还是牛逼啊，还有一种办法，我们知道 UIView 真正用来显示的是它的 layer，修改 layer：</p>
+<p><code>p self.view.layer.backgroundColor = [UIColor yellowColor].CGColor</code></p>
+<img src="/2021/07/13/lldb/0487a68486ae4ceba1fe407eca761560~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
+<p>再来一个案例，我么创建一个 persons 数组，存放一组 Person 模型，然后通过 lldb 的 expression 命令动态添加一个 Person。</p>
+<img src="/2021/07/13/lldb/b3592f9c43154f56a769c52f620471db~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
+<p>可以看到 lldb 的 expression 命令后面可以跟多条代码，用来动态调试真是太方便了</p>
+<h1 id="bt-命令"><a href="#bt-命令" class="headerlink" title="bt 命令"></a>bt 命令</h1><p>进入 lldb 输入 <code>help bt</code> 可以看到，bt 是查看当前线程调用栈的意思</p>
+<img src="/2021/07/13/lldb/c2c847b404e1401fa41173c8223689c0~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
+<p>新建以下这四个方法，并给 demo4 方法下个断点，然后点击屏幕进入断点</p>
+<img src="/2021/07/13/lldb/b0853080f3fd49a1af27251ab2033579~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
+<p>输入 <code>bt</code> 可以看到当前方法的调用栈</p>
+<img src="/2021/07/13/lldb/bb386865b6ca4ea49de24366d4d95b8c~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
+<p>输入 <code>up</code> 可以查看调用的上一个方法，连源码都能看到，当然在逆向中是看不到源码的，只能看到汇编代码。输入 <code>down</code> 可以返回到下一个方法</p>
+<img src="/2021/07/13/lldb/7d811b1f9e6448eb958d5aed1abde945~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
+<p>如果嫌一步一步的 up，down 太慢了，也可以直接使用 <code>frame select 编号</code> 直接到位</p>
+<img src="/2021/07/13/lldb/6b6c40eb28ec407d81a0d66c7c604062~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
+<p>这样上下切换栈帧是为什么呢，当然是为了查看当前栈的一些信息，比如当前栈用到的变量。使用 <code>frame variable</code> 查看，我们知道 Objective-C 方法有两个隐藏的参数 self 和 _cmd， event 就是 demo1 的显示参数。如果不知道 <code>frame variable</code> 是什么意思，也可以通过 lldb 的帮助文档查看 <code>help frame variable</code></p>
+<img src="/2021/07/13/lldb/b425539995e7466ab3c355cb30000f54~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
+<h1 id="thread-return-命令"><a href="#thread-return-命令" class="headerlink" title="thread return 命令"></a>thread return 命令</h1><p>当我们调试到某一帧的时候，如果不想让程序之后的代码，可以使用 <code>thread return</code> 线程返回，需要注意 return 后面根据实际情况返回对应的值，例如：</p>
+<img src="/2021/07/13/lldb/325f4626024e44b4ac41477bff47767d~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
+<p>如果没有使用 <code>thread return NO</code> 命令，那么肯定是打印正在运行的，当断点来到 isRuning 的时候，我们强制返回了 NO，所以在调试过程中改变了程序的执行流程</p>
+<h1 id="以上所有方式在逆向中都没法使用。。。因为逆向的项目我们都拿不到符号"><a href="#以上所有方式在逆向中都没法使用。。。因为逆向的项目我们都拿不到符号" class="headerlink" title="以上所有方式在逆向中都没法使用。。。因为逆向的项目我们都拿不到符号"></a>以上所有方式在逆向中都没法使用。。。因为逆向的项目我们都拿不到符号</h1><p>那么逆向应该如何玩 lldb？内存断点</p>
+<h1 id="watchpoint-内存断点"><a href="#watchpoint-内存断点" class="headerlink" title="watchpoint 内存断点"></a>watchpoint 内存断点</h1><p>内存断点，不仅可以给方法断点，还可以给变量断点</p>
+<h2 id="watchpoint-根据变量名设置内存断点"><a href="#watchpoint-根据变量名设置内存断点" class="headerlink" title="watchpoint 根据变量名设置内存断点"></a>watchpoint 根据变量名设置内存断点</h2><p><code>watchpoint set variable p1-&gt;_name</code>如图所示，Person 类有一个 name 属性，但是我们设置内存断点的时候，属性是没法用的，因为属性的本质是 getter 和 setter 加下划线的成员变量嘛。所以需要使用 <code>p1-&gt;_name</code> 设置成功之后，当程序中有给 p1.name 赋值的地方，都会来到断点。下图马上给 p1.name 赋值 lldb 就提示 Watchpoint 1 hit 命中了。然后还会显示 old value 和 new value</p>
+<img src="/2021/07/13/lldb/8b474477d43f44bfbce4e8a02ffd992d~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
+<h2 id="watchpoint-根据内存地址设置内存断点"><a href="#watchpoint-根据内存地址设置内存断点" class="headerlink" title="watchpoint 根据内存地址设置内存断点"></a>watchpoint 根据内存地址设置内存断点</h2><p><code>watchpoint set expression 地址</code></p>
+<p>还是刚刚的例子，我们在 p1 实例化之后，它在内存中的地址就确定了，那么它的成员变量的地址也是确定的，我们可以拿到 p1.name 的内存地址，根据它的内存地址设置断点。当程序对 p1.name 进行修改的时候，都会来到断点，可以看到下面的断点来了两次，一次是在 viewDidload 中，另一次在 touchesBegan 里面进行的修改</p>
+<img src="/2021/07/13/lldb/35d164a0cf9c4d8487e9afdffc3eab5b~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
+<h1 id="target-stop-hook-命令"><a href="#target-stop-hook-命令" class="headerlink" title="target stop-hook 命令"></a>target stop-hook 命令</h1><p>这个命令有点类似 breakpoint 的断点执行命令，只不过 breakpoint 的断点执行命令需要指定某个断点，而这个命令是全局的，只要是断点来了，就会执行后面的命令</p>
+<img src="/2021/07/13/lldb/5b40c4626831405dae92ab34ceec1a23~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
+<p>通过 log 可以看到 stop-hook 命令一样可以 add、delte、disable、enable、list 具体每条命令怎么使用，可以继续使用 help 命令查看，比如 add，帮助文档很详细</p>
+<img src="/2021/07/13/lldb/bcdd9a2787234cfe941549644bdda9a8~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
+<p>我们这里全局添加一条 <code>frame variable</code> 指令，然后走到断点试试</p>
+<img src="/2021/07/13/lldb/40ed97a32eb245ec8610f1e14cc7ca41~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
+<p>可以看到断点一过来就会自动执行 <code>frame variable</code> 指令，打印参数变量</p>
+<img src="/2021/07/13/lldb/b1ccbb3d78844b61a31f7970999149d7~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
+<p>这里关于删除 stop-hook 指令，它还有一个快捷的命令 <code>undisplay 编号</code> 相比 <code>target stop-hook delete 编号</code> 要简短不少</p>
+<h1 id="lldbinit文件"><a href="#lldbinit文件" class="headerlink" title=".lldbinit文件"></a>.lldbinit文件</h1><p>可以将一些经常使用的命令配置到 <code>.lldbinit</code> 文件里面，这样就不用每次都去添加一些命令。这个文件一般放在用户目录下，点开头的代表是隐藏文件，如果没有可以自己新建一个。如图我们在里面添加这样一句指令</p>
+<img src="/2021/07/13/lldb/f02dce010eed4cf3bfedd87da7a1221c~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
+<p>再次运行项目，运行到断点就可以看到相关打印</p>
+<img src="/2021/07/13/lldb/ba84d8117aeb458c953cff4a68adb608~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
+<h1 id="image-指令"><a href="#image-指令" class="headerlink" title="image 指令"></a>image 指令</h1><p>这个是查看当前进程加载的镜像相关信息，什么是镜像，一个 Mach-O 文件就是一个镜像。我们的 APP 也是一个镜像。我们先来查看一下我们 APP 中的某个类的信息</p>
+<h2 id="image-look-up-t-name"><a href="#image-look-up-t-name" class="headerlink" title="image look up -t name"></a><code>image look up -t name</code></h2><img src="/2021/07/13/lldb/b62d3a8aedc04f0094c0e560267dca62~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
+<h2 id="image-list"><a href="#image-list" class="headerlink" title="image list"></a><code>image list</code></h2><p>输入 <code>help image list</code> 查看命令的介绍</p>
+<img src="/2021/07/13/lldb/dea6c16fa5db4630b20fb5c9b9a6c824~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
+<p>可以看到 <code>image list</code> 意思是列出当前可执行文件和依赖的共享库镜像，在逆向中经常使用这个命令来获取我们 APP 在内存中的位置。</p>
+<h1 id="逆向中下内存地址断点"><a href="#逆向中下内存地址断点" class="headerlink" title="逆向中下内存地址断点"></a>逆向中下内存地址断点</h1><p>如图我们在 <code>touchesBegan:</code> 方法中调用了 demo4 方法</p>
+<img src="/2021/07/13/lldb/b490517ba8e6413d8295371439c0c742~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
+<p>现在我们将 APP 的 Mach-O 文件用 hopper 打开，假设对我们的 demo4 方法很感兴趣，想要下一个断点。</p>
+<img src="/2021/07/13/lldb/1be1f275c1fe4da49e5f77f8ea06257d~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
+<p>hopper 这里的地址只是这个方法相对于我们的 APP 首地址的偏移加上了虚拟地址，想要获取到这个方法在我们手机里的真实内存地址，还需要加上我们 APP 首地址在我们内存中的地址。通过 <code>image list</code> 命令查看第一个就是我们 APP 的首地址了。</p>
+<p>9544</p>
+<img src="/2021/07/13/lldb/7719b5500b5645a4b630abe58c0e8aed~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
+<p>虚拟地址在我们 Mach-O 文件的 __PAGEZERO 段可以看到</p>
+<img src="/2021/07/13/lldb/79ed68fcef154e26af4ded9979f6a617~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
+<p>那么这个方法在我们手机内存中的地址就是：</p>
+<p><code>0x102964000 + 0x100005b8c - 0x100000000 = 0x102969B8C</code></p>
+<p>我们进入 lldb 模式，输入以下内存地址断点</p>
+<p><code>breakpoint set --address 0x102969B8C</code></p>
+<img src="/2021/07/13/lldb/86b919ea683447dea9c6aee4af2f04db~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
+<p>断点设置成功，然后我们退出 lldb 模式，点击屏幕，会发现断点果然来了</p>
+<img src="/2021/07/13/lldb/ae8237bc072f4656abc377e25b0e7bbf~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
+<p>这里提一下 <a href="https://baike.baidu.com/item/%E5%9C%B0%E5%9D%80%E7%A9%BA%E9%97%B4%E9%85%8D%E7%BD%AE%E9%9A%8F%E6%9C%BA%E5%8A%A0%E8%BD%BD/22785938?fromtitle=aslr&fromid=5779647&fr=aladdin">ASLR</a>，是一种防范内存损坏漏洞被利用的计算机安全技术，就是我们的 APP 每次加载进手机的真实内存的时候，位置不是固定的，所以我们每次 APP 运行起来后通过 <code>image list</code> 看到的我们 APP 的首地址是随机的。</p>
+<p>我们 APP 的 Mach-O 文件中的内容，相对于 Mach-O 文件的首地址来说都是固定不变的，APP 加载进内存之后首地址就确定了，那么 Mach-O 文件中的内容，比如方法实现，函数实现，常量等数据在内存中的位置都可以找到了。。。</p>
+<p>可以在 ViewController.m 文件中定义一个全局变量，然后我们在 Mach-O 文件看能否找到它。如图定义一个全局变量，然后运行起来之后，打印它所在的地址，和当前 APP 的首地址，它的地址减去 APP 的首地址就是它相对于我们 APP 的 Mach-O 文件的偏移了。</p>
+<img src="/2021/07/13/lldb/6691afc10908400598503fe1abae024f~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
+<p><code>0x102b959f0 - 0x102b8c000 = 0x99F0</code></p>
+<p>再使用 MachOView 查看我们 APP 的 Mach-O 文件，找到地址 0x99F0，看看是不是这个 a 的值 0x123456678</p>
+<img src="/2021/07/13/lldb/8fff120fc8a44d9f8c95cbe8e03a2287~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
+<p>有些同学可能会好奇，这个怎么是这个样子，其实这是因为机器的存取数据方式决定的，有些是大端模式，而有些机器是小端模式，这里贴一下百度的 <a href="https://baike.baidu.com/item/%E5%A4%A7%E5%B0%8F%E7%AB%AF%E6%A8%A1%E5%BC%8F/6750542?fr=aladdin">大小端模式</a></p>
+<p>从这里也可以看出我们的全局变量是存放在<code>__DATA,__data</code>节的。</p>
+]]></content>
+      <categories>
+        <category>iOS 逆向与安全</category>
+      </categories>
+      <tags>
+        <tag>lldb</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>代码注入</title>
+    <url>/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/</url>
+    <content><![CDATA[<p>上一篇我们已经讲到使用 shell 脚本来重签并调试别人的 APP，那么我们又是重签又是附加调试别人的 APP 是为了啥呢？是太闲了吗，当然不是…我们接下来的任务就是<strong>代码注入</strong></p>
+<h1 id="App-执行哪些代码"><a href="#App-执行哪些代码" class="headerlink" title="App 执行哪些代码?"></a>App 执行哪些代码?</h1><p>在开始代码注入之前，我们先了解一下一个 iOS 的 App 在运行的时候,究竟会执行哪些代码,以及我们从哪里入手注入代码</p>
+<ol>
+<li>MachO。App 的二进制文件，我们写的所有代码都会在这里，后面的文章会介绍</li>
+<li>Framework 可以是我们写的，也可以是第三方的代码</li>
+<li>系统库</li>
+</ol>
+<p>其中系统库，在非越狱手机上我们改不了。MachO 我们可以修改，但是比较麻烦，需要会写汇编。而 Framework 是我们经常接触也是最容易入手的，我们自己写一个就行了…</p>
+<p>那么现在的问题就是我们写的 Framework 别人的 APP 怎么会执行呢?</p>
+<p>MachO 文件里面有一个 Load Commands 的部分，DYLD(the dynamic link editor 是苹果的动态链接器，后面的文章也会介绍)会读取这个 Load Commands 里面的内容，并加载到内存中，如果我们能把我们自己的 Framework 插入到别人 APP 的 MachO 的 Load Commands 里，那么我们的代码就自然的被执行了</p>
+<p>那么现在的问题就变成了如何把我们写的 Framework 插入到别人 App 的 MachO 文件里?</p>
+<p><a href="https://github.com/KJCracks/yololib"><strong>yololib</strong></a> 这是一个终端命令行工具，就是用来把我们写的 Framework 插入到 MachO 文件里，代码不多就 200 来行，感兴趣的可以看看源码，用法是 <code>yololib 参数1 参数2</code> 其中参数 1 是 MachO 文件,参数 2 是我们的 Framework 相对于 MachO 文件的路径。</p>
+<p>下载源码之后是我们很熟悉的 Xcode 工程，只不过是 Mac 上的命令行工程而不是我们常用的 iOS 工程，修改一下 Deployment Target 到你的 Xcode 兼容的最低版本，然后编译一下就能在编译后的文件夹下找到。编译后的文件夹可以通过点击 Xcode 上的 Product -&gt; Show Build Folder in Finder 中的 Products-&gt;Debug 找到。</p>
+<p>为了方便我们使用这个工具,建议把它放到系统的 usr&#x2F;local&#x2F;bin 目录下，记得给它提升可执行权限(在终端<code>chmod +x yololib</code>)，这样我们任意打开一个终端都可以使用这个命令了，也方便我们使用脚本来操作。</p>
+<p>好了，现在万事具备，只欠我们动手操作了…还记得上一篇文章讲到的内容吗，使用 shell 脚本重签 App。可以接着使用上次的工程，也可以新建一个工程来执行后面的代码注入，配置好脚本之后只需要放入一个砸壳的 app 包到根目录下就好了。我这里新建一个项目来演示后面的代码注入</p>
+<h1 id="代码注入的步骤"><a href="#代码注入的步骤" class="headerlink" title="代码注入的步骤"></a>代码注入的步骤</h1><h2 id="新建-Framework"><a href="#新建-Framework" class="headerlink" title="新建 Framework"></a>新建 Framework</h2><p>在完成了上一篇 shell 脚本重签的步骤之后，我们先来新建一个 Framework，把我们的 Framework 准备好</p>
+<img src="/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/df6e2cd5a8a44393bd4c2ad7e6e968b3~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>Framework 的名字就叫 FrankyHook 这个名字无所谓，但是要记住因为在后续使用 yololib 的时候要用到，在里面新建一个类 CodeInject 这个叫什么也无所谓，继承自 NSObject 就够了，主要是需要它的 load 方法，并在 load 方法里面打印点内容</p>
+<img src="/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/e6907858950d4925955c8e35546d239a~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<h2 id="在脚本中添加代码"><a href="#在脚本中添加代码" class="headerlink" title="在脚本中添加代码"></a>在脚本中添加代码</h2><p>记得修改为你自己的 Framework 名字，要是照着我的抄的的当我没说</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">yololib <span class="string">&quot;<span class="variable">$&#123;BUILT_PRODUCTS_DIR&#125;</span>/<span class="variable">$&#123;TARGET_NAME&#125;</span>.app/<span class="variable">$&#123;APP_BINARY&#125;</span>&quot;</span> <span class="string">&quot;Frameworks/FrankyHook.framework/FrankyHook&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>这里面有一个小细节，就是你的脚本运行一定要放在嵌入 Frameworks 之后，不然每次脚本运行之后再嵌入 Frameworks 的话 Xcode 会结合 Framework 的 Info.plist 重新处理工程源代码下的 Info.plist 文件到编译的包中，会导致少了很多配置从而启动崩溃。</p>
+<img src="/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/c1d7d440bea24897a23196bf5f8333eb~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>实不相瞒，做了四年多的 iOS 开发，也是到今天才知道这个地方居然可以拖动…</p>
+<h2 id="command-R-看控制台输出"><a href="#command-R-看控制台输出" class="headerlink" title="command + R 看控制台输出"></a>command + R 看控制台输出</h2><img src="/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/756a92a31db340e29078c8fa6a4e15f5~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>怎么样，是不是发现我们已经可以在 WeChat 里面执行我们的代码了？接下来我们来实现两个小小的需求</p>
+<h1 id="需要具备的一些知识点"><a href="#需要具备的一些知识点" class="headerlink" title="需要具备的一些知识点"></a>需要具备的一些知识点</h1><p>接下来的内容需要对 Objective-C 的 rumtime 有一定的了解,了解的同学这部分可以直接跳过,看下一部分<br></p>
+<p><strong>Method Swizzle方法交换</strong><br></p>
+<p>runtime 提供了一些 api 来让我们实现方法交换,现在假设有这么一段代码:</p>
+<img src="/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/448f73738ec247ffb300687ec6f3b910~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>使用 NSURL 初始化 URL 的时候，如果 URL 中含有中文，那么初始化就会失败返回 nil。这个问题做过 iOS 开发的同学应该都遇到过，解决的办法就是对 URL 进行一次百分号编码，现在假设一种情景，你刚入职一家新公司，发现了这个问题，然后在工程里面搜索了一下，发现我的天啦，到处都是这种 URL 中夹着中文，而没有进行编码的情况，那么这个时候，你是选择一个一个的去修改呢，还是会想其他更好的办法?</p>
+<p>使用方法交换就是更好的办法，新建一个 NSURL 的分类，在分类的 load 方法中,实现我们的方法交换</p>
+<img src="/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/37ae39be58a44d84be2e8b3d8f776c33~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>一个 OC 方法，我们可以分为两个部分，一个是方法名 SEL，一个是方法的实现 IMP。正常情况下，一个方法的名字对应着它的实现。而有时候我们通过 runtime 来交换方法的实现。就如上面的 <code>load</code> 方法里面的代码，默认情况下方法 <code>one</code> 和方法 <code>two</code> 的实现都是指向他们自己的 IMP 的，通过 <code>method_exchangeImplementations()</code> 函数交换之后，方法 <code>one</code> 的实现就指向了方法 <code>two</code> 的实现，而方法 <code>two</code> 的实现就指向了方法 <code>one</code> 的实现，当代码调用 <code>URLWithString:</code> 的时候，就会来到我们的 <code>HK_URLWithString:</code> 方法，当代码调用 <code>HK_URLWithString:</code> 的时候，就会执行 <code>URLWithString:</code> 方法</p>
+<p>这样原来工程里的所有 <code>URLWithString:</code> 方法都会执行到我们的代码中去，首先调用一次原始的初始化 URL 的方法，看能否成功生成 url 如果为 nil，就表示我们可能需要对字符串 str 进行一下编码。再用编码过后的 str 初始化 url，这样就不用浪费时间精力去一个一个的去修改工程里的代码了</p>
+<h1 id="拦截微信的注册点击"><a href="#拦截微信的注册点击" class="headerlink" title="拦截微信的注册点击"></a>拦截微信的注册点击</h1><p>使用 Debug View Hierarchy 查看微信的登录注册页面的视图层次结构，找到注册的按钮，查看按钮的 target 和 action</p>
+<img src="/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/ca5a9d2062f94a66819e4b3d7c70342e~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>我们知道了注册按钮点击的时候，会调用 <code>WCAccountLoginControlLogic</code> 的 <code>onFirstViewRegister</code> 方法，而且我们也已经可以在我们的 Framework 中执行我们的注入代码了，那么接下来我们如何实现拦截微信的注册按钮点击呢？当然可以使用 Method Swizzle 来实现</p>
+<p>在开始写代码实现方法交换之前，还有一个小小的问题，虽然我们根据经验可以知道这个 <code>onFirstViewRegister</code> 应该是个对象方法，可能没有返回值也没有参数，但这些都只是根据我们经验的猜测…关考猜测可不行，那么怎么验证我们的猜测呢？</p>
+<p><a href="https://github.com/nygard/class-dump"><strong>Class-dump</strong></a> 和 <strong>yololib</strong> 一样，也是一个终端命令行工具，同样也可以放到 usr&#x2F;local&#x2F;bin 目录下可以全局使用，它的作用是可以把 MachO 文件里的头文件信息全部导出来，我们可以 cd 到工程编译生成的 APP 包里面,使用以下命令<br></p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">class-dump -H WeChat -o ./headers/</span><br></pre></td></tr></table></figure>
+
+<p>将它的头文件都导到一个 headers 的文件夹内，这个过程需要一点时间</p>
+<img src="/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/1d783025112d46a7b01eaec3b73c3bd7~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>看了下这个文件挺大的，导完之后可以把它剪切到工程根目录下，这样给我们手机也能省点空间，也确实完全没必要放在 APP 包里面</p>
+<img src="/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/d734b1bee7d54b31b18821dba3857f24~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>可以看到这里面有 15074 个项目，微信的头文件还真不少呢…这么大的文件夹如果我们用 Xcode 打开搜索的话，一定会十分的痛苦。这里推荐使用 sublime…更轻量一点，找起头文件来也更快，搜索一番发现如图所示</p>
+<img src="/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/91d0302f97474f3295c318d5234d8944~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>这样就确保了这个 <code>onFirstViewRegister</code> 方法是无返回值无参数的，可以开始编写代码实现拦截了</p>
+<p>现在我们可以来到我们 Framework 的 CodeInject.m 文件写点代码</p>
+<img src="/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/1303896e20f242a69833262c714c29e9~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>代码就这么点，现在 command + R 运行起来之后，再次点击微信的注册按钮试试看？</p>
+<img src="/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/c3fbbc9607184b71b639734374708a27~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<h1 id="窃取用户的账号密码"><a href="#窃取用户的账号密码" class="headerlink" title="窃取用户的账号密码"></a>窃取用户的账号密码</h1><p>上面的需求仅仅只是破坏了功能，原来的功能都没法使用了。接下来这个需求让用户在神不知鬼不觉的情况下，账号密码就被窃取了（所以市面上那些来源不明的 App 真不要下载使用，除非你也是搞逆向研究的）。那么我们在什么时候，能拿到用户的账号和密码呢？当然是点击登录按钮的时候，所以你懂的，使用 viewDebug 查看登录按钮</p>
+<img src="/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/f7a259179375477c850d9ec4e85e6cff~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>登录按钮点击的 target:<code>WCAccountMainLoginViewController</code>,action:<code>onNext</code>;</p>
+<p>查看刚刚 class-dump 出来的头文件发现这个 onNext 方法是没有参数的，那么我们需要的账号密码在哪里呢？哈哈，有经验的同学是不是发现这两个名字是不是莫名的熟悉</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line">WCAccountTextFieldItem *_textFieldUserNameItem;</span><br><span class="line">WCAccountTextFieldItem *_textFieldUserPwdItem;</span><br></pre></td></tr></table></figure>
+
+<img src="/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/f71ee81de1e24f7e9abf2f6c5100420f~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>变量名是挺熟悉的，但是这个 <code>WCAccountTextFieldItem</code> 我们不知道是个什么东西怎么办？头文件都在手上了还问怎么办，接着搜索啊…</p>
+<img src="/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/750ecea4818247c8b7773d78750e4cab~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p><code>WCAccountTextFieldItem</code> 里面貌似没啥东西，那就看它父类 <code>WCBaseTextFieldItem</code></p>
+<img src="/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/f44b4b6fd6b94c2fb6cfb3e138e3b213~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>在 <code>WCBaseTextFieldItem</code> 类里面发现了一个 <code>WXUITextField</code> 的东西,跟我们熟悉的 <code>UITextField</code> 很像了，我们猜测可能就是这个 <code>m_textField</code> 存放着我们想要的东西，先不着急写代码</p>
+<p>现在我们可以再次使用 viewDebug 工具调试查看一下我们的账号和密码在哪里，并且使用 lldb 来动态调试验证我们的猜测</p>
+<img src="/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/4f7d5f230f76437e9438557b03ff5490~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>首先控制器的地址，可以由登录按钮的 target 获取到。获取到控制器之后，再使用 KVC 大法获取成员变量 <code>_textFieldUserPwdItem</code> 的地址(密码都能获取到了，账号也是一样的操作)并打印它。获取到 <code>_textFieldUserPwdItem</code> 的地址之后，再次使用 KVC 大法获取它的成员变量 <code>m_textField</code> 的地址并打印这个对象，好家伙，明文密码不就在这儿了吗!!!</p>
+<p>接下来我们通过代码来实现需求:</p>
+<img src="/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/935ac041181d4ebb9647deb4dadd555d~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>这代码看起来跟拦截微信注册的代码差不太多，那么我们 command + R 运行看看结果</p>
+<img src="/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/736508d48fa74925978c44a80393e619~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>WTF？账号密码确实是都获取到了，但是 APP 却崩溃了？为什么会发生崩溃，崩溃信息是我们经常能够遇到的经典报错 <code>unrecognized selector sent to instance 0x10b15b400</code> 说是控制器 <code>WCAccountMainLoginViewController</code> 无法识别 <code>FK_onNext</code> 这个方法</p>
+<p>我们思考一下，方法交换为什么一般推荐写在想要交换方法的类所在的分类里面？因为在想要交换方法的类的分类当中，我们会新增一个方法，用来实现我们的逻辑，也正好是因为在分类中，所以当前类自然的添加了我们新增的方法，这样交换下来就不会出现找不到方法的错误</p>
+<p>而上面的代码，我们的本意也是希望在 <code>WCAccountMainLoginViewController</code> 里面新增一个方法处理我们的逻辑，并交换 <code>onNext</code> 方法，但现在的问题是我们在 <code>CodeInject</code> 这个类的 <code>load</code> 方法中，那么有什么办法可以解决这个问题呢？</p>
+<h3 id="动态添加方法"><a href="#动态添加方法" class="headerlink" title="动态添加方法"></a>动态添加方法</h3><p>rumtime 的 api 提供了运行时动态添加方法的能力</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">BOOL</span><br><span class="line"><span class="title function_">class_addMethod</span><span class="params">(Class _Nullable cls, SEL _Nonnull name, IMP _Nonnull imp, <span class="type">const</span> <span class="type">char</span> * _Nullable types)</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>参数1: 给哪个类添加方法</li>
+<li>参数2: 方法的名字</li>
+<li>参数3: 方法的实现</li>
+<li>参数4: 方法的参数和返回值描述,用一些特定的符号表示,也可以不写</li>
+<li>参数5: BOOL值,表示是否添加成功</li>
+</ul>
+<p>那么借用这个 api 我们能想到什么解决办法呢，给 <code>WCAccountMainLoginViewController</code> 控制器添加我们的 <code>FK_onNext</code> 方法，再让 <code>FK_onNext</code> 和 <code>onNext</code> 方法交换，最终的代码如下</p>
+<img src="/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/c78c52886b3b41c3849c099e1634f3f3~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>再次 command + R 运行发现，既能成功获取到用户输入的账号密码，又能成功的去调用微信的登录逻辑了</p>
+<h3 id="动态替换方法"><a href="#动态替换方法" class="headerlink" title="动态替换方法"></a>动态替换方法</h3><p>现在除了添加新方法的方式，我们还有其他的办法吗？当然有(强大的runtime) rumtime 的 api 还提供了运行时替换方法的能力</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">IMP _Nullable</span><br><span class="line"><span class="title function_">class_replaceMethod</span><span class="params">(Class _Nullable cls, SEL _Nonnull name, IMP _Nonnull imp, <span class="type">const</span> <span class="type">char</span> * _Nullable types)</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>参数1: 替换哪个类</li>
+<li>参数2: 方法的名字</li>
+<li>参数3: 方法的实现</li>
+<li>参数4: 方法的参数和返回值描述,用一些特定的符号表示,也可以不写</li>
+<li>返回值: IMP，原始的方法实现</li>
+</ul>
+<p>如果使用这个方式，那么我们应该是将原始的 <code>onNext</code> 方法替换成我们的 <code>FK_onNext</code> 方法，那么我们如何去调用微信原始的 <code>onNext</code> 方法呢，在替换之前将原始的 <code>onNext</code> 方法的实现 IMP 记录下来，然后在我们的 <code>FK_onNext</code> 方法中使用这个记录的 IMP 来实现对原始 <code>onNext</code> 的调用，具体代码如下图:</p>
+<img src="/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/dea8641224fa410a9830ea57b23be7d1~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>对比方法交换的代码实现，我们发现方法替换的方式需要多一个变量 <code>originalIMP</code>，用来记录原始的 <code>onNext</code> 方法的实现，而且还会报个警告，虽然少了一点点代码，但看起来也不是那么好理解…当然，这里使用方法替换也只是为了学习一下 runtime 提供的 api，感受一下 rumtime 的强大，具体使用哪个方式就看个人的喜好</p>
+<h3 id="动态获取方法实现和设置方法实现"><a href="#动态获取方法实现和设置方法实现" class="headerlink" title="动态获取方法实现和设置方法实现"></a>动态获取方法实现和设置方法实现</h3><p>那么,还有更骚的操作吗？当然有…</p>
+<p>获取方法 m 的实现 IMP</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">IMP _Nonnull</span><br><span class="line"><span class="title function_">method_getImplementation</span><span class="params">(Method _Nonnull m)</span></span><br></pre></td></tr></table></figure>
+
+<p>设置方法 m 的实现 IMP</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">IMP _Nonnull</span><br><span class="line"><span class="title function_">method_setImplementation</span><span class="params">(Method _Nonnull m, IMP _Nonnull imp)</span></span><br></pre></td></tr></table></figure>
+
+<p>这个原理其实跟替换差不太多，首先获取原始 <code>onNext</code> 的实现并记录，然后设置新的 IMP(我们写的 <code>FK_onNext</code> )给 <code>WCAccountMainLoginViewController</code> 的 <code>onNext</code> 方法，具体代码如下：</p>
+<img src="/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/dfd4a8d6d9b0480584bcf4c782353eaf~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
+
+<p>好了，到此我们为了实现窃取用户的账号密码已经使用了三种 runtime 提供的方式…到这里就真的没了</p>
+<p>从上一篇 iOS 重签名，到这一篇的代码注入，如果你使用过 MonkeyDev 工具的 MonkeyApp 就会发现是如此的相似。其实这就是 MonkeyDev 的实现原理，只是 MonkeyDev 的实现更加复杂。</p>
+<p>下一篇文章开始介绍我们最近一直提到的 MachO 文件，到底什么是 MachO 文件，它包含了什么东西，干什么用的…</p>
+<h1 id="反微信重签名检测"><a href="#反微信重签名检测" class="headerlink" title="反微信重签名检测"></a>反微信重签名检测</h1><p>如果你希望在重签名的微信上登录账号使用，最好在添加以下代码绕过微信的检测。否则会有封号的风险，不保证以下代码长期有效。将以下代码粘贴到 CodeInject.m 文件中，不要放到类的实现中就行。</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="meta">#import <span class="string">&lt;objc/runtime.h&gt;</span></span></span><br><span class="line"><span class="comment">// 函数指针</span></span><br><span class="line"><span class="built_in">NSUUID</span>* (*original_advertisingIdentifier)(<span class="type">id</span>, SEL);</span><br><span class="line"><span class="type">void</span> (*original_setBundleId)(<span class="type">id</span>, SEL, <span class="built_in">NSString</span>*);</span><br><span class="line"><span class="type">void</span> (*original_setClientSeqId)(<span class="type">id</span>, SEL, <span class="built_in">NSString</span>*);</span><br><span class="line"><span class="type">void</span> (*original_setDeviceName)(<span class="type">id</span>, SEL, <span class="built_in">NSString</span>*);</span><br><span class="line"><span class="type">void</span> (*original_addLogInfo_withMessage)(<span class="type">id</span>, SEL,<span class="type">int</span> *,<span class="keyword">const</span> <span class="type">char</span> *);</span><br><span class="line"><span class="type">BOOL</span> (*original_HasInstallJailbreakPluginInvalidIAPPurchase)(<span class="type">id</span>, SEL);</span><br><span class="line"><span class="type">BOOL</span> (*original_IsJailBreak)(<span class="type">id</span>, SEL);</span><br><span class="line"><span class="type">BOOL</span> (*original_HasInstallJailbreakPlugin)(<span class="type">id</span>, SEL, <span class="type">id</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// hook函数</span></span><br><span class="line"><span class="keyword">static</span> <span class="built_in">NSUUID</span>* hook_advertisingIdentifier(<span class="type">id</span> <span class="keyword">self</span>, SEL _cmd) &#123;</span><br><span class="line">    <span class="built_in">NSUUID</span> *advertisingIdentifier;</span><br><span class="line">    <span class="built_in">NSString</span> *key = <span class="string">@&quot;idfa&quot;</span>;</span><br><span class="line">    <span class="built_in">NSString</span> *idfa = [[<span class="built_in">NSUserDefaults</span> standardUserDefaults] stringForKey:key];</span><br><span class="line">    <span class="keyword">if</span> (idfa &amp;&amp; idfa.length)&#123;</span><br><span class="line">        advertisingIdentifier = [[<span class="built_in">NSUUID</span> alloc] initWithUUIDString:idfa];</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        advertisingIdentifier = [<span class="built_in">NSUUID</span> UUID];</span><br><span class="line">        [[<span class="built_in">NSUserDefaults</span> standardUserDefaults] setObject:advertisingIdentifier.UUIDString forKey:key];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> advertisingIdentifier;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">static</span> <span class="type">void</span> hook_setBundleId(<span class="type">id</span> <span class="keyword">self</span>, SEL _cmd, <span class="built_in">NSString</span> *bundleId) &#123;</span><br><span class="line">    <span class="keyword">if</span> ([bundleId isEqualToString:[<span class="built_in">NSBundle</span> mainBundle].bundleIdentifier]) &#123;</span><br><span class="line">        bundleId = <span class="string">@&quot;com.tencent.xin&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    original_setBundleId(<span class="keyword">self</span>, _cmd, bundleId);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">static</span> <span class="type">void</span> hook_setClientDeqId(<span class="type">id</span> <span class="keyword">self</span>, SEL _cmd, <span class="built_in">NSString</span> *clientSeqId) &#123;</span><br><span class="line">    <span class="built_in">NSString</span> *key = <span class="string">@&quot;clientSeqId&quot;</span>;</span><br><span class="line">    <span class="built_in">NSString</span> *clientSeqId_fist = [[<span class="built_in">NSUserDefaults</span> standardUserDefaults] stringForKey:key];</span><br><span class="line">    <span class="keyword">if</span> (!clientSeqId_fist || clientSeqId_fist.length == <span class="number">0</span>) &#123;</span><br><span class="line">        clientSeqId_fist = [[<span class="built_in">NSUUID</span> UUID].UUIDString stringByReplacingOccurrencesOfString:<span class="string">@&quot;-&quot;</span> withString:<span class="string">@&quot;&quot;</span>];</span><br><span class="line">        [[<span class="built_in">NSUserDefaults</span> standardUserDefaults] setObject:clientSeqId_fist forKey:key];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">NSString</span> *newClientSeqId;</span><br><span class="line">    <span class="keyword">if</span> ([clientSeqId containsString:<span class="string">@&quot;-&quot;</span>]) &#123;</span><br><span class="line">        <span class="built_in">NSRange</span> range = [clientSeqId rangeOfString:<span class="string">@&quot;-&quot;</span>];</span><br><span class="line">        <span class="built_in">NSString</span> *clientSeqId_last = [clientSeqId substringFromIndex:range.location];</span><br><span class="line">        newClientSeqId = [<span class="built_in">NSString</span> stringWithFormat:<span class="string">@&quot;%@%@&quot;</span>, clientSeqId_fist, clientSeqId_last];</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        newClientSeqId = clientSeqId_fist;</span><br><span class="line">    &#125;</span><br><span class="line">    original_setClientSeqId(<span class="keyword">self</span>, _cmd, newClientSeqId);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">static</span> <span class="type">void</span> hook_setDeviceName(<span class="type">id</span> <span class="keyword">self</span>, SEL _cmd, <span class="built_in">NSString</span> *deviceName) &#123;</span><br><span class="line">    original_setDeviceName(<span class="keyword">self</span>, _cmd, <span class="string">@&quot;iPhone&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">static</span> <span class="type">void</span> hook_addLogInfo_withMessage(<span class="type">id</span> <span class="keyword">self</span>, SEL _cmd, <span class="type">int</span> *arg1, <span class="keyword">const</span> <span class="type">char</span> *arg2) &#123;</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">static</span> <span class="type">BOOL</span> hook_original_HasInstallJailbreakPluginInvalidIAPPurchase(<span class="type">id</span> <span class="keyword">self</span>, SEL _cmd) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">NO</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">static</span> <span class="type">BOOL</span> hook_IsJailBreak(<span class="type">id</span> <span class="keyword">self</span>, SEL _cmd) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">NO</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">static</span> <span class="type">BOOL</span> hook_HasInstallJailbreakPlugin(<span class="type">id</span> <span class="keyword">self</span>, SEL _cmd, <span class="type">id</span> arg1) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">NO</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 所有被 hook 的类和函数放在这里的构造函数中</span></span><br><span class="line">__attribute__((constructor)) <span class="keyword">static</span> <span class="type">void</span> hookMethods(<span class="type">void</span>) &#123;</span><br><span class="line">    <span class="keyword">@autoreleasepool</span> &#123;</span><br><span class="line">        Class cls = <span class="built_in">NSClassFromString</span>(<span class="string">@&quot;ASIdentifierManager&quot;</span>);</span><br><span class="line">        <span class="keyword">if</span> (cls) &#123;</span><br><span class="line">            Method method = class_getInstanceMethod(cls, <span class="keyword">@selector</span>(advertisingIdentifier));</span><br><span class="line">            <span class="keyword">if</span> (method) &#123;</span><br><span class="line">                original_advertisingIdentifier = (<span class="built_in">NSUUID</span>*(*)(<span class="type">id</span>, SEL))method_getImplementation(method);</span><br><span class="line">                method_setImplementation(method, (IMP)hook_advertisingIdentifier);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        cls = <span class="built_in">NSClassFromString</span>(<span class="string">@&quot;ManualAuthAesReqData&quot;</span>);</span><br><span class="line">        <span class="keyword">if</span> (cls) &#123;</span><br><span class="line">            Method method = class_getInstanceMethod(cls, <span class="keyword">@selector</span>(setBundleId:));</span><br><span class="line">            <span class="keyword">if</span> (method) &#123;</span><br><span class="line">                original_setBundleId = (<span class="type">void</span>(*)(<span class="type">id</span>,SEL,<span class="built_in">NSString</span>*))method_getImplementation(method);</span><br><span class="line">                method_setImplementation(method, (IMP)hook_setBundleId);</span><br><span class="line">            &#125;</span><br><span class="line">            method = class_getInstanceMethod(cls, <span class="keyword">@selector</span>(setClientSeqId:));</span><br><span class="line">            <span class="keyword">if</span> (method) &#123;</span><br><span class="line">                original_setBundleId = (<span class="type">void</span>(*)(<span class="type">id</span>,SEL,<span class="built_in">NSString</span>*))method_getImplementation(method);</span><br><span class="line">                method_setImplementation(method, (IMP)hook_setBundleId);</span><br><span class="line">            &#125;</span><br><span class="line">            method = class_getInstanceMethod(cls, <span class="keyword">@selector</span>(setDeviceName:));</span><br><span class="line">            <span class="keyword">if</span> (method) &#123;</span><br><span class="line">                original_setDeviceName = (<span class="type">void</span>(*)(<span class="type">id</span>,SEL,<span class="built_in">NSString</span>*))method_getImplementation(method);</span><br><span class="line">                method_setImplementation(method, (IMP)hook_setDeviceName);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        cls = <span class="built_in">NSClassFromString</span>(<span class="string">@&quot;MMCrashReportExtLogMgr&quot;</span>);</span><br><span class="line">        <span class="keyword">if</span> (cls) &#123;</span><br><span class="line">            Method method = class_getInstanceMethod(cls, <span class="keyword">@selector</span>(addLogInfo:withMessage:));</span><br><span class="line">            <span class="keyword">if</span> (method) &#123;</span><br><span class="line">                original_addLogInfo_withMessage = (<span class="type">void</span>(*)(<span class="type">id</span>,SEL,<span class="type">int</span>*,<span class="keyword">const</span> <span class="type">char</span>*))method_getImplementation(method);</span><br><span class="line">                method_setImplementation(method, (IMP)hook_addLogInfo_withMessage);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        cls = <span class="built_in">NSClassFromString</span>(<span class="string">@&quot;JailBreakHelper&quot;</span>);</span><br><span class="line">        <span class="keyword">if</span> (cls) &#123;</span><br><span class="line">            Method method = class_getInstanceMethod(cls, <span class="keyword">@selector</span>(HasInstallJailbreakPluginInvalidIAPPurchase));</span><br><span class="line">            <span class="keyword">if</span> (method) &#123;</span><br><span class="line">                original_HasInstallJailbreakPluginInvalidIAPPurchase = (<span class="type">BOOL</span>(*)(<span class="type">id</span>,SEL))method_getImplementation(method);</span><br><span class="line">                method_setImplementation(method, (IMP)hook_original_HasInstallJailbreakPluginInvalidIAPPurchase);</span><br><span class="line">            &#125;</span><br><span class="line">            method = class_getInstanceMethod(cls, <span class="keyword">@selector</span>(IsJailBreak));</span><br><span class="line">            <span class="keyword">if</span> (method) &#123;</span><br><span class="line">                original_IsJailBreak = (<span class="type">BOOL</span>(*)(<span class="type">id</span>,SEL))method_getImplementation(method);</span><br><span class="line">                method_setImplementation(method, (IMP)hook_IsJailBreak);</span><br><span class="line">            &#125;</span><br><span class="line">            method = class_getInstanceMethod(cls, <span class="keyword">@selector</span>(HasInstallJailbreakPlugin:));</span><br><span class="line">            <span class="keyword">if</span> (method) &#123;</span><br><span class="line">                original_HasInstallJailbreakPlugin = (<span class="type">BOOL</span>(*)(<span class="type">id</span>,SEL,<span class="type">id</span>))method_getImplementation(method);</span><br><span class="line">                method_setImplementation(method, (IMP)hook_HasInstallJailbreakPlugin);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <categories>
+        <category>iOS 逆向与安全</category>
+      </categories>
+      <tags>
+        <tag>yololib</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>内存管理</title>
     <url>/2025/05/15/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/</url>
     <content><![CDATA[<h1 id="相关面试题"><a href="#相关面试题" class="headerlink" title="相关面试题"></a>相关面试题</h1><ul>
@@ -5290,156 +5622,6 @@ commonModes并不是一个真正单独的模式
       <categories>
         <category>iOS 底层原理</category>
       </categories>
-  </entry>
-  <entry>
-    <title>代码注入</title>
-    <url>/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/</url>
-    <content><![CDATA[<p>上一篇我们已经讲到使用 shell 脚本来重签并调试别人的 APP，那么我们又是重签又是附加调试别人的 APP 是为了啥呢？是太闲了吗，当然不是…我们接下来的任务就是<strong>代码注入</strong></p>
-<h1 id="App-执行哪些代码"><a href="#App-执行哪些代码" class="headerlink" title="App 执行哪些代码?"></a>App 执行哪些代码?</h1><p>在开始代码注入之前，我们先了解一下一个 iOS 的 App 在运行的时候,究竟会执行哪些代码,以及我们从哪里入手注入代码</p>
-<ol>
-<li>MachO。App 的二进制文件，我们写的所有代码都会在这里，后面的文章会介绍</li>
-<li>Framework 可以是我们写的，也可以是第三方的代码</li>
-<li>系统库</li>
-</ol>
-<p>其中系统库，在非越狱手机上我们改不了。MachO 我们可以修改，但是比较麻烦，需要会写汇编。而 Framework 是我们经常接触也是最容易入手的，我们自己写一个就行了…</p>
-<p>那么现在的问题就是我们写的 Framework 别人的 APP 怎么会执行呢?</p>
-<p>MachO 文件里面有一个 Load Commands 的部分，DYLD(the dynamic link editor 是苹果的动态链接器，后面的文章也会介绍)会读取这个 Load Commands 里面的内容，并加载到内存中，如果我们能把我们自己的 Framework 插入到别人 APP 的 MachO 的 Load Commands 里，那么我们的代码就自然的被执行了</p>
-<p>那么现在的问题就变成了如何把我们写的 Framework 插入到别人 App 的 MachO 文件里?</p>
-<p><a href="https://github.com/KJCracks/yololib"><strong>yololib</strong></a> 这是一个终端命令行工具，就是用来把我们写的 Framework 插入到 MachO 文件里，代码不多就 200 来行，感兴趣的可以看看源码，用法是 <code>yololib 参数1 参数2</code> 其中参数 1 是 MachO 文件,参数 2 是我们的 Framework 相对于 MachO 文件的路径。</p>
-<p>下载源码之后是我们很熟悉的 Xcode 工程，只不过是 Mac 上的命令行工程而不是我们常用的 iOS 工程，修改一下 Deployment Target 到你的 Xcode 兼容的最低版本，然后编译一下就能在编译后的文件夹下找到。编译后的文件夹可以通过点击 Xcode 上的 Product -&gt; Show Build Folder in Finder 中的 Products-&gt;Debug 找到。</p>
-<p>为了方便我们使用这个工具,建议把它放到系统的 usr&#x2F;local&#x2F;bin 目录下，记得给它提升可执行权限(在终端<code>chmod +x yololib</code>)，这样我们任意打开一个终端都可以使用这个命令了，也方便我们使用脚本来操作。</p>
-<p>好了，现在万事具备，只欠我们动手操作了…还记得上一篇文章讲到的内容吗，使用 shell 脚本重签 App。可以接着使用上次的工程，也可以新建一个工程来执行后面的代码注入，配置好脚本之后只需要放入一个砸壳的 app 包到根目录下就好了。我这里新建一个项目来演示后面的代码注入</p>
-<h1 id="代码注入的步骤"><a href="#代码注入的步骤" class="headerlink" title="代码注入的步骤"></a>代码注入的步骤</h1><h2 id="新建-Framework"><a href="#新建-Framework" class="headerlink" title="新建 Framework"></a>新建 Framework</h2><p>在完成了上一篇 shell 脚本重签的步骤之后，我们先来新建一个 Framework，把我们的 Framework 准备好</p>
-<img src="/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/df6e2cd5a8a44393bd4c2ad7e6e968b3~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>Framework 的名字就叫 FrankyHook 这个名字无所谓，但是要记住因为在后续使用 yololib 的时候要用到，在里面新建一个类 CodeInject 这个叫什么也无所谓，继承自 NSObject 就够了，主要是需要它的 load 方法，并在 load 方法里面打印点内容</p>
-<img src="/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/e6907858950d4925955c8e35546d239a~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<h2 id="在脚本中添加代码"><a href="#在脚本中添加代码" class="headerlink" title="在脚本中添加代码"></a>在脚本中添加代码</h2><p>记得修改为你自己的 Framework 名字，要是照着我的抄的的当我没说</p>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">yololib <span class="string">&quot;<span class="variable">$&#123;BUILT_PRODUCTS_DIR&#125;</span>/<span class="variable">$&#123;TARGET_NAME&#125;</span>.app/<span class="variable">$&#123;APP_BINARY&#125;</span>&quot;</span> <span class="string">&quot;Frameworks/FrankyHook.framework/FrankyHook&quot;</span></span><br></pre></td></tr></table></figure>
-
-<p>这里面有一个小细节，就是你的脚本运行一定要放在嵌入 Frameworks 之后，不然每次脚本运行之后再嵌入 Frameworks 的话 Xcode 会结合 Framework 的 Info.plist 重新处理工程源代码下的 Info.plist 文件到编译的包中，会导致少了很多配置从而启动崩溃。</p>
-<img src="/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/c1d7d440bea24897a23196bf5f8333eb~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>实不相瞒，做了四年多的 iOS 开发，也是到今天才知道这个地方居然可以拖动…</p>
-<h2 id="command-R-看控制台输出"><a href="#command-R-看控制台输出" class="headerlink" title="command + R 看控制台输出"></a>command + R 看控制台输出</h2><img src="/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/756a92a31db340e29078c8fa6a4e15f5~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>怎么样，是不是发现我们已经可以在 WeChat 里面执行我们的代码了？接下来我们来实现两个小小的需求</p>
-<h1 id="需要具备的一些知识点"><a href="#需要具备的一些知识点" class="headerlink" title="需要具备的一些知识点"></a>需要具备的一些知识点</h1><p>接下来的内容需要对 Objective-C 的 rumtime 有一定的了解,了解的同学这部分可以直接跳过,看下一部分<br></p>
-<p><strong>Method Swizzle方法交换</strong><br></p>
-<p>runtime 提供了一些 api 来让我们实现方法交换,现在假设有这么一段代码:</p>
-<img src="/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/448f73738ec247ffb300687ec6f3b910~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>使用 NSURL 初始化 URL 的时候，如果 URL 中含有中文，那么初始化就会失败返回 nil。这个问题做过 iOS 开发的同学应该都遇到过，解决的办法就是对 URL 进行一次百分号编码，现在假设一种情景，你刚入职一家新公司，发现了这个问题，然后在工程里面搜索了一下，发现我的天啦，到处都是这种 URL 中夹着中文，而没有进行编码的情况，那么这个时候，你是选择一个一个的去修改呢，还是会想其他更好的办法?</p>
-<p>使用方法交换就是更好的办法，新建一个 NSURL 的分类，在分类的 load 方法中,实现我们的方法交换</p>
-<img src="/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/37ae39be58a44d84be2e8b3d8f776c33~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>一个 OC 方法，我们可以分为两个部分，一个是方法名 SEL，一个是方法的实现 IMP。正常情况下，一个方法的名字对应着它的实现。而有时候我们通过 runtime 来交换方法的实现。就如上面的 <code>load</code> 方法里面的代码，默认情况下方法 <code>one</code> 和方法 <code>two</code> 的实现都是指向他们自己的 IMP 的，通过 <code>method_exchangeImplementations()</code> 函数交换之后，方法 <code>one</code> 的实现就指向了方法 <code>two</code> 的实现，而方法 <code>two</code> 的实现就指向了方法 <code>one</code> 的实现，当代码调用 <code>URLWithString:</code> 的时候，就会来到我们的 <code>HK_URLWithString:</code> 方法，当代码调用 <code>HK_URLWithString:</code> 的时候，就会执行 <code>URLWithString:</code> 方法</p>
-<p>这样原来工程里的所有 <code>URLWithString:</code> 方法都会执行到我们的代码中去，首先调用一次原始的初始化 URL 的方法，看能否成功生成 url 如果为 nil，就表示我们可能需要对字符串 str 进行一下编码。再用编码过后的 str 初始化 url，这样就不用浪费时间精力去一个一个的去修改工程里的代码了</p>
-<h1 id="拦截微信的注册点击"><a href="#拦截微信的注册点击" class="headerlink" title="拦截微信的注册点击"></a>拦截微信的注册点击</h1><p>使用 Debug View Hierarchy 查看微信的登录注册页面的视图层次结构，找到注册的按钮，查看按钮的 target 和 action</p>
-<img src="/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/ca5a9d2062f94a66819e4b3d7c70342e~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>我们知道了注册按钮点击的时候，会调用 <code>WCAccountLoginControlLogic</code> 的 <code>onFirstViewRegister</code> 方法，而且我们也已经可以在我们的 Framework 中执行我们的注入代码了，那么接下来我们如何实现拦截微信的注册按钮点击呢？当然可以使用 Method Swizzle 来实现</p>
-<p>在开始写代码实现方法交换之前，还有一个小小的问题，虽然我们根据经验可以知道这个 <code>onFirstViewRegister</code> 应该是个对象方法，可能没有返回值也没有参数，但这些都只是根据我们经验的猜测…关考猜测可不行，那么怎么验证我们的猜测呢？</p>
-<p><a href="https://github.com/nygard/class-dump"><strong>Class-dump</strong></a> 和 <strong>yololib</strong> 一样，也是一个终端命令行工具，同样也可以放到 usr&#x2F;local&#x2F;bin 目录下可以全局使用，它的作用是可以把 MachO 文件里的头文件信息全部导出来，我们可以 cd 到工程编译生成的 APP 包里面,使用以下命令<br></p>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">class-dump -H WeChat -o ./headers/</span><br></pre></td></tr></table></figure>
-
-<p>将它的头文件都导到一个 headers 的文件夹内，这个过程需要一点时间</p>
-<img src="/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/1d783025112d46a7b01eaec3b73c3bd7~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>看了下这个文件挺大的，导完之后可以把它剪切到工程根目录下，这样给我们手机也能省点空间，也确实完全没必要放在 APP 包里面</p>
-<img src="/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/d734b1bee7d54b31b18821dba3857f24~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>可以看到这里面有 15074 个项目，微信的头文件还真不少呢…这么大的文件夹如果我们用 Xcode 打开搜索的话，一定会十分的痛苦。这里推荐使用 sublime…更轻量一点，找起头文件来也更快，搜索一番发现如图所示</p>
-<img src="/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/91d0302f97474f3295c318d5234d8944~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>这样就确保了这个 <code>onFirstViewRegister</code> 方法是无返回值无参数的，可以开始编写代码实现拦截了</p>
-<p>现在我们可以来到我们 Framework 的 CodeInject.m 文件写点代码</p>
-<img src="/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/1303896e20f242a69833262c714c29e9~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>代码就这么点，现在 command + R 运行起来之后，再次点击微信的注册按钮试试看？</p>
-<img src="/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/c3fbbc9607184b71b639734374708a27~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<h1 id="窃取用户的账号密码"><a href="#窃取用户的账号密码" class="headerlink" title="窃取用户的账号密码"></a>窃取用户的账号密码</h1><p>上面的需求仅仅只是破坏了功能，原来的功能都没法使用了。接下来这个需求让用户在神不知鬼不觉的情况下，账号密码就被窃取了（所以市面上那些来源不明的 App 真不要下载使用，除非你也是搞逆向研究的）。那么我们在什么时候，能拿到用户的账号和密码呢？当然是点击登录按钮的时候，所以你懂的，使用 viewDebug 查看登录按钮</p>
-<img src="/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/f7a259179375477c850d9ec4e85e6cff~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>登录按钮点击的 target:<code>WCAccountMainLoginViewController</code>,action:<code>onNext</code>;</p>
-<p>查看刚刚 class-dump 出来的头文件发现这个 onNext 方法是没有参数的，那么我们需要的账号密码在哪里呢？哈哈，有经验的同学是不是发现这两个名字是不是莫名的熟悉</p>
-<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line">WCAccountTextFieldItem *_textFieldUserNameItem;</span><br><span class="line">WCAccountTextFieldItem *_textFieldUserPwdItem;</span><br></pre></td></tr></table></figure>
-
-<img src="/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/f71ee81de1e24f7e9abf2f6c5100420f~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>变量名是挺熟悉的，但是这个 <code>WCAccountTextFieldItem</code> 我们不知道是个什么东西怎么办？头文件都在手上了还问怎么办，接着搜索啊…</p>
-<img src="/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/750ecea4818247c8b7773d78750e4cab~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p><code>WCAccountTextFieldItem</code> 里面貌似没啥东西，那就看它父类 <code>WCBaseTextFieldItem</code></p>
-<img src="/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/f44b4b6fd6b94c2fb6cfb3e138e3b213~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>在 <code>WCBaseTextFieldItem</code> 类里面发现了一个 <code>WXUITextField</code> 的东西,跟我们熟悉的 <code>UITextField</code> 很像了，我们猜测可能就是这个 <code>m_textField</code> 存放着我们想要的东西，先不着急写代码</p>
-<p>现在我们可以再次使用 viewDebug 工具调试查看一下我们的账号和密码在哪里，并且使用 lldb 来动态调试验证我们的猜测</p>
-<img src="/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/4f7d5f230f76437e9438557b03ff5490~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>首先控制器的地址，可以由登录按钮的 target 获取到。获取到控制器之后，再使用 KVC 大法获取成员变量 <code>_textFieldUserPwdItem</code> 的地址(密码都能获取到了，账号也是一样的操作)并打印它。获取到 <code>_textFieldUserPwdItem</code> 的地址之后，再次使用 KVC 大法获取它的成员变量 <code>m_textField</code> 的地址并打印这个对象，好家伙，明文密码不就在这儿了吗!!!</p>
-<p>接下来我们通过代码来实现需求:</p>
-<img src="/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/935ac041181d4ebb9647deb4dadd555d~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>这代码看起来跟拦截微信注册的代码差不太多，那么我们 command + R 运行看看结果</p>
-<img src="/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/736508d48fa74925978c44a80393e619~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>WTF？账号密码确实是都获取到了，但是 APP 却崩溃了？为什么会发生崩溃，崩溃信息是我们经常能够遇到的经典报错 <code>unrecognized selector sent to instance 0x10b15b400</code> 说是控制器 <code>WCAccountMainLoginViewController</code> 无法识别 <code>FK_onNext</code> 这个方法</p>
-<p>我们思考一下，方法交换为什么一般推荐写在想要交换方法的类所在的分类里面？因为在想要交换方法的类的分类当中，我们会新增一个方法，用来实现我们的逻辑，也正好是因为在分类中，所以当前类自然的添加了我们新增的方法，这样交换下来就不会出现找不到方法的错误</p>
-<p>而上面的代码，我们的本意也是希望在 <code>WCAccountMainLoginViewController</code> 里面新增一个方法处理我们的逻辑，并交换 <code>onNext</code> 方法，但现在的问题是我们在 <code>CodeInject</code> 这个类的 <code>load</code> 方法中，那么有什么办法可以解决这个问题呢？</p>
-<h3 id="动态添加方法"><a href="#动态添加方法" class="headerlink" title="动态添加方法"></a>动态添加方法</h3><p>rumtime 的 api 提供了运行时动态添加方法的能力</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">BOOL</span><br><span class="line"><span class="title function_">class_addMethod</span><span class="params">(Class _Nullable cls, SEL _Nonnull name, IMP _Nonnull imp, <span class="type">const</span> <span class="type">char</span> * _Nullable types)</span></span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>参数1: 给哪个类添加方法</li>
-<li>参数2: 方法的名字</li>
-<li>参数3: 方法的实现</li>
-<li>参数4: 方法的参数和返回值描述,用一些特定的符号表示,也可以不写</li>
-<li>参数5: BOOL值,表示是否添加成功</li>
-</ul>
-<p>那么借用这个 api 我们能想到什么解决办法呢，给 <code>WCAccountMainLoginViewController</code> 控制器添加我们的 <code>FK_onNext</code> 方法，再让 <code>FK_onNext</code> 和 <code>onNext</code> 方法交换，最终的代码如下</p>
-<img src="/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/c78c52886b3b41c3849c099e1634f3f3~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>再次 command + R 运行发现，既能成功获取到用户输入的账号密码，又能成功的去调用微信的登录逻辑了</p>
-<h3 id="动态替换方法"><a href="#动态替换方法" class="headerlink" title="动态替换方法"></a>动态替换方法</h3><p>现在除了添加新方法的方式，我们还有其他的办法吗？当然有(强大的runtime) rumtime 的 api 还提供了运行时替换方法的能力</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">IMP _Nullable</span><br><span class="line"><span class="title function_">class_replaceMethod</span><span class="params">(Class _Nullable cls, SEL _Nonnull name, IMP _Nonnull imp, <span class="type">const</span> <span class="type">char</span> * _Nullable types)</span></span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>参数1: 替换哪个类</li>
-<li>参数2: 方法的名字</li>
-<li>参数3: 方法的实现</li>
-<li>参数4: 方法的参数和返回值描述,用一些特定的符号表示,也可以不写</li>
-<li>返回值: IMP，原始的方法实现</li>
-</ul>
-<p>如果使用这个方式，那么我们应该是将原始的 <code>onNext</code> 方法替换成我们的 <code>FK_onNext</code> 方法，那么我们如何去调用微信原始的 <code>onNext</code> 方法呢，在替换之前将原始的 <code>onNext</code> 方法的实现 IMP 记录下来，然后在我们的 <code>FK_onNext</code> 方法中使用这个记录的 IMP 来实现对原始 <code>onNext</code> 的调用，具体代码如下图:</p>
-<img src="/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/dea8641224fa410a9830ea57b23be7d1~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>对比方法交换的代码实现，我们发现方法替换的方式需要多一个变量 <code>originalIMP</code>，用来记录原始的 <code>onNext</code> 方法的实现，而且还会报个警告，虽然少了一点点代码，但看起来也不是那么好理解…当然，这里使用方法替换也只是为了学习一下 runtime 提供的 api，感受一下 rumtime 的强大，具体使用哪个方式就看个人的喜好</p>
-<h3 id="动态获取方法实现和设置方法实现"><a href="#动态获取方法实现和设置方法实现" class="headerlink" title="动态获取方法实现和设置方法实现"></a>动态获取方法实现和设置方法实现</h3><p>那么,还有更骚的操作吗？当然有…</p>
-<p>获取方法 m 的实现 IMP</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">IMP _Nonnull</span><br><span class="line"><span class="title function_">method_getImplementation</span><span class="params">(Method _Nonnull m)</span></span><br></pre></td></tr></table></figure>
-
-<p>设置方法 m 的实现 IMP</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">IMP _Nonnull</span><br><span class="line"><span class="title function_">method_setImplementation</span><span class="params">(Method _Nonnull m, IMP _Nonnull imp)</span></span><br></pre></td></tr></table></figure>
-
-<p>这个原理其实跟替换差不太多，首先获取原始 <code>onNext</code> 的实现并记录，然后设置新的 IMP(我们写的 <code>FK_onNext</code> )给 <code>WCAccountMainLoginViewController</code> 的 <code>onNext</code> 方法，具体代码如下：</p>
-<img src="/2021/06/24/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/dfd4a8d6d9b0480584bcf4c782353eaf~tplv-k3u1fbpfcp-watermark.png" class="" alt="image.png">
-
-<p>好了，到此我们为了实现窃取用户的账号密码已经使用了三种 runtime 提供的方式…到这里就真的没了</p>
-<p>从上一篇 iOS 重签名，到这一篇的代码注入，如果你使用过 MonkeyDev 工具的 MonkeyApp 就会发现是如此的相似。其实这就是 MonkeyDev 的实现原理，只是 MonkeyDev 的实现更加复杂。</p>
-<p>下一篇文章开始介绍我们最近一直提到的 MachO 文件，到底什么是 MachO 文件，它包含了什么东西，干什么用的…</p>
-<h1 id="反微信重签名检测"><a href="#反微信重签名检测" class="headerlink" title="反微信重签名检测"></a>反微信重签名检测</h1><p>如果你希望在重签名的微信上登录账号使用，最好在添加以下代码绕过微信的检测。否则会有封号的风险，不保证以下代码长期有效。将以下代码粘贴到 CodeInject.m 文件中，不要放到类的实现中就行。</p>
-<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="meta">#import <span class="string">&lt;objc/runtime.h&gt;</span></span></span><br><span class="line"><span class="comment">// 函数指针</span></span><br><span class="line"><span class="built_in">NSUUID</span>* (*original_advertisingIdentifier)(<span class="type">id</span>, SEL);</span><br><span class="line"><span class="type">void</span> (*original_setBundleId)(<span class="type">id</span>, SEL, <span class="built_in">NSString</span>*);</span><br><span class="line"><span class="type">void</span> (*original_setClientSeqId)(<span class="type">id</span>, SEL, <span class="built_in">NSString</span>*);</span><br><span class="line"><span class="type">void</span> (*original_setDeviceName)(<span class="type">id</span>, SEL, <span class="built_in">NSString</span>*);</span><br><span class="line"><span class="type">void</span> (*original_addLogInfo_withMessage)(<span class="type">id</span>, SEL,<span class="type">int</span> *,<span class="keyword">const</span> <span class="type">char</span> *);</span><br><span class="line"><span class="type">BOOL</span> (*original_HasInstallJailbreakPluginInvalidIAPPurchase)(<span class="type">id</span>, SEL);</span><br><span class="line"><span class="type">BOOL</span> (*original_IsJailBreak)(<span class="type">id</span>, SEL);</span><br><span class="line"><span class="type">BOOL</span> (*original_HasInstallJailbreakPlugin)(<span class="type">id</span>, SEL, <span class="type">id</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// hook函数</span></span><br><span class="line"><span class="keyword">static</span> <span class="built_in">NSUUID</span>* hook_advertisingIdentifier(<span class="type">id</span> <span class="keyword">self</span>, SEL _cmd) &#123;</span><br><span class="line">    <span class="built_in">NSUUID</span> *advertisingIdentifier;</span><br><span class="line">    <span class="built_in">NSString</span> *key = <span class="string">@&quot;idfa&quot;</span>;</span><br><span class="line">    <span class="built_in">NSString</span> *idfa = [[<span class="built_in">NSUserDefaults</span> standardUserDefaults] stringForKey:key];</span><br><span class="line">    <span class="keyword">if</span> (idfa &amp;&amp; idfa.length)&#123;</span><br><span class="line">        advertisingIdentifier = [[<span class="built_in">NSUUID</span> alloc] initWithUUIDString:idfa];</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        advertisingIdentifier = [<span class="built_in">NSUUID</span> UUID];</span><br><span class="line">        [[<span class="built_in">NSUserDefaults</span> standardUserDefaults] setObject:advertisingIdentifier.UUIDString forKey:key];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> advertisingIdentifier;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">static</span> <span class="type">void</span> hook_setBundleId(<span class="type">id</span> <span class="keyword">self</span>, SEL _cmd, <span class="built_in">NSString</span> *bundleId) &#123;</span><br><span class="line">    <span class="keyword">if</span> ([bundleId isEqualToString:[<span class="built_in">NSBundle</span> mainBundle].bundleIdentifier]) &#123;</span><br><span class="line">        bundleId = <span class="string">@&quot;com.tencent.xin&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    original_setBundleId(<span class="keyword">self</span>, _cmd, bundleId);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">static</span> <span class="type">void</span> hook_setClientDeqId(<span class="type">id</span> <span class="keyword">self</span>, SEL _cmd, <span class="built_in">NSString</span> *clientSeqId) &#123;</span><br><span class="line">    <span class="built_in">NSString</span> *key = <span class="string">@&quot;clientSeqId&quot;</span>;</span><br><span class="line">    <span class="built_in">NSString</span> *clientSeqId_fist = [[<span class="built_in">NSUserDefaults</span> standardUserDefaults] stringForKey:key];</span><br><span class="line">    <span class="keyword">if</span> (!clientSeqId_fist || clientSeqId_fist.length == <span class="number">0</span>) &#123;</span><br><span class="line">        clientSeqId_fist = [[<span class="built_in">NSUUID</span> UUID].UUIDString stringByReplacingOccurrencesOfString:<span class="string">@&quot;-&quot;</span> withString:<span class="string">@&quot;&quot;</span>];</span><br><span class="line">        [[<span class="built_in">NSUserDefaults</span> standardUserDefaults] setObject:clientSeqId_fist forKey:key];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">NSString</span> *newClientSeqId;</span><br><span class="line">    <span class="keyword">if</span> ([clientSeqId containsString:<span class="string">@&quot;-&quot;</span>]) &#123;</span><br><span class="line">        <span class="built_in">NSRange</span> range = [clientSeqId rangeOfString:<span class="string">@&quot;-&quot;</span>];</span><br><span class="line">        <span class="built_in">NSString</span> *clientSeqId_last = [clientSeqId substringFromIndex:range.location];</span><br><span class="line">        newClientSeqId = [<span class="built_in">NSString</span> stringWithFormat:<span class="string">@&quot;%@%@&quot;</span>, clientSeqId_fist, clientSeqId_last];</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        newClientSeqId = clientSeqId_fist;</span><br><span class="line">    &#125;</span><br><span class="line">    original_setClientSeqId(<span class="keyword">self</span>, _cmd, newClientSeqId);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">static</span> <span class="type">void</span> hook_setDeviceName(<span class="type">id</span> <span class="keyword">self</span>, SEL _cmd, <span class="built_in">NSString</span> *deviceName) &#123;</span><br><span class="line">    original_setDeviceName(<span class="keyword">self</span>, _cmd, <span class="string">@&quot;iPhone&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">static</span> <span class="type">void</span> hook_addLogInfo_withMessage(<span class="type">id</span> <span class="keyword">self</span>, SEL _cmd, <span class="type">int</span> *arg1, <span class="keyword">const</span> <span class="type">char</span> *arg2) &#123;</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">static</span> <span class="type">BOOL</span> hook_original_HasInstallJailbreakPluginInvalidIAPPurchase(<span class="type">id</span> <span class="keyword">self</span>, SEL _cmd) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">NO</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">static</span> <span class="type">BOOL</span> hook_IsJailBreak(<span class="type">id</span> <span class="keyword">self</span>, SEL _cmd) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">NO</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">static</span> <span class="type">BOOL</span> hook_HasInstallJailbreakPlugin(<span class="type">id</span> <span class="keyword">self</span>, SEL _cmd, <span class="type">id</span> arg1) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">NO</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 所有被 hook 的类和函数放在这里的构造函数中</span></span><br><span class="line">__attribute__((constructor)) <span class="keyword">static</span> <span class="type">void</span> hookMethods(<span class="type">void</span>) &#123;</span><br><span class="line">    <span class="keyword">@autoreleasepool</span> &#123;</span><br><span class="line">        Class cls = <span class="built_in">NSClassFromString</span>(<span class="string">@&quot;ASIdentifierManager&quot;</span>);</span><br><span class="line">        <span class="keyword">if</span> (cls) &#123;</span><br><span class="line">            Method method = class_getInstanceMethod(cls, <span class="keyword">@selector</span>(advertisingIdentifier));</span><br><span class="line">            <span class="keyword">if</span> (method) &#123;</span><br><span class="line">                original_advertisingIdentifier = (<span class="built_in">NSUUID</span>*(*)(<span class="type">id</span>, SEL))method_getImplementation(method);</span><br><span class="line">                method_setImplementation(method, (IMP)hook_advertisingIdentifier);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        cls = <span class="built_in">NSClassFromString</span>(<span class="string">@&quot;ManualAuthAesReqData&quot;</span>);</span><br><span class="line">        <span class="keyword">if</span> (cls) &#123;</span><br><span class="line">            Method method = class_getInstanceMethod(cls, <span class="keyword">@selector</span>(setBundleId:));</span><br><span class="line">            <span class="keyword">if</span> (method) &#123;</span><br><span class="line">                original_setBundleId = (<span class="type">void</span>(*)(<span class="type">id</span>,SEL,<span class="built_in">NSString</span>*))method_getImplementation(method);</span><br><span class="line">                method_setImplementation(method, (IMP)hook_setBundleId);</span><br><span class="line">            &#125;</span><br><span class="line">            method = class_getInstanceMethod(cls, <span class="keyword">@selector</span>(setClientSeqId:));</span><br><span class="line">            <span class="keyword">if</span> (method) &#123;</span><br><span class="line">                original_setBundleId = (<span class="type">void</span>(*)(<span class="type">id</span>,SEL,<span class="built_in">NSString</span>*))method_getImplementation(method);</span><br><span class="line">                method_setImplementation(method, (IMP)hook_setBundleId);</span><br><span class="line">            &#125;</span><br><span class="line">            method = class_getInstanceMethod(cls, <span class="keyword">@selector</span>(setDeviceName:));</span><br><span class="line">            <span class="keyword">if</span> (method) &#123;</span><br><span class="line">                original_setDeviceName = (<span class="type">void</span>(*)(<span class="type">id</span>,SEL,<span class="built_in">NSString</span>*))method_getImplementation(method);</span><br><span class="line">                method_setImplementation(method, (IMP)hook_setDeviceName);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        cls = <span class="built_in">NSClassFromString</span>(<span class="string">@&quot;MMCrashReportExtLogMgr&quot;</span>);</span><br><span class="line">        <span class="keyword">if</span> (cls) &#123;</span><br><span class="line">            Method method = class_getInstanceMethod(cls, <span class="keyword">@selector</span>(addLogInfo:withMessage:));</span><br><span class="line">            <span class="keyword">if</span> (method) &#123;</span><br><span class="line">                original_addLogInfo_withMessage = (<span class="type">void</span>(*)(<span class="type">id</span>,SEL,<span class="type">int</span>*,<span class="keyword">const</span> <span class="type">char</span>*))method_getImplementation(method);</span><br><span class="line">                method_setImplementation(method, (IMP)hook_addLogInfo_withMessage);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        cls = <span class="built_in">NSClassFromString</span>(<span class="string">@&quot;JailBreakHelper&quot;</span>);</span><br><span class="line">        <span class="keyword">if</span> (cls) &#123;</span><br><span class="line">            Method method = class_getInstanceMethod(cls, <span class="keyword">@selector</span>(HasInstallJailbreakPluginInvalidIAPPurchase));</span><br><span class="line">            <span class="keyword">if</span> (method) &#123;</span><br><span class="line">                original_HasInstallJailbreakPluginInvalidIAPPurchase = (<span class="type">BOOL</span>(*)(<span class="type">id</span>,SEL))method_getImplementation(method);</span><br><span class="line">                method_setImplementation(method, (IMP)hook_original_HasInstallJailbreakPluginInvalidIAPPurchase);</span><br><span class="line">            &#125;</span><br><span class="line">            method = class_getInstanceMethod(cls, <span class="keyword">@selector</span>(IsJailBreak));</span><br><span class="line">            <span class="keyword">if</span> (method) &#123;</span><br><span class="line">                original_IsJailBreak = (<span class="type">BOOL</span>(*)(<span class="type">id</span>,SEL))method_getImplementation(method);</span><br><span class="line">                method_setImplementation(method, (IMP)hook_IsJailBreak);</span><br><span class="line">            &#125;</span><br><span class="line">            method = class_getInstanceMethod(cls, <span class="keyword">@selector</span>(HasInstallJailbreakPlugin:));</span><br><span class="line">            <span class="keyword">if</span> (method) &#123;</span><br><span class="line">                original_HasInstallJailbreakPlugin = (<span class="type">BOOL</span>(*)(<span class="type">id</span>,SEL,<span class="type">id</span>))method_getImplementation(method);</span><br><span class="line">                method_setImplementation(method, (IMP)hook_HasInstallJailbreakPlugin);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-]]></content>
-      <categories>
-        <category>iOS 逆向与安全</category>
-      </categories>
-      <tags>
-        <tag>yololib</tag>
-      </tags>
   </entry>
   <entry>
     <title>多线程</title>
@@ -6494,7 +6676,7 @@ m<sup>k * φ(n) + 1</sup> mod n = m
 <li><p><strong>Filza File Manager：</strong> </p>
 <p>  是一款功能强大的文件管理器，专为越狱后的 iOS 设备设计。它允许用户在设备上直接浏览、管理和编辑文件系统的内容。Filza 提供了与桌面操作系统文件管理器类似的体验，让用户可以轻松访问和操作 iOS 设备上的所有文件，包括系统文件和应用数据。</p>
 </li>
-<li><p><strong><a href="../openssh/openssh.md">OpenSSH</a></strong> </p>
+<li><p><strong><a href="/2023/08/03/OpenSSH/" title="OpenSSH">OpenSSH</a></strong> </p>
 <p>  是一个开源的 SSH 实现，它提供服务器的功能，用于安全远程登录、命令执行和文件传输。iOS 安装之后可以我们可以使用 Mac 远程登录到设备上。</p>
 </li>
 </ul>
@@ -6533,7 +6715,7 @@ m<sup>k * φ(n) + 1</sup> mod n = m
 
 
 
-<h1 id="脱壳微信"><a href="#脱壳微信" class="headerlink" title="脱壳微信"></a>脱壳微信</h1><p>对一个应用程序进行逆向分析之前，首先需要对其进行脱壳操作。至于什么是壳，请看 <a href="../binary_dumping/binary_dumping.md">iOS 应用脱壳</a></p>
+<h1 id="脱壳微信"><a href="#脱壳微信" class="headerlink" title="脱壳微信"></a>脱壳微信</h1><p>对一个应用程序进行逆向分析之前，首先需要对其进行脱壳操作。至于什么是壳，请看 <a href="/2024/10/27/iOS-%E5%BA%94%E7%94%A8%E7%A0%B8%E5%A3%B3/" title="iOS 应用砸壳">iOS 应用砸壳</a></p>
 <p>在 iOS12.5.7 上脱壳微信的方法有很多，这里只介绍 frida-ios-dump，要想成功脱壳还需要不少的配置和步骤。简单点来说就是使用 frida-ios-dump 需要用到 frida 等第三方库，而安装 frida 又需要用到其他的库，所以导致可能不会一次性就能成功运行脱壳。加上每个人的电脑环境不同，可能出现的问题千奇百怪，这里就记录作者本人使用过程中遇到的问题和解决的办法。</p>
 <h3 id="1-手机安装-frida"><a href="#1-手机安装-frida" class="headerlink" title="1.手机安装 frida"></a>1.手机安装 frida</h3><p>在 cydia&#x2F;sileo 上添加源 <a href="https://build.frida.re/">https://build.frida.re</a>，点击 frida 安装就好了。可以参考<a href="https://frida.re/docs/ios/#with-jailbreak">官方文档</a> </p>
 <h3 id="2-Mac下载-frida-ios-dump-项目"><a href="#2-Mac下载-frida-ios-dump-项目" class="headerlink" title="2.Mac下载 frida-ios-dump 项目"></a>2.Mac下载 <a href="https://github.com/AloneMonkey/frida-ios-dump">frida-ios-dump</a> 项目</h3><p>这一步是最简单的，大家都是程序员的话应该不用多说了吧。在终端输入以下命令下载：</p>
@@ -6549,7 +6731,7 @@ m<sup>k * φ(n) + 1</sup> mod n = m
 <figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"> ~/frida-ios-dump/ [master] python3 -m venv path/to/venv</span><br><span class="line"> ~/frida-ios-dump/ [master] <span class="built_in">source</span> path/to/venv/bin/activate</span><br><span class="line">(venv)  ~/frida-ios-dump/ [master] pip3 install -r requirements.txt --upgrade</span><br><span class="line">Collecting asn1crypto (from -r requirements.txt (line 1))</span><br><span class="line">  Using cached asn1crypto-1.5.1-py2.py3-none-any.whl.metadata (13 kB)</span><br><span class="line">Collecting bcrypt (from -r requirements.txt (line 2))</span><br><span class="line">  Using cached bcrypt-4.2.0-cp39-abi3-macosx_10_12_universal2.whl.metadata (9.6 kB)</span><br><span class="line">Collecting cffi (from -r requirements.txt (line 3))</span><br><span class="line">  Using cached cffi-1.17.1-cp312-cp312-macosx_10_9_x86_64.whl.metadata (1.5 kB)</span><br><span class="line">Collecting colorama (from -r requirements.txt (line 4))</span><br><span class="line">  Using cached colorama-0.4.6-py2.py3-none-any.whl.metadata (17 kB)</span><br><span class="line">Collecting cryptography (from -r requirements.txt (line 5))</span><br><span class="line">  Using cached cryptography-43.0.1-cp39-abi3-macosx_10_9_universal2.whl.metadata (5.4 kB)</span><br><span class="line">Collecting enum34 (from -r requirements.txt (line 6))</span><br><span class="line">  Using cached enum34-1.1.10-py3-none-any.whl.metadata (1.6 kB)</span><br><span class="line">Collecting frida-tools (from -r requirements.txt (line 7))</span><br><span class="line">  Using cached frida_tools-13.3.0-py3-none-any.whl</span><br><span class="line">Collecting idna (from -r requirements.txt (line 8))</span><br><span class="line">  Using cached idna-3.10-py3-none-any.whl.metadata (10 kB)</span><br><span class="line">Collecting ipaddress (from -r requirements.txt (line 9))</span><br><span class="line">  Using cached ipaddress-1.0.23-py2.py3-none-any.whl.metadata (923 bytes)</span><br><span class="line">Collecting paramiko (from -r requirements.txt (line 10))</span><br><span class="line">  Using cached paramiko-3.5.0-py3-none-any.whl.metadata (4.4 kB)</span><br><span class="line">Collecting prompt-toolkit (from -r requirements.txt (line 11))</span><br><span class="line">  Using cached prompt_toolkit-3.0.48-py3-none-any.whl.metadata (6.4 kB)</span><br><span class="line">Collecting pyasn1 (from -r requirements.txt (line 12))</span><br><span class="line">  Using cached pyasn1-0.6.1-py3-none-any.whl.metadata (8.4 kB)</span><br><span class="line">Collecting pycparser (from -r requirements.txt (line 13))</span><br><span class="line">  Using cached pycparser-2.22-py3-none-any.whl.metadata (943 bytes)</span><br><span class="line">Collecting Pygments (from -r requirements.txt (line 14))</span><br><span class="line">  Using cached pygments-2.18.0-py3-none-any.whl.metadata (2.5 kB)</span><br><span class="line">Collecting PyNaCl (from -r requirements.txt (line 15))</span><br><span class="line">  Using cached PyNaCl-1.5.0-cp36-abi3-macosx_10_10_universal2.whl.metadata (8.7 kB)</span><br><span class="line">Collecting scp (from -r requirements.txt (line 16))</span><br><span class="line">  Using cached scp-0.15.0-py2.py3-none-any.whl.metadata (4.3 kB)</span><br><span class="line">Collecting six (from -r requirements.txt (line 17))</span><br><span class="line">  Using cached six-1.16.0-py2.py3-none-any.whl.metadata (1.8 kB)</span><br><span class="line">Collecting tqdm (from -r requirements.txt (line 18))</span><br><span class="line">  Using cached tqdm-4.66.5-py3-none-any.whl.metadata (57 kB)</span><br><span class="line">Collecting wcwidth (from -r requirements.txt (line 19))</span><br><span class="line">  Using cached wcwidth-0.2.13-py2.py3-none-any.whl.metadata (14 kB)</span><br><span class="line">Collecting frida&lt;17.0.0,&gt;=16.2.2 (from frida-tools-&gt;-r requirements.txt (line 7))</span><br><span class="line">  Using cached frida-16.5.5-cp37-abi3-macosx_10_13_x86_64.whl.metadata (2.0 kB)</span><br><span class="line">Collecting websockets&lt;14.0.0,&gt;=13.0.0 (from frida-tools-&gt;-r requirements.txt (line 7))</span><br><span class="line">  Using cached websockets-13.1-cp312-cp312-macosx_10_9_x86_64.whl.metadata (6.8 kB)</span><br><span class="line">Using cached asn1crypto-1.5.1-py2.py3-none-any.whl (105 kB)</span><br><span class="line">Using cached bcrypt-4.2.0-cp39-abi3-macosx_10_12_universal2.whl (472 kB)</span><br><span class="line">Using cached cffi-1.17.1-cp312-cp312-macosx_10_9_x86_64.whl (183 kB)</span><br><span class="line">Using cached colorama-0.4.6-py2.py3-none-any.whl (25 kB)</span><br><span class="line">Using cached cryptography-43.0.1-cp39-abi3-macosx_10_9_universal2.whl (6.2 MB)</span><br><span class="line">Using cached enum34-1.1.10-py3-none-any.whl (11 kB)</span><br><span class="line">Using cached idna-3.10-py3-none-any.whl (70 kB)</span><br><span class="line">Using cached ipaddress-1.0.23-py2.py3-none-any.whl (18 kB)</span><br><span class="line">Using cached paramiko-3.5.0-py3-none-any.whl (227 kB)</span><br><span class="line">Using cached prompt_toolkit-3.0.48-py3-none-any.whl (386 kB)</span><br><span class="line">Using cached pyasn1-0.6.1-py3-none-any.whl (83 kB)</span><br><span class="line">Using cached pycparser-2.22-py3-none-any.whl (117 kB)</span><br><span class="line">Using cached pygments-2.18.0-py3-none-any.whl (1.2 MB)</span><br><span class="line">Using cached PyNaCl-1.5.0-cp36-abi3-macosx_10_10_universal2.whl (349 kB)</span><br><span class="line">Using cached scp-0.15.0-py2.py3-none-any.whl (8.8 kB)</span><br><span class="line">Using cached six-1.16.0-py2.py3-none-any.whl (11 kB)</span><br><span class="line">Using cached tqdm-4.66.5-py3-none-any.whl (78 kB)</span><br><span class="line">Using cached wcwidth-0.2.13-py2.py3-none-any.whl (34 kB)</span><br><span class="line">Using cached frida-16.5.5-cp37-abi3-macosx_10_13_x86_64.whl (16.7 MB)</span><br><span class="line">Using cached websockets-13.1-cp312-cp312-macosx_10_9_x86_64.whl (155 kB)</span><br><span class="line">Installing collected packages: wcwidth, ipaddress, enum34, asn1crypto, websockets, tqdm, six, Pygments, pycparser, pyasn1, prompt-toolkit, idna, frida, colorama, bcrypt, frida-tools, cffi, PyNaCl, cryptography, paramiko, scp</span><br><span class="line">Successfully installed PyNaCl-1.5.0 Pygments-2.18.0 asn1crypto-1.5.1 bcrypt-4.2.0 cffi-1.17.1 colorama-0.4.6 cryptography-43.0.1 enum34-1.1.10 frida-16.5.5 frida-tools-13.3.0 idna-3.10 ipaddress-1.0.23 paramiko-3.5.0 prompt-toolkit-3.0.48 pyasn1-0.6.1 pycparser-2.22 scp-0.15.0 six-1.16.0 tqdm-4.66.5 wcwidth-0.2.13 websockets-13.1</span><br></pre></td></tr></table></figure>
 
 <p>可以看到成功安装了 frida。可以使用 <code>pip3 list</code> 查看 frida 的版本号。确保 frida 的版本号和手机上的 frida 是同个版本。</p>
-<h3 id="4-进行端口转发"><a href="#4-进行端口转发" class="headerlink" title="4.进行端口转发"></a>4.进行端口转发</h3><p>使用 frida-ios-dump 的前提是你的越狱设备安装并配置好了 <a href="../openssh/openssh.md">OpenSSH</a> 免密码登录。这可以看我之前写过的文章。</p>
+<h3 id="4-进行端口转发"><a href="#4-进行端口转发" class="headerlink" title="4.进行端口转发"></a>4.进行端口转发</h3><p>使用 frida-ios-dump 的前提是你的越狱设备安装并配置好了 <a href="/2023/08/03/OpenSSH/" title="OpenSSH">OpenSSH</a> 免密码登录。这可以看我之前写过的文章。</p>
 <p>使用 iproxy 进行端口转发，<code>iproxy 2222:22</code> 通过 USB 将电脑上的 2222 端口和手机的 22 端口建立映射。这一步基本没什么问题。<code>iproxy</code> 是 <code>libimobiledevice</code> 工具集的一部分，所以通过 <code>brew</code> 安装 <code>libimobiledevice</code> 获得 <code>iproxy</code>。</p>
 <figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">brew install libimobiledevice</span><br></pre></td></tr></table></figure>
 
@@ -6599,8 +6781,8 @@ m<sup>k * φ(n) + 1</sup> mod n = m
 </ol>
 <h1 id="实现抢红包插件的-UI-代码"><a href="#实现抢红包插件的-UI-代码" class="headerlink" title="实现抢红包插件的 UI 代码"></a>实现抢红包插件的 UI 代码</h1><p>实现微信自动抢红包功能可以完全不提供 UI 界面，这样每个红包消息过来的时候就自动拆开了。但这样不太好，而且实际的情况下不合适的红包自动抢了会很尴尬，另外从学习逆向开发的角度来说，多练习下也是不错的。但这个功能 UI 不是重点，所以我们还是尽可能的简单处理，只在微信的设置页面添加一个 cell 左边显示自动抢红包功能，右边显示一个开关用来控制该功能。</p>
 <p>现在很多人可能会好奇，Tweak.x 编写什么代码呢？.x 文件里面写 Logos 语法的代码。Logos 是一个基于 Perl 语言的正则表达式的预处理器，它通过优雅的类似 Objective-C 的语法简化了为 Objective-C 方法和 C 函数创建 hook 所需的模板代码。如果熟悉 Objective-C 的 runtime 的话，就可以理解为 Logos 语法将平时我们自己通过 runtime 编写的 hook 代码简化了。Logos 语法也没有很多，官方文档在<a href="https://theos.dev/docs/logos-syntax">这里</a>。</p>
-<p>了解或熟悉 Logos 语法之后，接下来就是考虑对哪些类，哪些方法进行 hook 了，至于什么是 hook，<a href="hook/hook.md">这篇文章</a> 有介绍。按照刚刚所说的 UI 需求的话，就需要分析微信的设置界面所用的类，和实现的逻辑了。这里会用到界面分析工具 <a href="%E8%BF%99%E9%87%8C%E5%86%99%E8%BF%87%E6%96%87%E7%AB%A0">Reveal</a> 或者 Lookin 等类似工具用于查看设置界面的控制器类，也可以用 <a href="%E8%BF%99%E9%87%8C%E5%86%99%E8%BF%87%E6%96%87%E7%AB%A0">cycript</a>，<a href="%E8%BF%99%E9%87%8C%E4%B9%9F%E6%9C%89%E6%96%87%E7%AB%A0%E4%BA%86">lldb</a> 等命令行工具查看。知道了是哪个控制器类之后，就可以使用 <a href="%E9%9C%80%E8%A6%81%E4%B8%80%E7%AF%87%E6%96%87%E7%AB%A0">class-dump</a> 工具对前面脱壳过的微信可执行文件导出所有的头文件，阅读对应的控制器类的头文件了。再结合正向开发的经验，分析应该 hook 哪些类的哪些方法。</p>
-<p>这里我们以 Reveal 为例，作者使用的是 Reveal46，因为 Reveal47 要求 iOS13 以上了，老版本可以在<a href="https://revealapp.com/updates/46/">官网下载</a>。</p>
+<p>了解或熟悉 Logos 语法之后，接下来就是考虑对哪些类，哪些方法进行 hook 了，至于什么是 hook，<a href="hook/hook.md">这篇文章</a> 有介绍。按照刚刚所说的 UI 需求的话，就需要分析微信的设置界面所用的类，和实现的逻辑了。这里会用到界面分析工具 <a href="/2023/08/26/Reveal/" title="Reveal">Reveal</a> 或者 Lookin 等类似工具用于查看设置界面的控制器类，也可以用 <a href="/2023/08/23/Cycript/" title="Cycript">Cycript</a>，<a href="/2021/07/13/lldb/" title="lldb">lldb</a> 等命令行工具查看。知道了是哪个控制器类之后，就可以使用 <a href="%E9%9C%80%E8%A6%81%E4%B8%80%E7%AF%87%E6%96%87%E7%AB%A0">class-dump</a> 工具对前面脱壳过的微信可执行文件导出所有的头文件，阅读对应的控制器类的头文件了。再结合正向开发的经验，分析应该 hook 哪些类的哪些方法。</p>
+<p>这里我们以 Reveal 为例，作者使用的是 Reveal46，因为 Reveal47 要求 iOS13 以上了，老版本可以在 <a href="https://revealapp.com/updates/46/">官网下载</a>。</p>
 <p>在手机上的 Cydia 搜索安装 Reveal2Loader 并安装。安装成功之后还需要再去设置中，找到 Reveal 项，进入 Enabled Applications 打开微信的右侧开关，这样才会在启动微信的时候注入 Reveal 服务。Reveal2Loader 自带的 RevealServer.framework 很古老了，大概率和你 Mac 上的 Reveal 是不匹配的，但是不用担心，可以将 Mac 上 Reveal 的 RevealServer.framework 复制到越狱设备的 &#x2F;Library&#x2F;Frameworks 文件夹下。可以使用任何你熟悉的方式，如：使用 iFunBox，使用 scp 命令。这里以 scp 命令为例子：</p>
 <figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"> ~/ scp -r -P 2222 /Applications/Reveal.app/Contents/SharedSupport/iOS-Libraries/RevealServer.framework root@localhost:/Library/Frameworks</span><br><span class="line">CodeResources                                                                                                                                                100% 2754     1.1MB/s   00:00</span><br><span class="line">RevealServer.h                                                                                                                                               100%  309   197.0KB/s   00:00</span><br><span class="line">RevealServer                                                                                                                                                 100%   12MB  38.1MB/s   00:00</span><br><span class="line">copy_and_codesign_revealserver.sh                                                                                                                            100% 1399   700.3KB/s   00:00</span><br><span class="line">module.modulemap                                                                                                                                             100%  105    59.6KB/s   00:00</span><br><span class="line">Info.plist</span><br></pre></td></tr></table></figure>
 
@@ -6758,16 +6940,6 @@ m<sup>k * φ(n) + 1</sup> mod n = m
         <tag>微信</tag>
         <tag>插件</tag>
       </tags>
-  </entry>
-  <entry>
-    <title>深入理解 iOS 对象模型</title>
-    <url>/2025/04/25/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3-iOS-%E5%AF%B9%E8%B1%A1%E6%A8%A1%E5%9E%8B/</url>
-    <content><![CDATA[<p>001:<br>讲了 Objective-C 对象的底层是 C 结构体</p>
-<h1 id="Objective-C-实例对象"><a href="#Objective-C-实例对象" class="headerlink" title="Objective-C 实例对象"></a>Objective-C 实例对象</h1><p>在日常使用 Objective-C 开发过程中，我们经常会使用 <code>[[NSObject alloc] init]</code> 这样的方式创建一个实例对象，并调用初始化方法。当然实际的情况中可能不是使用 NSObject 类，而是 UIKit 框架中的类，或者是你自定义的子类。实例对象对于我们来说简直是再熟悉不过了，但是各位有没有思考过，对于 <code>NSObject</code> 来说，<code>alloc</code> 方法分配内存，究竟分配了多大的内存空间，分配的内存中存放的又是什么东西，<code>init</code> 方法又究竟初始化了什么东西？如果不是 <code>NSObject</code> 类，而是其他系统框架类，或者我们自定义的类呢？我们先以 <code>NSObject</code> 类为例，分析 <code>alloc</code> 方法究竟是如何分配内存的，分配了多少内存空间，内存中又放的一些什么东西？</p>
-<h2 id="NSObject-的实例"><a href="#NSObject-的实例" class="headerlink" title="NSObject 的实例"></a>NSObject 的实例</h2>]]></content>
-      <categories>
-        <category>iOS 底层原理</category>
-      </categories>
   </entry>
   <entry>
     <title>架构模式</title>
@@ -7307,6 +7479,16 @@ NewsService 类提供一个 API 加载数据，内部实现是使用 DBTool 加�
         <tag>MVVM</tag>
         <tag>VIPER</tag>
       </tags>
+  </entry>
+  <entry>
+    <title>深入理解 iOS 对象模型</title>
+    <url>/2025/04/25/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3-iOS-%E5%AF%B9%E8%B1%A1%E6%A8%A1%E5%9E%8B/</url>
+    <content><![CDATA[<p>001:<br>讲了 Objective-C 对象的底层是 C 结构体</p>
+<h1 id="Objective-C-实例对象"><a href="#Objective-C-实例对象" class="headerlink" title="Objective-C 实例对象"></a>Objective-C 实例对象</h1><p>在日常使用 Objective-C 开发过程中，我们经常会使用 <code>[[NSObject alloc] init]</code> 这样的方式创建一个实例对象，并调用初始化方法。当然实际的情况中可能不是使用 NSObject 类，而是 UIKit 框架中的类，或者是你自定义的子类。实例对象对于我们来说简直是再熟悉不过了，但是各位有没有思考过，对于 <code>NSObject</code> 来说，<code>alloc</code> 方法分配内存，究竟分配了多大的内存空间，分配的内存中存放的又是什么东西，<code>init</code> 方法又究竟初始化了什么东西？如果不是 <code>NSObject</code> 类，而是其他系统框架类，或者我们自定义的类呢？我们先以 <code>NSObject</code> 类为例，分析 <code>alloc</code> 方法究竟是如何分配内存的，分配了多少内存空间，内存中又放的一些什么东西？</p>
+<h2 id="NSObject-的实例"><a href="#NSObject-的实例" class="headerlink" title="NSObject 的实例"></a>NSObject 的实例</h2>]]></content>
+      <categories>
+        <category>iOS 底层原理</category>
+      </categories>
   </entry>
   <entry>
     <title>解决git clone速度慢的问题</title>
