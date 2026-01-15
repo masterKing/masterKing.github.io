@@ -7,7 +7,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://masterking.github.io/images/iOS_low-level_principles.webp">
 <meta property="article:published_time" content="2025-05-22T16:12:00.000Z">
-<meta property="article:modified_time" content="2026-01-04T15:36:24.325Z">
+<meta property="article:modified_time" content="2026-01-15T12:08:19.670Z">
 <meta property="article:author" content="masterKing">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://masterking.github.io/images/iOS_low-level_principles.webp"><script type="application/ld+json">{
@@ -17,7 +17,7 @@
   "url": "https://masterking.github.io/2025/05/23/%E5%A4%9A%E7%BA%BF%E7%A8%8B/",
   "image": "https://masterking.github.io/images/iOS_low-level_principles.webp",
   "datePublished": "2025-05-22T16:12:00.000Z",
-  "dateModified": "2026-01-04T15:36:24.325Z",
+  "dateModified": "2026-01-15T12:08:19.670Z",
   "author": [
     {
       "@type": "Person",
@@ -168,7 +168,7 @@ btf.addGlobalFn('pjaxComplete', () => {
   isHighlightShrink: undefined,
   isToc: true,
   pageType: 'post'
-}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg" style="background: linear-gradient( 135deg, #2c241f, #968282);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/images/WechatIMG1.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">48</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">37</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">6</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/sileorepo/"><i class="fa-fw fas fa-shop"></i><span> sileo 源</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/images/iOS_low-level_principles.webp);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">masterKing 的博客</span></a><a class="nav-page-title" href="/"><span class="site-name">多线程</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/sileorepo/"><i class="fa-fw fas fa-shop"></i><span> sileo 源</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">多线程</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-05-22T16:12:00.000Z" title="发表于 2025-05-23 00:12:00">2025-05-23</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-01-04T15:36:24.325Z" title="更新于 2026-01-04 23:36:24">2026-01-04</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/iOS-%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86/">iOS 底层原理</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">总字数:</span><span class="word-count">6.4k</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span><span class="post-meta-separator">|</span><span class="post-meta-commentcount"><i class="far fa-comments fa-fw post-meta-icon"></i><span class="post-meta-label">评论数:</span><a href="/2025/05/23/%E5%A4%9A%E7%BA%BF%E7%A8%8B/#post-comment" itemprop="discussionUrl"><span class="valine-comment-count" data-xid="/2025/05/23/%E5%A4%9A%E7%BA%BF%E7%A8%8B/" itemprop="commentCount"><i class="fa-solid fa-spinner fa-spin"></i></span></a></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><div id="post-outdate-notice" data="{&quot;limitDay&quot;:365,&quot;messagePrev&quot;:&quot;距离上次更新已有&quot;,&quot;messageNext&quot;:&quot;天，文章某些内容可能已过时。&quot;,&quot;postUpdate&quot;:&quot;2026-01-04 23:36:24&quot;}" hidden></div><!--
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg" style="background: linear-gradient( 135deg, #2c241f, #968282);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/images/WechatIMG1.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">48</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">37</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">6</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/sileorepo/"><i class="fa-fw fas fa-shop"></i><span> sileo 源</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/images/iOS_low-level_principles.webp);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">masterKing 的博客</span></a><a class="nav-page-title" href="/"><span class="site-name">多线程</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/sileorepo/"><i class="fa-fw fas fa-shop"></i><span> sileo 源</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">多线程</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-05-22T16:12:00.000Z" title="发表于 2025-05-23 00:12:00">2025-05-23</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-01-15T12:08:19.670Z" title="更新于 2026-01-15 20:08:19">2026-01-15</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/iOS-%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86/">iOS 底层原理</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">总字数:</span><span class="word-count">5k</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span><span class="post-meta-separator">|</span><span class="post-meta-commentcount"><i class="far fa-comments fa-fw post-meta-icon"></i><span class="post-meta-label">评论数:</span><a href="/2025/05/23/%E5%A4%9A%E7%BA%BF%E7%A8%8B/#post-comment" itemprop="discussionUrl"><span class="valine-comment-count" data-xid="/2025/05/23/%E5%A4%9A%E7%BA%BF%E7%A8%8B/" itemprop="commentCount"><i class="fa-solid fa-spinner fa-spin"></i></span></a></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><div id="post-outdate-notice" data="{&quot;limitDay&quot;:365,&quot;messagePrev&quot;:&quot;距离上次更新已有&quot;,&quot;messageNext&quot;:&quot;天，文章某些内容可能已过时。&quot;,&quot;postUpdate&quot;:&quot;2026-01-15 20:08:19&quot;}" hidden></div><!--
 # 相关面试题
 
 - 你理解的多线程？
@@ -706,39 +706,84 @@ btf.addGlobalFn('pjaxComplete', () => {
 
 
 
-<h1 id="线程同步方案"><a href="#线程同步方案" class="headerlink" title="线程同步方案"></a>线程同步方案</h1><p>169:<br>多线程存在的问题？同时做多件事情提高了效率，但是存在线程安全问题<br>资源共享问题：<br>    多个线程访问和使用同一个资源</p>
-<p>案例：<br>存钱取钱。<br>卖票案例。</p>
-<p>解决办法：<br>    线程同步技术：加锁</p>
-<p>170-173：<br>iOS 中的线程同步方案有：</p>
-<ul>
-<li>OSSpinLock</li>
-<li>os_unfair_lock</li>
-<li>pthread_mutex</li>
-<li>NSLock</li>
-<li>NSRecursiveLock</li>
-<li>NSCondition</li>
-<li>NSConditionLock</li>
-<li>@synchronized</li>
-<li>dispatch_semaphore</li>
-<li>dispatch_queue(DISPATCH_QUEUE_SERIAL)</li>
-</ul>
-<p>然后是介绍 OSSpinLock 的使用了。导入 libkern&#x2F;OSAtomic.h 头文件，OS_SPINLOCK_INIT 宏创建锁，OSSpinLockLock() 函数加锁  OSSpinLockUnlock() 函数解锁<br>OSSpinLock 叫自旋锁，等待锁的期间一直占用着 CPU，已经过时了，还有可能产生优先级问题。。。总是就是不要用了，那为什么还讲那么多七七八八的呢</p>
-<p>原来 172 里是对代码的结构进行了调整。。。结合了一些封装设计在里面。。。站在讲解多线程锁的角度来讲，完全没有必要讲这块内容！<br>但是我想想有没有必要学习下怎么写的？？？</p>
-<p>173：答疑</p>
-<p>174：os_unfair_lock<br>这是自旋锁还是互斥锁呢？好像没讲呢？根据汇编得知是互斥锁，调用syscall让CPU休眠了</p>
-<p>175：pthread_mutex<br>互斥锁，等待锁的线程会处于休眠状态。</p>
-<p>176：pthread_mutex 递归锁</p>
-<p>177：自旋锁，互斥锁的汇编实现<br>自旋锁底层是一个循环一直在执行。<br>互斥锁底层调用了syscall让CPU进入休眠</p>
-<p>178：pthread_mutex 条件<br>讲了个什么场景没太理解。。。<br>感觉讲的真不好，总是磕磕绊绊来来回回重复叙述<br>pthread_cond_wait()<br>pthread_cond_signal()<br>意思好像是始终能保证 A 在 B 之前执行？好像是 OperationQueue 里面的依赖关系的？可能就是依赖的底层实现？<br>生产者？消费者？模式，意思是生产者必须先生产产品出来才可以给消费者消费。</p>
-<p>179:<br>NSLock 是对 mutex 普通锁的封装<br>NSRecursiveLock 是对 mutex 递归锁的封装<br>NSCondition 是 mutex cond 的封装</p>
-<p>180：课后答疑</p>
-<p>181：<br>[self.confition signal] 解释<br>完全听不明白了，不知道在表达啥呢。。。<br>答疑 RunLoop，这不是前面讲过了，看看什么问题</p>
-<ol>
-<li>NSThread 的生命不是一个强引用就能保证的，它的 RunLoop 不执行，线程的入口函数执行完就释放了。</li>
-<li>线程的入口函数执行了一段代码，但是如果不实现循环，它就跟普通的命令行程序执行完入口函数就结束了。<br>其实还是对线程的理解不够深入。确实线程对象比普通的对象更抽象。</li>
-</ol>
-<p>182：NSConditionLock<br>NSConditionLock？不是有一个 NSCondition 吗，这个又是什么<br>原来 NSConditionLock 是对 NSCondition 的封装。提供了更多功能<br>条件锁，应用场景还是建立依赖。。。</p>
-<p>183：串行队列<br>是的，GCD 的串行队列也可以实现线程同步</p>
+<h1 id="线程同步方案"><a href="#线程同步方案" class="headerlink" title="线程同步方案"></a>线程同步方案</h1><p>待更新…</p>
+<!--
+
+169:
+多线程存在的问题？同时做多件事情提高了效率，但是存在线程安全问题
+资源共享问题：
+    多个线程访问和使用同一个资源
+
+案例：
+存钱取钱。
+卖票案例。
+
+解决办法：
+    线程同步技术：加锁
+
+170-173：
+iOS 中的线程同步方案有：
+- OSSpinLock
+- os_unfair_lock
+- pthread_mutex
+- NSLock
+- NSRecursiveLock
+- NSCondition
+- NSConditionLock
+- @synchronized
+- dispatch_semaphore
+- dispatch_queue(DISPATCH_QUEUE_SERIAL)
+
+然后是介绍 OSSpinLock 的使用了。导入 libkern/OSAtomic.h 头文件，OS_SPINLOCK_INIT 宏创建锁，OSSpinLockLock() 函数加锁  OSSpinLockUnlock() 函数解锁
+OSSpinLock 叫自旋锁，等待锁的期间一直占用着 CPU，已经过时了，还有可能产生优先级问题。。。总是就是不要用了，那为什么还讲那么多七七八八的呢
+
+原来 172 里是对代码的结构进行了调整。。。结合了一些封装设计在里面。。。站在讲解多线程锁的角度来讲，完全没有必要讲这块内容！
+但是我想想有没有必要学习下怎么写的？？？
+
+173：答疑
+
+174：os_unfair_lock
+这是自旋锁还是互斥锁呢？好像没讲呢？根据汇编得知是互斥锁，调用syscall让CPU休眠了
+
+175：pthread_mutex
+互斥锁，等待锁的线程会处于休眠状态。
+
+176：pthread_mutex 递归锁
+
+177：自旋锁，互斥锁的汇编实现
+自旋锁底层是一个循环一直在执行。
+互斥锁底层调用了syscall让CPU进入休眠
+
+178：pthread_mutex 条件
+讲了个什么场景没太理解。。。
+感觉讲的真不好，总是磕磕绊绊来来回回重复叙述
+pthread_cond_wait()
+pthread_cond_signal()
+意思好像是始终能保证 A 在 B 之前执行？好像是 OperationQueue 里面的依赖关系的？可能就是依赖的底层实现？
+生产者？消费者？模式，意思是生产者必须先生产产品出来才可以给消费者消费。
+
+179:
+NSLock 是对 mutex 普通锁的封装
+NSRecursiveLock 是对 mutex 递归锁的封装
+NSCondition 是 mutex cond 的封装
+
+180：课后答疑
+
+181：
+[self.confition signal] 解释
+完全听不明白了，不知道在表达啥呢。。。
+答疑 RunLoop，这不是前面讲过了，看看什么问题
+1. NSThread 的生命不是一个强引用就能保证的，它的 RunLoop 不执行，线程的入口函数执行完就释放了。
+2. 线程的入口函数执行了一段代码，但是如果不实现循环，它就跟普通的命令行程序执行完入口函数就结束了。
+其实还是对线程的理解不够深入。确实线程对象比普通的对象更抽象。
+
+182：NSConditionLock
+NSConditionLock？不是有一个 NSCondition 吗，这个又是什么
+原来 NSConditionLock 是对 NSCondition 的封装。提供了更多功能
+条件锁，应用场景还是建立依赖。。。
+
+183：串行队列
+是的，GCD 的串行队列也可以实现线程同步
 <figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">dispatch_queue_t</span> moneyQueue = dispatch_queue_create(<span class="string">&quot;custom_queue1&quot;</span>, DISPATCH_QUEUE_SERIAL);</span><br><span class="line"><span class="built_in">dispatch_sync</span>(moneyQueue, ^&#123;</span><br><span class="line">	</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
 <p>这个好理解</p>
 <p>184-185：dispatch_semaphore<br>信号量，通过信号量控制线程最大并发数量为 1 的话同样可以实现线程同步。</p>
@@ -781,7 +826,8 @@ btf.addGlobalFn('pjaxComplete', () => {
 <ol>
 <li>信号量最大并发为1，可以实现，但是只能单读单写。如果要实现多读单写就不能使用信号量了。多个线程可以同时读取数据，但只有一个线程写入数据，读和写是不能同时进行（只能有一个线程写，且写的时候无法读，可以有多个线程读但读的时候无法写）</li>
 <li>pthread_rwlock 读写锁，等待锁的线程会进入休眠 <figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#import <span class="string">&lt;pthread.h&gt;</span></span></span><br><span class="line"></span><br><span class="line">pthread_rwlock_t lock;</span><br><span class="line">pthread_rwlock_init(&amp;lock, <span class="literal">NULL</span>);</span><br><span class="line"><span class="comment">// 读锁</span></span><br><span class="line">pthread_rwlock_rdlock(&amp;lock);</span><br><span class="line"><span class="comment">// ......</span></span><br><span class="line">pthread_rwlock_unlock(&amp;lock);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 写锁</span></span><br><span class="line">pthread_rwlock_wrlock(&amp;lock);</span><br><span class="line"><span class="comment">// ......</span></span><br><span class="line">pthread_rwlock_unlock(&amp;lock);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 释放锁</span></span><br><span class="line">pthread_rwlock_destroy(&amp;lock);</span><br></pre></td></tr></table></figure></li>
-<li>dispatch_barrier_async 异步栅栏函数 <figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 必须使用创建的并发队列，全局并发队列或串行队列都无效</span></span><br><span class="line"><span class="built_in">dispatch_queue_t</span> queue = dispatch_queue_create(<span class="string">&quot;rw_queue&quot;</span>, DISPATCH_QUEUE_CONCURRENT);</span><br><span class="line"><span class="built_in">dispatch_async</span>(queue, ^&#123;</span><br><span class="line">	<span class="comment">// 读操作...</span></span><br><span class="line">&#125;);</span><br><span class="line">dispatch_barrier_async(queue, ^&#123;</span><br><span class="line">	<span class="comment">// 写操作...</span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></li>
+<li>dispatch_barrier_async 异步栅栏函数 <figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 必须使用创建的并发队列，全局并发队列或串行队列都无效</span></span><br><span class="line"><span class="built_in">dispatch_queue_t</span> queue = dispatch_queue_create(<span class="string">&quot;rw_queue&quot;</span>, DISPATCH_QUEUE_CONCURRENT);</span><br><span class="line"><span class="built_in">dispatch_async</span>(queue, ^&#123;</span><br><span class="line">	<span class="comment">// 读操作...</span></span><br><span class="line">&#125;);</span><br><span class="line">dispatch_barrier_async(queue, ^&#123;</span><br><span class="line">	<span class="comment">// 写操作...</span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+–&gt;</li>
 </ol>
 </article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://masterking.github.io">masterKing</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://masterking.github.io/2025/05/23/%E5%A4%9A%E7%BA%BF%E7%A8%8B/">https://masterking.github.io/2025/05/23/多线程/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="https://masterking.github.io" target="_blank">masterKing 的博客</a>！</span></div></div><div class="tag_share"><div class="post-share"><div class="social-share" data-image="/images/iOS_low-level_principles.webp" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2025/05/15/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/" title="内存管理"><img class="cover" src="/images/iOS_low-level_principles.webp" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">内存管理</div></div><div class="info-2"><div class="info-item-1">相关面试题 使用 CADisplayLink、NSTimer 有什么注意点？ 强引用控制器导致控制器，定时器均无法正常释放的问题 依赖 RunLoop，如果 RunLoop 任务繁重可能出现定时器不准时的问题   介绍下内存的几大区域 讲一下你对 iOS 内存管理的理解 autorelease 对象在什么时机会被释放 方法里有局部对象，出了方法后会立即释放吗？ ARC 都帮我们做了什么？ w...</div></div></div></a><a class="pagination-related" href="/2025/06/05/%E6%9E%B6%E6%9E%84%E6%A8%A1%E5%BC%8F/" title="架构模式"><img class="cover" src="/images/iOS_low-level_principles.webp" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">架构模式</div></div><div class="info-2"><div class="info-item-1">关于架构模式什么是架构模式标准的定义：软件架构模式（Architectural Pattern） 是一种在软件系统中对模块进行职责划分、依赖管理与协作约束的设计思想，用来帮助开发者在复杂系统中保持结构清晰、逻辑解耦和可维护性。 简单通俗来说，架构模式就是在面向对象软件编程中给对象分门别类并建立或者约定它们之间关系的一种思想。这是我个人总结的通俗的说法并不一定完全准确，但我相信大体上没有错误并...</div></div></div></a></nav><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div class="vcomment" id="vcomment"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content is-expand"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#iOS-%E5%A4%9A%E7%BA%BF%E7%A8%8B%E6%96%B9%E6%A1%88%E6%8A%80%E6%9C%AF%E6%8A%A5%E5%91%8A"><span class="toc-text">iOS 多线程方案技术报告</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E6%96%B9%E6%A1%88%E7%BB%BC%E8%BF%B0%E4%B8%8E%E5%AF%B9%E6%AF%94%E8%A1%A8"><span class="toc-text">1. 方案综述与对比表</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E6%A0%B8%E5%BF%83%E6%96%B9%E6%A1%88%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90"><span class="toc-text">2. 核心方案深度解析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#A-Pthread-POSIX-Threads"><span class="toc-text">A. Pthread (POSIX Threads)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#B-NSThread"><span class="toc-text">B. NSThread</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#C-GCD-Grand-Central-Dispatch"><span class="toc-text">C. GCD (Grand Central Dispatch)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#D-NSOperation-NSOperationQueue"><span class="toc-text">D. NSOperation &amp; NSOperationQueue</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#E-Swift-Concurrency-Async-Await"><span class="toc-text">E. Swift Concurrency (Async&#x2F;Await)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E9%80%89%E5%9E%8B%E5%BB%BA%E8%AE%AE%E6%80%BB%E7%BB%93"><span class="toc-text">3. 选型建议总结</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#GCD-%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86"><span class="toc-text">GCD 基础知识</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%98%AF%E4%BB%80%E4%B9%88"><span class="toc-text">是什么</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%A6%96%E6%AC%A1%E9%9D%A2%E4%B8%96%E7%9A%84%E6%97%B6%E9%97%B4"><span class="toc-text">首次面世的时间</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AF%9E%E7%94%9F%E7%9A%84%E8%BF%87%E7%A8%8B"><span class="toc-text">诞生的过程</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E6%97%B6%E4%BB%A3%E8%83%8C%E6%99%AF%EF%BC%9A%E5%A4%9A%E6%A0%B8%E6%97%B6%E4%BB%A3%E6%9D%A5%E5%BE%97%E6%AF%94%E8%BD%AF%E4%BB%B6%E5%87%86%E5%A4%87%E5%BE%97%E6%9B%B4%E5%BF%AB%EF%BC%882004%E2%80%932008%EF%BC%89"><span class="toc-text">一、时代背景：多核时代来得比软件准备得更快（2004–2008）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E4%BC%A0%E7%BB%9F%E7%BA%BF%E7%A8%8B%E6%A8%A1%E5%9E%8B%E5%9C%A8-Apple-%E7%94%9F%E6%80%81%E4%B8%AD%E7%9A%84%E5%A4%B1%E8%B4%A5"><span class="toc-text">二、传统线程模型在 Apple 生态中的失败</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%89%E3%80%81GCD-%E7%9A%84%E6%80%9D%E6%83%B3%E6%9D%A5%E6%BA%90%EF%BC%9A%E4%B8%8D%E6%98%AF%E5%87%AD%E7%A9%BA%E5%8F%91%E6%98%8E%E7%9A%84"><span class="toc-text">三、GCD 的思想来源：不是凭空发明的</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9B%9B%E3%80%81GCD-%E5%9C%A8-2006%E2%80%932008-%E5%B9%B4%E9%97%B4%E7%9A%84%E5%86%85%E9%83%A8%E5%AD%95%E8%82%B2"><span class="toc-text">四、GCD 在 2006–2008 年间的内部孕育</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%94%E3%80%812009-%E5%B9%B4%E5%8F%91%E5%B8%83%EF%BC%9A%E4%B8%8D%E6%98%AF%E7%BB%88%E7%82%B9%EF%BC%8C%E8%80%8C%E6%98%AF%E2%80%9C%E5%BC%BA%E5%88%B6%E8%BD%AC%E5%90%91%E7%82%B9%E2%80%9D"><span class="toc-text">五、2009 年发布：不是终点，而是“强制转向点”</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%AD%EF%BC%9A%E4%B8%80%E5%8F%A5%E9%AB%98%E5%BA%A6%E6%A6%82%E6%8B%AC"><span class="toc-text">六：一句高度概括</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#GCD-%E6%8F%90%E4%BE%9B%E4%BA%86%E4%BB%80%E4%B9%88%E8%83%BD%E5%8A%9B%EF%BC%9F"><span class="toc-text">GCD 提供了什么能力？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#GCD-%E5%A4%B4%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84%E4%B8%8E-API-%E5%88%86%E7%B1%BB%EF%BC%8815-%E4%B8%AA%E5%85%AC%E5%BC%80%E5%A4%B4%E6%96%87%E4%BB%B6%EF%BC%89"><span class="toc-text">GCD 头文件结构与 API 分类（15 个公开头文件）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#queue-h"><span class="toc-text">queue.h</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9C%80%E5%B8%B8%E7%94%A8%E7%9A%84%E5%9C%BA%E6%99%AF"><span class="toc-text">最常用的场景</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%9C%80%E8%A6%81%E6%B3%A8%E6%84%8F%E7%9A%84%E9%97%AE%E9%A2%98"><span class="toc-text">需要注意的问题</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%BA%95%E5%B1%82%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86"><span class="toc-text">底层实现原理</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#group-h"><span class="toc-text">group.h</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#semaphore-h"><span class="toc-text">semaphore.h</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#time-h"><span class="toc-text">time.h</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#source-h"><span class="toc-text">source.h</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#once-h"><span class="toc-text">once.h</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%BA%BF%E7%A8%8B%E5%90%8C%E6%AD%A5%E6%96%B9%E6%A1%88"><span class="toc-text">线程同步方案</span></a></li></ol></div></div></div></div></main><footer id="footer" style="background-image: url(/images/iOS_low-level_principles.webp);"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2018 - 2026 By masterKing</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.4.3</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="前往评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"><script>(() => {
   const isShuoshuo = GLOBAL_CONFIG_SITE.pageType === 'shuoshuo'
