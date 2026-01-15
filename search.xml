@@ -6164,84 +6164,39 @@ commonModes并不是一个真正单独的模式
 
 
 
-<h1 id="线程同步方案"><a href="#线程同步方案" class="headerlink" title="线程同步方案"></a>线程同步方案</h1><p>待更新…</p>
-<!--
-
-169:
-多线程存在的问题？同时做多件事情提高了效率，但是存在线程安全问题
-资源共享问题：
-    多个线程访问和使用同一个资源
-
-案例：
-存钱取钱。
-卖票案例。
-
-解决办法：
-    线程同步技术：加锁
-
-170-173：
-iOS 中的线程同步方案有：
-- OSSpinLock
-- os_unfair_lock
-- pthread_mutex
-- NSLock
-- NSRecursiveLock
-- NSCondition
-- NSConditionLock
-- @synchronized
-- dispatch_semaphore
-- dispatch_queue(DISPATCH_QUEUE_SERIAL)
-
-然后是介绍 OSSpinLock 的使用了。导入 libkern/OSAtomic.h 头文件，OS_SPINLOCK_INIT 宏创建锁，OSSpinLockLock() 函数加锁  OSSpinLockUnlock() 函数解锁
-OSSpinLock 叫自旋锁，等待锁的期间一直占用着 CPU，已经过时了，还有可能产生优先级问题。。。总是就是不要用了，那为什么还讲那么多七七八八的呢
-
-原来 172 里是对代码的结构进行了调整。。。结合了一些封装设计在里面。。。站在讲解多线程锁的角度来讲，完全没有必要讲这块内容！
-但是我想想有没有必要学习下怎么写的？？？
-
-173：答疑
-
-174：os_unfair_lock
-这是自旋锁还是互斥锁呢？好像没讲呢？根据汇编得知是互斥锁，调用syscall让CPU休眠了
-
-175：pthread_mutex
-互斥锁，等待锁的线程会处于休眠状态。
-
-176：pthread_mutex 递归锁
-
-177：自旋锁，互斥锁的汇编实现
-自旋锁底层是一个循环一直在执行。
-互斥锁底层调用了syscall让CPU进入休眠
-
-178：pthread_mutex 条件
-讲了个什么场景没太理解。。。
-感觉讲的真不好，总是磕磕绊绊来来回回重复叙述
-pthread_cond_wait()
-pthread_cond_signal()
-意思好像是始终能保证 A 在 B 之前执行？好像是 OperationQueue 里面的依赖关系的？可能就是依赖的底层实现？
-生产者？消费者？模式，意思是生产者必须先生产产品出来才可以给消费者消费。
-
-179:
-NSLock 是对 mutex 普通锁的封装
-NSRecursiveLock 是对 mutex 递归锁的封装
-NSCondition 是 mutex cond 的封装
-
-180：课后答疑
-
-181：
-[self.confition signal] 解释
-完全听不明白了，不知道在表达啥呢。。。
-答疑 RunLoop，这不是前面讲过了，看看什么问题
-1. NSThread 的生命不是一个强引用就能保证的，它的 RunLoop 不执行，线程的入口函数执行完就释放了。
-2. 线程的入口函数执行了一段代码，但是如果不实现循环，它就跟普通的命令行程序执行完入口函数就结束了。
-其实还是对线程的理解不够深入。确实线程对象比普通的对象更抽象。
-
-182：NSConditionLock
-NSConditionLock？不是有一个 NSCondition 吗，这个又是什么
-原来 NSConditionLock 是对 NSCondition 的封装。提供了更多功能
-条件锁，应用场景还是建立依赖。。。
-
-183：串行队列
-是的，GCD 的串行队列也可以实现线程同步
+<h1 id="线程同步方案"><a href="#线程同步方案" class="headerlink" title="线程同步方案"></a>线程同步方案</h1><p>169:<br>多线程存在的问题？同时做多件事情提高了效率，但是存在线程安全问题<br>资源共享问题：<br>    多个线程访问和使用同一个资源</p>
+<p>案例：<br>存钱取钱。<br>卖票案例。</p>
+<p>解决办法：<br>    线程同步技术：加锁</p>
+<p>170-173：<br>iOS 中的线程同步方案有：</p>
+<ul>
+<li>OSSpinLock</li>
+<li>os_unfair_lock</li>
+<li>pthread_mutex</li>
+<li>NSLock</li>
+<li>NSRecursiveLock</li>
+<li>NSCondition</li>
+<li>NSConditionLock</li>
+<li>@synchronized</li>
+<li>dispatch_semaphore</li>
+<li>dispatch_queue(DISPATCH_QUEUE_SERIAL)</li>
+</ul>
+<p>然后是介绍 OSSpinLock 的使用了。导入 libkern&#x2F;OSAtomic.h 头文件，OS_SPINLOCK_INIT 宏创建锁，OSSpinLockLock() 函数加锁  OSSpinLockUnlock() 函数解锁<br>OSSpinLock 叫自旋锁，等待锁的期间一直占用着 CPU，已经过时了，还有可能产生优先级问题。。。总是就是不要用了，那为什么还讲那么多七七八八的呢</p>
+<p>原来 172 里是对代码的结构进行了调整。。。结合了一些封装设计在里面。。。站在讲解多线程锁的角度来讲，完全没有必要讲这块内容！<br>但是我想想有没有必要学习下怎么写的？？？</p>
+<p>173：答疑</p>
+<p>174：os_unfair_lock<br>这是自旋锁还是互斥锁呢？好像没讲呢？根据汇编得知是互斥锁，调用syscall让CPU休眠了</p>
+<p>175：pthread_mutex<br>互斥锁，等待锁的线程会处于休眠状态。</p>
+<p>176：pthread_mutex 递归锁</p>
+<p>177：自旋锁，互斥锁的汇编实现<br>自旋锁底层是一个循环一直在执行。<br>互斥锁底层调用了syscall让CPU进入休眠</p>
+<p>178：pthread_mutex 条件<br>讲了个什么场景没太理解。。。<br>感觉讲的真不好，总是磕磕绊绊来来回回重复叙述<br>pthread_cond_wait()<br>pthread_cond_signal()<br>意思好像是始终能保证 A 在 B 之前执行？好像是 OperationQueue 里面的依赖关系的？可能就是依赖的底层实现？<br>生产者？消费者？模式，意思是生产者必须先生产产品出来才可以给消费者消费。</p>
+<p>179:<br>NSLock 是对 mutex 普通锁的封装<br>NSRecursiveLock 是对 mutex 递归锁的封装<br>NSCondition 是 mutex cond 的封装</p>
+<p>180：课后答疑</p>
+<p>181：<br>[self.confition signal] 解释<br>完全听不明白了，不知道在表达啥呢。。。<br>答疑 RunLoop，这不是前面讲过了，看看什么问题</p>
+<ol>
+<li>NSThread 的生命不是一个强引用就能保证的，它的 RunLoop 不执行，线程的入口函数执行完就释放了。</li>
+<li>线程的入口函数执行了一段代码，但是如果不实现循环，它就跟普通的命令行程序执行完入口函数就结束了。<br>其实还是对线程的理解不够深入。确实线程对象比普通的对象更抽象。</li>
+</ol>
+<p>182：NSConditionLock<br>NSConditionLock？不是有一个 NSCondition 吗，这个又是什么<br>原来 NSConditionLock 是对 NSCondition 的封装。提供了更多功能<br>条件锁，应用场景还是建立依赖。。。</p>
+<p>183：串行队列<br>是的，GCD 的串行队列也可以实现线程同步</p>
 <figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="built_in">dispatch_queue_t</span> moneyQueue = dispatch_queue_create(<span class="string">&quot;custom_queue1&quot;</span>, DISPATCH_QUEUE_SERIAL);</span><br><span class="line"><span class="built_in">dispatch_sync</span>(moneyQueue, ^&#123;</span><br><span class="line">	</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
 <p>这个好理解</p>
 <p>184-185：dispatch_semaphore<br>信号量，通过信号量控制线程最大并发数量为 1 的话同样可以实现线程同步。</p>
@@ -6284,8 +6239,7 @@ NSConditionLock？不是有一个 NSCondition 吗，这个又是什么
 <ol>
 <li>信号量最大并发为1，可以实现，但是只能单读单写。如果要实现多读单写就不能使用信号量了。多个线程可以同时读取数据，但只有一个线程写入数据，读和写是不能同时进行（只能有一个线程写，且写的时候无法读，可以有多个线程读但读的时候无法写）</li>
 <li>pthread_rwlock 读写锁，等待锁的线程会进入休眠 <figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="meta">#import <span class="string">&lt;pthread.h&gt;</span></span></span><br><span class="line"></span><br><span class="line">pthread_rwlock_t lock;</span><br><span class="line">pthread_rwlock_init(&amp;lock, <span class="literal">NULL</span>);</span><br><span class="line"><span class="comment">// 读锁</span></span><br><span class="line">pthread_rwlock_rdlock(&amp;lock);</span><br><span class="line"><span class="comment">// ......</span></span><br><span class="line">pthread_rwlock_unlock(&amp;lock);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 写锁</span></span><br><span class="line">pthread_rwlock_wrlock(&amp;lock);</span><br><span class="line"><span class="comment">// ......</span></span><br><span class="line">pthread_rwlock_unlock(&amp;lock);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 释放锁</span></span><br><span class="line">pthread_rwlock_destroy(&amp;lock);</span><br></pre></td></tr></table></figure></li>
-<li>dispatch_barrier_async 异步栅栏函数 <figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 必须使用创建的并发队列，全局并发队列或串行队列都无效</span></span><br><span class="line"><span class="built_in">dispatch_queue_t</span> queue = dispatch_queue_create(<span class="string">&quot;rw_queue&quot;</span>, DISPATCH_QUEUE_CONCURRENT);</span><br><span class="line"><span class="built_in">dispatch_async</span>(queue, ^&#123;</span><br><span class="line">	<span class="comment">// 读操作...</span></span><br><span class="line">&#125;);</span><br><span class="line">dispatch_barrier_async(queue, ^&#123;</span><br><span class="line">	<span class="comment">// 写操作...</span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-–&gt;</li>
+<li>dispatch_barrier_async 异步栅栏函数 <figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 必须使用创建的并发队列，全局并发队列或串行队列都无效</span></span><br><span class="line"><span class="built_in">dispatch_queue_t</span> queue = dispatch_queue_create(<span class="string">&quot;rw_queue&quot;</span>, DISPATCH_QUEUE_CONCURRENT);</span><br><span class="line"><span class="built_in">dispatch_async</span>(queue, ^&#123;</span><br><span class="line">	<span class="comment">// 读操作...</span></span><br><span class="line">&#125;);</span><br><span class="line">dispatch_barrier_async(queue, ^&#123;</span><br><span class="line">	<span class="comment">// 写操作...</span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></li>
 </ol>
 ]]></content>
       <categories>
@@ -6988,6 +6942,16 @@ m<sup>k * φ(n) + 1</sup> mod n = m
       </tags>
   </entry>
   <entry>
+    <title>深入理解 iOS 对象模型</title>
+    <url>/2025/04/25/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3-iOS-%E5%AF%B9%E8%B1%A1%E6%A8%A1%E5%9E%8B/</url>
+    <content><![CDATA[<p>001:<br>讲了 Objective-C 对象的底层是 C 结构体</p>
+<h1 id="Objective-C-实例对象"><a href="#Objective-C-实例对象" class="headerlink" title="Objective-C 实例对象"></a>Objective-C 实例对象</h1><p>在日常使用 Objective-C 开发过程中，我们经常会使用 <code>[[NSObject alloc] init]</code> 这样的方式创建一个实例对象，并调用初始化方法。当然实际的情况中可能不是使用 NSObject 类，而是 UIKit 框架中的类，或者是你自定义的子类。实例对象对于我们来说简直是再熟悉不过了，但是各位有没有思考过，对于 <code>NSObject</code> 来说，<code>alloc</code> 方法分配内存，究竟分配了多大的内存空间，分配的内存中存放的又是什么东西，<code>init</code> 方法又究竟初始化了什么东西？如果不是 <code>NSObject</code> 类，而是其他系统框架类，或者我们自定义的类呢？我们先以 <code>NSObject</code> 类为例，分析 <code>alloc</code> 方法究竟是如何分配内存的，分配了多少内存空间，内存中又放的一些什么东西？</p>
+<h2 id="NSObject-的实例"><a href="#NSObject-的实例" class="headerlink" title="NSObject 的实例"></a>NSObject 的实例</h2>]]></content>
+      <categories>
+        <category>iOS 底层原理</category>
+      </categories>
+  </entry>
+  <entry>
     <title>架构模式</title>
     <url>/2025/06/05/%E6%9E%B6%E6%9E%84%E6%A8%A1%E5%BC%8F/</url>
     <content><![CDATA[<h1 id="关于架构模式"><a href="#关于架构模式" class="headerlink" title="关于架构模式"></a>关于架构模式</h1><h2 id="什么是架构模式"><a href="#什么是架构模式" class="headerlink" title="什么是架构模式"></a>什么是架构模式</h2><p>标准的定义：软件架构模式（Architectural Pattern） 是一种在软件系统中对模块进行职责划分、依赖管理与协作约束的设计思想，用来帮助开发者在复杂系统中保持结构清晰、逻辑解耦和可维护性。</p>
@@ -7525,16 +7489,6 @@ NewsService 类提供一个 API 加载数据，内部实现是使用 DBTool 加�
         <tag>MVVM</tag>
         <tag>VIPER</tag>
       </tags>
-  </entry>
-  <entry>
-    <title>深入理解 iOS 对象模型</title>
-    <url>/2025/04/25/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3-iOS-%E5%AF%B9%E8%B1%A1%E6%A8%A1%E5%9E%8B/</url>
-    <content><![CDATA[<p>001:<br>讲了 Objective-C 对象的底层是 C 结构体</p>
-<h1 id="Objective-C-实例对象"><a href="#Objective-C-实例对象" class="headerlink" title="Objective-C 实例对象"></a>Objective-C 实例对象</h1><p>在日常使用 Objective-C 开发过程中，我们经常会使用 <code>[[NSObject alloc] init]</code> 这样的方式创建一个实例对象，并调用初始化方法。当然实际的情况中可能不是使用 NSObject 类，而是 UIKit 框架中的类，或者是你自定义的子类。实例对象对于我们来说简直是再熟悉不过了，但是各位有没有思考过，对于 <code>NSObject</code> 来说，<code>alloc</code> 方法分配内存，究竟分配了多大的内存空间，分配的内存中存放的又是什么东西，<code>init</code> 方法又究竟初始化了什么东西？如果不是 <code>NSObject</code> 类，而是其他系统框架类，或者我们自定义的类呢？我们先以 <code>NSObject</code> 类为例，分析 <code>alloc</code> 方法究竟是如何分配内存的，分配了多少内存空间，内存中又放的一些什么东西？</p>
-<h2 id="NSObject-的实例"><a href="#NSObject-的实例" class="headerlink" title="NSObject 的实例"></a>NSObject 的实例</h2>]]></content>
-      <categories>
-        <category>iOS 底层原理</category>
-      </categories>
   </entry>
   <entry>
     <title>解决git clone速度慢的问题</title>
