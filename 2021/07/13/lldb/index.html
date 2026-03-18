@@ -169,57 +169,57 @@ btf.addGlobalFn('pjaxComplete', () => {
   isHighlightShrink: undefined,
   isToc: true,
   pageType: 'post'
-}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg" style="background: linear-gradient( 135deg, #2c241f, #968282);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/images/WechatIMG1.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">48</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">37</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">6</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/sileorepo/"><i class="fa-fw fas fa-shop"></i><span> sileo 源</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/images/iOSReveseEngineeringAndSecurity1.webp);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">masterKing 的博客</span></a><a class="nav-page-title" href="/"><span class="site-name">lldb</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/sileorepo/"><i class="fa-fw fas fa-shop"></i><span> sileo 源</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">lldb</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2021-07-13T09:42:00.000Z" title="发表于 2021-07-13 17:42:00">2021-07-13</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-01-14T13:30:39.868Z" title="更新于 2026-01-14 21:30:39">2026-01-14</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/iOS-%E9%80%86%E5%90%91%E4%B8%8E%E5%AE%89%E5%85%A8/">iOS 逆向与安全</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">总字数:</span><span class="word-count">3.5k</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span><span class="post-meta-separator">|</span><span class="post-meta-commentcount"><i class="far fa-comments fa-fw post-meta-icon"></i><span class="post-meta-label">评论数:</span><a href="/2021/07/13/lldb/#post-comment" itemprop="discussionUrl"><span class="valine-comment-count" data-xid="/2021/07/13/lldb/" itemprop="commentCount"><i class="fa-solid fa-spinner fa-spin"></i></span></a></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><div id="post-outdate-notice" data="{&quot;limitDay&quot;:365,&quot;messagePrev&quot;:&quot;距离上次更新已有&quot;,&quot;messageNext&quot;:&quot;天，文章某些内容可能已过时。&quot;,&quot;postUpdate&quot;:&quot;2026-01-14 21:30:39&quot;}" hidden></div><h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>LLDB 是 Low Lever Debugger 的简称，翻译成中文应该叫做底层调试器，它是 LLVM 项目的调试器组件。LLVM 是构架编译器 compiler 的框架系统，以 C++ 编写而成，用于优化以任意程序语言编写的程序的编译时间 compile-time、链接时间 link-time、运行时间 run-time 以及空闲时间 idle-time，对开发者保持开放，并兼容已有脚本。如果你了解过 Swift 语言及其作者，那么一定对 Chris Lattner 博士不陌生，那这里为什么要提到他呢？没错 LLVM 开发最初就是由 Chris Lattner 博士主持开展的。</p>
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg" style="background: linear-gradient( 135deg, #2c241f, #968282);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/images/WechatIMG1.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">48</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">37</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">6</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/sileorepo/"><i class="fa-fw fas fa-shop"></i><span> sileo 源</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/images/iOSReveseEngineeringAndSecurity1.webp);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">masterKing 的博客</span></a><a class="nav-page-title" href="/"><span class="site-name">lldb</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/sileorepo/"><i class="fa-fw fas fa-shop"></i><span> sileo 源</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">lldb</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2021-07-13T09:42:00.000Z" title="发表于 2021-07-13 17:42:00">2021-07-13</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-01-14T13:30:39.868Z" title="更新于 2026-01-14 21:30:39">2026-01-14</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/iOS-%E9%80%86%E5%90%91%E4%B8%8E%E5%AE%89%E5%85%A8/">iOS 逆向与安全</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">总字数:</span><span class="word-count">3.5k</span></span><span class="post-meta-separator">|</span><span class="leancloud_visitors" id="/2021/07/13/lldb/" data-flag-title="lldb"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span class="leancloud-visitors-count"><i class="fa-solid fa-spinner fa-spin"></i></span></span><span class="post-meta-separator">|</span><span class="post-meta-commentcount"><i class="far fa-comments fa-fw post-meta-icon"></i><span class="post-meta-label">评论数:</span><a href="/2021/07/13/lldb/#post-comment" itemprop="discussionUrl"><span class="valine-comment-count" data-xid="/2021/07/13/lldb/" itemprop="commentCount"><i class="fa-solid fa-spinner fa-spin"></i></span></a></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><div id="post-outdate-notice" data="{&quot;limitDay&quot;:365,&quot;messagePrev&quot;:&quot;距离上次更新已有&quot;,&quot;messageNext&quot;:&quot;天，文章某些内容可能已过时。&quot;,&quot;postUpdate&quot;:&quot;2026-01-14 21:30:39&quot;}" hidden></div><h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>LLDB 是 Low Lever Debugger 的简称，翻译成中文应该叫做底层调试器，它是 LLVM 项目的调试器组件。LLVM 是构架编译器 compiler 的框架系统，以 C++ 编写而成，用于优化以任意程序语言编写的程序的编译时间 compile-time、链接时间 link-time、运行时间 run-time 以及空闲时间 idle-time，对开发者保持开放，并兼容已有脚本。如果你了解过 Swift 语言及其作者，那么一定对 Chris Lattner 博士不陌生，那这里为什么要提到他呢？没错 LLVM 开发最初就是由 Chris Lattner 博士主持开展的。</p>
 <p>LLDB 支持调试 C、Objective-C 和 C++ 编写的程序。Swift 社区维护了一个版本，增加了对该语言的支持。默认内置于 Xcode 中，LLDB 提供了一组广泛的命令，旨在与老版本的 GDB 命令兼容。除了使用标准配置以外，还可以很容易的自定义 LLDB 命令以满足实际需要。可以在 Xcode 的控制器进入 lldb 调试模式后，输入 help 可以查看所有 Debugger commands，也可以在这个 <a target="_blank" rel="noopener" href="https://lldb.llvm.org/use/map.html">网站查询</a></p>
-<img src="/2021/07/13/lldb/03137798cb894df69f51a52caf25d7d1~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
 
 <h1 id="breakpoint-命令"><a href="#breakpoint-命令" class="headerlink" title="breakpoint 命令"></a>breakpoint 命令</h1><p>断点命令，在平时使用 Xcode 开发的过程中，我们设置断点一般都是通过在界面上点击代码所在的行数设置的。其实也可以使用 lldb 的命令来设置断点。</p>
-<h2 id="根据名字设置断点"><a href="#根据名字设置断点" class="headerlink" title="根据名字设置断点"></a>根据名字设置断点</h2><h3 id="设置C函数名断点"><a href="#设置C函数名断点" class="headerlink" title="设置C函数名断点"></a>设置C函数名断点</h3><img src="/2021/07/13/lldb/c1df1a8fc0824a1eb514cbc346414faf~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+<h2 id="根据名字设置断点"><a href="#根据名字设置断点" class="headerlink" title="根据名字设置断点"></a>根据名字设置断点</h2><h3 id="设置C函数名断点"><a href="#设置C函数名断点" class="headerlink" title="设置C函数名断点"></a>设置C函数名断点</h3>
 
 <p>在 <code>touchedBegan</code> 方法中，我们从界面设置了一个断点，进入了 lldb 调试模式，再输入以下命令设置函数断点:</p>
 <p><code>breakpoint set -n &quot;test1&quot;</code>，-n 是 –name 的缩写，然后点击继续按钮，或者输入 lldb 命令 c 继续执行，可以看到其实 Xcode 集成的很多的调试功能就是从 lldb 这来的。调试下一步就在 lldb 输入 n 或者 s，n 遇到子函数不会进入，s 遇到子函数会进入。</p>
 <h3 id="设置-OC-方法名断点"><a href="#设置-OC-方法名断点" class="headerlink" title="设置 OC 方法名断点"></a>设置 OC 方法名断点</h3><p>先搭建个如图所示的简单界面</p>
-<img src="/2021/07/13/lldb/026b14e3117e49d6b98f474643da37e3~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
 
 <p>然后暂停程序，在控制台输入如下命令：</p>
 <p><code>breakpoint set -n &quot;-[ViewController save:]&quot; -n &quot;-[ViewController pause:]&quot; -n &quot;-[ViewController continue:]&quot;</code></p>
 <p>这样就设置了一组断点，它有三个断点。可以使用以下命令查看当前所有断点：</p>
 <p><code>breakpoint list</code></p>
-<img src="/2021/07/13/lldb/9c17f3eaf4df4d32b259e2295a1da0bd~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
 
 <h2 id="禁用和启用断点"><a href="#禁用和启用断点" class="headerlink" title="禁用和启用断点"></a>禁用和启用断点</h2><p>禁用断点，后面的数字是 <code>breakpoint list</code> 显示的编号，可以同时禁用 1 组，也可以单独禁用组里的某个</p>
 <p><code>breakpoint disable 编号</code></p>
-<img src="/2021/07/13/lldb/7ee088e8c3f248f8829a2608adf29374~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
 
 <p>启用断点 <code>breakpoint enalbe 编号</code></p>
-<img src="/2021/07/13/lldb/4a4e4350d0b843e6bcc8a94a09f82928~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
 
 <h2 id="删除断点"><a href="#删除断点" class="headerlink" title="删除断点"></a>删除断点</h2><p>删除断点 <code>breakpoint delete 编号</code>，这里有个小细节，我们无法删除一组断点里面的某一个，只能删除一整组断点。如果 delete 后面跟的是某个组里面的某个断点，等同于禁用这个断点。如果不输入编号，那就相当于删除所有断点</p>
-<img src="/2021/07/13/lldb/a71601ac742e4e34ab3e5064da9b0cfa~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
 
 <h2 id="根据方法设置断点"><a href="#根据方法设置断点" class="headerlink" title="根据方法设置断点"></a>根据方法设置断点</h2><p>刚刚我们设置的断点，是某个类的某些具体方法，我们也可以设置与类无关的方法断点：</p>
 <p><code>breakpoint set --selector touchesBegan:withEvent:</code></p>
-<img src="/2021/07/13/lldb/d255257b5a8549ab94ad18a819668a0d~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
 
 <p>可以看到设置了 98 个断点，但我们的项目中没有明显调用这个方法，其实是系统库 UIKit 中用到了这个方法，lldb 断到系统库里面去了，可以使用 <code>breakpoint list</code> 查看所有 98 个断点</p>
 <p>如果不想这样把断点断到系统库里面去，可以指定文件设置方法断点，我们在 <code>ViewController</code> 里加上 <code>touchesBegan:</code> 方法：</p>
 <p><code>breakpoint set --file ViewController.m --selector touchesBegan:withEvent:</code></p>
-<img src="/2021/07/13/lldb/22eaa56f1b724fa7a0145c2da2b2a10d~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
 
 <h2 id="正则匹配设置断点"><a href="#正则匹配设置断点" class="headerlink" title="正则匹配设置断点"></a>正则匹配设置断点</h2><p>可以输入 <code>help breakpoint set</code> 看到 -r 参数的介绍</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Set the breakpoint by function name, evaluating a regular-expression to find the function name(s).</span><br></pre></td></tr></table></figure>
 
 <p><code>breakpoint set -r save:</code> 这样就会根据 -r 后面的参数去寻找所有能匹配到的方法</p>
-<img src="/2021/07/13/lldb/efd06b7a9e854ca3b6f0de70574c6dea~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
 
 <p>我们明明只有在 <code>ViewController</code> 里面有一个 <code>save:</code> 方法，为什么显示有 11 处断点呢，使用 <code>breakpoint list</code> 查看</p>
-<img src="/2021/07/13/lldb/df9eb095678c4c05ac6158afb94a4f22~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
 
 <p>可以看到除了第一个是我们工程里面的断点，其他的断点都不在我们的工程里。都断到系统库里去了。</p>
 <p>同样的，我们可以配合指定文件来使用这个命令</p>
 <p><code>breakpoint set -r save: --file ViewController.m</code></p>
 <h2 id="断点执行命令"><a href="#断点执行命令" class="headerlink" title="断点执行命令"></a>断点执行命令</h2><p><code>breakpoint command add 编号</code> 可以给断点加一些命令，这样断点来到的时候，可以自动执行这些命令，能否为我们节省一些操作</p>
-<img src="/2021/07/13/lldb/1199afeaa0c144ebb1b5210728fb9c68~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
 
 <p>以上这些所有的 lldb 命令，都可以缩写，比如:</p>
 <ul>
@@ -231,112 +231,112 @@ btf.addGlobalFn('pjaxComplete', () => {
 <p>反正你可以去各种尝试，多一个少一个字母或许都能行，比较随意，比起普通的命令错一个字符都不行还是蛮牛逼的。</p>
 <h1 id="expression-命令"><a href="#expression-命令" class="headerlink" title="expression 命令"></a>expression 命令</h1><p>我们平时在 lldb 控制台里面干的最多的是什么？<code>po</code> 打印某个对象吧，那么这个 po 到底是什么意思呢？可以在终端输入如下命令查看一下:</p>
 <p><code>help po</code></p>
-<img src="/2021/07/13/lldb/4bc5c3e1fa4e4a618b7a1dead8b684ee~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
 
 <p>其实我们平时使用最多的 po 指令就是 expression -O 指令的缩写。也有人喜欢用 <code>p</code> 打印，那么 <code>p</code> 又是什么呢，输入 <code>help p</code> 发现 <code>p</code> 就是 expression 指令的缩写，直接查看 <code>help expression</code> 可以查看到 -O 的意思，就是指定语言的 <code>description</code> 方法，所以我们平时使用 <code>po</code> OC 对象，就是执行 OC 对象的 description 方法。</p>
 <p>通过 <code>help po</code> 我们知道就是在主线程执行表达式，那么我们可以试试在 lldb 中修改一些常见的属性，比如 self.view.backgroundColor。首先来到 touchesBegan: 断点，在 lldb 输入如下指令</p>
 <p><code>p self.view.backgroundColor = [UIColor redColor];</code></p>
-<img src="/2021/07/13/lldb/dc5c508108d54a81a3481ba930115338~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
 
 <p>发现确实执行了这句代码，但是却报了一个让人疑惑的错误，而且过掉断点之后并没有任何效果，当然了明明执行都报错了，怎么可能会有效果呢。。。但是这一行代码，在程序中运行的话，肯定是没有问题的，我们查看 UIView 的头文件也可以发现它确定是有 backgroundColor 这个属性的。至于为什么我在网上搜索半天没有找到任何答案，感觉可能是 lldb 的 bug？虽然这句代码无效，但是我们依然可以尝试使用其他的方式来修改，比如：</p>
 <p><code>p [self.view setValue:[UIColor blueColor] forKey:@&quot;backgroundColor&quot;]</code></p>
-<img src="/2021/07/13/lldb/58f7629cc9bd48feb00391caa3b706f6~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
 
 <p>KVC 还是牛逼啊，还有一种办法，我们知道 UIView 真正用来显示的是它的 layer，修改 layer：</p>
 <p><code>p self.view.layer.backgroundColor = [UIColor yellowColor].CGColor</code></p>
-<img src="/2021/07/13/lldb/0487a68486ae4ceba1fe407eca761560~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
 
 <p>再来一个案例，我么创建一个 persons 数组，存放一组 Person 模型，然后通过 lldb 的 expression 命令动态添加一个 Person。</p>
-<img src="/2021/07/13/lldb/b3592f9c43154f56a769c52f620471db~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
 
 <p>可以看到 lldb 的 expression 命令后面可以跟多条代码，用来动态调试真是太方便了</p>
 <h1 id="bt-命令"><a href="#bt-命令" class="headerlink" title="bt 命令"></a>bt 命令</h1><p>进入 lldb 输入 <code>help bt</code> 可以看到，bt 是查看当前线程调用栈的意思</p>
-<img src="/2021/07/13/lldb/c2c847b404e1401fa41173c8223689c0~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
 
 <p>新建以下这四个方法，并给 demo4 方法下个断点，然后点击屏幕进入断点</p>
-<img src="/2021/07/13/lldb/b0853080f3fd49a1af27251ab2033579~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
 
 <p>输入 <code>bt</code> 可以看到当前方法的调用栈</p>
-<img src="/2021/07/13/lldb/bb386865b6ca4ea49de24366d4d95b8c~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
 
 <p>输入 <code>up</code> 可以查看调用的上一个方法，连源码都能看到，当然在逆向中是看不到源码的，只能看到汇编代码。输入 <code>down</code> 可以返回到下一个方法</p>
-<img src="/2021/07/13/lldb/7d811b1f9e6448eb958d5aed1abde945~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
 
 <p>如果嫌一步一步的 up，down 太慢了，也可以直接使用 <code>frame select 编号</code> 直接到位</p>
-<img src="/2021/07/13/lldb/6b6c40eb28ec407d81a0d66c7c604062~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
 
 <p>这样上下切换栈帧是为什么呢，当然是为了查看当前栈的一些信息，比如当前栈用到的变量。使用 <code>frame variable</code> 查看，我们知道 Objective-C 方法有两个隐藏的参数 self 和 _cmd， event 就是 demo1 的显示参数。如果不知道 <code>frame variable</code> 是什么意思，也可以通过 lldb 的帮助文档查看 <code>help frame variable</code></p>
-<img src="/2021/07/13/lldb/b425539995e7466ab3c355cb30000f54~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
 
 <h1 id="thread-return-命令"><a href="#thread-return-命令" class="headerlink" title="thread return 命令"></a>thread return 命令</h1><p>当我们调试到某一帧的时候，如果不想让程序之后的代码，可以使用 <code>thread return</code> 线程返回，需要注意 return 后面根据实际情况返回对应的值，例如：</p>
-<img src="/2021/07/13/lldb/325f4626024e44b4ac41477bff47767d~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
 
 <p>如果没有使用 <code>thread return NO</code> 命令，那么肯定是打印正在运行的，当断点来到 isRuning 的时候，我们强制返回了 NO，所以在调试过程中改变了程序的执行流程</p>
 <h1 id="以上所有方式在逆向中都没法使用。。。因为逆向的项目我们都拿不到符号"><a href="#以上所有方式在逆向中都没法使用。。。因为逆向的项目我们都拿不到符号" class="headerlink" title="以上所有方式在逆向中都没法使用。。。因为逆向的项目我们都拿不到符号"></a>以上所有方式在逆向中都没法使用。。。因为逆向的项目我们都拿不到符号</h1><p>那么逆向应该如何玩 lldb？内存断点</p>
 <h1 id="watchpoint-内存断点"><a href="#watchpoint-内存断点" class="headerlink" title="watchpoint 内存断点"></a>watchpoint 内存断点</h1><p>内存断点，不仅可以给方法断点，还可以给变量断点</p>
 <h2 id="watchpoint-根据变量名设置内存断点"><a href="#watchpoint-根据变量名设置内存断点" class="headerlink" title="watchpoint 根据变量名设置内存断点"></a>watchpoint 根据变量名设置内存断点</h2><p><code>watchpoint set variable p1-&gt;_name</code>如图所示，Person 类有一个 name 属性，但是我们设置内存断点的时候，属性是没法用的，因为属性的本质是 getter 和 setter 加下划线的成员变量嘛。所以需要使用 <code>p1-&gt;_name</code> 设置成功之后，当程序中有给 p1.name 赋值的地方，都会来到断点。下图马上给 p1.name 赋值 lldb 就提示 Watchpoint 1 hit 命中了。然后还会显示 old value 和 new value</p>
-<img src="/2021/07/13/lldb/8b474477d43f44bfbce4e8a02ffd992d~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
 
 <h2 id="watchpoint-根据内存地址设置内存断点"><a href="#watchpoint-根据内存地址设置内存断点" class="headerlink" title="watchpoint 根据内存地址设置内存断点"></a>watchpoint 根据内存地址设置内存断点</h2><p><code>watchpoint set expression 地址</code></p>
 <p>还是刚刚的例子，我们在 p1 实例化之后，它在内存中的地址就确定了，那么它的成员变量的地址也是确定的，我们可以拿到 p1.name 的内存地址，根据它的内存地址设置断点。当程序对 p1.name 进行修改的时候，都会来到断点，可以看到下面的断点来了两次，一次是在 viewDidload 中，另一次在 touchesBegan 里面进行的修改</p>
-<img src="/2021/07/13/lldb/35d164a0cf9c4d8487e9afdffc3eab5b~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
 
 <h1 id="target-stop-hook-命令"><a href="#target-stop-hook-命令" class="headerlink" title="target stop-hook 命令"></a>target stop-hook 命令</h1><p>这个命令有点类似 breakpoint 的断点执行命令，只不过 breakpoint 的断点执行命令需要指定某个断点，而这个命令是全局的，只要是断点来了，就会执行后面的命令</p>
-<img src="/2021/07/13/lldb/5b40c4626831405dae92ab34ceec1a23~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
 
 <p>通过 log 可以看到 stop-hook 命令一样可以 add、delte、disable、enable、list 具体每条命令怎么使用，可以继续使用 help 命令查看，比如 add，帮助文档很详细</p>
-<img src="/2021/07/13/lldb/bcdd9a2787234cfe941549644bdda9a8~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
 
 <p>我们这里全局添加一条 <code>frame variable</code> 指令，然后走到断点试试</p>
-<img src="/2021/07/13/lldb/40ed97a32eb245ec8610f1e14cc7ca41~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
 
 <p>可以看到断点一过来就会自动执行 <code>frame variable</code> 指令，打印参数变量</p>
-<img src="/2021/07/13/lldb/b1ccbb3d78844b61a31f7970999149d7~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
 
 <p>这里关于删除 stop-hook 指令，它还有一个快捷的命令 <code>undisplay 编号</code> 相比 <code>target stop-hook delete 编号</code> 要简短不少</p>
 <h1 id="lldbinit文件"><a href="#lldbinit文件" class="headerlink" title=".lldbinit文件"></a>.lldbinit文件</h1><p>可以将一些经常使用的命令配置到 <code>.lldbinit</code> 文件里面，这样就不用每次都去添加一些命令。这个文件一般放在用户目录下，点开头的代表是隐藏文件，如果没有可以自己新建一个。如图我们在里面添加这样一句指令</p>
-<img src="/2021/07/13/lldb/f02dce010eed4cf3bfedd87da7a1221c~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
 
 <p>再次运行项目，运行到断点就可以看到相关打印</p>
-<img src="/2021/07/13/lldb/ba84d8117aeb458c953cff4a68adb608~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
 
 <h1 id="image-指令"><a href="#image-指令" class="headerlink" title="image 指令"></a>image 指令</h1><p>这个是查看当前进程加载的镜像相关信息，什么是镜像，一个 Mach-O 文件就是一个镜像。我们的 APP 也是一个镜像。我们先来查看一下我们 APP 中的某个类的信息</p>
-<h2 id="image-look-up-t-name"><a href="#image-look-up-t-name" class="headerlink" title="image look up -t name"></a><code>image look up -t name</code></h2><img src="/2021/07/13/lldb/b62d3a8aedc04f0094c0e560267dca62~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+<h2 id="image-look-up-t-name"><a href="#image-look-up-t-name" class="headerlink" title="image look up -t name"></a><code>image look up -t name</code></h2>
 
 <h2 id="image-list"><a href="#image-list" class="headerlink" title="image list"></a><code>image list</code></h2><p>输入 <code>help image list</code> 查看命令的介绍</p>
-<img src="/2021/07/13/lldb/dea6c16fa5db4630b20fb5c9b9a6c824~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
 
 <p>可以看到 <code>image list</code> 意思是列出当前可执行文件和依赖的共享库镜像，在逆向中经常使用这个命令来获取我们 APP 在内存中的位置。</p>
 <h1 id="逆向中下内存地址断点"><a href="#逆向中下内存地址断点" class="headerlink" title="逆向中下内存地址断点"></a>逆向中下内存地址断点</h1><p>如图我们在 <code>touchesBegan:</code> 方法中调用了 demo4 方法</p>
-<img src="/2021/07/13/lldb/b490517ba8e6413d8295371439c0c742~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
 
 <p>现在我们将 APP 的 Mach-O 文件用 hopper 打开，假设对我们的 demo4 方法很感兴趣，想要下一个断点。</p>
-<img src="/2021/07/13/lldb/1be1f275c1fe4da49e5f77f8ea06257d~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
 
 <p>hopper 这里的地址只是这个方法相对于我们的 APP 首地址的偏移加上了虚拟地址，想要获取到这个方法在我们手机里的真实内存地址，还需要加上我们 APP 首地址在我们内存中的地址。通过 <code>image list</code> 命令查看第一个就是我们 APP 的首地址了。</p>
 <p>9544</p>
-<img src="/2021/07/13/lldb/7719b5500b5645a4b630abe58c0e8aed~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
 
 <p>虚拟地址在我们 Mach-O 文件的 __PAGEZERO 段可以看到</p>
-<img src="/2021/07/13/lldb/79ed68fcef154e26af4ded9979f6a617~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
 
 <p>那么这个方法在我们手机内存中的地址就是：</p>
 <p><code>0x102964000 + 0x100005b8c - 0x100000000 = 0x102969B8C</code></p>
 <p>我们进入 lldb 模式，输入以下内存地址断点</p>
 <p><code>breakpoint set --address 0x102969B8C</code></p>
-<img src="/2021/07/13/lldb/86b919ea683447dea9c6aee4af2f04db~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
 
 <p>断点设置成功，然后我们退出 lldb 模式，点击屏幕，会发现断点果然来了</p>
-<img src="/2021/07/13/lldb/ae8237bc072f4656abc377e25b0e7bbf~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
 
 <p>这里提一下 <a target="_blank" rel="noopener" href="https://baike.baidu.com/item/%E5%9C%B0%E5%9D%80%E7%A9%BA%E9%97%B4%E9%85%8D%E7%BD%AE%E9%9A%8F%E6%9C%BA%E5%8A%A0%E8%BD%BD/22785938?fromtitle=aslr&fromid=5779647&fr=aladdin">ASLR</a>，是一种防范内存损坏漏洞被利用的计算机安全技术，就是我们的 APP 每次加载进手机的真实内存的时候，位置不是固定的，所以我们每次 APP 运行起来后通过 <code>image list</code> 看到的我们 APP 的首地址是随机的。</p>
 <p>我们 APP 的 Mach-O 文件中的内容，相对于 Mach-O 文件的首地址来说都是固定不变的，APP 加载进内存之后首地址就确定了，那么 Mach-O 文件中的内容，比如方法实现，函数实现，常量等数据在内存中的位置都可以找到了。。。</p>
 <p>可以在 ViewController.m 文件中定义一个全局变量，然后我们在 Mach-O 文件看能否找到它。如图定义一个全局变量，然后运行起来之后，打印它所在的地址，和当前 APP 的首地址，它的地址减去 APP 的首地址就是它相对于我们 APP 的 Mach-O 文件的偏移了。</p>
-<img src="/2021/07/13/lldb/6691afc10908400598503fe1abae024f~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
 
 <p><code>0x102b959f0 - 0x102b8c000 = 0x99F0</code></p>
 <p>再使用 MachOView 查看我们 APP 的 Mach-O 文件，找到地址 0x99F0，看看是不是这个 a 的值 0x123456678</p>
-<img src="/2021/07/13/lldb/8fff120fc8a44d9f8c95cbe8e03a2287~tplv-k3u1fbpfcp-zoom-in-crop-mark_1512_0_0_0.webp" class="">
+
 
 <p>有些同学可能会好奇，这个怎么是这个样子，其实这是因为机器的存取数据方式决定的，有些是大端模式，而有些机器是小端模式，这里贴一下百度的 <a target="_blank" rel="noopener" href="https://baike.baidu.com/item/%E5%A4%A7%E5%B0%8F%E7%AB%AF%E6%A8%A1%E5%BC%8F/6750542?fr=aladdin">大小端模式</a></p>
 <p>从这里也可以看出我们的全局变量是存放在<code>__DATA,__data</code>节的。</p>
@@ -361,7 +361,7 @@ btf.addGlobalFn('pjaxComplete', () => {
       avatar: 'monsterid',
       serverURLs: '',
       emojiMaps: "",
-      visitor: false,
+      visitor: true,
       ...option,
       path: isShuoshuo ? path : (option && option.path) || window.location.pathname
     }
